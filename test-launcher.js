@@ -97,6 +97,28 @@ const srv = http.createServer((req, res) => {
   check('update picked up (' + v2 + ')', v2 === '9999.01.01.1');
   check('account survived the update', await pg.evaluate("loggedIn() && P().user === 'mate1'"));
 
+  // --- the CDN-skew trap ---
+  // GitHub can serve version.json and the build from caches that lag
+  // independently. A launcher that decides "am I up to date?" from the cheap
+  // side-file will cache a NEW build under an OLD version string and then
+  // believe it is current forever. This happened in the wild. Simulate it:
+  // leave version.json pointing at an OLD version while the build moves on.
+  {
+    const vj = JSON.parse(fs.readFileSync(path.join(DIST, 'version.json'), 'utf8'));
+    vj.version = '1000.01.01.1';                 // deliberately stale
+    fs.writeFileSync(path.join(DIST, 'version.json'), JSON.stringify(vj));
+    const gf2 = path.join(DIST, 'stack-casino.html');
+    fs.writeFileSync(gf2, fs.readFileSync(gf2, 'utf8')
+      .replace(/(<meta name="stack-version" content=")[^"]*(">)/, '$18888.02.02.2$2'));
+
+    await pg.reload();
+    await pg.waitForFunction("typeof loggedIn==='function'", null, { timeout: 15000 }).catch(() => {});
+    const v3 = await pg.evaluate("(document.querySelector('meta[name=\"stack-version\"]')||{}).content");
+    const cached = await pg.evaluate("localStorage.getItem('stack-launcher-version')");
+    check('stale version.json cannot pin an old build (' + v3 + ')',
+          v3 === '8888.02.02.2' && cached === '8888.02.02.2');
+  }
+
   // --- offline: mirror down, must still boot from cache ---
   blockDist = true;
   await pg.reload();

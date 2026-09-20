@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.20.23",
-  "notes": "fight night: pixel boxing, 3 live rounds, full book",
+  "version": "2026.09.20.25",
+  "notes": "launcher: fix stale-version pinning",
   "bytes": 522354,
-  "at": "2026-09-20T06:30:09.112Z"
+  "at": "2026-09-20T06:36:18.936Z"
 }

@@ -278,6 +278,7 @@ Two patterns, don't mix them up:
 - **2026-09-20** — BUG found by the draw rate: fnDecision scored off cards that never included the final round, because fnEndRound was only called BETWEEN rounds. A one-round-each split finished 19-19 and was declared a draw - 45% of fights. Split into fnScoreRound (cards) and fnEndRound (cards + advance); fnDecision now scores the round in progress.
 - **2026-09-20** — Fighters wear red and blue corner colours in the ring rather than their own brand colour: two of the six are near-identical greens and that bout was unfollowable. Brand colour stays on the HUD chips.
 - **2026-09-20** — Knockdowns used burst() - the gold-coin WIN celebration - which showered coins over a man being counted out. Replaced with ring sparks. Check the emotion of a shared effect before reusing it.
+- **2026-09-20** — Launcher no longer trusts version.json to decide whether to update. GitHub serves version.json and the build from caches that lag INDEPENDENTLY: a real launch pulled version.json at .21 while the HTML was already .23, cached the new build under the old version string, and then believed it was current forever - Fight Night was downloaded but the launcher was pinned. It now always fetches the build when online and takes the version from the build's own meta tag, which is the only self-consistent source. test-launcher.js reproduces the skew.
 
 ---
 

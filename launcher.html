@@ -104,6 +104,13 @@ function offerCached(note){
   }
 }
 
+/* Read the build's own stamp. This - not version.json - is the authority on
+   what a downloaded file actually is. */
+function verOf(html){
+  var m = /<meta name="stack-version" content="([^"]*)">/.exec(html || '');
+  return m ? m[1] : null;
+}
+
 function start(){
   if (SRC.user === 'USER'){
     stop();
@@ -113,25 +120,27 @@ function start(){
   }
 
   var have = store(CACHE_VER);
-  say(have ? 'Checking for updates…' : 'Downloading the latest build…');
+  say(have ? 'Checking for updates\u2026' : 'Downloading the latest build\u2026');
 
-  grab('version.json').then(function(txt){
-    var v = JSON.parse(txt);
+  /* Always fetch the build itself when we're online, rather than trusting
+     version.json to tell us whether we need to.
 
-    if (have && have === v.version && store(CACHE_HTML)){
-      say('Up to date — build ' + v.version);
-      return boot(store(CACHE_HTML), v.version);
-    }
+     GitHub serves the two files from a CDN that can lag independently, and it
+     really does: a launcher once pulled version.json at .21 while the HTML was
+     already .23, cached the NEW build under the OLD version string, and then
+     believed it was up to date for good. Anything that compares a cheap
+     side-file against a cached name can pin itself to a stale build forever.
 
-    say(have ? 'New build ' + v.version + ' — updating…' : 'Downloading build ' + v.version + '…');
-    return grab('stack-casino.html').then(function(html){
-      if (html.length < 10000) throw new Error('build looks truncated');
-      put(CACHE_HTML, html);
-      put(CACHE_VER, v.version);
-      boot(html, v.version);
-    });
+     The build is ~500KB and there are two of us. Just fetch it. */
+  grab('stack-casino.html').then(function(html){
+    if (!html || html.length < 10000) throw new Error('build looks truncated');
+    var ver = verOf(html) || 'unknown';
+    if (have && have !== ver) say('New build ' + ver + ' \u2014 updating\u2026');
+    put(CACHE_HTML, html);
+    put(CACHE_VER, ver);
+    boot(html, ver);
   }).catch(function(e){
-    offerCached('Update check failed (' + e.message + ').');
+    offerCached('Could not reach the update server (' + e.message + ').');
   });
 }
 
