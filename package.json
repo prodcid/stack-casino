@@ -1,0 +1,16 @@
+{
+  "name": "stack-casino",
+  "private": true,
+  "scripts": {
+    "check": "node devkit.js check",
+    "test": "node test.js",
+    "test:solo": "node test.js solo",
+    "test:mp": "node test.js mp",
+    "test:strip": "node test.js strip",
+    "test:rtp": "node test.js rtp",
+    "test:launcher": "node ship.js --local \"launcher test\" && node test-launcher.js && node ship.js --local \"rebuild\"",
+    "build": "node ship.js --local \"local build\"",
+    "status": "node ship.js status"
+  },
+  "devDependencies": { "playwright": "^1.47.0" }
+}
