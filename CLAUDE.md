@@ -224,6 +224,9 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Sportsbook prices from the EXACT Binomial(90, lam/90) the generator uses, not a Poisson approximation of it. Model and generator must agree or the RTP drifts invisibly; a test compares priced odds against 20k simulated matches.
 - **2026-09-20** — Accumulators apply the edge ONCE to the whole ticket (0.97 / product of leg probabilities), not per leg. Compounding is what real books do and it would be 0.97^n - 86% on a 5-fold - which breaks the house rule and is exactly the hidden cost this project refuses to ship. Legs from the same match are blocked because those outcomes are correlated.
 - **2026-09-20** — Cash out is offered at fair value (stake x price x p_now) with no second margin. The edge was taken at placement, so charging again would penalise using an advertised feature, and E[p_now]=p_placement makes it provably neutral.
+- **2026-09-20** — Fixed a layout overlap in the shell: grid-template-columns used a bare 1fr, whose min-width:auto refuses to shrink below content, and .stage centres its overflow - so a wide fixture list spilled LEFT over the control column. Now minmax(0,1fr) plus min-width:0 on ctrl/stage. This was a global bug, not a sportsbook one.
+- **2026-09-20** — Sportsbook control column: flex items will not shrink below min-content in the cross axis, so the slip's nowrap prices and match names pushed past the 300px panel and got clipped. Constrained each level with min-width:0 and ellipsised the text. test.js sports now measures overlap and overflow at 1000/1280/1600px.
+- **2026-09-20** — Added an in-game betting guide (#fbGuide) covering decimal odds, each market, singles vs accas, live odds, cash out and the 97%. It also states plainly where this book is MORE generous than a real one (accas not compounded, cash out at fair value) - if we are going to be honest in the maths, say so in the copy.
 
 ---
 

@@ -59,9 +59,9 @@ input,select{font-family:inherit}
 .sec-title{font-weight:700;font-size:18px;margin-top:30px;display:flex;align-items:center;gap:8px}
 .sec-title svg{width:18px;fill:var(--mute)}
 /* game shell */
-.shell{display:grid;grid-template-columns:300px 1fr;background:var(--panel2);border-radius:12px;overflow:hidden;min-height:560px}
-.ctrl{background:var(--panel);padding:16px;display:flex;flex-direction:column;gap:12px}
-.stage{position:relative;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:520px}
+.shell{display:grid;grid-template-columns:300px minmax(0,1fr);background:var(--panel2);border-radius:12px;overflow:hidden;min-height:560px}
+.ctrl{background:var(--panel);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.stage{position:relative;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:520px;min-width:0}
 .lbl{font-size:13px;color:var(--mute);font-weight:600;display:flex;justify-content:space-between;margin-bottom:6px}
 .betbox{display:flex;background:var(--panel2);border-radius:var(--r);border:2px solid var(--line);overflow:hidden}
 .betbox input{flex:1;min-width:0;background:var(--bg);border:0;color:#fff;padding:10px;font-weight:700;font-size:15px}
@@ -206,6 +206,40 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 
 
 /* ===================== SPORTSBOOK ===================== */
+/* The book is a long scrolling column, not a centred board like the other games */
+#sportsView .stage{align-items:flex-start;justify-content:flex-start;overflow-y:auto;
+ overflow-x:hidden;padding:14px}
+/* The control column is a flex column, and flex items refuse to shrink below
+   their min-content in the cross axis. The slip's rows (nowrap prices, match
+   names) pushed that min-content past the 300px column, so everything spilled
+   out and got clipped. Let each level shrink, then ellipsis the text. */
+#sportsView .ctrl{overflow-y:auto;overflow-x:hidden}
+#sportsView .ctrl>*{min-width:0;max-width:100%}
+.slip,.slip>*,.sel,.obet,.sliptabs,.slipsum{min-width:0;max-width:100%}
+.sel>div{min-width:0;flex:1 1 auto}
+.sel b,.sel span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sliptabs button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slipsum{gap:10px}
+.slipsum span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slipsum b{white-space:nowrap}
+.obet .t b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.obet .l{overflow-wrap:anywhere}
+.sbk{min-width:0}
+.fxt{min-width:0}
+.odd{min-width:0}
+/* betting guide */
+.gbox{width:min(94vw,620px);max-height:86vh;overflow-y:auto}
+.gbox h4{margin:16px 0 6px;font-size:13px;color:var(--gold);letter-spacing:.04em}
+.gbox h4:first-of-type{margin-top:4px}
+.gbox p{margin:0 0 8px;font-size:13.5px;line-height:1.65;color:#cfe0ec}
+.gbox .eg{background:var(--bg);border-left:3px solid var(--green);border-radius:0 8px 8px 0;
+ padding:9px 12px;margin:0 0 10px;font-size:13px;line-height:1.6;color:#cfe0ec}
+.gbox .eg b{color:#fff}
+.gbox table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px}
+.gbox td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.gbox td:first-child{color:var(--gold);font-weight:800;white-space:nowrap;width:1%}
+.gbox .warn{color:var(--mute);font-size:12.5px;line-height:1.6}
+
 .sbk{display:grid;gap:12px}
 .sbkhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sbkhead h3{margin:0;font-size:17px}
@@ -1504,6 +1538,7 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
       <div class="ctrl">
         <div class="slip" id="fbSlip"></div>
         <div id="fbOpen"></div>
+        <button class="btn2" id="fbGuideBtn">Betting guide</button>
         <p class="info" id="fbInfo"></p>
       </div>
       <div class="stage" style="align-items:stretch">
@@ -1613,6 +1648,49 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
   <div class="devbox" id="devBox"></div>
   <div style="text-align:center;color:var(--dim);font-size:11px;font-weight:700" id="verLine"></div>
   <button class="go" id="closeP">Done</button>
+</div></div>
+<div class="modal" id="fbGuide"><div class="box gbox">
+  <h3>How betting works</h3>
+
+  <h4>READING THE ODDS</h4>
+  <p>Odds are decimal. <b>Multiply your stake by the odds to get your total return</b> &mdash; that includes your stake back.</p>
+  <div class="eg">10.00 at <b>2.50</b> returns <b>25.00</b><br>
+   That's your 10.00 back plus 15.00 profit.</div>
+  <p>Lower odds mean it's more likely. Divide 1 by the odds for a rough chance: 2.00 is about 50%, 4.00 about 25%, 10.0 about 10%.</p>
+
+  <h4>THE MARKETS</h4>
+  <table>
+   <tr><td>Match result</td><td>Home win, draw, or away win. The draw is a real outcome, not a refund &mdash; it loses your bet on either team.</td></tr>
+   <tr><td>Over/Under 2.5</td><td>Total goals by both teams. Over needs 3 or more, under needs 2 or fewer. The .5 exists so it can never tie.</td></tr>
+   <tr><td>Both to score</td><td>Both teams score at least one. A 3&ndash;0 is a losing bet on "yes" no matter how many goals there were.</td></tr>
+   <tr><td>Correct score</td><td>The exact final score. Hardest to hit, which is why it pays the most.</td></tr>
+  </table>
+
+  <h4>SINGLES vs ACCUMULATORS</h4>
+  <p>A <b>single</b> is one bet on one outcome. Three selections as singles means three separate bets, each winning or losing on its own.</p>
+  <p>An <b>accumulator</b> rolls selections into one bet. The odds multiply, so the return gets big fast &mdash; but <b>every leg has to win</b>. One loss and the whole ticket is gone.</p>
+  <div class="eg">Three legs at 2.00, 2.29 and 2.63 &rarr; about <b>12.0</b> combined.<br>
+   10.00 returns roughly 120.00, but all three must land.</div>
+  <p class="warn">Most books quietly take their cut on every leg, so a 5-fold there returns far less than a single. This one doesn't &mdash; an accumulator here pays the same 97% as a single. You're taking more variance, not worse value. Legs from the same match are blocked, because those results affect each other.</p>
+
+  <h4>LIVE ODDS</h4>
+  <p>Once a match kicks off the prices move every minute. A goal for the favourite <b>shortens</b> their price (turns green); going behind <b>drifts</b> it (turns red).</p>
+  <p>That's where the value is. Backing a good team that's 1&ndash;0 down gets you a much bigger price &mdash; you just need them to score twice.</p>
+  <p class="warn">Markets that are already decided get suspended. Once it's 1&ndash;1, "both teams to score &mdash; yes" is a certainty, and betting on a certainty can only lose you money.</p>
+
+  <h4>CASH OUT</h4>
+  <p>While a bet is still running you can take a <b>cash out</b> offer instead of waiting for the result. It rises when your bet is winning and falls when it isn't.</p>
+  <p>Use it to lock in profit when you're ahead, or to get something back when a leg has gone wrong.</p>
+  <p class="warn">Real books shave a margin off cash-out offers to make leaving early cost you. This one pays the true current value, so cashing out and holding on are worth exactly the same on average. Take it whenever you'd rather have the certainty.</p>
+
+  <h4>THE HOUSE EDGE</h4>
+  <p>Every market here returns <b>97%</b> over the long run &mdash; every bet type, every price, accumulators included. For every 100 staked you'd expect 97 back on average.</p>
+  <p>There's no bet on this page with better odds than another. Correct score isn't a worse deal than match result, it's just rarer and pays more. Pick what you enjoy watching.</p>
+
+  <h4>A FEW HONEST POINTERS</h4>
+  <p>Accumulators are the most fun and the least likely to land &mdash; treat them as a punt, not a plan. Correct score is close to a lottery. And chasing losses with bigger stakes doesn't change the 97%, it just gets you there faster.</p>
+
+  <button class="go" id="fbGuideClose">Got it</button>
 </div></div>
 <div class="gate" id="authGate"></div>
 
@@ -3099,6 +3177,9 @@ function fbSyncJoin(){
 
 function fbInit(){
  if(!$('fbCard'))return;
+ $('fbGuideBtn').onclick=()=>{SND.click();$('fbGuide').classList.add('show')};
+ $('fbGuideClose').onclick=()=>$('fbGuide').classList.remove('show');
+ $('fbGuide').onclick=e=>{if(e.target===$('fbGuide'))$('fbGuide').classList.remove('show')};
  fbNewRound(true);
 }
 

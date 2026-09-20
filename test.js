@@ -252,6 +252,38 @@ async function sports(ctx, errs) {
     ? pass('settled markets are suspended', 'lowest live price ' + suspended[0].toFixed(3) + ' across ' + suspended[1] + ' quotes')
     : fail('settled markets are suspended', JSON.stringify(suspended));
 
+  // Layout: the stage must never spill over the control column, and nothing in
+  // the slip may overflow its 300px panel. A bare `1fr` track and flex centring
+  // once pushed the fixture list straight over the bet slip.
+  for (const w of [1000, 1280, 1600]) {
+    await pg.setViewportSize({ width: w, height: 860 });
+    await pg.waitForTimeout(250);
+    const g = await pg.evaluate(`(()=>{
+      const c=document.querySelector('#sportsView .ctrl').getBoundingClientRect();
+      const s=document.querySelector('#sportsView .stage').getBoundingClientRect();
+      const sh=document.querySelector('#sportsView .shell').getBoundingClientRect();
+      const ctrl=document.querySelector('#sportsView .ctrl');
+      const cs=getComputedStyle(ctrl);
+      const inner=ctrl.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+      let over=0;
+      ctrl.querySelectorAll('*').forEach(el=>{ if(el.getBoundingClientRect().width>inner+1) over++; });
+      return [+(c.right-s.left).toFixed(1), +(s.right-sh.right).toFixed(1), over];
+    })()`);
+    (g[0] <= 0.5 && g[1] <= 0.5 && g[2] === 0)
+      ? pass('layout clean at ' + w + 'px')
+      : fail('layout clean at ' + w + 'px', 'overlap ' + g[0] + ', spill ' + g[1] + ', ' + g[2] + ' overflowing');
+  }
+  await pg.setViewportSize({ width: 1320, height: 980 });
+
+  // the guide must actually open
+  await pg.evaluate("go('sports')"); await pg.waitForTimeout(200);
+  await pg.click('#fbGuideBtn'); await pg.waitForTimeout(300);
+  const guideOpen = await pg.evaluate("!!document.querySelector('#fbGuide.show') && $('fbGuide').textContent.includes('Multiply your stake')");
+  guideOpen ? pass('betting guide opens') : fail('betting guide opens');
+  await pg.click('#fbGuideClose'); await pg.waitForTimeout(200);
+  const guideShut = await pg.evaluate("!document.querySelector('#fbGuide.show')");
+  guideShut ? pass('betting guide closes') : fail('betting guide closes');
+
   errs.length === n0 ? pass('no sportsbook console errors') : fail('no sportsbook console errors', errs.slice(n0).join(' | '));
   await pg.close();
 }
