@@ -120,6 +120,142 @@ async function solo(ctx, errs) {
 
 
 
+
+/* ---------------- sportsbook ---------------- */
+async function sports(ctx, errs) {
+  console.log('\nSPORTSBOOK');
+  const pg = await newPage(ctx, errs, 'fb', false);
+  const n0 = errs.length;
+  await pg.evaluate("P().bal=1000000;renderBal();go('sports')");
+  await pg.waitForTimeout(500);
+
+  const card = await pg.evaluate("FB.card.length");
+  card === 3 ? pass('card has 3 fixtures') : fail('card has 3 fixtures', 'got ' + card);
+
+  // Every market on a fixture must be a complete, non-overlapping book: the true
+  // probabilities have to sum to 1, or the odds are simply wrong.
+  const books = await pg.evaluate(`(()=>{
+    const m=FB.card[0], P=fbProbs(m,FB_MINS,0,0);
+    const r=[
+      ['1X2', P.home+P.draw+P.away],
+      ['O/U', P.ov+P.un],
+      ['BTTS', P.btts+P.nbtts],
+      ['CS grid', Object.values(P.cs).reduce((a,b)=>a+b,0)]
+    ];
+    return r.map(([n,v])=>[n, Math.abs(v-1)]);
+  })()`);
+  const badBook = books.find(b => b[1] > 0.005);
+  badBook ? fail('market books sum to 1', badBook[0] + ' off by ' + badBook[1].toFixed(4))
+          : pass('market books sum to 1', books.map(b=>b[0]).join(', '));
+
+  // The pricing model must match the GENERATOR exactly. Simulate thousands of
+  // matches from the same engine the game uses and compare realised frequency
+  // with the priced probability - a Poisson approximation would drift here.
+  const model = await pg.evaluate(`(()=>{
+    const m=FB.card[0], P=fbProbs(m,FB_MINS,0,0);
+    const N=20000; let h=0,d=0,a=0,ov=0,bt=0;
+    for(let i=0;i<N;i++){
+      const mm={h:m.h,a:m.a,lam:m.lam,seed:(i*2654435761)>>>0};
+      fbSim(mm);
+      const [H,A]=mm.ft;
+      if(H>A)h++;else if(H===A)d++;else a++;
+      if(H+A>=3)ov++;
+      if(H>0&&A>0)bt++;
+    }
+    return [[P.home,h/N],[P.draw,d/N],[P.away,a/N],[P.ov,ov/N],[P.btts,bt/N]];
+  })()`);
+  const worst = model.reduce((w,[pp,ff]) => Math.max(w, Math.abs(pp-ff)), 0);
+  worst < 0.015 ? pass('priced odds match the simulator', 'max gap ' + (worst*100).toFixed(2) + 'pp')
+                : fail('priced odds match the simulator', 'max gap ' + (worst*100).toFixed(2) + 'pp');
+
+  // single bets must return exactly 97%
+  const single = await pg.evaluate(`(()=>{
+    const m=FB.card[0], P=fbProbs(m,FB_MINS,0,0);
+    return ['home','draw','away','ov','un','btts','nbtts']
+      .map(k=>P[k]*fbOdds(P[k])*100);
+  })()`);
+  const sBad = single.find(v => Math.abs(v-97) > 0.01);
+  sBad === undefined ? pass('every single returns 97%') : fail('every single returns 97%', String(sBad));
+
+  // accumulators must ALSO return 97% - the edge is applied once, not per leg.
+  // Compounding would give 0.97^n (a 5-fold would be 86%) and breach the rule.
+  const acca = await pg.evaluate(`(()=>{
+    const out=[];
+    for(let n=2;n<=5;n++){
+      let p=1;
+      for(let i=0;i<n;i++){ const m=FB.card[i%FB.card.length];
+        const P=fbProbs(m,FB_MINS,0,0); p*= (i%2?P.ov:P.home); }
+      out.push(p*fbOdds(p)*100);
+    }
+    return out;
+  })()`);
+  const aBad = acca.find(v => Math.abs(v-97) > 0.01);
+  aBad === undefined ? pass('accumulators return 97% at every length', '2-5 folds')
+                     : fail('accumulators return 97% at every length', String(aBad));
+
+  // cash out must be value-neutral: E[cash value] == E[holding]
+  const co = await pg.evaluate(`(()=>{
+    const m=FB.card[0];
+    const P0=fbProbs(m,FB_MINS,0,0), price=fbOdds(P0.home), stake=100;
+    // average the fair cash value at minute 45 across many simulated first halves
+    const N=6000; let sum=0;
+    for(let i=0;i<N;i++){
+      const mm={h:m.h,a:m.a,lam:m.lam,seed:(i*40503+7)>>>0}; fbSim(mm);
+      let ch=0,ca=0;
+      for(const e of mm.events) if(e.type==='goal'&&e.t<=45){ch=e.ch;ca=e.ca;}
+      const Pn=fbProbs(m,45,ch,ca);
+      sum += stake*price*Pn.home;
+    }
+    return [sum/N, stake*price*P0.home];
+  })()`);
+  Math.abs(co[0]-co[1]) / co[1] < 0.03
+    ? pass('cash out is value-neutral', co[0].toFixed(2) + ' vs hold ' + co[1].toFixed(2))
+    : fail('cash out is value-neutral', co[0].toFixed(2) + ' vs ' + co[1].toFixed(2));
+
+  // placing a bet takes the stake; settlement pays the right amount
+  const flow = await pg.evaluate(`(()=>{
+    FB.sel=[];FB.mode='single';FB.open=[];
+    const m=FB.card[0];const {p,o}=fbPriceOf(m,'home');
+    FB.sel.push({mi:0,key:'home',p,o,label:'x',match:'y',min:0});
+    fbSlipRender();$('fbStake').value='100';
+    const before=P().bal; fbPlace();
+    const took=Math.round((before-P().bal)*100)/100;
+    // force the match to a home win and settle
+    const mm=FB.card[0]; mm.phase='done'; mm.ch=3; mm.ca=0;
+    const b4=P().bal; fbSettle();
+    const paid=Math.round((P().bal-b4)*100)/100;
+    return [took, paid, Math.round(100*o*100)/100];
+  })()`);
+  (flow[0] === 100 && Math.abs(flow[1]-flow[2]) < 0.02)
+    ? pass('stake taken and winner paid', flow[0] + ' in, ' + flow[1] + ' out')
+    : fail('stake taken and winner paid', JSON.stringify(flow));
+
+  // A settled market prices below 1.00 (BTTS "yes" at 1-1 is already certain, so
+  // 0.97/1 = 0.97). Offering that is a guaranteed loss, so every ENABLED price
+  // must clear 1.00 - checked across a whole match, minute by minute.
+  const suspended = await pg.evaluate(`(()=>{
+    let worst=99, offered=0;
+    const m=FB.card[0]; fbSim(m);
+    for(let t=0;t<=FB_MINS;t+=5){
+      let ch=0,ca=0;
+      for(const e of m.events) if(e.type==='goal'&&e.t<=t){ch=e.ch;ca=e.ca;}
+      const P=fbProbs(m,FB_MINS-t,ch,ca);
+      for(const k of ['home','draw','away','ov','un','btts','nbtts']){
+        const o=fbOdds(P[k]);
+        if(P[k]>0 && fbLive(o)){ offered++; worst=Math.min(worst,o); } }
+      for(const k in P.cs){ const o=fbOdds(P.cs[k]);
+        if(P.cs[k]>0 && fbLive(o)){ offered++; worst=Math.min(worst,o); } }
+    }
+    return [worst, offered];
+  })()`);
+  (suspended[0] > 1.0 && suspended[1] > 50)
+    ? pass('settled markets are suspended', 'lowest live price ' + suspended[0].toFixed(3) + ' across ' + suspended[1] + ' quotes')
+    : fail('settled markets are suspended', JSON.stringify(suspended));
+
+  errs.length === n0 ? pass('no sportsbook console errors') : fail('no sportsbook console errors', errs.slice(n0).join(' | '));
+  await pg.close();
+}
+
 /* ---------------- long shot ---------------- */
 async function longshot(ctx, errs) {
   console.log('\nLONG SHOT');
@@ -590,6 +726,7 @@ async function rtp(ctx, errs) {
     if (which === 'all' || which === 'admin') await admin(ctx, errs);
     if (which === 'all' || which === 'moles') await moles(ctx, errs);
     if (which === 'all' || which === 'shot') await longshot(ctx, errs);
+    if (which === 'all' || which === 'sports') await sports(ctx, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);

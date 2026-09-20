@@ -204,6 +204,82 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .acctcard{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:11px}
 
 
+
+/* ===================== SPORTSBOOK ===================== */
+.sbk{display:grid;gap:12px}
+.sbkhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sbkhead h3{margin:0;font-size:17px}
+.sbkround{background:rgba(255,200,0,.14);color:var(--gold);font-size:11px;font-weight:900;
+ padding:4px 9px;border-radius:999px;letter-spacing:.05em}
+.sbklead{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+.sbklead .lb{background:var(--bg);border:1px solid var(--line);border-radius:999px;
+ padding:4px 11px;font-size:11.5px;font-weight:800;display:flex;gap:6px;align-items:center}
+.sbklead .lb b{color:#fff}
+.sbklead .lb .up{color:var(--green2,#6dffa8)}
+.sbklead .lb .dn{color:#ff7a8a}
+
+.fxt{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.fxt+.fxt{margin-top:10px}
+.fxt.live{border-color:rgba(0,231,1,.45);box-shadow:0 0 0 1px rgba(0,231,1,.12)}
+.fxt.done{opacity:.72}
+.fxtop{display:flex;align-items:center;gap:11px;padding:11px 13px;background:rgba(255,255,255,.02)}
+.fxteam{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;min-width:0}
+.fxbadge{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+ font-size:10px;font-weight:900;color:#06131b;flex:none}
+.fxscore{font-size:19px;font-weight:900;letter-spacing:.04em;padding:0 6px}
+.fxclock{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--mute)}
+.fxclock .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:fxp 1s infinite}
+@keyframes fxp{0%,100%{opacity:1}50%{opacity:.25}}
+.fxmk{padding:4px 13px 12px}
+.fxmk h5{margin:10px 0 6px;font-size:10.5px;font-weight:900;color:var(--mute);letter-spacing:.07em}
+.fxrow{display:grid;gap:6px}
+.fxrow.c3{grid-template-columns:repeat(3,1fr)}
+.fxrow.c2{grid-template-columns:repeat(2,1fr)}
+.fxrow.c4{grid-template-columns:repeat(4,1fr)}
+.odd{background:var(--bg);border:2px solid var(--line);border-radius:9px;padding:8px 6px;
+ cursor:pointer;font:inherit;color:#fff;text-align:center;transition:border-color .12s,transform .1s}
+.odd:hover:not(:disabled){border-color:var(--green)}
+.odd:disabled{opacity:.35;cursor:not-allowed}
+.odd.on{border-color:var(--green);background:rgba(0,231,1,.1)}
+.odd span{display:block;font-size:10.5px;font-weight:800;color:var(--mute);white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis}
+.odd b{display:block;font-size:14px;font-weight:900;margin-top:2px}
+.odd.drift b{color:#ff7a8a}
+.odd.shorten b{color:var(--green2,#6dffa8)}
+.fxfeed{max-height:108px;overflow:auto;padding:0 13px 11px;display:grid;gap:4px;font-size:12px}
+.fxfeed div{color:var(--mute)}
+.fxfeed .g{color:#fff;font-weight:800}
+.fxfeed .g i{font-style:normal;color:var(--gold)}
+
+/* bet slip */
+.slip{display:grid;gap:9px}
+.sliptabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;background:var(--bg);padding:4px;border-radius:10px}
+.sliptabs button{background:none;border:0;color:var(--mute);font:inherit;font-weight:800;
+ padding:7px;border-radius:7px;cursor:pointer;font-size:12.5px}
+.sliptabs button.on{background:var(--panel);color:#fff}
+.sliptabs button:disabled{opacity:.4;cursor:not-allowed}
+.sel{background:var(--bg);border-radius:9px;padding:9px 10px;display:flex;gap:8px;align-items:flex-start}
+.sel .x{margin-left:auto;background:none;border:0;color:var(--dim);cursor:pointer;font:inherit;
+ font-size:15px;line-height:1;padding:0 2px}
+.sel .x:hover{color:#ff7a8a}
+.sel b{display:block;font-size:12.5px;font-weight:800}
+.sel span{display:block;font-size:11px;color:var(--mute);font-weight:700}
+.sel .pr{font-size:13px;font-weight:900;color:var(--gold);white-space:nowrap}
+.slipsum{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;color:var(--mute)}
+.slipsum b{color:#fff}
+.slipempty{color:var(--dim);font-size:12px;text-align:center;padding:14px 4px;line-height:1.6}
+.obet{background:var(--bg);border-radius:9px;padding:9px 10px;display:grid;gap:6px}
+.obet .t{display:flex;gap:8px;align-items:baseline}
+.obet .t b{font-size:12.5px}
+.obet .t span{margin-left:auto;font-size:12px;font-weight:900;color:var(--gold)}
+.obet .l{font-size:11px;color:var(--mute);font-weight:700}
+.obet .l.won{color:var(--green2,#6dffa8)}
+.obet .l.lost{color:#ff7a8a}
+.obet button{background:var(--panel);border:1px solid var(--line);color:#fff;font:inherit;
+ font-weight:800;font-size:12px;padding:7px;border-radius:8px;cursor:pointer}
+.obet button:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:700px){.fxrow.c4{grid-template-columns:repeat(2,1fr)}}
+
 /* ===================== LONG SHOT ===================== */
 .lswrap{position:relative;width:100%;height:100%;min-height:430px;border-radius:14px;overflow:hidden;background:#0d1b26}
 #lsCv{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
@@ -1423,6 +1499,25 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
       </div><div class="pop" id="crPop" style="top:26%"><b></b><i></i></div></div>
     </div></section>
 
+    <!-- SPORTSBOOK -->
+    <section class="view" id="sportsView"><div class="shell">
+      <div class="ctrl">
+        <div class="slip" id="fbSlip"></div>
+        <div id="fbOpen"></div>
+        <p class="info" id="fbInfo"></p>
+      </div>
+      <div class="stage" style="align-items:stretch">
+        <div class="sbk" style="width:100%">
+          <div class="sbkhead">
+            <h3>Stack League</h3><span class="sbkround" id="fbRound">ROUND 1</span>
+            <div class="sbklead" id="fbLead"></div>
+          </div>
+          <div id="fbCard"></div>
+          <div class="pop" id="fbPop"><b></b><i></i></div>
+        </div>
+      </div>
+    </div></section>
+
     <!-- LONG SHOT -->
     <section class="view" id="shotView"><div class="shell">
       <div class="ctrl">
@@ -1539,6 +1634,7 @@ IC.keno='<svg viewBox="0 0 24 24"><path d="M3 3h5v5H3zm6.5 0h5v5h-5zM16 3h5v5h-5
 IC.hilo='<svg viewBox="0 0 24 24"><path d="M12 2l6 7h-4v4h-4V9H6zm0 20-6-7h4v-2h4v2h4z"/></svg>';
 IC.bacc='<svg viewBox="0 0 24 24"><path d="M3 6h8v12H3zM13 6h8v12h-8z" opacity=".5"/><path d="M5 9h4v2H5zm10 0h4v2h-4z"/><text x="12" y="23" font-size="0">b</text></svg>';
 IC.locker='<svg viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 4-3 5 3 5 3-5z"/><path d="M19.5 2l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg>';
+IC.sports='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 6.4l3.2 2.3-1.2 3.8h-4l-1.2-3.8z"/><path d="M12 2.7v3.7M4.3 9.2l3.5 1.3M19.7 9.2l-3.5 1.3M7.2 19.4l2.6-3.1M16.8 19.4l-2.6-3.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
 IC.shot='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" /><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 IC.moles='<svg viewBox="0 0 24 24"><ellipse cx="12" cy="19" rx="9" ry="3.4" opacity=".45"/><path d="M12 5c3.3 0 6 2.7 6 6v6H6v-6c0-3.3 2.7-6 6-6z"/><circle cx="9.4" cy="11" r="1.5" fill="#0f212e"/><circle cx="14.6" cy="11" r="1.5" fill="#0f212e"/><path d="M10.7 14h2.6v2.4h-2.6z" fill="#0f212e"/></svg>';
 IC.admin='<svg viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 9.3 8 10.5 4.6-1.2 8-5.5 8-10.5v-6z"/><path d="M12 7a2.4 2.4 0 1 1 0 4.8A2.4 2.4 0 0 1 12 7zm0 6c2.4 0 4.4 1.3 4.4 2.8v1.2H7.6v-1.2C7.6 14.3 9.6 13 12 13z" fill="#0f212e"/></svg>';
@@ -1547,7 +1643,7 @@ IC.tower='<svg viewBox="0 0 24 24"><path d="M6 21V9l6-6 6 6v12h-5v-5h-2v5z"/><pa
 IC.limbo='<svg viewBox="0 0 24 24"><path d="M3 20 9 9l4 6 3-4 5 9z"/><circle cx="19" cy="5" r="2.5"/></svg>';
 IC.scratch='<svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" opacity=".5"/><path d="M7 8l4 4-4 4M13 16h5" stroke="#0f212e" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 IC.craps='<svg viewBox="0 0 24 24"><rect x="2" y="8" width="12" height="12" rx="3"/><rect x="11" y="3" width="11" height="11" rx="3" opacity=".55"/><circle cx="5.5" cy="11.5" r="1.3" fill="#0f212e"/><circle cx="10.5" cy="16.5" r="1.3" fill="#0f212e"/><circle cx="5.5" cy="16.5" r="1.3" fill="#0f212e"/><circle cx="10.5" cy="11.5" r="1.3" fill="#0f212e"/></svg>';
-const GAMES=[['lobby','Lobby'],['party','Online Party'],['locker','Cosmetics'],['moles','Moles'],['shot','Long Shot'],['tower','Tower'],['limbo','Limbo'],['scratch','Scratch'],['craps','Craps'],['chicken','Chicken Road'],['balloon','Balloon Pump'],['wheel','Fortune Wheel'],['mines','Mines'],['dice','Dice'],['roulette','Roulette'],['keno','Keno'],['hilo','Hi-Lo'],['bacc','Baccarat'],['plinko','Plinko'],['bj','Blackjack'],['poker','Video Poker'],['slots','Slots']];
+const GAMES=[['lobby','Lobby'],['party','Online Party'],['sports','Sportsbook'],['locker','Cosmetics'],['moles','Moles'],['shot','Long Shot'],['tower','Tower'],['limbo','Limbo'],['scratch','Scratch'],['craps','Craps'],['chicken','Chicken Road'],['balloon','Balloon Pump'],['wheel','Fortune Wheel'],['mines','Mines'],['dice','Dice'],['roulette','Roulette'],['keno','Keno'],['hilo','Hi-Lo'],['bacc','Baccarat'],['plinko','Plinko'],['bj','Blackjack'],['poker','Video Poker'],['slots','Slots']];
 
 /* ============ AUDIO ============ */
 /* ============================================================================
@@ -1801,7 +1897,7 @@ function buildNav(){const s=$('side'),m=$('mob'),L=navList();
  s.innerHTML='<h4>Casino</h4>'+L.map(([k,n])=>`<button class="nav" data-g="${k}">${IC[k]}${n}</button>`).join('');
  m.innerHTML=L.map(([k,n])=>`<button data-g="${k}">${IC[k]}${n.split(' ').pop()}</button>`).join('');
  document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>go(b.dataset.g))}
-function go(g){SND.click();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
+function go(g){SND.click();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='sports')fbRender();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
 $('mute').onclick=()=>{SND.on=!SND.on;$('muteIco').style.opacity=SND.on?1:.35;if(SND.on)SND.click()};
 $('refill').onclick=()=>{if(P().bal>=100){flash('Top up unlocks under 100 credits');return}P().bal+=1000;renderBal(true);save();SND.win(3)};
 
@@ -2648,6 +2744,364 @@ function devRender(){const box=$('devBox');if(!box)return;if(!DEV){box.innerHTML
 
 
 
+
+/* ============================================================================
+   SPORTSBOOK  -  Stack League
+   A simulated football league you can bet like a real book: a card of fixtures,
+   several markets per match, a bet slip, accumulators, live in-play odds and
+   cash out. Plays solo; in a party both of you get the SAME card and a live
+   profit leaderboard.
+
+   PRICING - the part that has to be exactly right
+   -----------------------------------------------
+   Each side scores at most one goal per simulated minute, with probability
+   lam/90. So a full-time score is Binomial(90, lam/90) per side, and the
+   pricing uses that EXACT distribution rather than a Poisson approximation of
+   it - if the model and the generator disagree, the RTP quietly drifts and no
+   amount of eyeballing finds it.
+
+     odds = FB_RTP / p        ->  every single bet returns exactly 97%
+
+   ACCUMULATORS: the edge is applied ONCE to the whole ticket, not per leg.
+     acca odds = FB_RTP / (p1 * p2 * ... * pn)
+   A real bookmaker compounds its margin on every leg, which is why accas are
+   such poor value there. Doing that here would breach the house rule (0.97^n
+   is 86% on a 5-fold) and it is exactly the kind of hidden cost this project
+   refuses to ship. So an acca returns 97% no matter how many legs it has - the
+   same as a single, just with fatter variance. Legs from the SAME match are
+   blocked, because those outcomes are correlated and the product rule lies.
+
+   CASH OUT is offered at FAIR current value: stake * price * p_now, with no
+   second margin. The edge was already taken when the bet was struck, so
+   charging again for leaving early would be a penalty for using a feature we
+   advertise. It is also provably neutral: E[p_now] = p_at_placement, so cashing
+   out and holding return the same 97%. test.js rtp checks all of this.
+   ========================================================================== */
+const FB_RTP=.97, FB_MINS=90, FB_MAXG=9;
+
+const FB_TEAMS=[
+ {id:'shk',n:'Sharks',   s:'SHK',c:'#00e701',atk:1.34,def:0.82},
+ {id:'wlv',n:'Wolves',   s:'WLV',c:'#b98cff',atk:1.18,def:0.95},
+ {id:'fal',n:'Falcons',  s:'FAL',c:'#4aa8ff',atk:1.26,def:1.04},
+ {id:'brs',n:'Bulls',    s:'BRS',c:'#ff9f43',atk:1.05,def:0.91},
+ {id:'kra',n:'Kraken',   s:'KRA',c:'#38e8d0',atk:0.96,def:1.12},
+ {id:'mag',n:'Magpies',  s:'MAG',c:'#ffc800',atk:0.88,def:1.24}];
+const fbTeam=id=>FB_TEAMS.find(t=>t.id===id)||FB_TEAMS[0];
+
+/* deterministic RNG so a party shares one card without streaming every event */
+function fbRng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;
+ let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;
+ return((t^t>>>14)>>>0)/4294967296}}
+
+/* expected goals. Home advantage is baked into the multiplier, not bolted on. */
+const fbLam=(h,a)=>[Math.max(.25,h.atk*a.def*1.22), Math.max(.2,a.atk*h.def*0.98)];
+
+/* exact Binomial(n, p) pmf - matches the minute-by-minute generator */
+function fbBin(n,p,k){if(k<0||k>n)return 0;let c=1;
+ for(let i=0;i<k;i++)c=c*(n-i)/(i+1);
+ return c*Math.pow(p,k)*Math.pow(1-p,n-k)}
+
+/* distribution of goals still to come for one side over `mins` minutes */
+function fbDist(lam,mins){const p=Math.min(.999,lam/FB_MINS),d=[];let tot=0;
+ for(let k=0;k<=FB_MAXG;k++){d[k]=fbBin(mins,p,k);tot+=d[k]}
+ for(let k=0;k<=FB_MAXG;k++)d[k]/=tot;            // truncation mass folded back in
+ return d}
+
+/* every market probability for a match, from the score so far plus what's left */
+function fbProbs(m,mins,ch,ca){
+ const [lh,la]=m.lam, dh=fbDist(lh,mins), da=fbDist(la,mins);
+ const P={home:0,draw:0,away:0,ov:0,un:0,btts:0,nbtts:0,cs:{}};
+ for(let i=0;i<=FB_MAXG;i++)for(let j=0;j<=FB_MAXG;j++){
+  const q=dh[i]*da[j];if(!q)continue;
+  const H=ch+i,A=ca+j;
+  if(H>A)P.home+=q;else if(H<A)P.away+=q;else P.draw+=q;
+  if(H+A>=3)P.ov+=q;else P.un+=q;
+  if(H>0&&A>0)P.btts+=q;else P.nbtts+=q;
+  const k=H+'-'+A;P.cs[k]=(P.cs[k]||0)+q}
+ return P}
+
+const fbOdds=pr=>pr>0?FB_RTP/pr:0;
+/* Never offer a price that cannot beat the stake. Once an outcome is settled
+   (BTTS "yes" at 1-1, say) its probability approaches 1 and the priced odds fall
+   through 1.00 - backing it would be a guaranteed loss dressed up as a bet.
+   Real books suspend those markets; so do we. */
+const FB_MINODDS=1.05;
+const fbLive=o=>o>=FB_MINODDS;
+const fbFmtOdds=o=>o>=100?o.toFixed(0):o>=10?o.toFixed(1):o.toFixed(2);
+
+/* ---- the card ---- */
+function fbMakeCard(seed,round){
+ const r=fbRng(seed^(round*7919));
+ const ids=FB_TEAMS.map(t=>t.id);
+ for(let i=ids.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}
+ const ms=[];
+ for(let i=0;i<ids.length;i+=2){
+  const h=fbTeam(ids[i]),a=fbTeam(ids[i+1]);
+  ms.push({h:h.id,a:a.id,lam:fbLam(h,a),seed:(seed^(round*104729)^(i*7717))>>>0,
+   phase:'pre',min:0,ch:0,ca:0,feed:[],events:null})}
+ return ms}
+
+/* Pre-roll the whole match from its own seed. Both players run this identically,
+   so a party stays in sync on the seed alone - no event streaming needed. */
+function fbSim(m){
+ const r=fbRng(m.seed),[lh,la]=m.lam,ph=lh/FB_MINS,pa=la/FB_MINS,ev=[];
+ let ch=0,ca=0;
+ const FLAV=['{T} shot blocked','{T} win a corner','{T} drag one wide',
+  '{T} forced a save','Booking for {T}','{T} header over','{T} break away'];
+ for(let t=1;t<=FB_MINS;t++){
+  if(r()<ph){ch++;ev.push({t,type:'goal',side:'h',ch,ca})}
+  if(r()<pa){ca++;ev.push({t,type:'goal',side:'a',ch,ca})}
+  if(r()<.055){const side=r()<.5?'h':'a';
+   ev.push({t,type:'flav',side,txt:FLAV[Math.floor(r()*FLAV.length)]})}
+ }
+ m.events=ev;m.ft=[ch,ca];return m}
+
+
+/* ---- state ---- */
+const FB={seed:(Math.random()*1e9)>>>0,round:1,card:[],sel:[],mode:'single',
+ open:[],profit:0,tick:null,live:-1,shared:false,oppProfit:null,lastOdds:{}};
+
+const FB_MK={
+ home:{g:'Match result',l:m=>fbTeam(m.h).s+' win'},
+ draw:{g:'Match result',l:()=> 'Draw'},
+ away:{g:'Match result',l:m=>fbTeam(m.a).s+' win'},
+ ov:{g:'Goals',l:()=>'Over 2.5'},
+ un:{g:'Goals',l:()=>'Under 2.5'},
+ btts:{g:'Both to score',l:()=>'Yes'},
+ nbtts:{g:'Both to score',l:()=>'No'}};
+const FB_CS=['1-0','2-0','2-1','1-1','0-0','0-1','1-2','0-2'];
+
+const fbMins=m=>m.phase==='done'?0:FB_MINS-m.min;
+function fbLiveProbs(m){return fbProbs(m,fbMins(m),m.ch,m.ca)}
+function fbPriceOf(m,key){const P=fbLiveProbs(m);
+ const pr=key.slice(0,3)==='cs:'?(P.cs[key.slice(3)]||0):P[key];
+ return{p:pr,o:fbOdds(pr)}}
+const fbLabel=(m,key)=>key.slice(0,3)==='cs:'
+ ? fbTeam(m.h).s+' '+key.slice(3)+' '+fbTeam(m.a).s
+ : (FB_MK[key]?FB_MK[key].l(m):key);
+
+/* ---- card / fixtures ---- */
+function fbNewRound(keepSeed){
+ fbStopTick();
+ if(!keepSeed)FB.seed=(Math.random()*1e9)>>>0;
+ FB.card=fbMakeCard(FB.seed,FB.round).map(fbSim);
+ FB.sel=[];FB.live=-1;FB.lastOdds={};
+ fbRender()}
+
+function fbRender(){if(!$('fbCard'))return;fbCardRender();fbSlipRender();fbOpenRender();fbLeadRender();
+ $('fbRound').textContent='ROUND '+FB.round;
+ $('fbInfo').textContent='Back a market, build a single or an accumulator, then watch it play out. '+
+  'Odds move live as goals go in, and you can cash out any open bet at its fair value. '+
+  'Every bet returns 97% \u2014 including accumulators, which are not penalised per leg the way a real book does it.'}
+
+function fbCardRender(){const el=$('fbCard');
+ el.innerHTML=FB.card.map((m,i)=>fbFixtureHTML(m,i)).join('')
+  +`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+     ${FB.card.every(m=>m.phase==='done')
+       ? `<button class="go" id="fbNext" style="flex:1">Next round</button>`
+       : `<button class="go" id="fbKick" style="flex:1" ${FB.live>=0?'disabled':''}>${FB.live>=0?'Match in play\u2026':'Kick off next match'}</button>`}
+    </div>`;
+ el.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>fbPick(+b.dataset.m,b.dataset.o));
+ if($('fbKick'))$('fbKick').onclick=fbKick;
+ if($('fbNext'))$('fbNext').onclick=()=>{FB.round++;fbNewRound(true);
+  if(FB.shared&&NET.host)send({t:'fbCard',seed:FB.seed,round:FB.round})}}
+
+function fbFixtureHTML(m,i){const h=fbTeam(m.h),a=fbTeam(m.a);
+ const live=m.phase==='live',done=m.phase==='done';
+ const P=fbLiveProbs(m);
+ const bad=(m.phase==='done');
+ const cell=(key,pr)=>{
+  const o=fbOdds(pr),id=i+'|'+key,prev=FB.lastOdds[id];
+  const open=!bad&&pr>0&&fbLive(o);
+  const dir=(prev==null||!open)?'':(o>prev+.02?'drift':o<prev-.02?'shorten':'');
+  if(open)FB.lastOdds[id]=o;
+  const on=FB.sel.some(x=>x.mi===i&&x.key===key);
+  return `<button class="odd ${dir} ${on?'on':''}" data-m="${i}" data-o="${key}" ${open?'':'disabled'}>
+   <span>${esc(fbLabel(m,key))}</span><b>${open?fbFmtOdds(o):(pr>0?'—':'\u2013')}</b></button>`};
+ const csCells=FB_CS.map(k=>cell('cs:'+k,P.cs[k]||0)).join('');
+ return `<div class="fxt ${live?'live':''} ${done?'done':''}">
+  <div class="fxtop">
+   <div class="fxteam"><span class="fxbadge" style="background:${h.c}">${h.s}</span>${esc(h.n)}</div>
+   <div class="fxscore">${m.ch} \u2013 ${m.ca}</div>
+   <div class="fxteam"><span class="fxbadge" style="background:${a.c}">${a.s}</span>${esc(a.n)}</div>
+   <div class="fxclock">${live?`<span class="dot"></span>${m.min}'`:done?'FT':'Not started'}</div>
+  </div>
+  <div class="fxmk">
+   <h5>MATCH RESULT</h5><div class="fxrow c3">${cell('home',P.home)}${cell('draw',P.draw)}${cell('away',P.away)}</div>
+   <h5>TOTAL GOALS</h5><div class="fxrow c2">${cell('ov',P.ov)}${cell('un',P.un)}</div>
+   <h5>BOTH TEAMS TO SCORE</h5><div class="fxrow c2">${cell('btts',P.btts)}${cell('nbtts',P.nbtts)}</div>
+   <h5>CORRECT SCORE</h5><div class="fxrow c4">${csCells}</div>
+  </div>
+  ${m.feed.length?`<div class="fxfeed">${m.feed.slice(-40).reverse().map(f=>
+    f.type==='goal'?`<div class="g">${f.t}' <i>GOAL</i> ${esc(fbTeam(f.side==='h'?m.h:m.a).n)} \u2014 ${f.ch}\u2013${f.ca}</div>`
+    :`<div>${f.t}' ${esc(f.txt.replace('{T}',fbTeam(f.side==='h'?m.h:m.a).n))}</div>`).join('')}</div>`:''}
+ </div>`}
+
+/* ---- slip ---- */
+function fbPick(mi,key){
+ const m=FB.card[mi];if(!m||m.phase==='done')return;
+ const at=FB.sel.findIndex(x=>x.mi===mi&&x.key===key);
+ if(at>=0){FB.sel.splice(at,1);SND.click();return fbRender()}
+ // legs from one match are correlated, so the product rule would misprice them
+ if(FB.mode==='acca'&&FB.sel.some(x=>x.mi===mi)){
+  toast('Accumulator legs must come from different matches');return}
+ const {p,o}=fbPriceOf(m,key);
+ if(!(p>0)||!fbLive(o)){toast('That market is suspended');return}
+ FB.sel.push({mi,key,p,o,label:fbLabel(m,key),
+  match:fbTeam(m.h).s+' v '+fbTeam(m.a).s,min:m.min});
+ SND.chip();fbRender()}
+
+const fbAccaP=()=>FB.sel.reduce((a,x)=>a*x.p,1);
+const fbAccaO=()=>fbOdds(fbAccaP());
+
+function fbSlipRender(){const el=$('fbSlip');if(!el)return;
+ const n=FB.sel.length,multi=FB.mode==='acca';
+ const stake=Math.max(0,parseFloat(keepVal('fbStake',10))||0);
+ const ret=multi?stake*fbAccaO():FB.sel.reduce((a,x)=>a+stake*x.o,0);
+ el.innerHTML=`
+  <div class="sliptabs">
+   <button data-sm="single" class="${multi?'':'on'}">Singles</button>
+   <button data-sm="acca" class="${multi?'on':''}" ${n>1||true?'':'disabled'}>Accumulator</button>
+  </div>
+  ${n?FB.sel.map((x,k)=>`<div class="sel">
+    <div style="min-width:0"><b>${esc(x.label)}</b><span>${esc(x.match)}</span></div>
+    <div class="pr">${fbFmtOdds(x.o)}</div>
+    <button class="x" data-rm="${k}">\u00d7</button></div>`).join('')
+   :'<div class="slipempty">Tap any odds on the card to add a selection.<br>Two or more from different matches can ride as an accumulator.</div>'}
+  ${n?`<div><div class="lbl">Stake ${multi?'':'per bet'}</div>
+   <div class="betbox"><input id="fbStake" type="number" min="0.1" step="1" value="${stake}" inputmode="decimal">
+   <button data-fm=".5">\u00bd</button><button data-fm="2">2\u00d7</button></div></div>
+   ${multi&&n>1?`<div class="slipsum"><span>Combined odds</span><b>${fbFmtOdds(fbAccaO())}</b></div>`:''}
+   <div class="slipsum"><span>Total stake</span><b>${fmt(multi?stake:stake*n)}</b></div>
+   <div class="slipsum"><span>Potential return</span><b>${fmt(ret)}</b></div>
+   <button class="go" id="fbPlace">Place ${multi&&n>1?'accumulator':n>1?n+' bets':'bet'}</button>
+   <button class="btn2" id="fbClear">Clear slip</button>`:''}`;
+ el.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{FB.mode=b.dataset.sm;SND.click();fbRender()});
+ el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{FB.sel.splice(+b.dataset.rm,1);fbRender()});
+ el.querySelectorAll('[data-fm]').forEach(b=>b.onclick=()=>{const i=$('fbStake');
+  i.value=Math.max(.1,Math.round((parseFloat(i.value)||0)*parseFloat(b.dataset.fm)*100)/100);SND.chip();fbSlipRender()});
+ if($('fbStake'))$('fbStake').oninput=()=>fbSlipRender();
+ if($('fbPlace'))$('fbPlace').onclick=fbPlace;
+ if($('fbClear'))$('fbClear').onclick=()=>{FB.sel=[];SND.click();fbRender()}}
+
+function fbPlace(){
+ const n=FB.sel.length;if(!n)return;
+ const stake=Math.round((parseFloat($('fbStake').value)||0)*100)/100;
+ if(!(stake>0)){toast('Enter a stake above 0');return}
+ const multi=FB.mode==='acca'&&n>1;
+ const total=multi?stake:stake*n;
+ if(total>P().bal+1e-9){flash('Not enough credits');return}
+ if(multi){
+  if(!take(stake))return;
+  FB.open.push({id:Date.now()+Math.random(),legs:FB.sel.slice(),stake,odds:fbAccaO(),acca:true,state:'open'});
+ }else{
+  for(const x of FB.sel){if(!take(stake))break;
+   FB.open.push({id:Date.now()+Math.random(),legs:[x],stake,odds:x.o,acca:false,state:'open'})}
+ }
+ FB.sel=[];SND.chip();toast(multi?'Accumulator placed':'Bet placed');fbRender()}
+
+/* ---- open bets + cash out ---- */
+/* Fair value, no second margin: stake * price * P(it still wins). */
+function fbCashVal(b){
+ if(b.state!=='open')return 0;
+ let p=1;
+ for(const L of b.legs){const m=FB.card[L.mi];if(!m)return 0;
+  const {p:pr}=fbPriceOf(m,L.key);p*=pr}
+ return Math.round(b.stake*b.odds*p*100)/100}
+
+function fbOpenRender(){const el=$('fbOpen');if(!el)return;
+ if(!FB.open.length){el.innerHTML='';return}
+ el.innerHTML='<div class="lbl" style="margin-bottom:6px">YOUR BETS</div>'+
+  FB.open.slice().reverse().map(b=>{
+   const cv=fbCashVal(b),anyLive=b.legs.some(L=>FB.card[L.mi]&&FB.card[L.mi].phase!=='pre');
+   return `<div class="obet">
+    <div class="t"><b>${b.acca?b.legs.length+'-fold acca':esc(b.legs[0].label)}</b>
+     <span>${fbFmtOdds(b.odds)}</span></div>
+    <div class="l">${b.acca?b.legs.map(L=>esc(L.label)).join(' \u00b7 '):esc(b.legs[0].match)}</div>
+    <div class="l ${b.state==='won'?'won':b.state==='lost'?'lost':''}">
+     ${b.state==='open'?`${fmt(b.stake)} to return ${fmt(b.stake*b.odds)}`
+      :b.state==='won'?`WON \u2014 returned ${fmt(b.ret)}`
+      :b.state==='cashed'?`Cashed out for ${fmt(b.ret)}`
+      :`LOST \u2014 ${fmt(b.stake)}`}</div>
+    ${b.state==='open'&&anyLive&&cv>0?`<button data-co="${b.id}">Cash out ${fmt(cv)}</button>`:''}
+   </div>`}).join('');
+ el.querySelectorAll('[data-co]').forEach(btn=>btn.onclick=()=>fbCashOut(btn.dataset.co))}
+
+function fbCashOut(id){
+ const b=FB.open.find(x=>String(x.id)===String(id));if(!b||b.state!=='open')return;
+ const v=fbCashVal(b);if(!(v>0))return;
+ b.state='cashed';b.ret=v;pay(v);FB.profit+=v-b.stake;
+ log('Sportsbook',b.stake,v/b.stake,v);SND.cash(v/b.stake);
+ fbShareProfit();fbRender()}
+
+/* ---- settlement ---- */
+function fbLegResult(L){const m=FB.card[L.mi];
+ if(!m||m.phase!=='done')return null;
+ const H=m.ch,A=m.ca,k=L.key;
+ if(k.slice(0,3)==='cs:')return k.slice(3)===H+'-'+A;
+ switch(k){case'home':return H>A;case'draw':return H===A;case'away':return H<A;
+  case'ov':return H+A>=3;case'un':return H+A<3;
+  case'btts':return H>0&&A>0;case'nbtts':return!(H>0&&A>0)}
+ return null}
+
+function fbSettle(){
+ let any=false;
+ for(const b of FB.open){
+  if(b.state!=='open')continue;
+  const res=b.legs.map(fbLegResult);
+  if(res.some(r=>r===false)){b.state='lost';b.ret=0;FB.profit-=b.stake;
+   log('Sportsbook',b.stake,0,0);any=true;continue}
+  if(res.every(r=>r===true)){const ret=Math.round(b.stake*b.odds*100)/100;
+   b.state='won';b.ret=ret;pay(ret);FB.profit+=ret-b.stake;
+   log('Sportsbook',b.stake,b.odds,ret);
+   SND.win(b.odds);if(b.odds>=10)bigWin(b.odds,ret);else burst(50);
+   popShow($('fbPop'),fbFmtOdds(b.odds)+'\u00d7','+'+fmt(ret));any=true}
+ }
+ if(any){fbShareProfit();fbOpenRender();fbLeadRender()}}
+
+/* ---- live match ---- */
+function fbStopTick(){clearInterval(FB.tick);FB.tick=null}
+function fbKick(){
+ const i=FB.card.findIndex(m=>m.phase==='pre');
+ if(i<0)return;
+ if(FB.shared&&!NET.host){toast('Your mate kicks off from their side');return}
+ if(FB.shared&&NET.host)send({t:'fbGo',mi:i});
+ fbRun(i)}
+
+function fbRun(i){
+ const m=FB.card[i];if(!m||m.phase!=='pre')return;
+ fbStopTick();m.phase='live';m.min=0;m.ch=0;m.ca=0;m.feed=[];FB.live=i;
+ SND.click();fbRender();
+ FB.tick=setInterval(()=>{
+  m.min++;
+  for(const e of m.events)if(e.t===m.min){
+   if(e.type==='goal'){m.ch=e.ch;m.ca=e.ca;m.feed.push(e);
+    SND.big?SND.win(2):0;burst(28);
+    popShow($('fbPop'),'GOAL',`${fbTeam(m.h).s} ${m.ch}\u2013${m.ca} ${fbTeam(m.a).s}`)}
+   else m.feed.push(e)}
+  if(m.min>=FB_MINS){m.phase='done';m.min=FB_MINS;FB.live=-1;fbStopTick();
+   SND.reelStop();fbSettle()}
+  fbRender();
+ },520)}
+
+/* ---- party: same card, compete on profit ---- */
+function fbShareProfit(){if(FB.shared&&connected())send({t:'fbP',v:Math.round(FB.profit*100)/100})}
+function fbLeadRender(){const el=$('fbLead');if(!el)return;
+ const mine=Math.round(FB.profit*100)/100;
+ const row=(nm,v)=>`<div class="lb">${esc(nm)} <b class="${v>0?'up':v<0?'dn':''}">${v>0?'+':''}${fmt(v)}</b></div>`;
+ el.innerHTML=row(loggedIn()?P().name:'You',mine)+
+  (FB.shared&&NET.remote&&FB.oppProfit!=null?row(NET.remote.name,FB.oppProfit):'')}
+
+function fbSyncJoin(){
+ // host owns the card so both sides see identical fixtures and results
+ if(NET.host){FB.shared=true;send({t:'fbCard',seed:FB.seed,round:FB.round})}
+ fbRender()}
+
+function fbInit(){
+ if(!$('fbCard'))return;
+ fbNewRound(true);
+}
+
 /* ============================================================================
    LONG SHOT  -  the skill game
    Drag back from the cannon to set angle and power, let go to fire. Land inside
@@ -3422,10 +3876,11 @@ function wire(c){NET.conn=c;c.on('open',()=>{NET.status='connected';send({t:'pro
 function netLost(){if(NET.status!=='connected'&&NET.status!=='joining')return;const who=NET.remote?NET.remote.name:'Friend';NET.remote=null;NET.conn=null;
  if(NET.inPlay>0){pay(NET.inPlay);toast(`Connection lost. Refunded ${fmt(NET.inPlay)} in play.`);NET.inPlay=0}else toast(`${who} disconnected`);
  chatSys(`${who} left the party`);if(NET.host){NET.status='waiting';hostOnGuestLeft()}else{netLeave(true)}partyRender()}
-function netLeave(keepErr){if(NET.inPlay>0){pay(NET.inPlay);NET.inPlay=0}try{NET.conn&&NET.conn.close()}catch(e){}try{NET.peer&&NET.peer.destroy()}catch(e){}
+function netLeave(keepErr){FB.shared=false;FB.oppProfit=null;
+ if(NET.inPlay>0){pay(NET.inPlay);NET.inPlay=0}try{NET.conn&&NET.conn.close()}catch(e){}try{NET.peer&&NET.peer.destroy()}catch(e){}
  const err=keepErr?NET.err:'';Object.assign(NET,{peer:null,conn:null,host:false,code:'',remote:null,status:'off',err});if(PG)hostStopAll();PG=null;PS=null;SEEN.clear();partyRender()}
 function onNet(m){if(!m||typeof m!=='object')return;switch(m.t){
- case 'prof':{const first=!NET.remote;NET.remote=m.p;rosterSee(m.p);if(first){chatSys(`${m.p.name} joined the party`);toast(`${m.p.name} joined`)}if(NET.host)push();partyRender();devRender();if(typeof admRender==='function')admRender();break}
+ case 'prof':{const first=!NET.remote;NET.remote=m.p;rosterSee(m.p);if(first&&NET.host)setTimeout(fbSyncJoin,120);if(first){chatSys(`${m.p.name} joined the party`);toast(`${m.p.name} joined`)}if(NET.host)push();partyRender();devRender();if(typeof admRender==='function')admRender();break}
  case 'full':NET.err='That party already has two players.';netLeave(true);break;
  case 'chat':chatAdd(NET.remote?NET.remote.name:'Friend',m.m);SND.tick();break;
  case 'taunt':showTaunt(m.e,m.name||'Friend');SND.tick();break;
@@ -3433,6 +3888,10 @@ function onNet(m){if(!m||typeof m!=='object')return;switch(m.t){
  case 'gift':pay(m.amt);toast(`${m.name} gifted you ${fmt(m.amt)}`);chatSys(`${m.name} gifted ${fmt(m.amt)}`);SND.win(4);burst(60);break;
  case 'dev':P().bal=Math.max(0,Math.round(m.bal*100)/100);renderBal(true);save();toast(`${m.by} set your balance to ${fmt(m.bal)} (dev)`);break;
  case 'adm':onAdminCmd(m);break;
+ case 'fbCard':{FB.shared=true;FB.seed=m.seed>>>0;FB.round=m.round||1;
+  FB.open=[];FB.profit=0;FB.oppProfit=0;fbNewRound(true);break}
+ case 'fbGo':fbRun(m.mi);break;
+ case 'fbP':FB.oppProfit=m.v;fbLeadRender();break;
  case 'admreq':send({t:'prof',p:myProf()});break;
  case 'st':if(!NET.host){m.s.d.rc=performance.now();PS=m.s;partyRenderTable()}break;
  case 'act':if(NET.host)hostAct('G',m);break;
@@ -4590,7 +5049,7 @@ function buildTiles(){const d=[['tower','Tower','Climb past the traps'],['limbo'
  if(loggedIn()&&P().suspended){AUTH.err=P().suspendMsg||'This account is suspended.';S.cur=-1;S.session=null}
  if(loggedIn()){P().sessions=(P().sessions||0)+1;P().lastSeen=Date.now();playStart()}
  S.players.forEach(ensureStats);
- S.players.forEach(ensureCos);S.players.forEach(p=>{p.skins=p.skins||{classic:1};for(const k in OLD_SKIN_REFUND)if(p.skins[k]){p.bal+=OLD_SKIN_REFUND[k];delete p.skins[k]}if(!skinOf(p.skin)||skinOf(p.skin).id!==p.skin)p.skin='classic';p.skin=p.skin||'classic'});save();ckBuild();ckUI();ckTraffic();moInit();lsInit();buildNav();buildTiles();renderBal();renderHist();slBuild();go('lobby');plResize();authRender();})();
+ S.players.forEach(ensureCos);S.players.forEach(p=>{p.skins=p.skins||{classic:1};for(const k in OLD_SKIN_REFUND)if(p.skins[k]){p.bal+=OLD_SKIN_REFUND[k];delete p.skins[k]}if(!skinOf(p.skin)||skinOf(p.skin).id!==p.skin)p.skin='classic';p.skin=p.skin||'classic'});save();ckBuild();ckUI();ckTraffic();moInit();lsInit();fbInit();buildNav();buildTiles();renderBal();renderHist();slBuild();go('lobby');plResize();authRender();})();
 </script>
 </body>
 </html>

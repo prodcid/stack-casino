@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.20.13",
-  "notes": "fix long shot aiming - was firing zero-power duds",
-  "bytes": 446465,
-  "at": "2026-09-20T04:30:19.307Z"
+  "version": "2026.09.20.15",
+  "notes": "sportsbook: stack league, live odds, accas, cash out",
+  "bytes": 470182,
+  "at": "2026-09-20T05:08:56.437Z"
 }

@@ -38,6 +38,8 @@ node test.js strip      # The Strip full game + money audit (skips: not built)
 node test.js rtp        # maths only, no clicking (~2 min)
 node test.js admin      # admin portal: stats, user table, suspend, audit
 node test.js moles      # Moles maths, reshuffle, payouts, guards + sound smoke
+node test.js shot       # Long Shot drag-aiming (real mouse drags)
+node test.js sports     # Sportsbook pricing, accas, cash out, suspensions
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -71,7 +73,7 @@ storage/account layer.
 
 ## 2. Current scope
 
-18 single-player games, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+18 single-player games + sportsbook, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -109,6 +111,26 @@ flawless and a sloppy aimer and requires the sloppy one to return strictly less.
 - **Roster** (`S.roster`) — everyone who has ever joined one of your parties, kept after they disconnect. Their figures are **self-reported by their client** on every `prof` message via `myProf().st`. Balance / suspend / message / kick are sent as `{t:'adm'}` and handled by `onAdminCmd()` on their side, so they only land while connected and only if their client co-operates. **Advisory, not enforcement** — never describe it otherwise.
 
 Per-account stats: `created`, `lastSeen`, `playMs`, `sessions`, `wagered`, `won`, `bets`, `big`. `ensureStats()` backfills old accounts. Playtime ticks every 10s only while the tab is visible. Every admin action writes to `S.audit`.
+
+**Sportsbook** (`sports` view, `FB` state) — simulated football: card of 3 fixtures,
+markets (1X2 / O-U 2.5 / BTTS / correct score), bet slip, accumulators, live in-play
+odds, cash out. Solo and party. Four rules that must not be broken:
+
+- **Price from the exact `Binomial(90, lam/90)` the generator uses**, never a Poisson
+  approximation. If model and generator disagree the RTP drifts and nothing visible
+  catches it. `test.js sports` compares priced odds against 20k simulated matches.
+- **Accumulators apply the edge once** — `0.97 / Πp`, not per leg. Per-leg is `0.97^n`
+  (86% on a 5-fold): a real-book practice, a house-rule breach, and a hidden cost.
+  Same-match legs are blocked; correlated outcomes make the product rule lie.
+- **Cash out at fair value** `stake × price × p_now`, no second margin. Provably neutral
+  since `E[p_now] = p_at_placement`.
+- **Suspend settled markets.** A certainty prices at `0.97/1 = 0.97` — a guaranteed
+  loss. `FB_MINODDS` gates every quote.
+
+Party sync is **seed-based**: host owns the card, both pre-simulate identically, only
+the seed and a kick-off cross the wire. Bets are always vs the house at 97% (in party
+too) — no money moves between players, so the zero-sum party rule is untouched; the
+party layer only shares fixtures and a profit leaderboard.
 
 **Shipping.** `node ship.js "what changed"`. See section 7.
 
@@ -166,6 +188,7 @@ Two patterns, don't mix them up:
 - Auto-update **is live** — `prodcid/stack-casino`, public. `node ship.js "notes"` publishes and the mate's `launcher.html` self-updates. Version numbers come from the git-log high-water mark, so they can only ever go up (two builds once shared a number and cached launchers silently refused to update).
 - Admin password ADMIN_PW is plaintext in the file, same as the old dev password. Anyone who opens the file can read it.
 - Roster figures are self-reported by the other player's client. Treat as a record, not proof.
+- Sportsbook party sync is seed-based: the host owns the card and kicks off. If the guest joins mid-round they get a fresh card, and their open bets from a previous card are cleared.
 
 ---
 
@@ -197,6 +220,10 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Dice and Limbo spins now tick per digit via SND.reel(k), throttled to ~20/sec with pitch climbing on progress, and SND.reelStop() punctuates the lock-in. Throttling matters: firing per animation frame would be 60 a second and become a buzz.
 - **2026-09-20** — Long Shot aiming rewritten. The slingshot mapping was broken at the root: the cannon sits ON the ground line (LS_CY=430), so 'pull back and below' was a sliver of off-screen pixels. Every normal drag clamped to dy=0, which gives vy=0, which gives flight time 2*vy/g = 0 - the ball landed at the cannon's feet and ate the stake every time. Now aims TOWARD the drag point, which uses the whole playfield.
 - **2026-09-20** — Long Shot arms only on a real drag (18 world units), never on a bare click, and a too-weak release cancels the shot instead of firing a dud. The player paid for an attempt, so a mis-gesture must not spend it.
+- **2026-09-20** — Sportsbook (Stack League) added - simulated football with a card, bet slip, accas, live in-play odds and cash out. Plays solo and, in a party, both sides share one card via a seed: the match is pre-simulated deterministically from that seed, so nothing but the seed and a kick-off command crosses the wire.
+- **2026-09-20** — Sportsbook prices from the EXACT Binomial(90, lam/90) the generator uses, not a Poisson approximation of it. Model and generator must agree or the RTP drifts invisibly; a test compares priced odds against 20k simulated matches.
+- **2026-09-20** — Accumulators apply the edge ONCE to the whole ticket (0.97 / product of leg probabilities), not per leg. Compounding is what real books do and it would be 0.97^n - 86% on a 5-fold - which breaks the house rule and is exactly the hidden cost this project refuses to ship. Legs from the same match are blocked because those outcomes are correlated.
+- **2026-09-20** — Cash out is offered at fair value (stake x price x p_now) with no second margin. The edge was taken at placement, so charging again would penalise using an advertised feature, and E[p_now]=p_placement makes it provably neutral.
 
 ---
 
