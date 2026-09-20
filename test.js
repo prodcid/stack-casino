@@ -119,6 +119,60 @@ async function solo(ctx, errs) {
 
 
 
+
+/* ---------------- long shot ---------------- */
+async function longshot(ctx, errs) {
+  console.log('\nLONG SHOT');
+  const pg = await newPage(ctx, errs, 'ls', false);
+  const n0 = errs.length;
+  await pg.evaluate("P().bal=100000;renderBal();go('shot')");
+  await pg.waitForTimeout(500);
+
+  const box = await pg.evaluate("(()=>{const r=$('lsCv').getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}})()");
+
+  // Drag from the cannon up and to the right - the natural gesture. This used to
+  // produce a zero-power flat shot that landed at the cannon's feet.
+  await pg.evaluate("$('lsBet').value='10';lsStart()");
+  await pg.waitForTimeout(250);
+  const cannon = await pg.evaluate("(()=>{const r=$('lsCv').getBoundingClientRect();return{x:r.x+lsX(LS_CX)/(SHOT.cv.width/r.width), y:r.y+lsY(LS_CY)/(SHOT.cv.height/r.height)}})()");
+  await pg.mouse.move(cannon.x, cannon.y);
+  await pg.mouse.down();
+  await pg.mouse.move(cannon.x + box.w * 0.45, cannon.y - box.h * 0.42, { steps: 8 });
+  const aim = await pg.evaluate("SHOT.aim?{vx:SHOT.aim.vx,vy:SHOT.aim.vy,sp:SHOT.aim.sp}:null");
+  (aim && aim.vy > 200 && aim.sp > 300) ? pass('drag up-right builds a real shot', 'vy=' + Math.round(aim.vy) + ' sp=' + Math.round(aim.sp))
+    : fail('drag up-right builds a real shot', JSON.stringify(aim));
+
+  await pg.mouse.up();
+  await pg.waitForTimeout(150);
+  const flew = await pg.evaluate("SHOT.phase==='fly'||SHOT.phase==='done'");
+  flew ? pass('release fires') : fail('release fires', await pg.evaluate("SHOT.phase"));
+
+  // it must actually travel, not drop at the cannon
+  await pg.waitForTimeout(2200);
+  const land = await pg.evaluate("SHOT.land");
+  // cannon sits at x=74; the old bug landed it there every time
+  land > 250 ? pass('ball travels downrange', 'landed at ' + Math.round(land))
+             : fail('ball travels downrange', 'landed at ' + Math.round(land) + ' (cannon is at 74)');
+
+  // a tap must NOT fire a dud and eat the stake
+  await pg.waitForTimeout(1600);
+  await pg.evaluate("SHOT.phase='idle';SHOT.shot=null;$('lsBet').value='10';lsStart()");
+  await pg.waitForTimeout(200);
+  const balBefore = await pg.evaluate("P().bal");
+  // a genuine click: press and release at the same point, no movement
+  await pg.mouse.move(cannon.x + box.w * 0.3, cannon.y - box.h * 0.3);
+  await pg.mouse.down();
+  await pg.mouse.up();
+  await pg.waitForTimeout(250);
+  const tap = await pg.evaluate("[ 'aim', SHOT.phase, 0 ]");
+  tap[2] = await pg.evaluate(`Math.round((${balBefore}-P().bal)*100)/100`);
+  (tap[1] === 'aim' && tap[2] === 0) ? pass('a tap cancels instead of firing a dud')
+                                     : fail('a tap cancels instead of firing a dud', JSON.stringify(tap));
+
+  errs.length === n0 ? pass('no long shot console errors') : fail('no long shot console errors', errs.slice(n0).join(' | '));
+  await pg.close();
+}
+
 /* ---------------- moles ---------------- */
 async function moles(ctx, errs) {
   console.log('\nMOLES');
@@ -535,6 +589,7 @@ async function rtp(ctx, errs) {
     if (which === 'all' || which === 'solo') await solo(ctx, errs);
     if (which === 'all' || which === 'admin') await admin(ctx, errs);
     if (which === 'all' || which === 'moles') await moles(ctx, errs);
+    if (which === 'all' || which === 'shot') await longshot(ctx, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);

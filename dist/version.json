@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.20.11",
-  "notes": "moles: default 5, odds shown, reshuffle made clear. dice+limbo spin audio. long shot",
-  "bytes": 444168,
-  "at": "2026-09-20T04:20:13.102Z"
+  "version": "2026.09.20.13",
+  "notes": "fix long shot aiming - was firing zero-power duds",
+  "bytes": 446465,
+  "at": "2026-09-20T04:30:19.307Z"
 }

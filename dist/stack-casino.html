@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.20.11">
+<meta name="stack-version" content="2026.09.20.13">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2677,6 +2677,7 @@ function devRender(){const box=$('devBox');if(!box)return;if(!DEV){box.innerHTML
    ========================================================================== */
 const LS_W=1000, LS_H=500, LS_GROUND=430, LS_CX=74, LS_CY=430;
 const LS_G=1400;           // gravity, world units / s^2
+const LS_SPMAX=1150;       // muzzle speed cap
 const LS_GUST=100;         // hidden gust spans +/- this, TRIANGULAR (see lsGust)
 const LS_RTP=.97;
 const LS_TIERS=[
@@ -2784,11 +2785,24 @@ function lsDrawPreview(x){const a=SHOT.aim;
   x.globalAlpha=1-i/11;x.fillStyle='#ffd44d';
   x.beginPath();x.arc(lsX(px),lsY(py),3.2*SHOT.sc,0,7);x.fill()}
  x.restore();
+ // line from the muzzle to where you are pointing, so the gesture is obvious
+ if(SHOT.ptr){x.save();x.setLineDash([6*SHOT.sc,6*SHOT.sc]);
+  x.strokeStyle='rgba(255,255,255,.4)';x.lineWidth=2*SHOT.sc;
+  x.beginPath();x.moveTo(lsX(LS_CX),lsY(LS_CY));
+  x.lineTo(lsX(SHOT.ptr.x),lsY(SHOT.ptr.y));x.stroke();
+  x.setLineDash([]);
+  x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=2*SHOT.sc;
+  x.beginPath();x.arc(lsX(SHOT.ptr.x),lsY(SHOT.ptr.y),7*SHOT.sc,0,7);x.stroke();
+  x.restore()}
  // power gauge on the barrel
- const pw=Math.min(1,a.sp/1150);
- x.fillStyle='rgba(0,0,0,.45)';x.fillRect(lsX(LS_CX-26),lsY(LS_CY+18),lsX(52),7*SHOT.sc);
- x.fillStyle=pw>.92?'#ff7a8a':'#6dffa8';
- x.fillRect(lsX(LS_CX-26),lsY(LS_CY+18),lsX(52)*pw,7*SHOT.sc)}
+ const pw=Math.min(1,a.sp/LS_SPMAX);
+ x.fillStyle='rgba(0,0,0,.5)';x.fillRect(lsX(LS_CX-34),lsY(LS_CY+20),lsX(68),9*SHOT.sc);
+ x.fillStyle=pw>.95?'#ff7a8a':pw<.16?'#8aa3b4':'#6dffa8';
+ x.fillRect(lsX(LS_CX-34),lsY(LS_CY+20),lsX(68)*pw,9*SHOT.sc);
+ x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=1*SHOT.sc;
+ x.strokeRect(lsX(LS_CX-34),lsY(LS_CY+20),lsX(68),9*SHOT.sc);
+ x.fillStyle='#fff';x.font='900 '+(11*SHOT.sc)+'px Outfit';x.textAlign='center';
+ x.fillText(Math.round(pw*100)+'%',lsX(LS_CX),lsY(LS_CY+46));x.textAlign='left'}
 
 function lsDrawShot(x){const sh=SHOT.shot;
  x.save();
@@ -2803,22 +2817,42 @@ function lsDrawShot(x){const sh=SHOT.shot;
  x.restore()}
 
 /* ---- aiming ---- */
+/* Aim TOWARD the point you drag to: up and right of the cannon.
+
+   The first build pulled back slingshot-style, which was simply wrong here -
+   the cannon sits ON the ground line, so "behind and below it" was a sliver of
+   off-screen pixels. Any normal drag clamped to dy=0, which gives vy=0, which
+   gives a flight time of 2*vy/g = 0. The ball landed at the cannon's feet every
+   single time and ate the stake. Direct aiming uses the whole playfield. */
 function lsDown(e){if(SHOT.phase!=='aim')return;
- SHOT.cv.setPointerCapture&&SHOT.cv.setPointerCapture(e.pointerId);
- SHOT.drag=lsToWorld(e);lsMove(e)}
+ if(e.preventDefault)e.preventDefault();
+ try{SHOT.cv.setPointerCapture&&SHOT.cv.setPointerCapture(e.pointerId)}catch(err){}
+ // Record where the press started but do NOT arm a shot yet. A bare click must
+ // never fire - that was the original complaint, and click-to-fire would just
+ // reintroduce it in a new costume.
+ SHOT.drag=lsToWorld(e);SHOT.ptr=null;SHOT.aim=null;lsDraw()}
 function lsMove(e){if(SHOT.phase!=='aim'||!SHOT.drag)return;
  const w=lsToWorld(e);
- // pull back from the cannon, slingshot style
- let dx=LS_CX-w.x, dy=w.y-LS_CY;
- if(dx<2)dx=2; if(dy<0)dy=0;
- const sp=Math.min(1150,Math.hypot(dx,dy)*5.2);
+ if(!SHOT.ptr&&Math.hypot(w.x-SHOT.drag.x,w.y-SHOT.drag.y)<18)return; // not a drag yet
+ SHOT.ptr=w;
+ let dx=Math.max(8,w.x-LS_CX), dy=Math.max(8,LS_CY-w.y);
+ /* 1.9 not 2.6: at 2.6 the cap was hit less than halfway across the board, so
+    most of the playfield was "100%" and there was no fine control where it
+    matters. This puts full power at roughly a full-diagonal drag. */
+ const sp=Math.min(LS_SPMAX,Math.hypot(dx,dy)*1.9);
  const ang=Math.atan2(dy,dx);
  SHOT.aim={vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,sp};
  lsDraw()}
 function lsUp(e){if(SHOT.phase!=='aim'||!SHOT.drag)return;
  SHOT.drag=null;
- if(!SHOT.aim||SHOT.aim.sp<60){SHOT.aim=null;lsDraw();return}
- lsFire()}
+ // A tap or a twitch is not a shot. Cancel and keep the round alive rather than
+ // firing a dud and pocketing the stake - the player paid for a real attempt.
+ if(!SHOT.aim){SHOT.ptr=null;lsDraw();
+  toast('Drag from the cannon towards your target, then release');return}
+ if(SHOT.aim.sp<170||SHOT.aim.vy<90){
+  SHOT.aim=null;SHOT.ptr=null;lsDraw();
+  toast('Drag further up and away from the cannon to build power');return}
+ SHOT.ptr=null;lsFire()}
 
 /* ---- firing ---- */
 function lsFire(){
@@ -2897,7 +2931,7 @@ function lsUI(){const t=LS_TIERS[SHOT.tier],idle=SHOT.phase==='idle',p=P();
  $('lsStreak').textContent=SHOT.streak;
  $('lsBest').textContent=p.lsBest||0;
  $('lsBulls').textContent=p.lsBulls||0;
- $('lsInfo').textContent=`Drag back from the cannon and release. Land inside the ${t.n.toLowerCase()} pad to win ${lsPay(SHOT.tier).toFixed(2)}\u00d7. `+
+ $('lsInfo').textContent=`Drag from the cannon up towards your target and release \u2014 the further you drag, the more power. Land inside the ${t.n.toLowerCase()} pad to win ${lsPay(SHOT.tier).toFixed(2)}\u00d7. `+
   `Wind is shown and can be aimed off; a random gust of up to \u00b1${LS_GUST} cannot. Flawless aim lands it ${(lsQ(SHOT.tier)*100).toFixed(0)}% of the time, and that is exactly where the 97% comes from \u2014 97% is the ceiling, and every bit of aim you gain earns more of it.`;
  const wd=$('lsWind');
  wd.innerHTML=`<span>WIND</span><b>${SHOT.phase==='idle'?'\u2013':(SHOT.wind>0?'\u2192 ':'\u2190 ')+Math.abs(SHOT.wind)}</b>`;
@@ -2906,7 +2940,7 @@ function lsUI(){const t=LS_TIERS[SHOT.tier],idle=SHOT.phase==='idle',p=P();
    <div class="lschip gold">Pays <b>${lsPay(SHOT.tier).toFixed(2)}\u00d7</b></div>
    <div class="lschip green">Streak <b>${SHOT.streak}</b></div>`;
  $('lsHint').textContent=idle?'Place a bet to load the cannon'
-  :SHOT.phase==='aim'?'Drag back from the cannon, release to fire \u2014 only the first part of the arc is shown'
+  :SHOT.phase==='aim'?'Drag up and to the right, release to fire \u2014 only the first part of the arc is shown'
   :SHOT.phase==='fly'?'\u2026':''}
 
 function lsInit(){

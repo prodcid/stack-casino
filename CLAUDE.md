@@ -83,7 +83,11 @@ the bust reveal as a fixed board being uncovered, so the board twitches on each 
 and the bust screen spells it out. If this confuses someone again, fix the explanation,
 never the mechanics.
 
-**Long Shot** (`SHOT` state) — the only skill game. Drag-aim a cannon at a target pad.
+**Long Shot** (`SHOT` state) — the only skill game. Drag from the cannon **towards** the
+target; power is drag distance. Do **not** re-introduce slingshot "pull back" aiming: the
+cannon sits on the ground line, so below-and-behind is off-screen, every drag clamped to
+`vy=0`, flight time `2*vy/g` became 0 and the ball died at the cannon's feet. Arms only
+after an 18-unit drag, and a weak release cancels rather than firing a dud.
 97% is a **ceiling, not an average**: the landing is `physics(aim) + visibleWind + hiddenGust`,
 and only flawless aim leaves the gust alone, so `qMax = P(|gust| ≤ half)` and payout is
 `0.97/qMax`. Skill closes the gap toward 97% and can never exceed it. The gust must stay
@@ -159,7 +163,7 @@ Two patterns, don't mix them up:
 - Account passwords are a non-cryptographic hash in localStorage. Fine for mates, not security.
 - Skyline and The Strip are in the docs but not in the build. test.js skips them; decide whether to build or drop.
 - Balloon Pump's element used id='bal', which collided with the header wallet - FIXED, now #bpBal. Watch for new duplicate ids; devkit check does not catch two elements sharing one id.
-- **Auto-update is not live yet.** Alex still has to do the one-time setup in `SHIPPING.md`: `node ship.js setup <github-user> stack-casino`, create the empty **public** repo, then ship once. Until then `launcher.html` shows a "not configured" screen.
+- Auto-update **is live** — `prodcid/stack-casino`, public. `node ship.js "notes"` publishes and the mate's `launcher.html` self-updates. Version numbers come from the git-log high-water mark, so they can only ever go up (two builds once shared a number and cached launchers silently refused to update).
 - Admin password ADMIN_PW is plaintext in the file, same as the old dev password. Anyone who opens the file can read it.
 - Roster figures are self-reported by the other player's client. Treat as a record, not proof.
 
@@ -191,6 +195,8 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Moles default moved from 3 moles to 5. Three moles is 42.9% a swing and averages 0.75 hits per round, which reads as broken rather than hard. Five is 71.4% and ~2.5 hits. The odds were always correct; the default was the problem.
 - **2026-09-20** — Moles reshuffle is now shown, not just stated: the board twitches on every redeal and the bust screen says the moles move every hit. Alex read the bust reveal as a fixed board being uncovered and thought whacking a mole should remove it. Constant p is REQUIRED - it is the only way 0.98/p^8 yields Stake's published max win - so the fix is explanation, never mechanics.
 - **2026-09-20** — Dice and Limbo spins now tick per digit via SND.reel(k), throttled to ~20/sec with pitch climbing on progress, and SND.reelStop() punctuates the lock-in. Throttling matters: firing per animation frame would be 60 a second and become a buzz.
+- **2026-09-20** — Long Shot aiming rewritten. The slingshot mapping was broken at the root: the cannon sits ON the ground line (LS_CY=430), so 'pull back and below' was a sliver of off-screen pixels. Every normal drag clamped to dy=0, which gives vy=0, which gives flight time 2*vy/g = 0 - the ball landed at the cannon's feet and ate the stake every time. Now aims TOWARD the drag point, which uses the whole playfield.
+- **2026-09-20** — Long Shot arms only on a real drag (18 world units), never on a bare click, and a too-weak release cancels the shot instead of firing a dud. The player paid for an attempt, so a mis-gesture must not spend it.
 
 ---
 
