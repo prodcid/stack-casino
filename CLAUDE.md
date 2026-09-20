@@ -36,6 +36,7 @@ node test.js solo       # single-player + tickets + cosmetics
 node test.js mp         # two-window multiplayer, all 8 tables + login/identity
 node test.js strip      # The Strip full game + money audit (skips: not built)
 node test.js rtp        # maths only, no clicking (~2 min)
+node test.js admin      # admin portal: stats, user table, suspend, audit
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -69,7 +70,7 @@ storage/account layer.
 
 ## 2. Current scope
 
-16 single-player games, 8 party tables, 8 card skins, 2 cosmetic types, accounts, dev mode.
+16 single-player games, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -80,6 +81,13 @@ storage/account layer.
 **Cosmetics:** 8 card skins (`SKINS`), 7 avatar frames (`FRAMES`), 7 nameplates (`PLATES`), auto wealth rank (`WEALTH`).
 
 **Accounts.** `S.players` is the account list on this device, `S.cur` is who's logged in (`-1` = nobody), `S.session` is the username restored on load. `P()` returns the logged-in account or a read-only `GUEST` stub, so nothing crashes before login. `#authGate` covers the app until `loggedIn()`. There is no server and no cross-device account — identity travels to the other player over PeerJS in `myProf()`, which sends `user` (stable handle) as well as `name` (display).
+
+**Admin portal** (`admin` view, `ADM` state, unlocked with `ADMIN_PW`, hidden from the nav until then). Two populations, and the distinction matters:
+
+- **Local accounts** (`S.players`) — full control: balance, rename, reset password, grant admin, suspend, delete, log in as.
+- **Roster** (`S.roster`) — everyone who has ever joined one of your parties, kept after they disconnect. Their figures are **self-reported by their client** on every `prof` message via `myProf().st`. Balance / suspend / message / kick are sent as `{t:'adm'}` and handled by `onAdminCmd()` on their side, so they only land while connected and only if their client co-operates. **Advisory, not enforcement** — never describe it otherwise.
+
+Per-account stats: `created`, `lastSeen`, `playMs`, `sessions`, `wagered`, `won`, `bets`, `big`. `ensureStats()` backfills old accounts. Playtime ticks every 10s only while the tab is visible. Every admin action writes to `S.audit`.
 
 **Shipping.** `node ship.js "what changed"`. See section 7.
 
@@ -134,6 +142,8 @@ Two patterns, don't mix them up:
 - Skyline and The Strip are in the docs but not in the build. test.js skips them; decide whether to build or drop.
 - Balloon Pump's element used id='bal', which collided with the header wallet - FIXED, now #bpBal. Watch for new duplicate ids; devkit check does not catch two elements sharing one id.
 - **Auto-update is not live yet.** Alex still has to do the one-time setup in `SHIPPING.md`: `node ship.js setup <github-user> stack-casino`, create the empty **public** repo, then ship once. Until then `launcher.html` shows a "not configured" screen.
+- Admin password ADMIN_PW is plaintext in the file, same as the old dev password. Anyone who opens the file can read it.
+- Roster figures are self-reported by the other player's client. Treat as a record, not proof.
 
 ---
 
@@ -152,6 +162,9 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Shipping goes through ship.js + a launcher.html the mate keeps. Launcher boots from a localStorage cache so it works offline, and document.write keeps the game on the launcher's origin so accounts survive every update.
 - **2026-09-20** — Login and logout call save(true) to write through immediately; only bets stay on the 300ms debounce. A reload right after signup was losing the account, which test.js mp caught.
 - **2026-09-20** — Added double-click .cmd shortcuts (1 Play / 2 Try before shipping / 3 Test everything / 4 Ship to mate / 5 First time setup) so Alex never needs a terminal. _findnode.cmd locates Node and puts it on PATH, because a freshly installed Node is absent from already-open shells. ship.js spawns process.execPath rather than bare 'node' for the same reason.
+- **2026-09-20** — Admin portal added. No server exists, so 'all users' means two sources: accounts on this device (full control) and a persistent roster of everyone who has joined a party (record + live commands while connected). Chose a roster over pretending there is a central DB.
+- **2026-09-20** — Accounts now track created / lastSeen / playMs / sessions / wagered / won. Playtime only ticks while the tab is visible, so an idle open tab does not report as playtime.
+- **2026-09-20** — Remote admin commands (balance, suspend, kick, message) are advisory: the guest's client applies them. A modified client could ignore them. Acceptable for mates; do not describe it as enforcement.
 
 ---
 

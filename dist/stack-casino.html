@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.20.7">
+<meta name="stack-version" content="2026.09.20.2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -202,6 +202,50 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .authwho button:hover{color:#fff;border-color:var(--green)}
 .authnote{color:var(--dim);font-size:11.5px;text-align:center;margin:4px 0 0;line-height:1.5}
 .acctcard{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:11px}
+/* ---- admin portal ---- */
+.admwrap{display:grid;gap:14px}
+.admhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.admhead h2{font-size:22px;margin:0}
+.admtag{background:rgba(255,200,0,.14);color:var(--gold);font-size:11px;font-weight:900;padding:4px 9px;border-radius:999px;letter-spacing:.06em}
+.admstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.admstat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px}
+.admstat b{display:block;font-size:20px;line-height:1.2}
+.admstat span{color:var(--mute);font-size:11.5px;font-weight:700}
+.admbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.admbar input[type=search]{flex:1;min-width:150px;background:var(--panel);border:2px solid var(--line);color:#fff;border-radius:var(--r);padding:9px 12px;font:inherit;font-weight:600}
+.admbar input[type=search]:focus{outline:0;border-color:var(--green)}
+.admtable{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:auto}
+.admtable table{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
+.admtable th{text-align:left;padding:11px 12px;color:var(--mute);font-size:11px;font-weight:800;letter-spacing:.05em;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+.admtable th:hover{color:#fff}
+.admtable th .ar{opacity:.5;font-size:9px}
+.admtable td{padding:11px 12px;border-bottom:1px solid rgba(44,67,83,.5);white-space:nowrap}
+.admtable tr[data-u]{cursor:pointer}
+.admtable tr[data-u]:hover td{background:rgba(255,255,255,.035)}
+.admtable tr.sel td{background:rgba(0,231,1,.07)}
+.admwho{display:flex;align-items:center;gap:9px}
+.pill{font-size:10px;font-weight:900;padding:3px 8px;border-radius:999px;letter-spacing:.04em}
+.pill.here{background:rgba(0,231,1,.15);color:var(--green2,#6dffa8)}
+.pill.remote{background:rgba(74,168,255,.15);color:#7cc0ff}
+.pill.live{background:rgba(0,231,1,.2);color:#6dffa8}
+.pill.susp{background:rgba(255,122,138,.16);color:#ff7a8a}
+.pill.adminp{background:rgba(255,200,0,.16);color:var(--gold)}
+.admdrawer{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:13px}
+.admdrawer h3{margin:0;font-size:17px}
+.admgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.admfield{background:var(--bg);border-radius:9px;padding:10px}
+.admfield span{display:block;color:var(--mute);font-size:10.5px;font-weight:800;letter-spacing:.04em}
+.admfield b{font-size:14px;font-weight:800}
+.admacts{display:flex;gap:8px;flex-wrap:wrap}
+.admacts button{background:var(--bg);border:1px solid var(--line);color:#fff;font:inherit;font-weight:700;font-size:13px;padding:9px 13px;border-radius:9px;cursor:pointer}
+.admacts button:hover{border-color:var(--green)}
+.admacts button.warn:hover{border-color:#ff7a8a;color:#ff7a8a}
+.admacts button:disabled{opacity:.4;cursor:not-allowed}
+.admlog{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;max-height:230px;overflow:auto;font-size:12.5px;display:grid;gap:7px}
+.admlog div{color:var(--mute)}
+.admlog b{color:#fff}
+.admnote{color:var(--dim);font-size:11.5px;line-height:1.6}
+@media(max-width:700px){.admtable table{min-width:620px}}
 .modal input{background:var(--bg);border:2px solid var(--line);color:#fff;border-radius:var(--r);padding:10px;font-weight:600;font-size:15px}
 .mob{display:none}
 /* responsive */
@@ -1252,6 +1296,27 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
       </div><div class="pop" id="crPop" style="top:26%"><b></b><i></i></div></div>
     </div></section>
 
+    <!-- ADMIN -->
+    <section class="view" id="adminView">
+      <div class="admwrap">
+        <div class="admhead"><h2>Admin</h2><span class="admtag" id="admTag">PORTAL</span>
+          <div style="margin-left:auto;display:flex;gap:8px"><button class="btn2" id="admExport">Export data</button><button class="btn2" id="admLock">Lock</button></div>
+        </div>
+        <div class="admstats" id="admStats"></div>
+        <div class="admbar">
+          <input type="search" id="admSearch" placeholder="Search by username or display name" autocomplete="off">
+          <button class="btn2" id="admRefresh">Refresh</button>
+        </div>
+        <div class="admtable" id="admTable"></div>
+        <div id="admDrawer"></div>
+        <div>
+          <div style="color:var(--mute);font-size:12px;font-weight:800;margin-bottom:7px">ADMIN ACTIVITY</div>
+          <div class="admlog" id="admLog"></div>
+        </div>
+        <p class="admnote" id="admNote"></p>
+      </div>
+    </section>
+
     <div class="hist" id="histWrap"><table><thead><tr><th>Game</th><th>Player</th><th class="hide-m">Bet</th><th>Multi</th><th>Payout</th></tr></thead><tbody id="hist"></tbody></table></div>
   </main>
   <nav class="mob" id="mob"></nav>
@@ -1265,6 +1330,7 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
   <label class="lbl">Display name</label><input id="n0" maxlength="14">
   <button class="btn2" id="saveName">Save display name</button>
   <div class="row2"><button class="btn2" id="logoutBtn">Log out</button><button class="btn2" id="resetAll" style="color:var(--red)">Reset my wallet</button></div>
+  <button class="btn2" id="admOpen">Admin portal</button>
   <div class="devbox" id="devBox"></div>
   <div style="text-align:center;color:var(--dim);font-size:11px;font-weight:700" id="verLine"></div>
   <button class="go" id="closeP">Done</button>
@@ -1289,6 +1355,7 @@ IC.keno='<svg viewBox="0 0 24 24"><path d="M3 3h5v5H3zm6.5 0h5v5h-5zM16 3h5v5h-5
 IC.hilo='<svg viewBox="0 0 24 24"><path d="M12 2l6 7h-4v4h-4V9H6zm0 20-6-7h4v-2h4v2h4z"/></svg>';
 IC.bacc='<svg viewBox="0 0 24 24"><path d="M3 6h8v12H3zM13 6h8v12h-8z" opacity=".5"/><path d="M5 9h4v2H5zm10 0h4v2h-4z"/><text x="12" y="23" font-size="0">b</text></svg>';
 IC.locker='<svg viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 4-3 5 3 5 3-5z"/><path d="M19.5 2l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg>';
+IC.admin='<svg viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 9.3 8 10.5 4.6-1.2 8-5.5 8-10.5v-6z"/><path d="M12 7a2.4 2.4 0 1 1 0 4.8A2.4 2.4 0 0 1 12 7zm0 6c2.4 0 4.4 1.3 4.4 2.8v1.2H7.6v-1.2C7.6 14.3 9.6 13 12 13z" fill="#0f212e"/></svg>';
 IC.party='<svg viewBox="0 0 24 24"><path d="M8 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 19c0-3.3 2.7-6 6-6s6 2.7 6 6v1H2zm13.5-6c2.9.2 5.5 2.4 5.5 5.5V20h-5v-1c0-2.3-.9-4.4-2.4-5.9.6-.1 1.2-.1 1.9-.1z"/></svg>';
 IC.tower='<svg viewBox="0 0 24 24"><path d="M6 21V9l6-6 6 6v12h-5v-5h-2v5z"/><path d="M9 11h2v2H9zm4 0h2v2h-2z" fill="#0f212e"/></svg>';
 IC.limbo='<svg viewBox="0 0 24 24"><path d="M3 20 9 9l4 6 3-4 5 9z"/><circle cx="19" cy="5" r="2.5"/></svg>';
@@ -1315,7 +1382,10 @@ addEventListener('pointerdown',()=>SND.init(),{once:false});
 
 /* ============ STATE ============ */
 /* Accounts. S.players is the account list on this device; S.cur is who is logged in (-1 = nobody). */
-const S={players:[],cur:-1,session:null,hist:[]};
+/* roster = everyone who has ever joined one of your parties, kept after they
+   disconnect so the admin portal has a real user list, not just this device.
+   audit = every admin action taken, so you can see what you did to whom. */
+const S={players:[],cur:-1,session:null,hist:[],roster:{},audit:[]};
 const GUEST={name:'Guest',bal:0,big:0,bets:0,color:'#00e701',skins:{classic:1},skin:'classic',frames:{none:1},frame:'none',plates:{plain:1},plate:'plain'};
 const SKEY='stack-casino';
 /* Two storage backends: window.storage when hosted, localStorage otherwise, so a
@@ -1329,10 +1399,12 @@ async function load(){let raw=null;
  try{const d=JSON.parse(raw);
   if(Array.isArray(d.players))S.players=d.players;
   if(Array.isArray(d.hist))S.hist=d.hist;
+  if(d.roster&&typeof d.roster==='object')S.roster=d.roster;
+  if(Array.isArray(d.audit))S.audit=d.audit;
   S.session=d.session||null;
  }catch(e){}}
 function saveNow(){clearTimeout(saveT);saveT=null;
- const raw=JSON.stringify({v:2,players:S.players,session:S.session,hist:S.hist.slice(0,20)});
+ const raw=JSON.stringify({v:3,players:S.players,session:S.session,hist:S.hist.slice(0,20),roster:S.roster,audit:S.audit.slice(-300)});
  if(LS){try{LS.setItem(SKEY,raw)}catch(e){}}
  if(hasStore){try{window.storage.set(SKEY,raw,false)}catch(e){}}}
 /* Bets debounce; anything identity-shaped (login, logout) writes through straight
@@ -1344,8 +1416,8 @@ const loggedIn=()=>S.cur>=0&&!!S.players[S.cur];
 const fmt=n=>(Math.round(n*100)/100).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
 const $=id=>document.getElementById(id);
 function renderBal(bump){const e=$('bal');e.querySelector('span').textContent=fmt(P().bal);if(bump){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}$('pname').textContent=P().name;$('av').textContent=P().name[0].toUpperCase();$('av').style.background=P().color;{const pp=P();ensureCos(pp);$('av').className='avatar avx fr-'+pp.frame;$('av').style.setProperty('--c',pp.color);$('av').style.setProperty('--sz','24px')}renderBoard();if(typeof sendProfSoon==='function'&&NET.status!=='off')sendProfSoon()}
-function take(bet){bet=Math.round(bet*100)/100;if(!(bet>0)){flash('Enter a bet above 0');return false}if(bet>P().bal+1e-9){flash('Not enough credits. Hit Top up.');return false}P().bal=Math.round((P().bal-bet)*100)/100;P().bets++;renderBal();save();return true}
-function pay(amt){if(amt<=0)return;P().bal=Math.round((P().bal+amt)*100)/100;renderBal(true);save()}
+function take(bet){bet=Math.round(bet*100)/100;if(!(bet>0)){flash('Enter a bet above 0');return false}if(bet>P().bal+1e-9){flash('Not enough credits. Hit Top up.');return false}P().bal=Math.round((P().bal-bet)*100)/100;P().bets++;P().wagered=Math.round(((P().wagered||0)+bet)*100)/100;renderBal();save();return true}
+function pay(amt){if(amt<=0)return;P().bal=Math.round((P().bal+amt)*100)/100;P().won=Math.round(((P().won||0)+amt)*100)/100;renderBal(true);save()}
 function log(game,bet,mult,payout){const p=P();if(payout-bet>p.big)p.big=Math.round((payout-bet)*100)/100;S.hist.unshift({game,pl:p.name,c:p.color,bet,mult,payout});S.hist=S.hist.slice(0,20);renderHist();save()}
 function renderHist(){$('hist').innerHTML=S.hist.map(h=>`<tr><td>${h.game}</td><td><span style="color:${h.c}">●</span> ${h.pl}</td><td class="hide-m">${fmt(h.bet)}</td><td class="${h.mult>=1?'w':'l'}">${h.mult.toFixed(2)}×</td><td class="${h.payout>h.bet?'w':'l'}">${h.payout>0?'+':''}${fmt(h.payout)}</td></tr>`).join('')||'<tr><td colspan="5" class="l">No bets yet. Pick a game to start.</td></tr>'}
 function renderBoard(){const rows=(loggedIn()?[P()]:[]).concat(typeof NET!=='undefined'&&NET.remote?[NET.remote]:[]);
@@ -1359,10 +1431,23 @@ function seg(id,cb){const el=$(id);el.querySelectorAll('button').forEach(b=>b.on
 const segVal=id=>$(id).querySelector('.on').dataset.v;
 
 /* ============ NAV ============ */
-function buildNav(){const s=$('side'),m=$('mob');s.innerHTML='<h4>Casino</h4>'+GAMES.map(([k,n])=>`<button class="nav" data-g="${k}">${IC[k]}${n}</button>`).join('');m.innerHTML=GAMES.map(([k,n])=>`<button data-g="${k}">${IC[k]}${n.split(' ').pop()}</button>`).join('');document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>go(b.dataset.g))}
-function go(g){SND.click();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
+function navList(){return ADM.on?[['admin','Admin']].concat(GAMES):GAMES}
+function buildNav(){const s=$('side'),m=$('mob'),L=navList();
+ s.innerHTML='<h4>Casino</h4>'+L.map(([k,n])=>`<button class="nav" data-g="${k}">${IC[k]}${n}</button>`).join('');
+ m.innerHTML=L.map(([k,n])=>`<button data-g="${k}">${IC[k]}${n.split(' ').pop()}</button>`).join('');
+ document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>go(b.dataset.g))}
+function go(g){SND.click();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
 $('mute').onclick=()=>{SND.on=!SND.on;$('muteIco').style.opacity=SND.on?1:.35;if(SND.on)SND.click()};
 $('refill').onclick=()=>{if(P().bal>=100){flash('Top up unlocks under 100 credits');return}P().bal+=1000;renderBal(true);save();SND.win(3)};
+
+/* ============ PLAYTIME ============ */
+/* Counts only while the tab is actually visible, so leaving it open overnight
+   does not report as 8 hours of play. */
+let playT=null;
+function playTick(){if(!loggedIn())return;const p=P();p.playMs=(p.playMs||0)+10000;p.lastSeen=Date.now();save()}
+function playStart(){if(playT)return;playT=setInterval(()=>{if(!document.hidden)playTick()},10000)}
+function playStop(){clearInterval(playT);playT=null}
+addEventListener('visibilitychange',()=>{if(loggedIn()&&!document.hidden){P().lastSeen=Date.now()}});
 
 /* ============ ACCOUNTS / AUTH ============ */
 /* Obfuscation, not security: this is a fake-money game shared between mates and the
@@ -1407,19 +1492,25 @@ function doAuth(){const u=($('auU').value||'').trim(),pw=$('auP').value||'';
  if(AUTH.mode==='signup'){
   if(i>=0)return fail('That username already exists on this device');
   if(pw!==($('auP2').value||''))return fail('Passwords do not match');
-  const a={user:u,name:u,pass:hashPw(u,pw),bal:1000,big:0,bets:0,color:ACOLS[S.players.length%ACOLS.length]};
-  ensureCos(a);S.players.push(a);S.cur=S.players.length-1;
+  const a={user:u,name:u,pass:hashPw(u,pw),bal:1000,big:0,bets:0,color:ACOLS[S.players.length%ACOLS.length],
+   created:Date.now(),lastSeen:Date.now(),playMs:0,sessions:0,wagered:0,won:0,
+   admin:S.players.length===0};
+  ensureCos(a);ensureStats(a);S.players.push(a);S.cur=S.players.length-1;
  }else{
   if(i<0)return fail('No account with that username here. Sign up instead.');
   if(S.players[i].pass!==hashPw(S.players[i].user,pw))return fail('Wrong password');
+  if(S.players[i].suspended)return fail(S.players[i].suspendMsg||'This account is suspended.');
   S.cur=i;
  }
- AUTH.err='';S.session=P().user;ensureCos(P());save(true);
+ AUTH.err='';S.session=P().user;ensureCos(P());ensureStats(P());
+ P().sessions=(P().sessions||0)+1;P().lastSeen=Date.now();
+ save(true);playStart();
  authRender();renderBal(true);renderHist();
  SND.init();SND.win(2);toast('Welcome, '+P().name)}
 
 function logout(){if(typeof NET!=='undefined'&&NET.status!=='off')netLeave();
- S.cur=-1;S.session=null;save(true);AUTH.mode='login';AUTH.err='';
+ if(loggedIn()){P().lastSeen=Date.now()}
+ playStop();S.cur=-1;S.session=null;save(true);AUTH.mode='login';AUTH.err='';
  renderBal();renderHist();authRender()}
 
 $('switchP').onclick=()=>{if(!loggedIn())return;const p=P();
@@ -1428,6 +1519,11 @@ $('switchP').onclick=()=>{if(!loggedIn())return;const p=P();
  $('pModal').classList.add('show')};
 $('saveName').onclick=()=>{const v=$('n0').value.trim();if(!v)return;P().name=v;renderBal();save();toast('Display name saved')};
 $('closeP').onclick=()=>$('pModal').classList.remove('show');
+$('admOpen').onclick=()=>{$('pModal').classList.remove('show');if(ADM.on)go('admin');else admUnlock()};
+$('admLock').onclick=admLock;
+$('admExport').onclick=admExport;
+$('admRefresh').onclick=()=>{if(connected())send({t:'admreq'});admRender();toast('Refreshed')};
+$('admSearch').oninput=e=>{ADM.q=e.target.value;admRender()};
 const STACK_VER=(document.querySelector('meta[name="stack-version"]')||{content:'?'}).content||'?';
 if($('verLine'))$('verLine').textContent='Build '+STACK_VER;
 $('logoutBtn').onclick=()=>{if(!confirm('Log out of '+P().name+'?'))return;$('pModal').classList.remove('show');logout()};
@@ -2127,6 +2223,18 @@ const PLATES=[
 const WEALTH=[[0,'BROKE','#8a8f99'],[500,'GRINDER','#b1bad3'],[5000,'HIGH ROLLER','#e2c26a'],[25000,'BALLER','#3fbf7f'],[100000,'TYCOON','#5b8cff'],[1000000,'WHALE','#ff4fd8']];
 const wealthOf=b=>{let w=WEALTH[0];for(const x of WEALTH)if(b>=x[0])w=x;return w};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* Backfills stats onto accounts made before the admin portal existed. Anything
+   we cannot know retrospectively starts at 0 rather than being invented. */
+function ensureStats(p){if(!p||p===GUEST)return p;
+ if(!p.created)p.created=Date.now();
+ if(typeof p.playMs!=='number')p.playMs=0;
+ if(typeof p.sessions!=='number')p.sessions=0;
+ if(typeof p.wagered!=='number')p.wagered=0;
+ if(typeof p.won!=='number')p.won=0;
+ if(typeof p.bets!=='number')p.bets=0;
+ if(typeof p.big!=='number')p.big=0;
+ if(!p.lastSeen)p.lastSeen=p.created;
+ return p}
 function ensureCos(p){p.skins=p.skins||{classic:1};p.skin=p.skin||'classic';p.frames=p.frames||{none:1};p.frame=p.frame||'none';p.plates=p.plates||{plain:1};p.plate=p.plate||'plain'}
 function avHTML(pr,sz=28){return `<span class="avx fr-${esc(pr.frame||'none')}" style="--c:${esc(pr.color||'#00e701')};--sz:${sz}px">${esc((pr.name||'?')[0].toUpperCase())}</span>`}
 function plateHTML(pr){return `<span class="np np-${esc(pr.plate||'plain')}"><b>${esc(pr.name||'Player')}</b></span>`}
@@ -2139,6 +2247,23 @@ function rainCash(name,amt){const b=document.createElement('div');b.className='r
   e.style.left=x+'px';document.body.appendChild(e);e.animate([{transform:'translateY(0) rotate(0) rotateX(0)'},{transform:`translateY(${innerHeight+120}px) translateX(${(Math.random()-.5)*160}px) rotate(${r}deg) rotateX(720deg)`}],{duration:d*1000,easing:'cubic-bezier(.3,.1,.6,1)'});setTimeout(()=>e.remove(),d*1000)},i*45);
  SND.big();burst(80)}
 
+/* ===================== ROSTER / AUDIT ===================== */
+/* Everyone you have played with, kept across sessions. Their numbers are whatever
+   their client last reported - this is a mates' game, not an authoritative server,
+   and a determined player could report anything. Treat it as a record, not proof. */
+function rosterSee(pr){if(!pr||!pr.user)return;
+ const k=String(pr.user).toLowerCase(),st=pr.st||{},old=S.roster[k]||{};
+ S.roster[k]={user:pr.user,name:pr.name,color:pr.color,bal:pr.bal,
+  created:st.created||old.created||Date.now(),
+  playMs:st.playMs||old.playMs||0,sessions:st.sessions||old.sessions||0,
+  wagered:st.wagered||old.wagered||0,won:st.won||old.won||0,
+  bets:st.bets||old.bets||0,big:st.big||old.big||0,
+  lastSeen:Date.now(),firstSeen:old.firstSeen||Date.now(),
+  suspended:old.suspended||false};
+ save()}
+function audit(action,target,detail){S.audit.push({at:Date.now(),by:loggedIn()?P().user:'?',action,target:target||'',detail:detail||''});
+ S.audit=S.audit.slice(-300);save()}
+
 /* ===================== DEV MODE ===================== */
 let DEV=false;
 function devRender(){const box=$('devBox');if(!box)return;if(!DEV){box.innerHTML='<button class="btn2" id="devUnlock">Dev mode</button>';$('devUnlock').onclick=()=>{const pw=prompt('Dev password');if(pw==='CID'){DEV=true;SND.win(2);devRender()}else if(pw!==null)toast('Wrong password')};return}
@@ -2148,6 +2273,222 @@ function devRender(){const box=$('devBox');if(!box)return;if(!DEV){box.innerHTML
  box.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{const i=+b.dataset.l,v=Math.max(0,parseFloat($('devL'+i).value)||0);S.players[i].bal=Math.round(v*100)/100;renderBal(true);save();toast('Balance set')});
  if($('devRset'))$('devRset').onclick=()=>{const v=Math.max(0,parseFloat($('devR').value)||0);send({t:'dev',bal:v,by:P().name});chatSys(`Dev: set ${NET.remote.name}'s balance to ${fmt(v)}`);toast('Sent')};
  $('devOff').onclick=()=>{DEV=false;devRender()}}
+
+
+/* ===================== ADMIN PORTAL ===================== */
+/* Scope, honestly: there is no server. This portal manages the accounts on THIS
+   device in full, and manages anyone who has joined one of your parties as far as
+   a peer-to-peer link allows - live commands when they are connected, a stored
+   record when they are not. Their client has to co-operate for a remote command to
+   land, so this is a host's control panel between mates, not server-side authority. */
+const ADM={on:false,sel:null,sort:'lastSeen',dir:-1,q:''};
+const ADMIN_PW='CID';
+
+const ago=t=>{if(!t)return 'never';const d=Date.now()-t;
+ if(d<60000)return 'just now';
+ if(d<3600000)return Math.floor(d/60000)+'m ago';
+ if(d<86400000)return Math.floor(d/3600000)+'h ago';
+ if(d<2592000000)return Math.floor(d/86400000)+'d ago';
+ return new Date(t).toLocaleDateString('en-AU')};
+const dur=ms=>{ms=ms||0;const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);
+ return h?`${h}h ${m}m`:`${m}m`};
+const dstamp=t=>t?new Date(t).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'-';
+
+function admUnlock(){const pw=prompt('Admin password');
+ if(pw===null)return;
+ if(pw!==ADMIN_PW){toast('Wrong password');return}
+ ADM.on=true;buildNav();SND.win(2);toast('Admin unlocked');go('admin')}
+function admLock(){ADM.on=false;ADM.sel=null;buildNav();go('lobby');toast('Admin locked')}
+
+/* One row per known user: local accounts first, then roster-only people. */
+function admUsers(){
+ const out=S.players.map((a,i)=>({
+  key:(a.user||a.name||'').toLowerCase(),user:a.user||a.name,name:a.name,color:a.color,
+  bal:a.bal,created:a.created,lastSeen:a.lastSeen,playMs:a.playMs,sessions:a.sessions,
+  wagered:a.wagered,won:a.won,bets:a.bets,big:a.big,
+  suspended:!!a.suspended,admin:!!a.admin,local:true,idx:i,
+  live:false,me:i===S.cur}));
+ const have=new Set(out.map(u=>u.key));
+ for(const k in S.roster){if(have.has(k))continue;const r=S.roster[k];
+  out.push({key:k,user:r.user,name:r.name,color:r.color,bal:r.bal,created:r.created,
+   lastSeen:r.lastSeen,playMs:r.playMs,sessions:r.sessions,wagered:r.wagered,won:r.won,
+   bets:r.bets,big:r.big,suspended:!!r.suspended,admin:false,local:false,idx:-1,live:false,me:false})}
+ const rl=NET.remote&&NET.remote.user?String(NET.remote.user).toLowerCase():null;
+ if(rl&&connected())for(const u of out)if(u.key===rl){u.live=true;u.bal=NET.remote.bal}
+ return out}
+
+function admRender(){if(!$('adminView'))return;
+ if(!ADM.on){$('adminView').innerHTML='<div class="admwrap"><div class="admhead"><h2>Admin</h2></div><p class="admnote">Locked.</p></div>';return}
+ const all=admUsers();
+ const q=ADM.q.toLowerCase();
+ const rows=all.filter(u=>!q||(u.user||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q));
+ rows.sort((a,b)=>{const k=ADM.sort;let x=a[k],y=b[k];
+  if(typeof x==='string'||typeof y==='string'){x=String(x||'').toLowerCase();y=String(y||'').toLowerCase();return x<y?-ADM.dir:x>y?ADM.dir:0}
+  return ((x||0)-(y||0))*ADM.dir});
+
+ // headline numbers
+ const tot=all.reduce((a,u)=>a+(u.bal||0),0),wag=all.reduce((a,u)=>a+(u.wagered||0),0),
+       won=all.reduce((a,u)=>a+(u.won||0),0),bets=all.reduce((a,u)=>a+(u.bets||0),0);
+ const hold=wag>0?((wag-won)/wag*100):0;
+ $('admStats').innerHTML=[
+  ['Users',all.length],['Accounts here',all.filter(u=>u.local).length],
+  ['Credits in play',fmt(tot)],['Total wagered',fmt(wag)],
+  ['Total bets',bets.toLocaleString('en-AU')],
+  ['House hold',(wag>0?hold.toFixed(2)+'%':'-')]
+ ].map(([l,v])=>`<div class="admstat"><b>${v}</b><span>${l}</span></div>`).join('');
+
+ const H=(k,l)=>`<th data-s="${k}">${l} <span class="ar">${ADM.sort===k?(ADM.dir>0?'\u25b2':'\u25bc'):''}</span></th>`;
+ $('admTable').innerHTML=`<table><thead><tr>
+  ${H('name','User')}${H('bal','Balance')}${H('playMs','Playtime')}${H('sessions','Logins')}
+  ${H('bets','Bets')}${H('wagered','Wagered')}${H('created','Created')}${H('lastSeen','Last seen')}
+ </tr></thead><tbody>${rows.length?rows.map(u=>`<tr data-u="${esc(u.key)}" class="${ADM.sel===u.key?'sel':''}">
+  <td><div class="admwho">${avHTML(u,26)}<div><div style="font-weight:800">${esc(u.name||'?')}
+   ${u.me?'<span class="pill adminp">YOU</span>':''}${u.admin?'<span class="pill adminp">ADMIN</span>':''}
+   ${u.live?'<span class="pill live">ONLINE</span>':''}${u.suspended?'<span class="pill susp">SUSPENDED</span>':''}</div>
+   <div style="color:var(--dim);font-size:11px">@${esc(u.user||'?')} · <span class="pill ${u.local?'here':'remote'}">${u.local?'this device':'remote'}</span></div></div></div></td>
+  <td>${fmt(u.bal||0)}</td><td>${dur(u.playMs)}</td><td>${u.sessions||0}</td>
+  <td>${u.bets||0}</td><td>${fmt(u.wagered||0)}</td><td>${ago(u.created)}</td><td>${ago(u.lastSeen)}</td>
+ </tr>`).join(''):'<tr><td colspan="8" style="color:var(--dim);padding:22px;text-align:center">No users match.</td></tr>'}</tbody></table>`;
+
+ $('admTable').querySelectorAll('th[data-s]').forEach(th=>th.onclick=()=>{
+  const k=th.dataset.s;if(ADM.sort===k)ADM.dir*=-1;else{ADM.sort=k;ADM.dir=-1}admRender()});
+ $('admTable').querySelectorAll('tr[data-u]').forEach(tr=>tr.onclick=()=>{
+  ADM.sel=ADM.sel===tr.dataset.u?null:tr.dataset.u;admRender()});
+
+ admDrawer(all);
+ $('admLog').innerHTML=S.audit.length?[...S.audit].reverse().slice(0,40)
+  .map(a=>`<div><b>${esc(a.by)}</b> ${esc(a.action)} ${a.target?`<b>${esc(a.target)}</b>`:''} ${a.detail?esc(a.detail):''} <span style="color:var(--dim)">· ${ago(a.at)}</span></div>`).join('')
+  : '<div>Nothing yet.</div>';
+ $('admNote').innerHTML='Accounts live in each player\u2019s own browser \u2014 there is no central server. '+
+  'People here marked <span class="pill remote">remote</span> are known from party sessions, and their figures are whatever their game last reported. '+
+  'Commands to a remote player only apply while they are connected and their client accepts them.';
+}
+
+function admDrawer(all){const d=$('admDrawer');if(!ADM.sel){d.innerHTML='';return}
+ const u=all.find(x=>x.key===ADM.sel);if(!u){d.innerHTML='';return}
+ const net=(u.won||0)-(u.wagered||0);
+ const F=(l,v)=>`<div class="admfield"><span>${l}</span><b>${v}</b></div>`;
+ d.innerHTML=`<div class="admdrawer">
+  <h3>${esc(u.name||'?')} <span style="color:var(--dim);font-weight:700;font-size:13px">@${esc(u.user||'?')}</span></h3>
+  <div class="admgrid">
+   ${F('Balance',fmt(u.bal||0))}${F('Net P&amp;L',(net>=0?'+':'')+fmt(net))}
+   ${F('Total wagered',fmt(u.wagered||0))}${F('Total returned',fmt(u.won||0))}
+   ${F('Biggest win',fmt(u.big||0))}${F('Bets placed',u.bets||0)}
+   ${F('Playtime',dur(u.playMs))}${F('Logins',u.sessions||0)}
+   ${F('Account created',dstamp(u.created))}${F('Last seen',dstamp(u.lastSeen))}
+   ${F('Stored',u.local?'This device':'Party record only')}${F('Status',u.suspended?'Suspended':u.live?'Online now':'Offline')}
+  </div>
+  <div class="admacts">
+   <button data-a="bal">Set balance</button>
+   <button data-a="give">Grant credits</button>
+   <button data-a="rename" ${u.local?'':'disabled'}>Rename</button>
+   <button data-a="pw" ${u.local?'':'disabled'}>Reset password</button>
+   <button data-a="admin" ${u.local&&!u.me?'':'disabled'}>${u.admin?'Remove admin':'Make admin'}</button>
+   <button data-a="susp" class="warn" ${u.me?'disabled':''}>${u.suspended?'Unsuspend':'Suspend'}</button>
+   <button data-a="msg" ${u.live?'':'disabled'}>Send message</button>
+   <button data-a="kick" class="warn" ${u.live?'':'disabled'}>Kick from party</button>
+   <button data-a="as" ${u.local&&!u.me?'':'disabled'}>Log in as</button>
+   <button data-a="del" class="warn" ${u.me?'disabled':''}>Delete</button>
+  </div>
+  ${u.local?'':'<p class="admnote">This person\u2019s account lives on their device. Balance, suspend, message and kick are sent over the party link and only apply while they are connected.</p>'}
+ </div>`;
+ d.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>admAct(b.dataset.a,u));
+}
+
+/* local account object for a row, or null if they are remote-only */
+const admLocal=u=>u.local?S.players[u.idx]:null;
+
+function admAct(a,u){
+ const acct=admLocal(u),live=u.live;
+ const pushRemote=(o)=>{if(live)send(Object.assign({t:'adm'},o))};
+
+ if(a==='bal'){const v=prompt(`Set ${u.name}'s balance to:`,String(Math.round(u.bal||0)));
+  if(v===null)return;const n=Math.max(0,Math.round((parseFloat(v)||0)*100)/100);
+  if(acct){acct.bal=n;if(u.me)renderBal(true)}
+  if(S.roster[u.key])S.roster[u.key].bal=n;
+  pushRemote({a:'bal',v:n,by:P().name});
+  audit('set balance of',u.user,'to '+fmt(n));save();toast('Balance set');return admRender()}
+
+ if(a==='give'){const v=prompt(`Grant how many credits to ${u.name}?`,'1000');
+  if(v===null)return;const n=Math.round((parseFloat(v)||0)*100)/100;if(!n)return;
+  const nb=Math.max(0,Math.round(((u.bal||0)+n)*100)/100);
+  if(acct){acct.bal=nb;if(u.me)renderBal(true)}
+  if(S.roster[u.key])S.roster[u.key].bal=nb;
+  pushRemote({a:'bal',v:nb,by:P().name});
+  audit('granted',u.user,fmt(n)+' credits');save();toast('Granted');return admRender()}
+
+ if(a==='rename'){if(!acct)return;const v=prompt('New display name:',acct.name);
+  if(!v||!v.trim())return;acct.name=v.trim().slice(0,14);
+  audit('renamed',u.user,'to '+acct.name);save();if(u.me)renderBal();return admRender()}
+
+ if(a==='pw'){if(!acct)return;const v=prompt(`New password for ${acct.name}:`);
+  if(!v)return;if(v.length<3){toast('Too short');return}
+  acct.pass=hashPw(acct.user,v);audit('reset password of',u.user);save();toast('Password reset');return}
+
+ if(a==='admin'){if(!acct)return;acct.admin=!acct.admin;
+  audit(acct.admin?'made admin':'removed admin from',u.user);save();return admRender()}
+
+ if(a==='susp'){const now=!u.suspended;
+  if(now){const why=prompt('Reason shown to them (optional):','Suspended by an admin.');
+   if(why===null)return;
+   if(acct){acct.suspended=true;acct.suspendMsg=why||'This account is suspended.'}
+   if(S.roster[u.key])S.roster[u.key].suspended=true;
+   pushRemote({a:'susp',v:true,msg:why||'Suspended by an admin.',by:P().name});
+   audit('suspended',u.user,why||'')}
+  else{if(acct){acct.suspended=false;acct.suspendMsg=''}
+   if(S.roster[u.key])S.roster[u.key].suspended=false;
+   pushRemote({a:'susp',v:false,by:P().name});
+   audit('unsuspended',u.user)}
+  save();return admRender()}
+
+ if(a==='msg'){const m=prompt(`Message to ${u.name}:`);if(!m)return;
+  pushRemote({a:'msg',m,by:P().name});audit('messaged',u.user,m);toast('Sent');return}
+
+ if(a==='kick'){if(!confirm(`Kick ${u.name} out of the party?`))return;
+  pushRemote({a:'kick',by:P().name});audit('kicked',u.user);
+  setTimeout(()=>{if(NET.host){try{NET.conn&&NET.conn.close()}catch(e){}netLost()}},250);
+  return admRender()}
+
+ if(a==='as'){if(!acct)return;
+  if(!confirm(`Log in as ${acct.name}? You will be logged out of your own account.`))return;
+  audit('logged in as',u.user);playStop();
+  S.cur=u.idx;S.session=acct.user;acct.lastSeen=Date.now();save(true);playStart();
+  ADM.sel=null;renderBal(true);renderHist();authRender();toast('Now playing as '+acct.name);return admRender()}
+
+ if(a==='del'){if(!confirm(`Delete ${u.name}? This wipes their account and stats on this device and cannot be undone.`))return;
+  if(acct){const wasCur=S.cur;S.players.splice(u.idx,1);
+   if(wasCur===u.idx){S.cur=-1;S.session=null;authRender()}
+   else if(wasCur>u.idx)S.cur--;
+   if(loggedIn())S.session=P().user}
+  delete S.roster[u.key];
+  audit('deleted',u.user);ADM.sel=null;save(true);renderBal();return admRender()}
+}
+
+/* ---- guest side: what an admin command actually does to you ---- */
+function onAdminCmd(m){
+ if(!m||!m.a)return;
+ if(m.a==='bal'){P().bal=Math.max(0,Math.round((m.v||0)*100)/100);renderBal(true);save();
+  toast(`${m.by||'Admin'} set your balance to ${fmt(P().bal)}`);chatSys(`Admin set your balance to ${fmt(P().bal)}`);return}
+ if(m.a==='msg'){chatSys(`${m.by||'Admin'}: ${m.m}`);toast(`${m.by||'Admin'}: ${m.m}`);SND.tick();return}
+ if(m.a==='kick'){toast(`${m.by||'Admin'} removed you from the party`);netLeave();return}
+ if(m.a==='susp'){
+  if(m.v){const acct=loggedIn()?P():null;
+   if(acct){acct.suspended=true;acct.suspendMsg=m.msg||'This account is suspended.'}
+   save(true);toast(m.msg||'Your account has been suspended');
+   AUTH.err=m.msg||'This account is suspended.';logout()}
+  else{const i=acctIdx(m.user||(loggedIn()?P().user:''));
+   if(i>=0){S.players[i].suspended=false;S.players[i].suspendMsg=''}
+   save(true);toast('Your account was reinstated')}
+  return}
+}
+
+function admExport(){
+ const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),
+  accounts:S.players.map(a=>{const c=Object.assign({},a);delete c.pass;return c}),
+  roster:S.roster,audit:S.audit},null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download='stack-users-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),4000);audit('exported user data')}
 
 /* ===================== LOCKER TABS / COSMETIC SHOP ===================== */
 let lkTab='skins';
@@ -2171,7 +2512,9 @@ function loadPeer(){return new Promise((res,rej)=>{if(window.Peer)return res();c
 const ME=()=>NET.host?'H':'G';
 const connected=()=>!!(NET.conn&&NET.conn.open&&NET.remote);
 function send(o){try{if(NET.conn&&NET.conn.open)NET.conn.send(o)}catch(e){}}
-function myProf(){const p=P();ensureCos(p);return{user:p.user||p.name,name:p.name,bal:p.bal,color:p.color,skin:p.skin,frame:p.frame,plate:p.plate}}
+function myProf(){const p=P();ensureCos(p);ensureStats(p);
+ return{user:p.user||p.name,name:p.name,bal:p.bal,color:p.color,skin:p.skin,frame:p.frame,plate:p.plate,
+  st:{created:p.created,lastSeen:Date.now(),playMs:p.playMs,sessions:p.sessions,wagered:p.wagered,won:p.won,bets:p.bets,big:p.big}}}
 let profT;function sendProfSoon(){clearTimeout(profT);profT=setTimeout(()=>{send({t:'prof',p:myProf()});if(NET.host&&PG)push();else partyRenderBar()},150)}
 function newCode(){return Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('')}
 async function netHost(){if(NET.peer)return;NET.status='loading';NET.err='';partyRender();try{await loadPeer()}catch(e){NET.status='off';NET.err='Could not load the multiplayer library. You need internet, and the file has to be opened in a normal browser (Safari or Chrome).';partyRender();return}
@@ -2193,13 +2536,15 @@ function netLost(){if(NET.status!=='connected'&&NET.status!=='joining')return;co
 function netLeave(keepErr){if(NET.inPlay>0){pay(NET.inPlay);NET.inPlay=0}try{NET.conn&&NET.conn.close()}catch(e){}try{NET.peer&&NET.peer.destroy()}catch(e){}
  const err=keepErr?NET.err:'';Object.assign(NET,{peer:null,conn:null,host:false,code:'',remote:null,status:'off',err});if(PG)hostStopAll();PG=null;PS=null;SEEN.clear();partyRender()}
 function onNet(m){if(!m||typeof m!=='object')return;switch(m.t){
- case 'prof':{const first=!NET.remote;NET.remote=m.p;if(first){chatSys(`${m.p.name} joined the party`);toast(`${m.p.name} joined`)}if(NET.host)push();partyRender();devRender();break}
+ case 'prof':{const first=!NET.remote;NET.remote=m.p;rosterSee(m.p);if(first){chatSys(`${m.p.name} joined the party`);toast(`${m.p.name} joined`)}if(NET.host)push();partyRender();devRender();if(typeof admRender==='function')admRender();break}
  case 'full':NET.err='That party already has two players.';netLeave(true);break;
  case 'chat':chatAdd(NET.remote?NET.remote.name:'Friend',m.m);SND.tick();break;
  case 'taunt':showTaunt(m.e,m.name||'Friend');SND.tick();break;
  case 'rain':rainCash(m.name,m.amt);chatSys(`${m.name} made it rain ${fmt(m.amt)}`);break;
  case 'gift':pay(m.amt);toast(`${m.name} gifted you ${fmt(m.amt)}`);chatSys(`${m.name} gifted ${fmt(m.amt)}`);SND.win(4);burst(60);break;
  case 'dev':P().bal=Math.max(0,Math.round(m.bal*100)/100);renderBal(true);save();toast(`${m.by} set your balance to ${fmt(m.bal)} (dev)`);break;
+ case 'adm':onAdminCmd(m);break;
+ case 'admreq':send({t:'prof',p:myProf()});break;
  case 'st':if(!NET.host){m.s.d.rc=performance.now();PS=m.s;partyRenderTable()}break;
  case 'act':if(NET.host)hostAct('G',m);break;
  case 'set':localSettle(m.bet,m.payout,m.game);break;
@@ -3347,6 +3692,10 @@ function buildTiles(){const d=[['tower','Tower','Climb past the traps'],['limbo'
 /* ============ INIT ============ */
 (async()=>{await load();
  S.cur=S.session?acctIdx(S.session):-1;
+ // a suspended account must not come back in through a restored session
+ if(loggedIn()&&P().suspended){AUTH.err=P().suspendMsg||'This account is suspended.';S.cur=-1;S.session=null}
+ if(loggedIn()){P().sessions=(P().sessions||0)+1;P().lastSeen=Date.now();playStart()}
+ S.players.forEach(ensureStats);
  S.players.forEach(ensureCos);S.players.forEach(p=>{p.skins=p.skins||{classic:1};for(const k in OLD_SKIN_REFUND)if(p.skins[k]){p.bal+=OLD_SKIN_REFUND[k];delete p.skins[k]}if(!skinOf(p.skin)||skinOf(p.skin).id!==p.skin)p.skin='classic';p.skin=p.skin||'classic'});save();ckBuild();ckUI();ckTraffic();buildNav();buildTiles();renderBal();renderHist();slBuild();go('lobby');plResize();authRender();})();
 </script>
 </body>

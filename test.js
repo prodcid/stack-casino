@@ -2,6 +2,7 @@
 /* test.js — browser regression for the single-file build.
    node test.js            everything
    node test.js solo       single-player games + tickets + cosmetics
+   node test.js admin      admin portal: stats, user table, suspend, audit
    node test.js mp         two-window multiplayer, all party tables
    node test.js rtp        maths only (fast, no clicking)
    node test.js strip      The Strip full game + money-conservation audit
@@ -112,6 +113,80 @@ async function solo(ctx, errs) {
   await pg.setViewportSize({ width: 390, height: 844 });
   for (const v of ['lobby', 'balloon', 'craps', 'scratch', 'roulette']) { await pg.evaluate(`go('${v}')`); await pg.waitForTimeout(350); }
   errs.length === n1 ? pass('mobile 390px') : fail('mobile 390px', errs.slice(n1).join(' | '));
+  await pg.close();
+}
+
+
+/* ---------------- admin portal ---------------- */
+async function admin(ctx, errs) {
+  console.log('\nADMIN PORTAL');
+  const pg = await newPage(ctx, errs, 'adm', false);
+  const n0 = errs.length;
+
+  // stats must actually accrue from play, not sit at zero
+  await pg.evaluate("P().bal=5000;renderBal();go('dice')");
+  await tap(pg, '#dcGo', 1500);
+  const w = await pg.evaluate("P().wagered");
+  w > 0 ? pass('wagering is recorded', w.toFixed(2)) : fail('wagering is recorded', 'wagered=' + w);
+
+  const created = await pg.evaluate("P().created");
+  created > 0 ? pass('account creation date set') : fail('account creation date set');
+
+  // playtime ticker
+  await pg.evaluate("playTick();playTick()");
+  const pm = await pg.evaluate("P().playMs");
+  pm >= 20000 ? pass('playtime accrues', (pm / 1000) + 's') : fail('playtime accrues', 'playMs=' + pm);
+
+  // unlock without touching the prompt
+  await pg.evaluate("ADM.on=true;buildNav();go('admin')");
+  await pg.waitForTimeout(400);
+  const listed = await pg.evaluate("!!document.querySelector('#admTable tr[data-u]')");
+  listed ? pass('user table renders') : fail('user table renders');
+
+  const statCount = await pg.evaluate("document.querySelectorAll('#admStats .admstat').length");
+  statCount === 6 ? pass('headline stats render') : fail('headline stats render', 'got ' + statCount);
+
+  // a second account, then admin actions against it
+  await pg.evaluate(`(()=>{const a={user:'victim',name:'victim',pass:hashPw('victim','pw123'),bal:500,
+    color:'#ffc800',created:Date.now()-86400000,lastSeen:Date.now(),playMs:60000,sessions:3,
+    wagered:200,won:150,bets:9,big:20};ensureCos(a);ensureStats(a);S.players.push(a);save(true);admRender()})()`);
+  await pg.waitForTimeout(250);
+
+  const two = await pg.evaluate("document.querySelectorAll('#admTable tr[data-u]').length");
+  two === 2 ? pass('second account listed') : fail('second account listed', 'rows=' + two);
+
+  // select it and confirm the drawer opens with their real figures
+  await pg.evaluate("ADM.sel='victim';admRender()");
+  await pg.waitForTimeout(200);
+  const drawer = await pg.evaluate("$('admDrawer').textContent");
+  drawer.includes('victim') ? pass('detail drawer opens') : fail('detail drawer opens');
+
+  // suspend -> that account must not be able to log back in
+  await pg.evaluate("(()=>{const u=admUsers().find(x=>x.key==='victim');S.players[u.idx].suspended=true;S.players[u.idx].suspendMsg='nope';save(true)})()");
+  await pg.evaluate("logout()");
+  await pg.waitForSelector('#authGate.show', { timeout: 6000 });
+  await pg.fill('#auU', 'victim'); await pg.fill('#auP', 'pw123');
+  await pg.click('#auGo'); await pg.waitForTimeout(400);
+  const blocked = await pg.evaluate("!loggedIn() && (AUTH.err||'').includes('nope')");
+  blocked ? pass('suspended account cannot log in') : fail('suspended account cannot log in', await pg.evaluate("AUTH.err"));
+
+  // unsuspend -> back in
+  await pg.evaluate("(()=>{const i=acctIdx('victim');S.players[i].suspended=false;S.players[i].suspendMsg='';save(true)})()");
+  await pg.fill('#auU', 'victim'); await pg.fill('#auP', 'pw123');
+  await pg.click('#auGo');
+  await pg.waitForFunction('loggedIn()', null, { timeout: 6000 }).catch(() => {});
+  (await pg.evaluate("loggedIn() && P().user==='victim'")) ? pass('unsuspend restores access') : fail('unsuspend restores access');
+
+  // audit trail records what was done
+  await pg.evaluate("audit('test action','victim','detail')");
+  const logged = await pg.evaluate("S.audit.length>0 && S.audit[S.audit.length-1].action==='test action'");
+  logged ? pass('audit trail records actions') : fail('audit trail records actions');
+
+  // admin state must not leak to a player who has not unlocked it
+  const navHidden = await pg.evaluate("(()=>{ADM.on=false;buildNav();return !document.querySelector('[data-g=\"admin\"]')})()");
+  navHidden ? pass('admin hidden when locked') : fail('admin hidden when locked');
+
+  errs.length === n0 ? pass('no admin console errors') : fail('no admin console errors', errs.slice(n0).join(' | '));
   await pg.close();
 }
 
@@ -298,6 +373,7 @@ async function rtp(ctx, errs) {
   const errs = [];
   try {
     if (which === 'all' || which === 'solo') await solo(ctx, errs);
+    if (which === 'all' || which === 'admin') await admin(ctx, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);
