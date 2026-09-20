@@ -205,6 +205,55 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 
 
 
+
+/* ===================== PARTY HUD (presence / join / side bets) ============ */
+.cohud{position:fixed;right:14px;bottom:14px;z-index:64;width:min(92vw,306px);
+ background:var(--panel);border:1px solid var(--line);border-radius:13px;
+ box-shadow:0 18px 44px rgba(0,0,0,.5);overflow:hidden;display:none}
+.cohud.show{display:block}
+.cotop{display:flex;align-items:center;gap:9px;padding:10px 12px;cursor:pointer;
+ background:rgba(255,255,255,.03)}
+.cotop .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+ font-size:11px;font-weight:900;color:#06131b;flex:none}
+.cotop .nm{min-width:0;line-height:1.25}
+.cotop .nm b{display:block;font-size:12.5px;font-weight:800;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis}
+.cotop .nm span{display:block;font-size:11px;color:var(--mute);font-weight:700;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cotop .cv{margin-left:auto;color:var(--dim);font-size:12px;flex:none}
+.codot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none}
+.codot.busy{background:var(--gold);animation:fxp 1s infinite}
+.cobody{padding:11px 12px;display:grid;gap:9px;border-top:1px solid var(--line)}
+.cohud.min .cobody{display:none}
+.cobtn{background:var(--bg);border:1px solid var(--line);color:#fff;font:inherit;
+ font-weight:800;font-size:12.5px;padding:9px;border-radius:9px;cursor:pointer;width:100%}
+.cobtn:hover:not(:disabled){border-color:var(--green)}
+.cobtn.go{background:var(--green);color:#03291a;border-color:var(--green)}
+.cobtn.warn:hover{border-color:#ff7a8a;color:#ff7a8a}
+.cobtn:disabled{opacity:.45;cursor:not-allowed}
+.corow{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.conote{color:var(--mute);font-size:11.5px;line-height:1.55;margin:0}
+.cowait{background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:var(--gold);
+ border-radius:9px;padding:8px 10px;font-size:11.5px;font-weight:800;line-height:1.45}
+.cofeed{max-height:96px;overflow:auto;display:grid;gap:4px;font-size:11.5px}
+.cofeed div{color:var(--mute)}
+.cofeed b{color:#fff}
+.cosb{background:var(--bg);border-radius:9px;padding:9px 10px;display:grid;gap:7px}
+.cosb .q{font-size:12px;font-weight:800;color:#fff;line-height:1.35}
+.cosb .i{font-size:11px;color:var(--mute);font-weight:700}
+.cosb input{background:var(--panel);border:2px solid var(--line);color:#fff;border-radius:8px;
+ padding:7px 9px;font:inherit;font-weight:700;font-size:13px;width:100%;min-width:0}
+.cosbopt{background:var(--panel);border:2px solid var(--line);border-radius:9px;padding:7px 4px;
+ cursor:pointer;font:inherit;color:#fff;text-align:center}
+.cosbopt:hover:not(:disabled){border-color:var(--green)}
+.cosbopt:disabled{opacity:.4;cursor:not-allowed}
+.cosbopt b{display:block;font-size:13px;font-weight:900}
+.cosbopt span{display:block;font-size:10px;color:var(--mute);font-weight:800}
+.cosbres{border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:800}
+.cosbres.w{background:rgba(0,231,1,.12);color:#6dffa8}
+.cosbres.l{background:rgba(255,122,138,.12);color:#ff7a8a}
+@media(max-width:900px){.cohud{right:8px;left:8px;width:auto;bottom:70px}}
+
 /* ===================== SPORTSBOOK ===================== */
 /* The book is a long scrolling column, not a centred board like the other games */
 #sportsView .stage{align-items:flex-start;justify-content:flex-start;overflow-y:auto;
@@ -267,9 +316,9 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .fxmk{padding:4px 13px 12px}
 .fxmk h5{margin:10px 0 6px;font-size:10.5px;font-weight:900;color:var(--mute);letter-spacing:.07em}
 .fxrow{display:grid;gap:6px}
-.fxrow.c3{grid-template-columns:repeat(3,1fr)}
-.fxrow.c2{grid-template-columns:repeat(2,1fr)}
-.fxrow.c4{grid-template-columns:repeat(4,1fr)}
+.fxrow.c3{grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
+.fxrow.c2{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.fxrow.c4{grid-template-columns:repeat(auto-fit,minmax(78px,1fr))}
 .odd{background:var(--bg);border:2px solid var(--line);border-radius:9px;padding:8px 6px;
  cursor:pointer;font:inherit;color:#fff;text-align:center;transition:border-color .12s,transform .1s}
 .odd:hover:not(:disabled){border-color:var(--green)}
@@ -312,7 +361,9 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .obet button{background:var(--panel);border:1px solid var(--line);color:#fff;font:inherit;
  font-weight:800;font-size:12px;padding:7px;border-radius:8px;cursor:pointer}
 .obet button:hover{border-color:var(--gold);color:var(--gold)}
-@media(max-width:700px){.fxrow.c4{grid-template-columns:repeat(2,1fr)}}
+/* No sportsbook-specific breakpoint: the odds grids above use auto-fit, so they
+   reflow to whatever width the stage actually has. Viewport width is the wrong
+   thing to key off here anyway - the sidebar and the 300px slip both eat into it. */
 
 /* ===================== LONG SHOT ===================== */
 .lswrap{position:relative;width:100%;height:100%;min-height:430px;border-radius:14px;overflow:hidden;background:#0d1b26}
@@ -1692,6 +1743,7 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 
   <button class="go" id="fbGuideClose">Got it</button>
 </div></div>
+<div class="cohud" id="coHud"></div>
 <div class="gate" id="authGate"></div>
 
 <script>
@@ -1975,7 +2027,7 @@ function buildNav(){const s=$('side'),m=$('mob'),L=navList();
  s.innerHTML='<h4>Casino</h4>'+L.map(([k,n])=>`<button class="nav" data-g="${k}">${IC[k]}${n}</button>`).join('');
  m.innerHTML=L.map(([k,n])=>`<button data-g="${k}">${IC[k]}${n.split(' ').pop()}</button>`).join('');
  document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>go(b.dataset.g))}
-function go(g){SND.click();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='sports')fbRender();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
+function go(g){SND.click();coOnView(g);document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='sports')fbRender();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
 $('mute').onclick=()=>{SND.on=!SND.on;$('muteIco').style.opacity=SND.on?1:.35;if(SND.on)SND.click()};
 $('refill').onclick=()=>{if(P().bal>=100){flash('Top up unlocks under 100 credits');return}P().bal+=1000;renderBal(true);save();SND.win(3)};
 
@@ -2823,6 +2875,157 @@ function devRender(){const box=$('devBox');if(!box)return;if(!DEV){box.innerHTML
 
 
 
+
+/* ============================================================================
+   PARTY HUD  -  presence, join requests, and side bets on your mate's round
+
+   While you are in a party the HUD shows what your mate is playing. Hit Join and
+   they get an invite; if they are mid-round it waits until the round ends rather
+   than yanking them out of it. Once you are together you see their results live
+   and can bet on their next outcome.
+
+   Side bets are HOUSE-BANKED from your own wallet at the usual 97%, exactly like
+   a solo bet - no money moves between the two of you, so the zero-sum rule for
+   party tables is untouched.
+
+   The actor's game code owns the odds (it is the only place that knows them) and
+   publishes an offer; the HUD is generic and just renders whatever it is handed.
+   Adding another game is two calls: coOffer() when the odds change, coSettle()
+   when the outcome lands.
+   ========================================================================== */
+const CO={game:null,theirGame:null,theirBusy:false,on:false,
+ out:null,inReq:null,held:null,offer:null,bet:null,res:null,feed:[],min:false};
+
+/* Most games expose phase:'idle'; a couple use a busy flag. */
+const CO_ST={bj:()=>BJ,chicken:()=>CK,balloon:()=>BP,mines:()=>MN,hilo:()=>HL,
+ moles:()=>MO,tower:()=>TW,scratch:()=>SC,dice:()=>DC,limbo:()=>LB,shot:()=>SHOT};
+function coBusy(g){try{const f=CO_ST[g];if(!f)return false;const o=f();if(!o)return false;
+ if('phase'in o)return o.phase!=='idle';
+ if('busy'in o)return!!o.busy}catch(e){}return false}
+const coName=g=>{const e=GAMES.find(x=>x[0]===g);return e?e[1]:(g||'the lobby')};
+const coPlayable=g=>g&&!['lobby','party','locker','admin'].includes(g);
+
+let coCur='lobby',coPresT=null;
+function coPresSend(){if(!connected())return;
+ clearTimeout(coPresT);
+ coPresT=setTimeout(()=>{send({t:'pres',g:coCur,busy:coBusy(coCur)});
+  // a held invite fires the moment we are out of a round
+  if(CO.held&&!coBusy(coCur)){CO.inReq=CO.held;CO.held=null;SND.tick();coRender()}
+ },60)}
+function coOnView(g){
+ if(CO.on&&g!==CO.game){coEnd(true)}
+ coCur=g;coPresSend();coRender()}
+
+/* ---- invites ---- */
+function coJoin(){const g=CO.theirGame;if(!coPlayable(g))return;
+ CO.out={g};send({t:'jreq',g});SND.click();coRender()}
+function coCancel(){CO.out=null;send({t:'jcancel'});coRender()}
+function coAccept(){const r=CO.inReq;if(!r)return;CO.inReq=null;
+ CO.on=true;CO.game=r.g;CO.feed=[];send({t:'jres',ok:true,g:r.g});
+ SND.win(2);if(coCur!==r.g)go(r.g);coRender()}
+function coDecline(){CO.inReq=null;send({t:'jres',ok:false});coRender()}
+function coEnd(silent){
+ if(CO.on)send({t:'coop',on:false});
+ if(CO.bet){pay(CO.bet.stake);CO.bet=null;if(!silent)toast('Side bet refunded')}
+ CO.on=false;CO.game=null;CO.offer=null;CO.res=null;CO.feed=[];coRender()}
+
+/* ---- what the actor publishes ---- */
+function coOffer(o){if(!CO.on||!connected())return;
+ send(o?{t:'offer',q:o.q,label:o.label,info:o.info||''}:{t:'offer',clear:1})}
+function coSettle(yes){if(!CO.on||!connected())return;send({t:'osettle',yes:!!yes})}
+function coFeed(txt){if(!CO.on||!connected())return;send({t:'ofeed',txt});
+ CO.feed.push({me:1,txt});CO.feed=CO.feed.slice(-30);coRender()}
+
+/* ---- spectator side bet: house-banked, 97%, priced off their published odds ---- */
+function coBet(side){
+ const o=CO.offer;if(!o||CO.bet)return;
+ const q=side==='yes'?o.q:1-o.q;
+ if(!(q>0)){toast('No odds on that');return}
+ const st=Math.round((parseFloat($('coStake').value)||0)*100)/100;
+ if(!(st>0)){toast('Enter a stake above 0');return}
+ if(!take(st))return;
+ CO.bet={side,stake:st,mult:0.97/q,label:o.label};
+ SND.chip();coRender()}
+
+function coOnSettle(yes){
+ const b=CO.bet;CO.offer=null;
+ if(!b){coRender();return}
+ CO.bet=null;
+ const won=(b.side==='yes')===yes;
+ if(won){const pay_=Math.round(b.stake*b.mult*100)/100;
+  pay(pay_);log('Side bet',b.stake,b.mult,pay_);
+  CO.res={win:1,txt:`Side bet won \u2014 +${fmt(pay_)}`};SND.win(b.mult);burst(36)}
+ else{log('Side bet',b.stake,0,0);
+  CO.res={win:0,txt:`Side bet lost \u2014 \u2212${fmt(b.stake)}`};SND.lose()}
+ setTimeout(()=>{CO.res=null;coRender()},4200);
+ coRender()}
+
+/* ---- render ---- */
+function coRender(){const el=$('coHud');if(!el)return;
+ if(!connected()||!loggedIn()){el.classList.remove('show');return}
+ const rm=NET.remote||{name:'Friend',color:'#ffc800'};
+ el.classList.add('show');el.classList.toggle('min',CO.min);
+ const busy=CO.theirBusy,tg=CO.theirGame;
+ const status=CO.on?`Together in ${esc(coName(CO.game))}`
+  :coPlayable(tg)?`${busy?'Mid-round in':'Playing'} ${esc(coName(tg))}`
+  :`In ${esc(coName(tg))}`;
+
+ let body='';
+ if(CO.inReq){
+  body=`<div class="cowait">${esc(rm.name)} wants to join you in ${esc(coName(CO.inReq.g))}</div>
+   <div class="corow"><button class="cobtn go" id="coAcc">Accept</button>
+   <button class="cobtn warn" id="coDec">Decline</button></div>`;
+ }else if(CO.out){
+  body=`<div class="cowait">${busy?`${esc(rm.name)} is mid-round \u2014 they'll get the invite the moment it ends`:`Waiting for ${esc(rm.name)} to accept\u2026`}</div>
+   <button class="cobtn" id="coCan">Cancel invite</button>`;
+ }else if(CO.on){
+  body=`${CO.res?`<div class="cosbres ${CO.res.win?'w':'l'}">${esc(CO.res.txt)}</div>`:''}
+   ${CO.offer&&!CO.bet?coSbHTML(rm):''}
+   ${CO.bet?`<div class="cowait">${fmt(CO.bet.stake)} on <b>${CO.bet.side==='yes'?'YES':'NO'}</b> at ${CO.bet.mult.toFixed(2)}\u00d7 \u2014 riding on ${esc(rm.name)}</div>`:''}
+   ${CO.feed.length?`<div class="cofeed">${CO.feed.slice(-12).reverse().map(f=>
+     `<div>${f.me?'<b>You</b>':'<b>'+esc(rm.name)+'</b>'} ${esc(f.txt)}</div>`).join('')}</div>`:
+     '<p class="conote">Play your own rounds side by side. When they start one you can back the outcome.</p>'}
+   <button class="cobtn warn" id="coLeave">Leave session</button>`;
+ }else{
+  body=coPlayable(tg)
+   ? `<button class="cobtn go" id="coJoin">Join them in ${esc(coName(tg))}</button>
+      <p class="conote">They'll get an invite. If they're mid-round it waits until it ends.</p>`
+   : `<p class="conote">${esc(rm.name)} isn't in a game right now. When they start one you can join from here.</p>`;
+ }
+
+ el.innerHTML=`<div class="cotop" id="coTop">
+   <span class="av" style="background:${esc(rm.color||'#ffc800')}">${esc((rm.name||'?')[0].toUpperCase())}</span>
+   <span class="codot ${busy?'busy':''}"></span>
+   <span class="nm"><b>${esc(rm.name)}</b><span>${status}</span></span>
+   <span class="cv">${CO.min?'\u25b2':'\u25bc'}</span>
+  </div>
+  <div class="cobody">${body}</div>`;
+
+ $('coTop').onclick=()=>{CO.min=!CO.min;coRender()};
+ if($('coJoin'))$('coJoin').onclick=coJoin;
+ if($('coCan'))$('coCan').onclick=coCancel;
+ if($('coAcc'))$('coAcc').onclick=coAccept;
+ if($('coDec'))$('coDec').onclick=coDecline;
+ if($('coLeave'))$('coLeave').onclick=()=>coEnd();
+ if($('coYes'))$('coYes').onclick=()=>coBet('yes');
+ if($('coNo'))$('coNo').onclick=()=>coBet('no');
+}
+
+function coSbHTML(rm){const o=CO.offer,q=o.q;
+ const py=q>0?(0.97/q):0, pn=q<1?(0.97/(1-q)):0;
+ return `<div class="cosb">
+  <div class="q">${esc(rm.name)} \u2014 ${esc(o.label)}?</div>
+  ${o.info?`<div class="i">${esc(o.info)}</div>`:''}
+  <input id="coStake" type="number" min="0.1" step="1" value="${keepVal('coStake',10)}" inputmode="decimal">
+  <div class="corow">
+   <button class="cosbopt" id="coYes" ${py>=1.02?'':'disabled'}>
+    <b>${py>=1.02?py.toFixed(2)+'\u00d7':'\u2014'}</b><span>YES \u00b7 ${(q*100).toFixed(0)}%</span></button>
+   <button class="cosbopt" id="coNo" ${pn>=1.02?'':'disabled'}>
+    <b>${pn>=1.02?pn.toFixed(2)+'\u00d7':'\u2014'}</b><span>NO \u00b7 ${((1-q)*100).toFixed(0)}%</span></button>
+  </div>
+  <div class="i">Your wallet, 97% \u2014 nothing moves between you two.</div>
+ </div>`}
+
 /* ============================================================================
    SPORTSBOOK  -  Stack League
    A simulated football league you can bet like a real book: a card of fixtures,
@@ -2898,6 +3101,28 @@ function fbProbs(m,mins,ch,ca){
   const k=H+'-'+A;P.cs[k]=(P.cs[k]||0)+q}
  return P}
 
+/* Outcome predicates, so any set of markets can be priced together off the same
+   score grid. This is what makes a same-match accumulator honest: "home win AND
+   over 2.5" are correlated, so multiplying their individual probabilities is
+   simply wrong. Summing the grid cells where BOTH hold is exact. */
+const FB_PRED={home:(H,A)=>H>A,draw:(H,A)=>H===A,away:(H,A)=>H<A,
+ ov:(H,A)=>H+A>=3,un:(H,A)=>H+A<3,
+ btts:(H,A)=>H>0&&A>0,nbtts:(H,A)=>!(H>0&&A>0)};
+function fbPred(key){if(key.slice(0,3)==='cs:'){
+  const v=key.slice(3).split('-').map(Number);return (H,A)=>H===v[0]&&A===v[1]}
+ return FB_PRED[key]||(()=>false)}
+/* P(all of `keys` land), given the score so far and the minutes left */
+function fbJointP(m,keys,mins,ch,ca){
+ if(!keys.length)return 1;
+ mins=mins==null?fbMins(m):mins;ch=ch==null?m.ch:ch;ca=ca==null?m.ca:ca;
+ const [lh,la]=m.lam,dh=fbDist(lh,mins),da=fbDist(la,mins),pr=keys.map(fbPred);
+ let t=0;
+ for(let i=0;i<=FB_MAXG;i++)for(let j=0;j<=FB_MAXG;j++){
+  const q=dh[i]*da[j];if(!q)continue;
+  const H=ch+i,A=ca+j;
+  let ok=true;for(const f of pr)if(!f(H,A)){ok=false;break}
+  if(ok)t+=q}
+ return t}
 const fbOdds=pr=>pr>0?FB_RTP/pr:0;
 /* Never offer a price that cannot beat the stake. Once an outcome is settled
    (BTTS "yes" at 1-1, say) its probability approaches 1 and the priced odds fall
@@ -2912,12 +3137,12 @@ function fbMakeCard(seed,round){
  const r=fbRng(seed^(round*7919));
  const ids=FB_TEAMS.map(t=>t.id);
  for(let i=ids.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}
- const ms=[];
- for(let i=0;i<ids.length;i+=2){
-  const h=fbTeam(ids[i]),a=fbTeam(ids[i+1]);
-  ms.push({h:h.id,a:a.id,lam:fbLam(h,a),seed:(seed^(round*104729)^(i*7717))>>>0,
-   phase:'pre',min:0,ch:0,ca:0,feed:[],events:null})}
- return ms}
+ // One match at a time: the whole card on screen pushed the bet slip and its
+ // cash-out buttons below the fold, which is the one control you need to reach
+ // in a hurry. A finished match rolls straight into the next one.
+ const h=fbTeam(ids[0]),a=fbTeam(ids[1]);
+ return [{h:h.id,a:a.id,lam:fbLam(h,a),seed:(seed^(round*104729))>>>0,
+  phase:'pre',min:0,ch:0,ca:0,feed:[],events:null}]}
 
 /* Pre-roll the whole match from its own seed. Both players run this identically,
    so a party stays in sync on the seed alone - no event streaming needed. */
@@ -2968,21 +3193,22 @@ function fbNewRound(keepSeed){
 
 function fbRender(){if(!$('fbCard'))return;fbCardRender();fbSlipRender();fbOpenRender();fbLeadRender();
  $('fbRound').textContent='ROUND '+FB.round;
- $('fbInfo').textContent='Back a market, build a single or an accumulator, then watch it play out. '+
+ $('fbInfo').textContent='One match at a time. Back a market, build a single or an accumulator, then watch it play out \u2014 the next fixture comes up automatically. '+
   'Odds move live as goals go in, and you can cash out any open bet at its fair value. '+
-  'Every bet returns 97% \u2014 including accumulators, which are not penalised per leg the way a real book does it.'}
+  'Every bet returns 97%, accumulators included.'}
 
 function fbCardRender(){const el=$('fbCard');
+ const m0=FB.card[0];
+ const guest=FB.shared&&!NET.host;
  el.innerHTML=FB.card.map((m,i)=>fbFixtureHTML(m,i)).join('')
   +`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-     ${FB.card.every(m=>m.phase==='done')
-       ? `<button class="go" id="fbNext" style="flex:1">Next round</button>`
-       : `<button class="go" id="fbKick" style="flex:1" ${FB.live>=0?'disabled':''}>${FB.live>=0?'Match in play\u2026':'Kick off next match'}</button>`}
+     ${!m0?'':m0.phase==='done'
+       ? `<button class="go" id="fbNext" style="flex:1" ${guest?'disabled':''}>${guest?'Next match coming up\u2026':'Next match'}</button>`
+       : `<button class="go" id="fbKick" style="flex:1" ${FB.live>=0||guest?'disabled':''}>${FB.live>=0?'Match in play\u2026':guest?'Waiting on the host\u2026':'Kick off'}</button>`}
     </div>`;
  el.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>fbPick(+b.dataset.m,b.dataset.o));
  if($('fbKick'))$('fbKick').onclick=fbKick;
- if($('fbNext'))$('fbNext').onclick=()=>{FB.round++;fbNewRound(true);
-  if(FB.shared&&NET.host)send({t:'fbCard',seed:FB.seed,round:FB.round})}}
+ if($('fbNext'))$('fbNext').onclick=fbAdvance}
 
 function fbFixtureHTML(m,i){const h=fbTeam(m.h),a=fbTeam(m.a);
  const live=m.phase==='live',done=m.phase==='done';
@@ -3020,16 +3246,13 @@ function fbPick(mi,key){
  const m=FB.card[mi];if(!m||m.phase==='done')return;
  const at=FB.sel.findIndex(x=>x.mi===mi&&x.key===key);
  if(at>=0){FB.sel.splice(at,1);SND.click();return fbRender()}
- // legs from one match are correlated, so the product rule would misprice them
- if(FB.mode==='acca'&&FB.sel.some(x=>x.mi===mi)){
-  toast('Accumulator legs must come from different matches');return}
  const {p,o}=fbPriceOf(m,key);
  if(!(p>0)||!fbLive(o)){toast('That market is suspended');return}
  FB.sel.push({mi,key,p,o,label:fbLabel(m,key),
   match:fbTeam(m.h).s+' v '+fbTeam(m.a).s,min:m.min});
  SND.chip();fbRender()}
 
-const fbAccaP=()=>FB.sel.reduce((a,x)=>a*x.p,1);
+const fbAccaP=()=>FB.card[0]?fbJointP(FB.card[0],FB.sel.map(x=>x.key)):0;
 const fbAccaO=()=>fbOdds(fbAccaP());
 
 function fbSlipRender(){const el=$('fbSlip');if(!el)return;
@@ -3045,7 +3268,7 @@ function fbSlipRender(){const el=$('fbSlip');if(!el)return;
     <div style="min-width:0"><b>${esc(x.label)}</b><span>${esc(x.match)}</span></div>
     <div class="pr">${fbFmtOdds(x.o)}</div>
     <button class="x" data-rm="${k}">\u00d7</button></div>`).join('')
-   :'<div class="slipempty">Tap any odds on the card to add a selection.<br>Two or more from different matches can ride as an accumulator.</div>'}
+   :'<div class="slipempty">Tap any odds to add a selection.<br>Two or more ride together as an accumulator.</div>'}
   ${n?`<div><div class="lbl">Stake ${multi?'':'per bet'}</div>
    <div class="betbox"><input id="fbStake" type="number" min="0.1" step="1" value="${stake}" inputmode="decimal">
    <button data-fm=".5">\u00bd</button><button data-fm="2">2\u00d7</button></div></div>
@@ -3082,9 +3305,8 @@ function fbPlace(){
 /* Fair value, no second margin: stake * price * P(it still wins). */
 function fbCashVal(b){
  if(b.state!=='open')return 0;
- let p=1;
- for(const L of b.legs){const m=FB.card[L.mi];if(!m)return 0;
-  const {p:pr}=fbPriceOf(m,L.key);p*=pr}
+ const m=FB.card[0];if(!m)return 0;
+ const p=fbJointP(m,b.legs.map(L=>L.key));   // joint, not a product of singles
  return Math.round(b.stake*b.odds*p*100)/100}
 
 function fbOpenRender(){const el=$('fbOpen');if(!el)return;
@@ -3139,6 +3361,11 @@ function fbSettle(){
 
 /* ---- live match ---- */
 function fbStopTick(){clearInterval(FB.tick);FB.tick=null}
+function fbAdvance(){
+ if(FB.live>=0)return;
+ if(!FB.card.length||FB.card[0].phase!=='done')return;
+ FB.round++;fbNewRound(true);
+ if(FB.shared&&NET.host)send({t:'fbCard',seed:FB.seed,round:FB.round})}
 function fbKick(){
  const i=FB.card.findIndex(m=>m.phase==='pre');
  if(i<0)return;
@@ -3158,7 +3385,9 @@ function fbRun(i){
     popShow($('fbPop'),'GOAL',`${fbTeam(m.h).s} ${m.ch}\u2013${m.ca} ${fbTeam(m.a).s}`)}
    else m.feed.push(e)}
   if(m.min>=FB_MINS){m.phase='done';m.min=FB_MINS;FB.live=-1;fbStopTick();
-   SND.reelStop();fbSettle()}
+   SND.reelStop();fbSettle();
+   // give the result a beat to land, then bring on the next fixture
+   if(!FB.shared||NET.host)setTimeout(fbAdvance,4200);}
   fbRender();
  },520)}
 
@@ -3447,7 +3676,10 @@ function lsLand(){
   popShow($('lsPop'),'',`${Math.round(dist)} off target. Lost ${fmt(SHOT.bet)}`,true);
   log('Long Shot',SHOT.bet,0,0);
  }
- setTimeout(()=>{if(SHOT.phase==='done'){SHOT.phase='idle';SHOT.shot=null;lsDraw();lsUI()}},1500);
+ coSettle(hit);
+ coFeed(hit?`hit the pad — ${bull?'bullseye! ':''}won ${fmt(SHOT.bet*lsPay(SHOT.tier))}`
+           :`missed by ${Math.round(dist)} — lost ${fmt(SHOT.bet)}`);
+ setTimeout(()=>{if(SHOT.phase==='done'){SHOT.phase='idle';SHOT.shot=null;lsDraw();lsUI();coPresSend()}},1500);
  lsUI()}
 
 function lsMsg(t){const m=$('lsMsg');if(!m)return;m.textContent=t;
@@ -3455,7 +3687,10 @@ function lsMsg(t){const m=$('lsMsg');if(!m)return;m.textContent=t;
 
 function lsStart(){if(SHOT.phase!=='idle')return;
  const bet=betVal('lsBet');if(!take(bet))return;
- SHOT.bet=bet;SHOT.phase='aim';lsNewRound();SND.click();lsDraw();lsUI()}
+ SHOT.bet=bet;SHOT.phase='aim';lsNewRound();SND.click();lsDraw();lsUI();
+ coPresSend();coFeed(`lining up a ${fmt(bet)} shot — ${LS_TIERS[SHOT.tier].n.toLowerCase()} pad`);
+ coOffer({q:lsQ(SHOT.tier),label:'hits the pad',
+  info:`${LS_TIERS[SHOT.tier].n} pad · pays ${lsPay(SHOT.tier).toFixed(2)}× · ${fmt(bet)} at stake`})}
 
 function lsUI(){const t=LS_TIERS[SHOT.tier],idle=SHOT.phase==='idle',p=P();
  $('lsGo').disabled=!idle;
@@ -3612,7 +3847,9 @@ function moStart(){if(MO.phase!=='idle'||MO.busy)return;
  MO.bet=bet;MO.hits=0;MO.mult=1;MO.phase='play';
  moDeal();
  $('moHoles').querySelectorAll('.mohole').forEach(el=>el.className='mohole');
- SND.click();moUI();moMsg('Whack a mole!')}
+ SND.click();moUI();moMsg('Whack a mole!');
+ coPresSend();coFeed(`started a round — ${MO.moles} moles, ${fmt(bet)}`);
+ coOffer({q:moP(),label:'lands the next swing',info:`${MO.moles} moles · ${(moP()*100).toFixed(0)}% · ${fmt(MO.bet)} at stake`})}
 
 function moWhack(i,el){
  if(MO.phase!=='play'||MO.busy)return;
@@ -3635,6 +3872,7 @@ function moWhack(i,el){
    burstAt(r.left+r.width/2,r.top+r.height*.45,16,['#8a5a2b','#6d4520','#c98b3e','#fff'],6);
    const mu=$('moMult');mu.classList.remove('bump');void mu.offsetWidth;mu.classList.add('bump');
    moUI();
+   coSettle(true);coFeed(`hit ${MO.hits} — now ${moFmt(MO.mult)}×`);
    if(MO.hits>=MO_MAX){moMsg('MAXED OUT!');setTimeout(()=>moCash(true),600);return}
    moMsg(['Nice!','Got him!','Bonk!','Smack!','Clean hit!'][Math.floor(Math.random()*5)]);
    // reset that hole, reshuffle, carry on
@@ -3642,10 +3880,13 @@ function moWhack(i,el){
     el.classList.remove('bonk');el.classList.add('sink');
     setTimeout(()=>{el.className='mohole';el.querySelector('.moleclip').innerHTML=MOLE_SVG;
      moDeal();moShuffleTell();moSub('All '+MO.moles+' moles moved \u2014 new holes');
-     MO.busy=false;moUI()},300)},380);
+     MO.busy=false;moUI();
+     coOffer({q:moP(),label:'lands the next swing',
+      info:`${MO.hits} hit${MO.hits===1?'':'s'} · ${moFmt(MO.mult)}× riding · ${(moP()*100).toFixed(0)}%`})},300)},380);
   }else{
    SND.dud(pan);
    burstAt(r.left+r.width/2,r.top+r.height*.75,10,['#6d4520','#583716'],4);
+   coSettle(false);coFeed(`missed on ${MO.hits} hit${MO.hits===1?'':'s'} — lost ${fmt(MO.bet)}`);
    moBust(el);
   }
  },130)}
@@ -3664,7 +3905,7 @@ function moBust(el){
  setTimeout(()=>{
   log('Moles',MO.bet,0,0);SND.lose();
   popShow($('moPop'),'',`Missed \u2014 empty hole. Lost ${fmt(MO.bet)}`,true);
-  MO.phase='idle';MO.busy=false;MO.hits=0;MO.mult=1;moUI();
+  MO.phase='idle';MO.busy=false;MO.hits=0;MO.mult=1;moUI();coPresSend();
  },900);
  setTimeout(()=>{if(MO.phase==='idle')$('moHoles').querySelectorAll('.mohole').forEach(e=>{
   e.classList.remove('up');e.classList.add('sink');setTimeout(()=>e.className='mohole',300)})},2100)}
@@ -3679,7 +3920,8 @@ function moCash(auto){
  moMsg(auto?'MAX WIN!':'Cashed out!');
  burst(MO.mult>=10?160:70);
  if(MO.mult>=10)bigWin(MO.mult,payout);
- MO.phase='idle';MO.hits=0;MO.mult=1;
+ coOffer(null);coFeed(`cashed out at ${moFmt(MO.mult)}× for ${fmt(payout)}`);
+ MO.phase='idle';MO.hits=0;MO.mult=1;coPresSend();
  setTimeout(()=>{$('moHoles').querySelectorAll('.mohole').forEach(e=>{
   e.classList.add('sink');setTimeout(()=>e.className='mohole',300)});
   MO.busy=false;moUI()},420)}
@@ -3954,14 +4196,20 @@ async function netJoin(code){code=(code||'').trim().toUpperCase().replace(/[^A-Z
  NET.peer.on('error',e=>{NET.err=e&&e.type==='peer-unavailable'?'No party with that code. Check the code and that your mate is hosting.':'Network error: '+(e&&e.type||e);netLeave(true)});
  setTimeout(()=>{if(NET.status==='joining'){NET.err='Timed out connecting. Try both on the same Wi-Fi, or re-check the code.';netLeave(true)}},20000)}
 function wire(c){NET.conn=c;c.on('open',()=>{NET.status='connected';send({t:'prof',p:myProf()});SND.win(2);partyRender()});c.on('data',onNet);c.on('close',netLost);c.on('error',netLost)}
-function netLost(){if(NET.status!=='connected'&&NET.status!=='joining')return;const who=NET.remote?NET.remote.name:'Friend';NET.remote=null;NET.conn=null;
+function netLost(){if(NET.status!=='connected'&&NET.status!=='joining')return;
+ if(CO.bet){pay(CO.bet.stake);CO.bet=null;toast('Side bet refunded')}
+ Object.assign(CO,{game:null,theirGame:null,theirBusy:false,on:false,out:null,inReq:null,held:null,offer:null,bet:null,res:null,feed:[]});
+ if($('coHud'))$('coHud').classList.remove('show');const who=NET.remote?NET.remote.name:'Friend';NET.remote=null;NET.conn=null;
  if(NET.inPlay>0){pay(NET.inPlay);toast(`Connection lost. Refunded ${fmt(NET.inPlay)} in play.`);NET.inPlay=0}else toast(`${who} disconnected`);
  chatSys(`${who} left the party`);if(NET.host){NET.status='waiting';hostOnGuestLeft()}else{netLeave(true)}partyRender()}
 function netLeave(keepErr){FB.shared=false;FB.oppProfit=null;
+ if(CO.bet){pay(CO.bet.stake);CO.bet=null}
+ Object.assign(CO,{game:null,theirGame:null,theirBusy:false,on:false,out:null,inReq:null,held:null,offer:null,bet:null,res:null,feed:[]});
+ if($('coHud'))$('coHud').classList.remove('show');
  if(NET.inPlay>0){pay(NET.inPlay);NET.inPlay=0}try{NET.conn&&NET.conn.close()}catch(e){}try{NET.peer&&NET.peer.destroy()}catch(e){}
  const err=keepErr?NET.err:'';Object.assign(NET,{peer:null,conn:null,host:false,code:'',remote:null,status:'off',err});if(PG)hostStopAll();PG=null;PS=null;SEEN.clear();partyRender()}
 function onNet(m){if(!m||typeof m!=='object')return;switch(m.t){
- case 'prof':{const first=!NET.remote;NET.remote=m.p;rosterSee(m.p);if(first&&NET.host)setTimeout(fbSyncJoin,120);if(first){chatSys(`${m.p.name} joined the party`);toast(`${m.p.name} joined`)}if(NET.host)push();partyRender();devRender();if(typeof admRender==='function')admRender();break}
+ case 'prof':{const first=!NET.remote;NET.remote=m.p;rosterSee(m.p);if(first&&NET.host)setTimeout(fbSyncJoin,120);if(first)setTimeout(coPresSend,200);coRender();if(first){chatSys(`${m.p.name} joined the party`);toast(`${m.p.name} joined`)}if(NET.host)push();partyRender();devRender();if(typeof admRender==='function')admRender();break}
  case 'full':NET.err='That party already has two players.';netLeave(true);break;
  case 'chat':chatAdd(NET.remote?NET.remote.name:'Friend',m.m);SND.tick();break;
  case 'taunt':showTaunt(m.e,m.name||'Friend');SND.tick();break;
@@ -3973,6 +4221,22 @@ function onNet(m){if(!m||typeof m!=='object')return;switch(m.t){
   FB.open=[];FB.profit=0;FB.oppProfit=0;fbNewRound(true);break}
  case 'fbGo':fbRun(m.mi);break;
  case 'fbP':FB.oppProfit=m.v;fbLeadRender();break;
+ case 'pres':{CO.theirGame=m.g;CO.theirBusy=!!m.busy;
+  if(CO.on&&m.g!==CO.game)coEnd(true);coRender();break}
+ case 'jreq':{const r={g:m.g};
+  if(coBusy(coCur))CO.held=r; else {CO.inReq=r;SND.tick()}
+  coRender();break}
+ case 'jcancel':CO.inReq=null;CO.held=null;coRender();break;
+ case 'jres':{const want=CO.out;CO.out=null;
+  if(m.ok&&want){CO.on=true;CO.game=want.g;CO.feed=[];
+   toast('Joined '+(NET.remote?NET.remote.name:'your mate'));SND.win(2);
+   if(coCur!==want.g)go(want.g)}
+  else if(!m.ok)toast('They declined');
+  coRender();break}
+ case 'coop':if(!m.on)coEnd(true);break;
+ case 'offer':CO.offer=m.clear?null:{q:m.q,label:m.label,info:m.info};coRender();break;
+ case 'osettle':coOnSettle(m.yes);break;
+ case 'ofeed':CO.feed.push({me:0,txt:m.txt});CO.feed=CO.feed.slice(-30);coRender();break;
  case 'admreq':send({t:'prof',p:myProf()});break;
  case 'st':if(!NET.host){m.s.d.rc=performance.now();PS=m.s;partyRenderTable()}break;
  case 'act':if(NET.host)hostAct('G',m);break;

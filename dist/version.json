@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.20.17",
-  "notes": "fix panel overlap, add betting guide",
-  "bytes": 476254,
-  "at": "2026-09-20T05:20:32.493Z"
+  "version": "2026.09.20.19",
+  "notes": "party presence + join + side bets; sportsbook one match at a time",
+  "bytes": 491262,
+  "at": "2026-09-20T05:39:23.882Z"
 }

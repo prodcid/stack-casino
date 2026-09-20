@@ -39,7 +39,8 @@ node test.js rtp        # maths only, no clicking (~2 min)
 node test.js admin      # admin portal: stats, user table, suspend, audit
 node test.js moles      # Moles maths, reshuffle, payouts, guards + sound smoke
 node test.js shot       # Long Shot drag-aiming (real mouse drags)
-node test.js sports     # Sportsbook pricing, accas, cash out, suspensions
+node test.js sports     # Sportsbook pricing, accas, cash out, suspensions, layout
+node test.js coop       # two-window presence, join invites, side bets
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -127,10 +128,28 @@ odds, cash out. Solo and party. Four rules that must not be broken:
 - **Suspend settled markets.** A certainty prices at `0.97/1 = 0.97` — a guaranteed
   loss. `FB_MINODDS` gates every quote.
 
-Party sync is **seed-based**: host owns the card, both pre-simulate identically, only
-the seed and a kick-off cross the wire. Bets are always vs the house at 97% (in party
+**One fixture at a time**, rolling to the next automatically — the three-match card
+pushed the slip's cash-out button below the fold. Because there is only one match,
+accumulator legs are **correlated**, so they are priced from the **joint distribution
+over the score grid**, never the product of singles (multiplying "home win" by
+"over 2.5" measured 5.00pp wrong against simulation; joint is 0.03pp).
+
+Party sync is **seed-based**: host owns the card and drives kick-off, both pre-simulate
+identically, only the seed and a kick-off cross the wire. Bets are always vs the house at 97% (in party
 too) — no money moves between players, so the zero-sum party rule is untouched; the
 party layer only shares fixtures and a profit leaderboard.
+
+**Party HUD** (`CO` state, `#coHud`) — a floating panel, only while `connected()`.
+Shows what your mate is playing, sends a join invite they accept, and offers side bets
+on their live round.
+
+- An invite arriving while they are **mid-round is held**, not shown, until the round
+  ends. `coBusy(g)` reads `phase !== 'idle'` (or `busy`) off that game's state object.
+- **Side bets are house-banked** from the spectator's own wallet at 97%. No money moves
+  between players, so the zero-sum party rule is untouched.
+- The **actor's game code publishes the odds** (`coOffer`) — it is the only place that
+  knows them — and calls `coSettle(yes)` on the outcome. The HUD is generic. Adding a
+  game is those two calls. Currently wired for Moles and Long Shot.
 
 **Shipping.** `node ship.js "what changed"`. See section 7.
 
@@ -188,7 +207,8 @@ Two patterns, don't mix them up:
 - Auto-update **is live** — `prodcid/stack-casino`, public. `node ship.js "notes"` publishes and the mate's `launcher.html` self-updates. Version numbers come from the git-log high-water mark, so they can only ever go up (two builds once shared a number and cached launchers silently refused to update).
 - Admin password ADMIN_PW is plaintext in the file, same as the old dev password. Anyone who opens the file can read it.
 - Roster figures are self-reported by the other player's client. Treat as a record, not proof.
-- Sportsbook party sync is seed-based: the host owns the card and kicks off. If the guest joins mid-round they get a fresh card, and their open bets from a previous card are cleared.
+- Sportsbook: host drives kick-off and the roll to the next match; the guest's buttons are disabled. A guest joining mid-match gets a fresh fixture and any open bets on the old one are cleared.
+- Party HUD side bets are wired for Moles and Long Shot only. Other games show presence and join, but no side-bet offer until they call coOffer/coSettle.
 
 ---
 
@@ -227,6 +247,10 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Fixed a layout overlap in the shell: grid-template-columns used a bare 1fr, whose min-width:auto refuses to shrink below content, and .stage centres its overflow - so a wide fixture list spilled LEFT over the control column. Now minmax(0,1fr) plus min-width:0 on ctrl/stage. This was a global bug, not a sportsbook one.
 - **2026-09-20** — Sportsbook control column: flex items will not shrink below min-content in the cross axis, so the slip's nowrap prices and match names pushed past the 300px panel and got clipped. Constrained each level with min-width:0 and ellipsised the text. test.js sports now measures overlap and overflow at 1000/1280/1600px.
 - **2026-09-20** — Added an in-game betting guide (#fbGuide) covering decimal odds, each market, singles vs accas, live odds, cash out and the 97%. It also states plainly where this book is MORE generous than a real one (accas not compounded, cash out at fair value) - if we are going to be honest in the maths, say so in the copy.
+- **2026-09-20** — Party HUD added: a floating panel showing what your mate is playing, a join invite they accept, and side bets on their round. An invite lands while they are mid-round is HELD until the round ends rather than interrupting it - coBusy() reads phase/busy off each game's state object. Side bets are house-banked from your own wallet at 97%, so no money moves between players and the zero-sum party rule is untouched.
+- **2026-09-20** — Side-bet odds are published by the ACTOR's game code (coOffer) because that is the only place that knows them; the HUD is generic. Adding a game is two calls - coOffer when the odds change, coSettle when the outcome lands. Wired for Moles and Long Shot.
+- **2026-09-20** — Sportsbook now shows ONE fixture at a time and rolls to the next automatically. The three-match card pushed the bet slip and its cash-out button below the fold, and cash out is the one control you need in a hurry.
+- **2026-09-20** — Same-match accumulator legs are now ALLOWED and priced from the joint distribution over the score grid, not the product of single probabilities. Multiplying correlated markets (home win AND over 2.5) was 5.00pp wrong against simulation; the joint price is 0.03pp. This replaces the old block on same-match legs, which only existed because the product rule lied.
 
 ---
 

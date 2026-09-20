@@ -121,6 +121,80 @@ async function solo(ctx, errs) {
 
 
 
+
+/* ---------------- party presence / join / side bets ---------------- */
+async function coop(browser, errs) {
+  console.log('\nPARTY HUD');
+  const [A, B] = await connectPair(browser, errs);
+  if (await A.evaluate("NET.status") !== 'connected') { fail('coop: no connection'); await A.close(); await B.close(); return; }
+
+  // B wanders off into Moles; A should be told about it
+  await B.evaluate("go('moles')");
+  await A.waitForTimeout(500);
+  const seen = await A.evaluate("[CO.theirGame, !!document.querySelector('#coHud.show')]");
+  (seen[0] === 'moles' && seen[1]) ? pass('presence shows their game', 'moles')
+                                   : fail('presence shows their game', JSON.stringify(seen));
+
+  // mid-round is reported as busy, and an invite is HELD rather than interrupting
+  await B.evaluate("P().bal=10000;renderBal();$('moBet').value='10';moStart()");
+  await A.waitForTimeout(500);
+  const busy = await A.evaluate("CO.theirBusy");
+  busy ? pass('mid-round reads as busy') : fail('mid-round reads as busy');
+
+  await A.evaluate("coJoin()");
+  await B.waitForTimeout(500);
+  const held = await B.evaluate("[!!CO.held, !!CO.inReq]");
+  (held[0] && !held[1]) ? pass('invite waits while they are mid-round')
+                        : fail('invite waits while they are mid-round', JSON.stringify(held));
+
+  // end B's round -> the invite should surface
+  await B.evaluate("MO.phase='idle';MO.busy=false;coPresSend()");
+  await B.waitForTimeout(600);
+  const surfaced = await B.evaluate("[!!CO.inReq, !!CO.held]");
+  (surfaced[0] && !surfaced[1]) ? pass('invite arrives once the round ends')
+                                : fail('invite arrives once the round ends', JSON.stringify(surfaced));
+
+  await B.evaluate("coAccept()");
+  await A.waitForTimeout(600);
+  const joined = await A.evaluate("[CO.on, CO.game]");
+  (joined[0] && joined[1] === 'moles') ? pass('both land in the same game', 'moles')
+                                       : fail('both land in the same game', JSON.stringify(joined));
+
+  // B starts a round -> A gets a priced side-bet offer
+  await B.evaluate("MO.moles=5;$('moBet').value='10';moStart()");
+  await A.waitForTimeout(600);
+  const offer = await A.evaluate("CO.offer?[CO.offer.q, CO.offer.label]:null");
+  (offer && Math.abs(offer[0] - 5/7) < 1e-9) ? pass('side-bet offer priced from live odds', (offer[0]*100).toFixed(1) + '%')
+                                             : fail('side-bet offer priced from live odds', JSON.stringify(offer));
+
+  // A backs YES; stake leaves A's wallet only
+  const bal = await A.evaluate("P().bal");
+  const bBal = await B.evaluate("P().bal");
+  await A.evaluate("$('coStake').value='20';coBet('yes')");
+  await A.waitForTimeout(250);
+  const took = await A.evaluate(`Math.round((${bal}-P().bal)*100)/100`);
+  const bUnchanged = await B.evaluate(`Math.abs(P().bal-${bBal})<0.001`);
+  (took === 20 && bUnchanged) ? pass('side bet is house-banked, not player-vs-player')
+                              : fail('side bet is house-banked', 'took ' + took + ', theirs changed: ' + !bUnchanged);
+
+  // force a hit on B -> A's YES must pay at 0.97/q
+  const before = await A.evaluate("P().bal");
+  await B.evaluate(`(()=>{const el=document.querySelector('.mohole[data-h="0"]');MO.set=new Set([0]);moWhack(0,el)})()`);
+  await A.waitForTimeout(1400);
+  const paidA = await A.evaluate(`Math.round((P().bal-${before})*100)/100`);
+  const want = Math.round(20 * (0.97 / (5/7)) * 100) / 100;
+  Math.abs(paidA - want) < 0.02 ? pass('winning side bet pays 0.97/q', paidA + ' (want ' + want + ')')
+                                : fail('winning side bet pays 0.97/q', paidA + ' vs ' + want);
+
+  // leaving the game ends the session for both
+  await A.evaluate("go('lobby')");
+  await B.waitForTimeout(500);
+  const ended = await B.evaluate("CO.on");
+  !ended ? pass('leaving the game ends the session') : fail('leaving the game ends the session');
+
+  await A.close(); await B.close();
+}
+
 /* ---------------- sportsbook ---------------- */
 async function sports(ctx, errs) {
   console.log('\nSPORTSBOOK');
@@ -130,7 +204,7 @@ async function sports(ctx, errs) {
   await pg.waitForTimeout(500);
 
   const card = await pg.evaluate("FB.card.length");
-  card === 3 ? pass('card has 3 fixtures') : fail('card has 3 fixtures', 'got ' + card);
+  card === 1 ? pass('one fixture at a time') : fail('one fixture at a time', 'got ' + card);
 
   // Every market on a fixture must be a complete, non-overlapping book: the true
   // probabilities have to sum to 1, or the odds are simply wrong.
@@ -180,18 +254,34 @@ async function sports(ctx, errs) {
   // accumulators must ALSO return 97% - the edge is applied once, not per leg.
   // Compounding would give 0.97^n (a 5-fold would be 86%) and breach the rule.
   const acca = await pg.evaluate(`(()=>{
-    const out=[];
-    for(let n=2;n<=5;n++){
-      let p=1;
-      for(let i=0;i<n;i++){ const m=FB.card[i%FB.card.length];
-        const P=fbProbs(m,FB_MINS,0,0); p*= (i%2?P.ov:P.home); }
-      out.push(p*fbOdds(p)*100);
-    }
-    return out;
+    const m=FB.card[0], sets=[['home','ov'],['home','btts'],['home','ov','btts'],['away','un','nbtts']];
+    return sets.map(ks=>{ const p=fbJointP(m,ks,FB_MINS,0,0); return p>0?p*fbOdds(p)*100:97; });
   })()`);
   const aBad = acca.find(v => Math.abs(v-97) > 0.01);
-  aBad === undefined ? pass('accumulators return 97% at every length', '2-5 folds')
-                     : fail('accumulators return 97% at every length', String(aBad));
+  aBad === undefined ? pass('accumulators return 97%', '2 and 3-leg combinations')
+                     : fail('accumulators return 97%', String(aBad));
+
+  // Legs within one match are CORRELATED, so multiplying their individual
+  // probabilities misprices the ticket. The joint probability must match what
+  // the simulator actually produces, and must differ from the naive product.
+  const joint = await pg.evaluate(`(()=>{
+    const m=FB.card[0];
+    const P=fbProbs(m,FB_MINS,0,0);
+    const jt=fbJointP(m,['home','ov'],FB_MINS,0,0);
+    const naive=P.home*P.ov;
+    const N=20000; let both=0;
+    for(let i=0;i<N;i++){
+      const mm={h:m.h,a:m.a,lam:m.lam,seed:(i*2246822519)>>>0}; fbSim(mm);
+      const [H,A]=mm.ft;
+      if(H>A && H+A>=3) both++;
+    }
+    return [jt, naive, both/N];
+  })()`);
+  const jtErr = Math.abs(joint[0]-joint[2]), naiveErr = Math.abs(joint[1]-joint[2]);
+  (jtErr < 0.015 && naiveErr > jtErr)
+    ? pass('correlated legs priced jointly, not multiplied',
+           'joint off by ' + (jtErr*100).toFixed(2) + 'pp, naive product off by ' + (naiveErr*100).toFixed(2) + 'pp')
+    : fail('correlated legs priced jointly', JSON.stringify(joint));
 
   // cash out must be value-neutral: E[cash value] == E[holding]
   const co = await pg.evaluate(`(()=>{
@@ -255,7 +345,7 @@ async function sports(ctx, errs) {
   // Layout: the stage must never spill over the control column, and nothing in
   // the slip may overflow its 300px panel. A bare `1fr` track and flex centring
   // once pushed the fixture list straight over the bet slip.
-  for (const w of [1000, 1280, 1600]) {
+  for (const w of [920, 1000, 1100, 1280, 1440, 1600, 1920]) {
     await pg.setViewportSize({ width: w, height: 860 });
     await pg.waitForTimeout(250);
     const g = await pg.evaluate(`(()=>{
@@ -760,6 +850,7 @@ async function rtp(ctx, errs) {
     if (which === 'all' || which === 'shot') await longshot(ctx, errs);
     if (which === 'all' || which === 'sports') await sports(ctx, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
+    if (which === 'all' || which === 'coop') await coop(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);
   } finally { await browser.close(); }
