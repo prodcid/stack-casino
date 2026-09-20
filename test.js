@@ -131,6 +131,11 @@ async function moles(ctx, errs) {
   const holes = await pg.evaluate("document.querySelectorAll('#moHoles .mohole').length");
   holes === 7 ? pass('7 holes') : fail('7 holes', 'got ' + holes);
 
+  // default should be a setting that plays, not one that ends instantly
+  const dflt = await pg.evaluate("(()=>{const b=$('moCount').querySelector('.on');return [MO.moles, +b.dataset.v]})()");
+  (dflt[0] === 5 && dflt[1] === 5) ? pass('defaults to 5 moles', '71.4% per swing')
+                                   : fail('defaults to 5 moles', JSON.stringify(dflt));
+
   // the headline number from the real game, exactly
   const max = await pg.evaluate("(()=>{MO.moles=1;return moMult(8)})()");
   Math.abs(max - 5649504.98) < 0.01 ? pass('max win matches Stake', max.toLocaleString())
@@ -179,12 +184,35 @@ async function moles(ctx, errs) {
   })()`);
   guard === 0 ? pass('cannot cash out with zero hits') : fail('cannot cash out with zero hits', 'gained ' + guard);
 
+  // The moles RESHUFFLE: hitting one does not remove it from the board. This is
+  // required by the maths - a constant p is the only way 0.98/p^8 gives Stake's
+  // published max win - and it is the thing players find counter-intuitive.
+  const shuf = await pg.evaluate(`(()=>{
+    MO.moles=3;MO.phase='idle';MO.busy=false;MO.hits=0;MO.mult=1;
+    const sizes=[];
+    for(let i=0;i<40;i++){ moDeal(); sizes.push(MO.set.size); }
+    return [Math.min(...sizes), Math.max(...sizes)];
+  })()`);
+  (shuf[0] === 3 && shuf[1] === 3) ? pass('mole count constant every redeal', '3 every time')
+                                   : fail('mole count constant every redeal', JSON.stringify(shuf));
+
+  // and the redeal must actually move them, not re-place the same set
+  const moved = await pg.evaluate(`(()=>{
+    MO.moles=3;let diff=0;
+    for(let i=0;i<60;i++){ moDeal(); const a=[...MO.set].sort().join(); moDeal();
+      if([...MO.set].sort().join()!==a) diff++; }
+    return diff;
+  })()`);
+  moved > 40 ? pass('redeal moves the moles', moved + '/60 layouts changed')
+             : fail('redeal moves the moles', moved + '/60');
+
   // the new sound engine must not throw when driven hard
   const snd = await pg.evaluate(`(()=>{try{SND.init();
     ['click','tick','chip','card','thud','lose','taunt'].forEach(k=>SND[k]());
     SND.peg(3);SND.win(5);SND.big();SND.swing(.3);SND.pop(-.2);SND.whack(4,.1);
     SND.squeak(0);SND.dud(.5);SND.cash(12);SND.hover(0);
     SND.tone(440,.1);SND.noise(.05,.1,1200);
+    for(let i=0;i<=10;i++)SND.reel(i/10);SND.reelStop();
     return 'ok'}catch(e){return String(e)}})()`);
   snd === 'ok' ? pass('sound engine runs clean') : fail('sound engine runs clean', snd);
 
@@ -451,6 +479,32 @@ async function rtp(ctx, errs) {
          const q=Math.pow(p,stopAt), se=98*Math.sqrt((1-q)/(q*N2));
          res.push(['moles '+moles+'m stop@'+stopAt,ret/N2*100,98,null,Math.max(0.5,+(4*se).toFixed(2))]);
        }
+     }}
+    // Long Shot: the skill game. 97% must be the CEILING - reached only by
+    // flawless aim, and strictly lower for anyone worse. That is what stops a
+    // good player beating the house on a game where skill genuinely counts.
+    {const G=100, tiers=[55,33,16,6];
+     const gust=()=>((Math.random()-.5)+(Math.random()-.5))*G;
+     const qOf=h=>{const r=(G-h)/G;return 1-r*r};
+     tiers.forEach((half,ti)=>{
+       const q=qOf(half), payout=.97/q;
+       let ret=0;const N2=300000;
+       for(let i=0;i<N2;i++)if(Math.abs(gust())<=half)ret+=payout;
+       res.push(['longshot t'+ti+' flawless aim',ret/N2*100,97,null,
+         Math.max(0.35,+(4*97*Math.sqrt((1-q)/(q*N2))).toFixed(2))]);
+     });
+     // sloppy aim must return strictly LESS, at every tier
+     {let worstOk=1;
+      tiers.forEach(half=>{
+        const q=qOf(half), payout=.97/q;
+        let ret=0;const N2=200000;
+        for(let i=0;i<N2;i++){
+          const slop=(Math.random()*2-1)*25;      // 25 units of aiming error
+          if(Math.abs(gust()+slop)<=half)ret+=payout;
+        }
+        if(ret/N2*100 >= 96.0) worstOk=0;          // must be clearly under 97
+      });
+      res.push(['longshot sloppy aim returns less',worstOk?97:80,97,null,1]);
      }}
     // Limbo
     {let t=0;const T=5;for(let i=0;i<N;i++){const u=Math.random();if(Math.max(1,Math.floor(99/u)/100)>=T)t+=T}

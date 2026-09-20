@@ -37,7 +37,7 @@ node test.js mp         # two-window multiplayer, all 8 tables + login/identity
 node test.js strip      # The Strip full game + money audit (skips: not built)
 node test.js rtp        # maths only, no clicking (~2 min)
 node test.js admin      # admin portal: stats, user table, suspend, audit
-node test.js moles      # Moles maths, payouts, guards + sound engine smoke
+node test.js moles      # Moles maths, reshuffle, payouts, guards + sound smoke
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -71,11 +71,25 @@ storage/account layer.
 
 ## 2. Current scope
 
-17 single-player games, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+18 single-player games, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
-**Single player:** Moles, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
+**Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
 **Moles** (`MO` state) — Stake Originals clone. 7 holes, player picks 1–6 moles as the volatility dial, max 8 hits, moles reshuffle after every hit so each swing is an independent `M/7`. `mult(k) = 0.98 / p^k`, **kept exact — never round it**; truncating to 2dp cost 0.4% RTP. `moFmt()` displays up to 4dp so the shown multiplier matches the payout. `0.98 × 7⁸ = 5,649,504.98` is the real game's max win and `test.js moles` asserts it.
+Default is **5 moles** (71.4%); 3 averages 0.75 hits a round and reads as broken.
+**The moles reshuffle every hit and hitting one does NOT remove it.** Constant `p` is
+forced by the maths — it is the only way `0.98/p^8` reaches that max win. Alex misread
+the bust reveal as a fixed board being uncovered, so the board twitches on each redeal
+and the bust screen spells it out. If this confuses someone again, fix the explanation,
+never the mechanics.
+
+**Long Shot** (`SHOT` state) — the only skill game. Drag-aim a cannon at a target pad.
+97% is a **ceiling, not an average**: the landing is `physics(aim) + visibleWind + hiddenGust`,
+and only flawless aim leaves the gust alone, so `qMax = P(|gust| ≤ half)` and payout is
+`0.97/qMax`. Skill closes the gap toward 97% and can never exceed it. The gust must stay
+**triangular** — with a uniform gust the convolution against aiming error is flat, so
+sloppy aim costs nothing and skill stops mattering. `test.js rtp` simulates both a
+flawless and a sloppy aimer and requires the sloppy one to return strictly less.
 
 **Party (`PT` array):** The Heist, The Run, The Vault, Blackjack, Hold'em, Crash, Derby, Coin Duel.
 
@@ -126,7 +140,8 @@ Two patterns, don't mix them up:
 
 - **Look:** Stake.com — navy `#0f212e`, panels `#1a2c38`, green `#00e701`, gold `#ffc800`. Outfit font.
 - **Every game needs:** real animation, synthesised sound via `SND`, particle feedback (`burst`/`burstAt`/`floatText`), a clear win moment (`bigWin` at 10×+).
-- **Sound is all synthesised** in `SND` — no audio files, ever. The engine runs a master bus → compressor → out, plus a generated convolution reverb send. Three primitives: `_o()` pitched voice (pitch + filter envelopes), `_n()` filtered noise, `_fm()` FM voice. **Build sounds in layers** — a convincing impact is a noise transient + a low body + a tail, not one oscillator. `tone()` and `noise()` keep their original signatures; don't change them, 16 games call them.
+- **Sound is all synthesised** in `SND` — no audio files, ever. The engine runs a master bus → compressor → out, plus a generated convolution reverb send. Three primitives: `_o()` pitched voice (pitch + filter envelopes), `_n()` filtered noise, `_fm()` FM voice.
+`SND.reel(k)`/`reelStop()` drive spinning numbers (Dice, Limbo) — **throttle callers to ~20/sec**; per-frame is 60/sec and becomes a buzz. **Build sounds in layers** — a convincing impact is a noise transient + a low body + a tail, not one oscillator. `tone()` and `noise()` keep their original signatures; don't change them, 16 games call them.
 - **Card skins** dress zones (frame, index plates, one top module, back), not whole-card colour washes. Alex rejected "weird" themes — keep them premium and real-material: metal, lacquer, leather, gemstone. No cartoon art on faces; face cards are serif monograms.
 - **Animation restraint:** one module per card, calm timing. Alex pushed back hard on over-stimulating designs.
 - **Odds are always shown** on the button before the player commits. Nothing hidden.
@@ -172,6 +187,10 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Moles multipliers are kept EXACT, not rounded to 2dp. Truncating them cost up to 0.4% RTP (6 moles at 3 hits measured 97.61% instead of 98.00%). The display carries up to 4dp instead so what the player reads is what they are paid.
 - **2026-09-20** — Moles RTP is verified analytically (p^k x mult = 0.98 for all 48 combinations) as well as by simulation. Deep streaks cannot be sampled: 1 mole to 8 hits is 1 in 5,764,801, so a Monte Carlo row there just reads 0.00%. Simulation tolerances are now derived from the estimator variance rather than guessed.
 - **2026-09-20** — Sound engine rebuilt: master bus with compressor, generated convolution reverb send, and three primitives (_o pitched, _n filtered noise, _fm). Sounds are layered - an impact is transient + body + tail - which is what makes them read as distinct objects. tone() and noise() keep their old signatures so the other 16 games were untouched.
+- **2026-09-20** — Long Shot added - the skill game. 97% is the CEILING, reached only by flawless aim: the outcome is decided by a hidden gust the player cannot control, so skill closes the gap toward 97% but can never beat it. The gust is TRIANGULAR on purpose - with a uniform gust the convolution with aiming error is flat, so being sloppy by up to (GUST-half) cost nothing and skill did not matter at all. Caught by an RTP test, not by eye.
+- **2026-09-20** — Moles default moved from 3 moles to 5. Three moles is 42.9% a swing and averages 0.75 hits per round, which reads as broken rather than hard. Five is 71.4% and ~2.5 hits. The odds were always correct; the default was the problem.
+- **2026-09-20** — Moles reshuffle is now shown, not just stated: the board twitches on every redeal and the bust screen says the moles move every hit. Alex read the bust reveal as a fixed board being uncovered and thought whacking a mole should remove it. Constant p is REQUIRED - it is the only way 0.98/p^8 yields Stake's published max win - so the fix is explanation, never mechanics.
+- **2026-09-20** — Dice and Limbo spins now tick per digit via SND.reel(k), throttled to ~20/sec with pitch climbing on progress, and SND.reelStop() punctuates the lock-in. Throttling matters: firing per animation frame would be 60 a second and become a buzz.
 
 ---
 

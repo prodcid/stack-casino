@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.20.9",
-  "notes": "moles game, new sound engine, version collision fix",
-  "bytes": 424793,
-  "at": "2026-09-20T01:15:17.352Z"
+  "version": "2026.09.20.11",
+  "notes": "moles: default 5, odds shown, reshuffle made clear. dice+limbo spin audio. long shot",
+  "bytes": 444168,
+  "at": "2026-09-20T04:20:13.102Z"
 }

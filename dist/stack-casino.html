@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.20.9">
+<meta name="stack-version" content="2026.09.20.11">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -203,6 +203,34 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .authnote{color:var(--dim);font-size:11.5px;text-align:center;margin:4px 0 0;line-height:1.5}
 .acctcard{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:11px}
 
+
+/* ===================== LONG SHOT ===================== */
+.lswrap{position:relative;width:100%;height:100%;min-height:430px;border-radius:14px;overflow:hidden;background:#0d1b26}
+#lsCv{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.lshud{position:absolute;left:10px;top:10px;display:flex;gap:7px;flex-wrap:wrap;pointer-events:none;z-index:3}
+.lschip{background:rgba(6,18,26,.62);backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.12);
+ border-radius:9px;padding:5px 10px;font-size:11.5px;font-weight:800;color:#cfe6f5}
+.lschip b{color:#fff;font-size:13px}
+.lschip.gold b{color:var(--gold)}
+.lschip.green b{color:var(--green2,#6dffa8)}
+.lswind{position:absolute;right:10px;top:10px;z-index:3;background:rgba(6,18,26,.62);backdrop-filter:blur(3px);
+ border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:6px 11px;text-align:center;pointer-events:none}
+.lswind span{display:block;font-size:10px;font-weight:800;color:#8aa3b4;letter-spacing:.06em}
+.lswind b{font-size:14px;font-weight:900;color:#fff}
+.lswind i{font-style:normal;color:#6dffa8}
+.lsmsg{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:4;text-align:center;
+ font-weight:900;font-size:clamp(20px,4.4vw,34px);color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.6);
+ opacity:0;pointer-events:none}
+.lsmsg.show{animation:lsmsg 1.6s ease-out}
+@keyframes lsmsg{0%{opacity:0;transform:translate(-50%,-25%) scale(.7)}
+ 16%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+ 70%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+ 100%{opacity:0;transform:translate(-50%,-78%) scale(1)}}
+.lshint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:3;
+ background:rgba(6,18,26,.6);border-radius:8px;padding:5px 12px;font-size:11.5px;font-weight:700;
+ color:#a9c4d6;pointer-events:none;white-space:nowrap}
+@media(max-width:700px){.lswrap{min-height:340px}.lshint{font-size:10.5px}}
+
 /* ===================== MOLES ===================== */
 .mostage{position:relative;width:100%;height:100%;min-height:430px;border-radius:14px;overflow:hidden;
  background:linear-gradient(#5ec6f5 0%,#7ad4f7 42%,#8fdcf8 55%,#6cb43f 55%,#5aa233 72%,#4d8f2c 100%);
@@ -270,6 +298,21 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
  background:rgba(0,0,0,.42);color:rgba(255,255,255,.8);backdrop-filter:blur(2px)}
 .moladder i.on{background:var(--green);color:#03291a}
 .moladder i.next{background:rgba(255,255,255,.95);color:#0f212e}
+.mochance{position:absolute;left:10px;top:10px;z-index:5;pointer-events:none;
+ background:rgba(6,18,26,.55);backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.14);
+ border-radius:10px;padding:6px 11px;text-align:left}
+.mochance b{display:block;font-size:17px;font-weight:900;color:#fff;line-height:1.1}
+.mochance span{display:block;font-size:10px;font-weight:800;color:#a9c4d6;letter-spacing:.04em}
+.mosub{position:absolute;left:50%;top:50.5%;transform:translateX(-50%);z-index:7;
+ font-weight:800;font-size:clamp(11px,2.2vw,14px);color:rgba(255,255,255,.92);
+ text-shadow:0 2px 8px rgba(0,0,0,.6);opacity:0;pointer-events:none;text-align:center;
+ white-space:nowrap}
+.mosub.show{animation:mosub 2.6s ease-out}
+@keyframes mosub{0%{opacity:0}14%{opacity:1}78%{opacity:1}100%{opacity:0}}
+/* every hole twitches when the moles redeal - the tell that they MOVED */
+.mohole.shuffle .dirt{animation:moshuf .42s ease-out}
+@keyframes moshuf{0%{transform:translateY(0)}30%{transform:translateY(-5px) scaleX(1.06)}
+ 60%{transform:translateY(2px) scaleX(.97)}100%{transform:translateY(0)}}
 .momsg{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:7;
  font-weight:900;font-size:clamp(20px,4.4vw,32px);color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.5);
  opacity:0;pointer-events:none;text-align:center}
@@ -1380,11 +1423,33 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
       </div><div class="pop" id="crPop" style="top:26%"><b></b><i></i></div></div>
     </div></section>
 
+    <!-- LONG SHOT -->
+    <section class="view" id="shotView"><div class="shell">
+      <div class="ctrl">
+        <div><div class="lbl">Bet amount</div><div class="betbox"><input id="lsBet" type="number" value="10" min="0.1" step="0.1" inputmode="decimal"><button data-m=".5">&frac12;</button><button data-m="2">2&times;</button></div></div>
+        <div><div class="lbl">Target size</div><div class="seg" id="lsTier"><button data-v="0">Wide</button><button data-v="1" class="on">Fair</button><button data-v="2">Narrow</button><button data-v="3">Pin</button></div></div>
+        <button class="go" id="lsGo">Bet &amp; take aim</button>
+        <div class="dstats" style="grid-template-columns:1fr 1fr"><div>Payout<b id="lsPay">&ndash;</b></div><div>Streak<b id="lsStreak">0</b></div></div>
+        <div class="dstats" style="grid-template-columns:1fr 1fr"><div>Best streak<b id="lsBest">0</b></div><div>Bullseyes<b id="lsBulls">0</b></div></div>
+        <p class="info" id="lsInfo"></p>
+      </div>
+      <div class="stage" style="padding:0">
+        <div class="lswrap" id="lsWrap">
+          <canvas id="lsCv"></canvas>
+          <div class="lshud" id="lsHud"></div>
+          <div class="lswind" id="lsWind"><span>WIND</span><b>&ndash;</b></div>
+          <div class="lsmsg" id="lsMsg"></div>
+          <div class="lshint" id="lsHint">Place a bet to load the cannon</div>
+          <div class="pop" id="lsPop"><b></b><i></i></div>
+        </div>
+      </div>
+    </div></section>
+
     <!-- MOLES -->
     <section class="view" id="molesView"><div class="shell">
       <div class="ctrl">
         <div><div class="lbl">Bet amount</div><div class="betbox"><input id="moBet" type="number" value="10" min="0.1" step="0.1" inputmode="decimal"><button data-m=".5">&frac12;</button><button data-m="2">2&times;</button></div></div>
-        <div><div class="lbl">Moles</div><div class="seg" id="moCount"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3" class="on">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button></div></div>
+        <div><div class="lbl">Moles</div><div class="seg" id="moCount"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5" class="on">5</button><button data-v="6">6</button></div></div>
         <button class="go" id="moGo">Bet</button>
         <button class="btn2" id="moCash" disabled>Cash out</button>
         <div class="dstats" style="grid-template-columns:1fr 1fr"><div>Hits<b id="moHits">0</b></div><div>Next hit<b id="moNext">&ndash;</b></div></div>
@@ -1397,7 +1462,9 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
           <div class="momult" id="moMult"><b>1.00&times;</b><span>current multiplier</span></div>
           <div class="moholes" id="moHoles"></div>
           <div class="moladder" id="moLadder"></div>
+          <div class="mochance" id="moChance"></div>
           <div class="momsg" id="moMsg"></div>
+          <div class="mosub" id="moSub"></div>
           <svg class="mohammer" id="moHammer" viewBox="0 0 100 100" style="left:-200px;top:-200px">
             <g>
               <rect x="40" y="38" width="10" height="52" rx="5" fill="#8a5a2b"/>
@@ -1472,6 +1539,7 @@ IC.keno='<svg viewBox="0 0 24 24"><path d="M3 3h5v5H3zm6.5 0h5v5h-5zM16 3h5v5h-5
 IC.hilo='<svg viewBox="0 0 24 24"><path d="M12 2l6 7h-4v4h-4V9H6zm0 20-6-7h4v-2h4v2h4z"/></svg>';
 IC.bacc='<svg viewBox="0 0 24 24"><path d="M3 6h8v12H3zM13 6h8v12h-8z" opacity=".5"/><path d="M5 9h4v2H5zm10 0h4v2h-4z"/><text x="12" y="23" font-size="0">b</text></svg>';
 IC.locker='<svg viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 4-3 5 3 5 3-5z"/><path d="M19.5 2l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg>';
+IC.shot='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" /><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 IC.moles='<svg viewBox="0 0 24 24"><ellipse cx="12" cy="19" rx="9" ry="3.4" opacity=".45"/><path d="M12 5c3.3 0 6 2.7 6 6v6H6v-6c0-3.3 2.7-6 6-6z"/><circle cx="9.4" cy="11" r="1.5" fill="#0f212e"/><circle cx="14.6" cy="11" r="1.5" fill="#0f212e"/><path d="M10.7 14h2.6v2.4h-2.6z" fill="#0f212e"/></svg>';
 IC.admin='<svg viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 9.3 8 10.5 4.6-1.2 8-5.5 8-10.5v-6z"/><path d="M12 7a2.4 2.4 0 1 1 0 4.8A2.4 2.4 0 0 1 12 7zm0 6c2.4 0 4.4 1.3 4.4 2.8v1.2H7.6v-1.2C7.6 14.3 9.6 13 12 13z" fill="#0f212e"/></svg>';
 IC.party='<svg viewBox="0 0 24 24"><path d="M8 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 19c0-3.3 2.7-6 6-6s6 2.7 6 6v1H2zm13.5-6c2.9.2 5.5 2.4 5.5 5.5V20h-5v-1c0-2.3-.9-4.4-2.4-5.9.6-.1 1.2-.1 1.9-.1z"/></svg>';
@@ -1479,7 +1547,7 @@ IC.tower='<svg viewBox="0 0 24 24"><path d="M6 21V9l6-6 6 6v12h-5v-5h-2v5z"/><pa
 IC.limbo='<svg viewBox="0 0 24 24"><path d="M3 20 9 9l4 6 3-4 5 9z"/><circle cx="19" cy="5" r="2.5"/></svg>';
 IC.scratch='<svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" opacity=".5"/><path d="M7 8l4 4-4 4M13 16h5" stroke="#0f212e" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 IC.craps='<svg viewBox="0 0 24 24"><rect x="2" y="8" width="12" height="12" rx="3"/><rect x="11" y="3" width="11" height="11" rx="3" opacity=".55"/><circle cx="5.5" cy="11.5" r="1.3" fill="#0f212e"/><circle cx="10.5" cy="16.5" r="1.3" fill="#0f212e"/><circle cx="5.5" cy="16.5" r="1.3" fill="#0f212e"/><circle cx="10.5" cy="11.5" r="1.3" fill="#0f212e"/></svg>';
-const GAMES=[['lobby','Lobby'],['party','Online Party'],['locker','Cosmetics'],['moles','Moles'],['tower','Tower'],['limbo','Limbo'],['scratch','Scratch'],['craps','Craps'],['chicken','Chicken Road'],['balloon','Balloon Pump'],['wheel','Fortune Wheel'],['mines','Mines'],['dice','Dice'],['roulette','Roulette'],['keno','Keno'],['hilo','Hi-Lo'],['bacc','Baccarat'],['plinko','Plinko'],['bj','Blackjack'],['poker','Video Poker'],['slots','Slots']];
+const GAMES=[['lobby','Lobby'],['party','Online Party'],['locker','Cosmetics'],['moles','Moles'],['shot','Long Shot'],['tower','Tower'],['limbo','Limbo'],['scratch','Scratch'],['craps','Craps'],['chicken','Chicken Road'],['balloon','Balloon Pump'],['wheel','Fortune Wheel'],['mines','Mines'],['dice','Dice'],['roulette','Roulette'],['keno','Keno'],['hilo','Hi-Lo'],['bacc','Baccarat'],['plinko','Plinko'],['bj','Blackjack'],['poker','Video Poker'],['slots','Slots']];
 
 /* ============ AUDIO ============ */
 /* ============================================================================
@@ -1658,7 +1726,22 @@ const SND={ctx:null,on:true,bus:null,rev:null,master:null,_ir:null,
   for(let i=0;i<7;i++)this._o({f:1800+Math.random()*2200,d:.09,type:'sine',v:.03,dly:.12+i*.045,rev:.4});
   this._n({d:.35,v:.05,filt:'highpass',ff:5000,dly:.1,rev:.3})},
  /* hover tick over a hole */
- hover(pan){this._o({f:1150,d:.022,type:'sine',v:.022,pan:pan||0})}
+ hover(pan){this._o({f:1150,d:.022,type:'sine',v:.022,pan:pan||0})},
+
+ /* ---- SPINNING NUMBERS (dice, limbo) ----
+    One click per digit change, pitch climbing with progress so the spin builds
+    instead of droning. Callers throttle this to ~20/sec - firing it per frame
+    would be 60 a second and turn into a buzz. */
+ reel(k){k=Math.max(0,Math.min(1,k||0));
+  const f=540+k*k*1150+Math.random()*40;
+  this._o({f,d:.026,type:'square',v:.032,a:.001});
+  this._o({f:f*2.01,d:.016,type:'sine',v:.012,a:.001});
+  this._n({d:.014,v:.045,ff:4600,shape:1.5})},
+ /* the number locking in */
+ reelStop(){this._n({d:.05,v:.17,ff:2600,ff2:800,shape:1});
+  this._o({f:340,f2:150,d:.13,type:'sine',v:.22,a:.001});
+  this._o({f:1020,d:.05,type:'square',v:.045,a:.001});
+  this._o({f:1530,d:.07,type:'sine',v:.02,dly:.02,rev:.2})}
 };
 addEventListener('pointerdown',()=>SND.init(),{once:false});
 
@@ -1718,7 +1801,7 @@ function buildNav(){const s=$('side'),m=$('mob'),L=navList();
  s.innerHTML='<h4>Casino</h4>'+L.map(([k,n])=>`<button class="nav" data-g="${k}">${IC[k]}${n}</button>`).join('');
  m.innerHTML=L.map(([k,n])=>`<button data-g="${k}">${IC[k]}${n.split(' ').pop()}</button>`).join('');
  document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>go(b.dataset.g))}
-function go(g){SND.click();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
+function go(g){SND.click();document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
 $('mute').onclick=()=>{SND.on=!SND.on;$('muteIco').style.opacity=SND.on?1:.35;if(SND.on)SND.click()};
 $('refill').onclick=()=>{if(P().bal>=100){flash('Top up unlocks under 100 credits');return}P().bal+=1000;renderBal(true);save();SND.win(3)};
 
@@ -2368,7 +2451,13 @@ $('dcDir').onclick=()=>{DC.over=!DC.over;SND.click();dcUI()};$('dcBet').oninput=
 async function dcRoll(){if(DC.busy)return;const bet=betVal('dcBet');if(!take(bet)){DC.auto=0;return}DC.busy=true;$('dcGo').disabled=!DC.auto;
  const roll=Math.floor(Math.random()*10001)/100,win=DC.over?roll>DC.target:roll<DC.target,m=win?dcMult():0,out=Math.round(bet*m*100)/100;
  const el=$('dcRoll');el.className='droll';const st=performance.now(),dur=DC.auto?250:550;
- SND.noise(.15,.3,3000);await new Promise(res=>{(function f(n){const k=(n-st)/dur;if(k<1){el.textContent=(Math.random()*100).toFixed(2);requestAnimationFrame(f)}else res()})(st)});
+ SND.noise(.15,.3,3000);
+ let dcTick=0;
+ await new Promise(res=>{(function f(n){const k=(n-st)/dur;
+  if(k<1){el.textContent=(Math.random()*100).toFixed(2);
+   if(n-dcTick>46){dcTick=n;SND.reel(k)}
+   requestAnimationFrame(f)}else res()})(st)});
+ SND.reelStop();
  el.textContent=roll.toFixed(2);el.className='droll '+(win?'w':'l');const mk=$('dcMark');mk.style.opacity=1;mk.style.left=roll+'%';mk.className='dmark '+(win?'w':'l');mk.firstChild.className=win?'w':'l';mk.firstChild.textContent=roll.toFixed(2);
  pay(out);log('Dice',bet,m,out);DC.hist.unshift({roll,win});DC.hist=DC.hist.slice(0,10);$('dcHist').innerHTML=DC.hist.map(h=>`<span class="${h.win?'w':'l'}">${h.roll.toFixed(2)}</span>`).join('');
  if(win){SND.win(m);if(m>=10)bigWin(m,out);else{const r=el.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,20,['#00e701','#fff'],6)}}else SND.tone(220,.12,'triangle',.08);
@@ -2558,6 +2647,279 @@ function devRender(){const box=$('devBox');if(!box)return;if(!DEV){box.innerHTML
 
 
 
+
+/* ============================================================================
+   LONG SHOT  -  the skill game
+   Drag back from the cannon to set angle and power, let go to fire. Land inside
+   the target pad to win. Only the first stretch of the arc is previewed, so
+   judging the rest is on you.
+
+   How a SKILL game keeps an honest house edge
+   -------------------------------------------
+   Every other game here is pure chance, so RTP is fixed by the payout table.
+   Here the player's aim matters, which means RTP would climb with skill - a
+   perfect player would eventually beat the house. So the randomness that
+   decides the outcome is deliberately OUTSIDE the player's control:
+
+     landing = physics(your aim) + visibleWind  + hiddenGust
+                                   ^compensable  ^uniform(-G,G), unknowable
+
+   Aim perfectly and you cancel the physics and the visible wind exactly; what
+   is left is the gust alone. So the best achievable win chance is
+
+     qMax = min(1, halfWidth / G)        and we pay  0.97 / qMax
+
+   which makes 97% the CEILING, reached only by flawless play, and anything less
+   returns less. Skill is genuinely rewarded, the house edge cannot be beaten,
+   and `test.js rtp` verifies it by simulating a perfect aimer.
+   Bullseyes pay nothing extra on purpose - they are glory and a tracked stat,
+   so chasing them never distorts the maths.
+   ========================================================================== */
+const LS_W=1000, LS_H=500, LS_GROUND=430, LS_CX=74, LS_CY=430;
+const LS_G=1400;           // gravity, world units / s^2
+const LS_GUST=100;         // hidden gust spans +/- this, TRIANGULAR (see lsGust)
+const LS_RTP=.97;
+const LS_TIERS=[
+ {n:'Wide',   half:55},
+ {n:'Fair',   half:33},
+ {n:'Narrow', half:16},
+ {n:'Pin',    half:6}];
+/* The gust is TRIANGULAR, not uniform, and that detail is load-bearing.
+   With a uniform gust, convolving it with your aiming error leaves the hit
+   chance completely flat - being sloppy by up to (GUST - half) would cost you
+   literally nothing, so skill would not matter until you were wildly off.
+   A triangular gust is peaked at zero, so every unit of aiming error strictly
+   lowers your chance. Summing two uniforms gives the triangle for free. */
+const lsGust=()=>((Math.random()-.5)+(Math.random()-.5))*LS_GUST;
+/* P(|gust| <= h) under that triangle */
+const lsQ=t=>{const h=Math.min(LS_GUST,LS_TIERS[t].half),r=(LS_GUST-h)/LS_GUST;return 1-r*r};
+const lsPay=t=>LS_RTP/lsQ(t);
+
+const SHOT={phase:'idle',tier:1,bet:0,tx:700,wind:0,gust:0,
+ drag:null,aim:null,shot:null,streak:0,t0:0,land:0,dist:0,cv:null,cx:null,raf:0};
+
+/* ---- world <-> canvas ---- */
+function lsFit(){const c=$('lsCv');if(!c)return;const w=$('lsWrap');
+ const r=w.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);
+ c.width=Math.max(320,r.width*d);c.height=Math.max(220,r.height*d);
+ SHOT.cv=c;SHOT.cx=c.getContext('2d');SHOT.sc=c.width/LS_W;SHOT.oy=(c.height-LS_H*SHOT.sc)/2;
+ lsDraw()}
+const lsX=x=>x*SHOT.sc, lsY=y=>y*SHOT.sc+SHOT.oy;
+function lsToWorld(e){const r=SHOT.cv.getBoundingClientRect();
+ const d=SHOT.cv.width/r.width;
+ return{x:(e.clientX-r.left)*d/SHOT.sc,y:((e.clientY-r.top)*d-SHOT.oy)/SHOT.sc}}
+
+/* ---- shot maths ----
+   Flat ground, so flight time is 2*vy/g and the physics range is vx*T.
+   Landing is that plus the two wind terms. */
+const lsRange=(vx,vy)=>vx*(2*vy/LS_G);
+function lsLanding(aim){return LS_CX+lsRange(aim.vx,aim.vy)+SHOT.wind+SHOT.gust}
+
+function lsNewRound(){
+ SHOT.tx=330+Math.random()*470;
+ SHOT.wind=Math.round((Math.random()*2-1)*60);
+ SHOT.gust=lsGust();   // rolled now, revealed only on landing
+ SHOT.aim=null;SHOT.shot=null}
+
+/* ---- drawing ---- */
+function lsDraw(){const x=SHOT.cx;if(!x)return;const c=SHOT.cv;
+ x.clearRect(0,0,c.width,c.height);
+ // sky
+ const g=x.createLinearGradient(0,lsY(0),0,lsY(LS_GROUND));
+ g.addColorStop(0,'#123047');g.addColorStop(.55,'#1b4d63');g.addColorStop(1,'#2a6b6f');
+ x.fillStyle=g;x.fillRect(0,0,c.width,lsY(LS_GROUND));
+ // distant hills
+ x.fillStyle='rgba(10,40,52,.75)';
+ x.beginPath();x.moveTo(0,lsY(LS_GROUND));
+ for(let i=0;i<=10;i++){const px=i/10*LS_W;
+  x.lineTo(lsX(px),lsY(LS_GROUND-52-38*Math.sin(i*1.1)-18*Math.sin(i*2.7)))}
+ x.lineTo(lsX(LS_W),lsY(LS_GROUND));x.closePath();x.fill();
+ // ground
+ const gg=x.createLinearGradient(0,lsY(LS_GROUND),0,lsY(LS_H));
+ gg.addColorStop(0,'#3c7a2e');gg.addColorStop(1,'#25521d');
+ x.fillStyle=gg;x.fillRect(0,lsY(LS_GROUND),c.width,c.height-lsY(LS_GROUND));
+ x.strokeStyle='rgba(0,0,0,.25)';x.lineWidth=2*SHOT.sc;
+ x.beginPath();x.moveTo(0,lsY(LS_GROUND));x.lineTo(c.width,lsY(LS_GROUND));x.stroke();
+
+ if(SHOT.phase!=='idle')lsDrawTarget(x);
+ lsDrawCannon(x);
+ if(SHOT.phase==='aim'&&SHOT.aim)lsDrawPreview(x);
+ if(SHOT.shot)lsDrawShot(x);
+}
+
+function lsDrawTarget(x){const t=LS_TIERS[SHOT.tier],h=t.half;
+ const y=lsY(LS_GROUND);
+ // pad
+ x.fillStyle='#d8dee3';x.fillRect(lsX(SHOT.tx-h),y-6*SHOT.sc,lsX(2*h),6*SHOT.sc);
+ // rings, outer to inner
+ const bands=[[h,'#e8413c'],[h*.66,'#fff'],[h*.33,'#e8413c']];
+ bands.forEach(([w,col])=>{x.fillStyle=col;x.fillRect(lsX(SHOT.tx-w),y-6*SHOT.sc,lsX(2*w),6*SHOT.sc)});
+ // centre post
+ x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=2*SHOT.sc;
+ x.beginPath();x.moveTo(lsX(SHOT.tx),y-6*SHOT.sc);x.lineTo(lsX(SHOT.tx),y-40*SHOT.sc);x.stroke();
+ x.fillStyle='rgba(255,255,255,.9)';
+ x.beginPath();x.moveTo(lsX(SHOT.tx),y-40*SHOT.sc);x.lineTo(lsX(SHOT.tx+26),y-33*SHOT.sc);
+ x.lineTo(lsX(SHOT.tx),y-26*SHOT.sc);x.closePath();x.fill()}
+
+function lsDrawCannon(x){const y=lsY(LS_CY);
+ let a=-0.72;
+ if(SHOT.aim)a=-Math.atan2(SHOT.aim.vy,SHOT.aim.vx);
+ x.save();x.translate(lsX(LS_CX),y);
+ // barrel
+ x.save();x.rotate(a);
+ x.fillStyle='#4a5b68';x.fillRect(0,-7*SHOT.sc,46*SHOT.sc,14*SHOT.sc);
+ x.fillStyle='#5f7482';x.fillRect(0,-7*SHOT.sc,46*SHOT.sc,5*SHOT.sc);
+ x.restore();
+ // base
+ x.fillStyle='#2f3d48';x.beginPath();x.arc(0,0,15*SHOT.sc,0,7);x.fill();
+ x.fillStyle='#22303a';x.fillRect(-14*SHOT.sc,0,28*SHOT.sc,12*SHOT.sc);
+ x.restore()}
+
+/* only the first stretch of the arc is shown - the rest is the player's job */
+function lsDrawPreview(x){const a=SHOT.aim;
+ x.save();x.setLineDash([]);
+ for(let i=1;i<=9;i++){const t=i*.035;
+  const px=LS_CX+a.vx*t, py=LS_CY-(a.vy*t-.5*LS_G*t*t);
+  if(py>LS_GROUND)break;
+  x.globalAlpha=1-i/11;x.fillStyle='#ffd44d';
+  x.beginPath();x.arc(lsX(px),lsY(py),3.2*SHOT.sc,0,7);x.fill()}
+ x.restore();
+ // power gauge on the barrel
+ const pw=Math.min(1,a.sp/1150);
+ x.fillStyle='rgba(0,0,0,.45)';x.fillRect(lsX(LS_CX-26),lsY(LS_CY+18),lsX(52),7*SHOT.sc);
+ x.fillStyle=pw>.92?'#ff7a8a':'#6dffa8';
+ x.fillRect(lsX(LS_CX-26),lsY(LS_CY+18),lsX(52)*pw,7*SHOT.sc)}
+
+function lsDrawShot(x){const sh=SHOT.shot;
+ x.save();
+ // trail
+ x.strokeStyle='rgba(255,212,77,.5)';x.lineWidth=2.4*SHOT.sc;x.beginPath();
+ sh.trail.forEach((p,i)=>{i?x.lineTo(lsX(p.x),lsY(p.y)):x.moveTo(lsX(p.x),lsY(p.y))});
+ x.stroke();
+ // ball
+ const p=sh.trail[sh.trail.length-1];
+ if(p){x.fillStyle='#ffe38a';x.beginPath();x.arc(lsX(p.x),lsY(p.y),6*SHOT.sc,0,7);x.fill();
+  x.fillStyle='rgba(255,255,255,.8)';x.beginPath();x.arc(lsX(p.x)-2*SHOT.sc,lsY(p.y)-2*SHOT.sc,2.2*SHOT.sc,0,7);x.fill()}
+ x.restore()}
+
+/* ---- aiming ---- */
+function lsDown(e){if(SHOT.phase!=='aim')return;
+ SHOT.cv.setPointerCapture&&SHOT.cv.setPointerCapture(e.pointerId);
+ SHOT.drag=lsToWorld(e);lsMove(e)}
+function lsMove(e){if(SHOT.phase!=='aim'||!SHOT.drag)return;
+ const w=lsToWorld(e);
+ // pull back from the cannon, slingshot style
+ let dx=LS_CX-w.x, dy=w.y-LS_CY;
+ if(dx<2)dx=2; if(dy<0)dy=0;
+ const sp=Math.min(1150,Math.hypot(dx,dy)*5.2);
+ const ang=Math.atan2(dy,dx);
+ SHOT.aim={vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,sp};
+ lsDraw()}
+function lsUp(e){if(SHOT.phase!=='aim'||!SHOT.drag)return;
+ SHOT.drag=null;
+ if(!SHOT.aim||SHOT.aim.sp<60){SHOT.aim=null;lsDraw();return}
+ lsFire()}
+
+/* ---- firing ---- */
+function lsFire(){
+ const a=SHOT.aim;SHOT.phase='fly';
+ const land=lsLanding(a);
+ SHOT.land=land;
+ const T=2*a.vy/LS_G;
+ // the wind terms are applied as a smooth drift across the flight so the ball
+ // visibly curves rather than teleporting at the last moment
+ const drift=SHOT.wind+SHOT.gust;
+ SHOT.shot={t:0,T,a,drift,trail:[]};
+ SND.swing(0);SND._o({f:150,f2:60,d:.25,type:'sawtooth',v:.22});
+ SND._n({d:.18,v:.3,ff:900,ff2:200,shape:1.2});
+ SHOT.t0=performance.now();
+ cancelAnimationFrame(SHOT.raf);SHOT.raf=requestAnimationFrame(lsStep);
+ lsUI()}
+
+function lsStep(now){
+ const sh=SHOT.shot;if(!sh){return}
+ const t=Math.min(sh.T,(now-SHOT.t0)/1000*1.05);
+ const k=sh.T?t/sh.T:1;
+ const px=LS_CX+sh.a.vx*t+sh.drift*(k*k);   // drift eases in, lands on target
+ const py=LS_CY-(sh.a.vy*t-.5*LS_G*t*t);
+ sh.trail.push({x:px,y:Math.min(LS_GROUND,py)});
+ if(sh.trail.length>90)sh.trail.shift();
+ lsDraw();
+ if(t>=sh.T){lsLand();return}
+ SHOT.raf=requestAnimationFrame(lsStep)}
+
+function lsLand(){
+ const t=LS_TIERS[SHOT.tier];
+ const d=SHOT.land-SHOT.tx, dist=Math.abs(d);
+ SHOT.dist=dist;
+ const hit=dist<=t.half, bull=dist<=t.half/3;
+ const cvr=SHOT.cv.getBoundingClientRect();
+ const sx=cvr.left+lsX(SHOT.land)/(SHOT.cv.width/cvr.width);
+ const sy=cvr.top+lsY(LS_GROUND)/(SHOT.cv.height/cvr.height);
+ SHOT.phase='done';
+
+ if(hit){
+  const mult=lsPay(SHOT.tier), payout=Math.round(SHOT.bet*mult*100)/100;
+  pay(payout);log('Long Shot',SHOT.bet,mult,payout);
+  SHOT.streak++;
+  const p=P();p.lsBest=Math.max(p.lsBest||0,SHOT.streak);
+  if(bull){p.lsBulls=(p.lsBulls||0)+1;SND._o({f:1400,f2:2100,d:.18,type:'sine',v:.1,rev:.4})}
+  save();
+  SND.whack(Math.min(8,SHOT.streak),0);SND.cash(mult);
+  burstAt(sx,sy,bull?60:30,['#ffd44d','#fff','#6dffa8'],bull?9:6);
+  lsMsg(bull?'BULLSEYE!':(SHOT.streak>2?`HIT! ${SHOT.streak} in a row`:'HIT!'));
+  popShow($('lsPop'),mult.toFixed(2)+'\u00d7','+'+fmt(payout));
+  if(mult>=10)bigWin(mult,payout);
+ }else{
+  SHOT.streak=0;
+  SND.dud(0);SND.lose();
+  burstAt(sx,sy,14,['#6d4520','#8a5a2b'],4);
+  lsMsg(dist<t.half*1.6?'SO CLOSE':'MISSED');
+  popShow($('lsPop'),'',`${Math.round(dist)} off target. Lost ${fmt(SHOT.bet)}`,true);
+  log('Long Shot',SHOT.bet,0,0);
+ }
+ setTimeout(()=>{if(SHOT.phase==='done'){SHOT.phase='idle';SHOT.shot=null;lsDraw();lsUI()}},1500);
+ lsUI()}
+
+function lsMsg(t){const m=$('lsMsg');if(!m)return;m.textContent=t;
+ m.classList.remove('show');void m.offsetWidth;m.classList.add('show')}
+
+function lsStart(){if(SHOT.phase!=='idle')return;
+ const bet=betVal('lsBet');if(!take(bet))return;
+ SHOT.bet=bet;SHOT.phase='aim';lsNewRound();SND.click();lsDraw();lsUI()}
+
+function lsUI(){const t=LS_TIERS[SHOT.tier],idle=SHOT.phase==='idle',p=P();
+ $('lsGo').disabled=!idle;
+ $('lsGo').textContent=idle?'Bet & take aim':(SHOT.phase==='aim'?'Drag to aim':'In flight');
+ $('lsBet').disabled=!idle;
+ $('lsTier').querySelectorAll('button').forEach(b=>b.disabled=!idle);
+ $('lsPay').textContent=lsPay(SHOT.tier).toFixed(2)+'\u00d7';
+ $('lsStreak').textContent=SHOT.streak;
+ $('lsBest').textContent=p.lsBest||0;
+ $('lsBulls').textContent=p.lsBulls||0;
+ $('lsInfo').textContent=`Drag back from the cannon and release. Land inside the ${t.n.toLowerCase()} pad to win ${lsPay(SHOT.tier).toFixed(2)}\u00d7. `+
+  `Wind is shown and can be aimed off; a random gust of up to \u00b1${LS_GUST} cannot. Flawless aim lands it ${(lsQ(SHOT.tier)*100).toFixed(0)}% of the time, and that is exactly where the 97% comes from \u2014 97% is the ceiling, and every bit of aim you gain earns more of it.`;
+ const wd=$('lsWind');
+ wd.innerHTML=`<span>WIND</span><b>${SHOT.phase==='idle'?'\u2013':(SHOT.wind>0?'\u2192 ':'\u2190 ')+Math.abs(SHOT.wind)}</b>`;
+ $('lsHud').innerHTML=idle?'':
+  `<div class="lschip">Target <b>${Math.round(SHOT.tx-LS_CX)}m</b></div>
+   <div class="lschip gold">Pays <b>${lsPay(SHOT.tier).toFixed(2)}\u00d7</b></div>
+   <div class="lschip green">Streak <b>${SHOT.streak}</b></div>`;
+ $('lsHint').textContent=idle?'Place a bet to load the cannon'
+  :SHOT.phase==='aim'?'Drag back from the cannon, release to fire \u2014 only the first part of the arc is shown'
+  :SHOT.phase==='fly'?'\u2026':''}
+
+function lsInit(){
+ const c=$('lsCv');if(!c)return;
+ seg('lsTier',v=>{if(SHOT.phase!=='idle')return;SHOT.tier=+v;lsUI();lsDraw()});
+ $('lsGo').onclick=lsStart;
+ c.addEventListener('pointerdown',lsDown);
+ c.addEventListener('pointermove',lsMove);
+ c.addEventListener('pointerup',lsUp);
+ c.addEventListener('pointercancel',()=>{SHOT.drag=null});
+ addEventListener('resize',lsFit);
+ lsFit();lsUI()}
+
 /* ============================================================================
    MOLES  -  Stake Originals clone
    7 holes. Pick how many moles hide in them (1-6). Whack a hole: a mole means
@@ -2571,7 +2933,7 @@ function devRender(){const box=$('devBox');if(!box)return;if(!DEV){box.innerHTML
    At 1 mole and 8 hits that is 0.98 x 7^8 = 5,649,504.98x, matching the real game.
    ========================================================================== */
 const MO_HOLES=7, MO_MAX=8, MO_RTP=.98;
-const MO={phase:'idle',moles:3,bet:0,hits:0,mult:1,set:new Set(),busy:false};
+const MO={phase:'idle',moles:5,bet:0,hits:0,mult:1,set:new Set(),busy:false};
 const moP=()=>MO.moles/MO_HOLES;
 const moMult=k=>k<=0?1:MO_RTP/Math.pow(moP(),k);
 /* Show enough decimals that what the player reads is what they are paid.
@@ -2653,7 +3015,11 @@ function moUI(){const idle=MO.phase==='idle';
  $('moMult').querySelector('b').textContent=moFmt(MO.mult)+'\u00d7';
  $('moMult').querySelector('span').textContent=MO.hits>0?`${fmt(MO.bet*MO.mult)} to cash out`:'current multiplier';
  const pc=(moP()*100).toFixed(1);
- $('moInfo').textContent=`7 holes, ${MO.moles} mole${MO.moles>1?'s':''} hiding. Each swing has a ${pc}% chance to connect, and the moles move after every hit. Cash out any time; a miss ends the round. Max ${MO_MAX} hits. Return to player is 98%.`;
+ const ch=$('moChance');
+ if(ch)ch.innerHTML=`<b>${pc}%</b><span>${MO.moles} MOLE${MO.moles>1?'S':''} \u00b7 ${MO.moles} IN 7 EACH SWING</span>`;
+ $('moInfo').textContent=`7 holes with ${MO.moles} mole${MO.moles>1?'s':''} hiding. `+
+  `All ${MO.moles} duck back down and move to new holes after every hit, so each swing is a fresh ${pc}% chance \u2014 whacking one does not remove it. `+
+  `Fewer moles pay more. Cash out any time; a miss ends the round. Max ${MO_MAX} hits, 98% return to player.`;
  moLadder()}
 
 function moLadder(){const L=$('moLadder');if(!L)return;
@@ -2663,6 +3029,14 @@ function moLadder(){const L=$('moLadder');if(!L)return;
 
 function moMsg(t){const m=$('moMsg');if(!m)return;m.textContent=t;
  m.classList.remove('show');void m.offsetWidth;m.classList.add('show')}
+function moSub(t){const m=$('moSub');if(!m)return;m.textContent=t;
+ m.classList.remove('show');void m.offsetWidth;m.classList.add('show')}
+/* visible proof that the moles moved, rather than asking the player to take it
+   on trust - the whole board twitches whenever they redeal */
+function moShuffleTell(){$('moHoles').querySelectorAll('.mohole').forEach((e,i)=>{
+ setTimeout(()=>{e.classList.remove('shuffle');void e.offsetWidth;e.classList.add('shuffle')},i*22)});
+ SND._n({d:.13,v:.05,filt:'bandpass',ff:900,ff2:2000,q:.7});
+ SND._o({f:300,f2:420,d:.1,type:'sine',v:.03,lin:1})}
 
 function moStart(){if(MO.phase!=='idle'||MO.busy)return;
  const bet=betVal('moBet');if(!take(bet))return;
@@ -2698,7 +3072,8 @@ function moWhack(i,el){
    setTimeout(()=>{
     el.classList.remove('bonk');el.classList.add('sink');
     setTimeout(()=>{el.className='mohole';el.querySelector('.moleclip').innerHTML=MOLE_SVG;
-     moDeal();MO.busy=false;moUI()},300)},380);
+     moDeal();moShuffleTell();moSub('All '+MO.moles+' moles moved \u2014 new holes');
+     MO.busy=false;moUI()},300)},380);
   }else{
    SND.dud(pan);
    burstAt(r.left+r.width/2,r.top+r.height*.75,10,['#6d4520','#583716'],4);
@@ -2715,10 +3090,11 @@ function moBust(el){
   [...MO.set].forEach((h,n)=>setTimeout(()=>{
    const e=moHoleEl(h);if(!e)return;e.classList.add('up');SND.pop(moPan(e))},n*110));
   SND.taunt();
+  moSub(`All ${MO.moles} were hiding here this swing \u2014 they move every hit`);
  },260);
  setTimeout(()=>{
   log('Moles',MO.bet,0,0);SND.lose();
-  popShow($('moPop'),'',`Missed. Lost ${fmt(MO.bet)}`,true);
+  popShow($('moPop'),'',`Missed \u2014 empty hole. Lost ${fmt(MO.bet)}`,true);
   MO.phase='idle';MO.busy=false;MO.hits=0;MO.mult=1;moUI();
  },900);
  setTimeout(()=>{if(MO.phase==='idle')$('moHoles').querySelectorAll('.mohole').forEach(e=>{
@@ -3391,7 +3767,12 @@ document.querySelectorAll('#lbQuick [data-t],#limboView .betbox [data-t]').forEa
 async function lbPlay(){if(LB.busy)return;const bet=betVal('lbBet'),T=lbTarget();if(!take(bet)){LB.auto=0;return}LB.busy=true;$('lbGo').disabled=!LB.auto;
  const r=lbRoll(),win=r>=T,m=win?T:0,out=Math.round(bet*m*100)/100;const N=$('lbN');N.className='lbnum';
  const dur=LB.auto?200:520,t0=performance.now();SND.noise(.14,.25,3000);
- await new Promise(res=>{(function f(n){const k=(n-t0)/dur;if(k<1){N.textContent=(1+Math.random()*Math.min(50,T*1.5)).toFixed(2)+'×';requestAnimationFrame(f)}else res()})(t0)});
+ let lbTick=0;
+ await new Promise(res=>{(function f(n){const k=(n-t0)/dur;
+  if(k<1){N.textContent=(1+Math.random()*Math.min(50,T*1.5)).toFixed(2)+'×';
+   if(n-lbTick>46){lbTick=n;SND.reel(k)}
+   requestAnimationFrame(f)}else res()})(t0)});
+ SND.reelStop();
  N.textContent=r.toFixed(2)+'×';N.className='lbnum '+(win?'w':'l');$('lbB').style.width=Math.min(100,Math.log10(r)/Math.log10(Math.max(10,T*2))*100)+'%';
  LB.hist.unshift({r,win});LB.hist=LB.hist.slice(0,14);$('lbH').innerHTML=LB.hist.map(h=>`<span class="${h.win?'w':''}">${h.r>=1000?Math.round(h.r).toLocaleString():h.r.toFixed(2)}×</span>`).join('');
  pay(out);log('Limbo',bet,m,out);
@@ -4175,7 +4556,7 @@ function buildTiles(){const d=[['tower','Tower','Climb past the traps'],['limbo'
  if(loggedIn()&&P().suspended){AUTH.err=P().suspendMsg||'This account is suspended.';S.cur=-1;S.session=null}
  if(loggedIn()){P().sessions=(P().sessions||0)+1;P().lastSeen=Date.now();playStart()}
  S.players.forEach(ensureStats);
- S.players.forEach(ensureCos);S.players.forEach(p=>{p.skins=p.skins||{classic:1};for(const k in OLD_SKIN_REFUND)if(p.skins[k]){p.bal+=OLD_SKIN_REFUND[k];delete p.skins[k]}if(!skinOf(p.skin)||skinOf(p.skin).id!==p.skin)p.skin='classic';p.skin=p.skin||'classic'});save();ckBuild();ckUI();ckTraffic();moInit();buildNav();buildTiles();renderBal();renderHist();slBuild();go('lobby');plResize();authRender();})();
+ S.players.forEach(ensureCos);S.players.forEach(p=>{p.skins=p.skins||{classic:1};for(const k in OLD_SKIN_REFUND)if(p.skins[k]){p.bal+=OLD_SKIN_REFUND[k];delete p.skins[k]}if(!skinOf(p.skin)||skinOf(p.skin).id!==p.skin)p.skin='classic';p.skin=p.skin||'classic'});save();ckBuild();ckUI();ckTraffic();moInit();lsInit();buildNav();buildTiles();renderBal();renderHist();slBuild();go('lobby');plResize();authRender();})();
 </script>
 </body>
 </html>
