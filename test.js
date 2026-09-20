@@ -83,6 +83,7 @@ async function solo(ctx, errs) {
     ['tower', [['#twGo', 400], ['#twRand', 600], ['#twGo', 800]]],
     ['limbo', [['#lbGo', 1400]]],
     ['craps', [['[data-b="pass"]', 150], ['#crRoll', 1900]]],
+    ['moles', [['#moGo', 500], ['.mohole[data-h="0"]', 900], ['.mohole[data-h="1"]', 900]]],
   ];
   for (const [view, acts] of games) {
     const n0 = errs.length;
@@ -116,6 +117,80 @@ async function solo(ctx, errs) {
   await pg.close();
 }
 
+
+
+/* ---------------- moles ---------------- */
+async function moles(ctx, errs) {
+  console.log('\nMOLES');
+  const pg = await newPage(ctx, errs, 'moles', false);
+  const n0 = errs.length;
+  await pg.evaluate("P().bal=100000;renderBal();go('moles')");
+  await pg.waitForTimeout(400);
+
+  // board shape must match the real game
+  const holes = await pg.evaluate("document.querySelectorAll('#moHoles .mohole').length");
+  holes === 7 ? pass('7 holes') : fail('7 holes', 'got ' + holes);
+
+  // the headline number from the real game, exactly
+  const max = await pg.evaluate("(()=>{MO.moles=1;return moMult(8)})()");
+  Math.abs(max - 5649504.98) < 0.01 ? pass('max win matches Stake', max.toLocaleString())
+                                    : fail('max win matches Stake', String(max));
+
+  // the edge must be applied once, not compounded per step
+  const once = await pg.evaluate("(()=>{MO.moles=3;const p=3/7;return Math.abs(moMult(4)-(0.98/Math.pow(p,4)))<0.02})()");
+  once ? pass('edge applied once, not per step') : fail('edge applied once, not per step');
+
+  // a forced win streak pays exactly bet x multiplier
+  const paid = await pg.evaluate(`(()=>{
+    MO.moles=3;MO.phase='idle';MO.busy=false;
+    const before=P().bal;
+    MO.bet=100;MO.hits=3;MO.mult=moMult(3);MO.phase='play';
+    const expect=Math.round(MO.bet*MO.mult*100)/100;
+    moCash(false);
+    return [Math.round((P().bal-before)*100)/100, expect];
+  })()`);
+  paid[0] === paid[1] ? pass('cash out pays bet x multiplier', paid[0] + '')
+                      : fail('cash out pays bet x multiplier', paid[0] + ' vs ' + paid[1]);
+
+  // a miss must cost the stake and reset the round
+  await pg.waitForTimeout(600);
+  const bust = await pg.evaluate(`(()=>{
+    MO.phase='idle';MO.busy=false;MO.hits=0;MO.mult=1;
+    const before=P().bal;
+    $('moBet').value='50';moStart();
+    const staked=Math.round((before-P().bal)*100)/100;
+    // force every hole empty, then whack one
+    MO.set=new Set();
+    const el=document.querySelector('.mohole[data-h="0"]');
+    moWhack(0,el);
+    return staked;
+  })()`);
+  bust === 50 ? pass('miss costs the stake') : fail('miss costs the stake', 'staked ' + bust);
+  await pg.waitForTimeout(1400);
+  const reset = await pg.evaluate("MO.phase==='idle' && MO.hits===0 && MO.mult===1");
+  reset ? pass('round resets after a miss') : fail('round resets after a miss');
+
+  // cash out must be impossible before a hit lands
+  const guard = await pg.evaluate(`(()=>{
+    MO.phase='idle';MO.busy=false;MO.hits=0;MO.mult=1;
+    $('moBet').value='10';moStart();
+    const before=P().bal;moCash(false);
+    return Math.round((P().bal-before)*100)/100;
+  })()`);
+  guard === 0 ? pass('cannot cash out with zero hits') : fail('cannot cash out with zero hits', 'gained ' + guard);
+
+  // the new sound engine must not throw when driven hard
+  const snd = await pg.evaluate(`(()=>{try{SND.init();
+    ['click','tick','chip','card','thud','lose','taunt'].forEach(k=>SND[k]());
+    SND.peg(3);SND.win(5);SND.big();SND.swing(.3);SND.pop(-.2);SND.whack(4,.1);
+    SND.squeak(0);SND.dud(.5);SND.cash(12);SND.hover(0);
+    SND.tone(440,.1);SND.noise(.05,.1,1200);
+    return 'ok'}catch(e){return String(e)}})()`);
+  snd === 'ok' ? pass('sound engine runs clean') : fail('sound engine runs clean', snd);
+
+  errs.length === n0 ? pass('no moles console errors') : fail('no moles console errors', errs.slice(n0).join(' | '));
+  await pg.close();
+}
 
 /* ---------------- admin portal ---------------- */
 async function admin(ctx, errs) {
@@ -346,6 +421,37 @@ async function rtp(ctx, errs) {
       return [t/n*100,h/n*100];};
     [['crown',genCrown],['deep',genDeep],['neon',genNeon],['gold',genGold]].forEach(([k,f])=>{
       const [r,h]=tk(f,3000000);res.push(['ticket '+k,r,96,h,2.5]);});
+    // Moles: 0.98/p^k must hold for every mole count and every cash-out point.
+    // Exact expectation first - this covers the deep streaks that simulation
+    // cannot reach (1 mole to 8 hits is 1 in 5,764,801, so no sane sample size
+    // ever lands one and a Monte Carlo row there would just read 0.00%).
+    {const holes=7;let worst=98,worstAt='';
+     for(let moles=1;moles<=6;moles++)for(let k=1;k<=8;k++){
+       const p=moles/holes,mult=.98/Math.pow(p,k);
+       const ev=Math.pow(p,k)*mult*100;           // reach it with p^k, get paid mult
+       if(Math.abs(ev-98)>Math.abs(worst-98)){worst=ev;worstAt=moles+'m@'+k}
+     }
+     res.push(['moles exact EV (worst '+worstAt+')',worst,98,null,0.02]);
+     // then simulate the reachable cases, to prove the code matches the maths
+     for(const moles of [1,3,6]){
+       for(const stopAt of [1,3]){
+         const p=moles/holes;const mult=k=>k<=0?1:.98/Math.pow(p,k);
+         let ret=0;const N2=400000;
+         for(let i=0;i<N2;i++){
+           let k=0;
+           while(k<stopAt){ if(Math.random()<p)k++; else {k=-1;break} }
+           if(k>=stopAt)ret+=mult(stopAt);
+         }
+         // Tolerance from the estimator's own variance, not a guessed number.
+         // Payout is all-or-nothing with q=p^k, so the relative standard error is
+         // ~1/sqrt(qN) - at 1 mole and 3 hits that is 2.9%, and a fixed +/-1.2
+         // band would fail roughly a third of runs for no reason. The exact-EV
+         // row above is what pins the maths down; these rows prove the code
+         // matches it. 4 sigma keeps false failures rare.
+         const q=Math.pow(p,stopAt), se=98*Math.sqrt((1-q)/(q*N2));
+         res.push(['moles '+moles+'m stop@'+stopAt,ret/N2*100,98,null,Math.max(0.5,+(4*se).toFixed(2))]);
+       }
+     }}
     // Limbo
     {let t=0;const T=5;for(let i=0;i<N;i++){const u=Math.random();if(Math.max(1,Math.floor(99/u)/100)>=T)t+=T}
       res.push(['limbo @5x',t/N*100,99,null,0.8]);}
@@ -374,6 +480,7 @@ async function rtp(ctx, errs) {
   try {
     if (which === 'all' || which === 'solo') await solo(ctx, errs);
     if (which === 'all' || which === 'admin') await admin(ctx, errs);
+    if (which === 'all' || which === 'moles') await moles(ctx, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);

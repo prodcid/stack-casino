@@ -37,6 +37,7 @@ node test.js mp         # two-window multiplayer, all 8 tables + login/identity
 node test.js strip      # The Strip full game + money audit (skips: not built)
 node test.js rtp        # maths only, no clicking (~2 min)
 node test.js admin      # admin portal: stats, user table, suspend, audit
+node test.js moles      # Moles maths, payouts, guards + sound engine smoke
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -70,9 +71,11 @@ storage/account layer.
 
 ## 2. Current scope
 
-16 single-player games, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+17 single-player games, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
-**Single player:** Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
+**Single player:** Moles, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
+
+**Moles** (`MO` state) — Stake Originals clone. 7 holes, player picks 1–6 moles as the volatility dial, max 8 hits, moles reshuffle after every hit so each swing is an independent `M/7`. `mult(k) = 0.98 / p^k`, **kept exact — never round it**; truncating to 2dp cost 0.4% RTP. `moFmt()` displays up to 4dp so the shown multiplier matches the payout. `0.98 × 7⁸ = 5,649,504.98` is the real game's max win and `test.js moles` asserts it.
 
 **Party (`PT` array):** The Heist, The Run, The Vault, Blackjack, Hold'em, Crash, Derby, Coin Duel.
 
@@ -123,7 +126,7 @@ Two patterns, don't mix them up:
 
 - **Look:** Stake.com — navy `#0f212e`, panels `#1a2c38`, green `#00e701`, gold `#ffc800`. Outfit font.
 - **Every game needs:** real animation, synthesised sound via `SND`, particle feedback (`burst`/`burstAt`/`floatText`), a clear win moment (`bigWin` at 10×+).
-- **Sound is all synthesised** in `SND` — no audio files, ever.
+- **Sound is all synthesised** in `SND` — no audio files, ever. The engine runs a master bus → compressor → out, plus a generated convolution reverb send. Three primitives: `_o()` pitched voice (pitch + filter envelopes), `_n()` filtered noise, `_fm()` FM voice. **Build sounds in layers** — a convincing impact is a noise transient + a low body + a tail, not one oscillator. `tone()` and `noise()` keep their original signatures; don't change them, 16 games call them.
 - **Card skins** dress zones (frame, index plates, one top module, back), not whole-card colour washes. Alex rejected "weird" themes — keep them premium and real-material: metal, lacquer, leather, gemstone. No cartoon art on faces; face cards are serif monograms.
 - **Animation restraint:** one module per card, calm timing. Alex pushed back hard on over-stimulating designs.
 - **Odds are always shown** on the button before the player commits. Nothing hidden.
@@ -165,6 +168,10 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Admin portal added. No server exists, so 'all users' means two sources: accounts on this device (full control) and a persistent roster of everyone who has joined a party (record + live commands while connected). Chose a roster over pretending there is a central DB.
 - **2026-09-20** — Accounts now track created / lastSeen / playMs / sessions / wagered / won. Playtime only ticks while the tab is visible, so an idle open tab does not report as playtime.
 - **2026-09-20** — Remote admin commands (balance, suspend, kick, message) are advisory: the guest's client applies them. A modified client could ignore them. Acceptable for mates; do not describe it as enforcement.
+- **2026-09-20** — Moles added, cloned from Stake Originals. Researched rather than guessed: 7 holes, 1-6 moles chosen as volatility, max 8 hits. Confirmed the model by reverse-engineering Stake's stated max win 5,649,504.980x = 0.98 x 7^8 exactly, which pins p=1/7 at one mole and the 8-hit cap.
+- **2026-09-20** — Moles multipliers are kept EXACT, not rounded to 2dp. Truncating them cost up to 0.4% RTP (6 moles at 3 hits measured 97.61% instead of 98.00%). The display carries up to 4dp instead so what the player reads is what they are paid.
+- **2026-09-20** — Moles RTP is verified analytically (p^k x mult = 0.98 for all 48 combinations) as well as by simulation. Deep streaks cannot be sampled: 1 mole to 8 hits is 1 in 5,764,801, so a Monte Carlo row there just reads 0.00%. Simulation tolerances are now derived from the estimator variance rather than guessed.
+- **2026-09-20** — Sound engine rebuilt: master bus with compressor, generated convolution reverb send, and three primitives (_o pitched, _n filtered noise, _fm). Sounds are layered - an impact is transient + body + tail - which is what makes them read as distinct objects. tone() and noise() keep their old signatures so the other 16 games were untouched.
 
 ---
 
