@@ -9,7 +9,8 @@
    up a new version, keeping the player's account across an update, and booting
    offline when the mirror is unreachable.
 
-   It rewrites dist/ as part of the run - re-run `node ship.js --local` after.
+   It rewrites dist/ during the run to fake a release, then restores it, so it
+   never leaves a bogus version behind for ship.js to build on.
 */
 const http = require('http');
 const fs = require('fs');
@@ -42,6 +43,15 @@ const srv = http.createServer((req, res) => {
     "return ['" + base + "/' + path + '?' + bust];");
   const tmp = path.join(DIST, '__launchertest.html');
   fs.writeFileSync(tmp, L);
+
+  // Snapshot dist/ - this test deliberately rewrites it to fake a new release,
+  // and leaving it rewritten made ship.js derive the next version from a bogus
+  // number (two builds ended up sharing a version, so cached launchers never
+  // updated). Always put it back.
+  const SNAP = ['version.json', 'stack-casino.html']
+    .map(f => [path.join(DIST, f), fs.existsSync(path.join(DIST, f)) ? fs.readFileSync(path.join(DIST, f)) : null]);
+  const restore = () => { for (const [f, buf] of SNAP) if (buf !== null) fs.writeFileSync(f, buf); };
+  process.on('exit', restore);
 
   const browser = await playwright.chromium.launch();
   const ctx = await browser.newContext();
@@ -96,6 +106,7 @@ const srv = http.createServer((req, res) => {
   console.log('\n  console errors: ' + (errs.length ? errs.join(' | ') : 'none'));
   await browser.close();
   await new Promise(r => srv.close(r));
+  restore();
   try { fs.unlinkSync(tmp); } catch {}
   console.log(bad ? `\n${bad} FAILED\n` : '\nlauncher ok\n');
   process.exit(bad || errs.length ? 1 : 0);

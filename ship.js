@@ -56,6 +56,26 @@ function ensureTrusted() {
 }
 
 /* ---------- version numbers: YYYY.MM.DD.N, N resets each day ---------- */
+const vKey = v => {
+  const m = /^(\d{4})\.(\d{2})\.(\d{2})\.(\d+)$/.exec(v || '');
+  return m ? (+m[1] * 1e10 + +m[2] * 1e8 + +m[3] * 1e6 + +m[4]) : -1;
+};
+
+/* The highest version ever PUBLISHED, taken from git history as well as dist/.
+   dist/version.json alone is not trustworthy: test-launcher.js rewrites it, and
+   deriving the next number from a tampered file once produced two different
+   builds both called 2026.09.20.2 - which a cached launcher treats as "already
+   up to date" and silently never downloads. Versions must only ever go up. */
+function highestShipped() {
+  let best = null, bestK = -1;
+  const consider = v => { const k = vKey(v); if (k > bestK) { bestK = k; best = v; } };
+  const f = path.join(DIST, 'version.json');
+  if (fs.existsSync(f)) { try { consider(JSON.parse(read(f)).version); } catch (e) {} }
+  const log = gitSoft('log', '--format=%s');
+  if (log) for (const line of log.split('\n')) consider(line.trim().split(/\s+/)[0]);
+  return best;
+}
+
 function nextVersion(current) {
   const d = new Date();
   const today = [
@@ -64,7 +84,15 @@ function nextVersion(current) {
     String(d.getDate()).padStart(2, '0')
   ].join('.');
   const m = /^(\d{4}\.\d{2}\.\d{2})\.(\d+)$/.exec(current || '');
-  return (m && m[1] === today) ? `${today}.${+m[2] + 1}` : `${today}.1`;
+  let next = (m && m[1] === today) ? `${today}.${+m[2] + 1}` : `${today}.1`;
+  // never reuse or go below something already published
+  const hi = highestShipped();
+  if (vKey(next) <= vKey(hi)) {
+    const h = /^(\d{4}\.\d{2}\.\d{2})\.(\d+)$/.exec(hi);
+    next = h ? `${h[1] === today ? today : h[1]}.${+h[2] + 1}` : next;
+    if (vKey(next) <= vKey(hi)) next = `${today}.${+(/\.(\d+)$/.exec(hi) || [, 0])[1] + 1}`;
+  }
+  return next;
 }
 
 /* The last version we actually published. Deliberately read from dist/, not from
@@ -73,8 +101,7 @@ function nextVersion(current) {
    also what you want the Account modal to say when you open it straight off disk. */
 function currentVersion() {
   if (!VER_RE.test(read(GAME))) die('stack-casino.html has no <meta name="stack-version"> tag. Put it back in <head>.');
-  const f = path.join(DIST, 'version.json');
-  return fs.existsSync(f) ? JSON.parse(read(f)).version : null;
+  return highestShipped();
 }
 
 /* ---------- setup ---------- */

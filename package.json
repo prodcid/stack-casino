@@ -8,7 +8,7 @@
     "test:mp": "node test.js mp",
     "test:strip": "node test.js strip",
     "test:rtp": "node test.js rtp",
-    "test:launcher": "node ship.js --local \"launcher test\" && node test-launcher.js && node ship.js --local \"rebuild\"",
+    "test:launcher": "node ship.js --local \"launcher test\" && node test-launcher.js",
     "build": "node ship.js --local \"local build\"",
     "status": "node ship.js status"
   },
