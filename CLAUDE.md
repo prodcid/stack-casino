@@ -41,6 +41,7 @@ node test.js moles      # Moles maths, reshuffle, payouts, guards + sound smoke
 node test.js shot       # Long Shot drag-aiming (real mouse drags)
 node test.js sports     # Sportsbook pricing, accas, cash out, suspensions, layout
 node test.js coop       # two-window presence, join invites, side bets
+node test.js fight      # Fight Night engine, outcome mix, RTP, joint accas
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -74,7 +75,7 @@ storage/account layer.
 
 ## 2. Current scope
 
-18 single-player games + sportsbook, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+18 single-player games + sportsbook + fight night, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -138,6 +139,24 @@ Party sync is **seed-based**: host owns the card and drives kick-off, both pre-s
 identically, only the seed and a kick-off cross the wire. Bets are always vs the house at 97% (in party
 too) — no money moves between players, so the zero-sum party rule is untouched; the
 party layer only shares fixtures and a profit leaderboard.
+
+**Fight Night** (`fight` view, `FN` state) — pixel boxing, 3 live rounds, full book
+(winner / distance / stoppage round / method), accumulators, live odds, cash out.
+
+**The simulator IS the pricing model.** Boxing has no closed form for "red by KO in
+round 2", so `fnPrices()` runs `fnPlayOut()` — the exact engine the player watches —
+a few thousand times from the current state and counts outcomes. Model and generator
+cannot drift apart because they are the same function. Accumulator legs count runs
+where every leg lands, so correlation is exact (nested legs like "wins" + "wins by KO"
+are 4.8pp off under a product rule, 0.03pp off jointly).
+
+Balance is **measured, never eyeballed** — target ~15% KO / ~75% decision / ~10% draw,
+with stoppages possible in **every** round or the round 1/2 markets are permanently
+suspended. `test.js fight` asserts that mix.
+
+Watch for: `fnScoreRound` (cards) is separate from `fnEndRound` (cards + advance) because
+`fnDecision` must score the round still in progress — missing that scored only rounds 1-2
+and drew 45% of fights. Ring uses **red/blue corner colours**, not fighter brand colours.
 
 **Party HUD** (`CO` state, `#coHud`) — a floating panel, only while `connected()`.
 Shows what your mate is playing, sends a join invite they accept, and offers side bets
@@ -209,6 +228,7 @@ Two patterns, don't mix them up:
 - Roster figures are self-reported by the other player's client. Treat as a record, not proof.
 - Sportsbook: host drives kick-off and the roll to the next match; the guest's buttons are disabled. A guest joining mid-match gets a fresh fixture and any open bets on the old one are cleared.
 - Party HUD side bets are wired for Moles and Long Shot only. Other games show presence and join, but no side-bet offer until they call coOffer/coSettle.
+- Fight Night party sync shares the seed and the host drives start/next, same as the sportsbook. Guest buttons are disabled.
 
 ---
 
@@ -253,6 +273,11 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Same-match accumulator legs are now ALLOWED and priced from the joint distribution over the score grid, not the product of single probabilities. Multiplying correlated markets (home win AND over 2.5) was 5.00pp wrong against simulation; the joint price is 0.03pp. This replaces the old block on same-match legs, which only existed because the product rule lied.
 - **2026-09-20** — Cash-out buttons now show the offer against the stake as a coloured +/- delta, so you can see at a glance whether taking it banks a profit or cuts a loss. Reviewed, nothing else to record.
 - **2026-09-20** — Open-bet list is wiped when the next fixture loads, so results do not pile up across matches. Anything still unsettled at that point is refunded rather than dropped - it should be impossible, but silently eating a stake would be worse than a stray toast.
+- **2026-09-20** — Fight Night added: pixel boxing, 3 live rounds, full book. PRICED BY THE SIMULATOR ITSELF - boxing has no closed form for 'red by KO in round 2', so the odds come from running the same engine a few thousand times from the current state. That makes the model and the generator the same object by construction, which is the drift the football book needed a test to guard against.
+- **2026-09-20** — Fight balance took three passes, all caught by measurement rather than eye. First cut: 93% of fights ended inside the distance (punch damage was ~3x what 100hp absorbs over 240 ticks). Overcorrected to 1.1% KO. Landed at ~15% KO / 75% decision / 10% draw with stoppages possible in every round - round 1 and 2 markets are unbettable otherwise.
+- **2026-09-20** — BUG found by the draw rate: fnDecision scored off cards that never included the final round, because fnEndRound was only called BETWEEN rounds. A one-round-each split finished 19-19 and was declared a draw - 45% of fights. Split into fnScoreRound (cards) and fnEndRound (cards + advance); fnDecision now scores the round in progress.
+- **2026-09-20** — Fighters wear red and blue corner colours in the ring rather than their own brand colour: two of the six are near-identical greens and that bout was unfollowable. Brand colour stays on the HUD chips.
+- **2026-09-20** — Knockdowns used burst() - the gold-coin WIN celebration - which showered coins over a man being counted out. Replaced with ring sparks. Check the emotion of a shared effect before reusing it.
 
 ---
 

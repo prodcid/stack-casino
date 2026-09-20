@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.20.21">
+<meta name="stack-version" content="2026.09.20.23">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -253,6 +253,44 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .cosbres.w{background:rgba(0,231,1,.12);color:#6dffa8}
 .cosbres.l{background:rgba(255,122,138,.12);color:#ff7a8a}
 @media(max-width:900px){.cohud{right:8px;left:8px;width:auto;bottom:70px}}
+
+
+/* ===================== FIGHT NIGHT ===================== */
+.fnwrap{position:relative;width:100%;display:grid;gap:10px}
+.fnring{position:relative;width:100%;background:#0a0f16;border-radius:12px;overflow:hidden;
+ border:1px solid var(--line)}
+#fnCv{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.fnhud{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;
+ background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.fnside{min-width:0}
+.fnside.r{text-align:right}
+.fnnm{display:flex;align-items:center;gap:7px;font-weight:900;font-size:13.5px;min-width:0}
+.fnside.r .fnnm{justify-content:flex-end}
+.fnnm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fnchip{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;
+ font-size:9px;font-weight:900;color:#06131b;flex:none}
+.fnbar{height:9px;border-radius:99px;background:var(--bg);overflow:hidden;margin-top:5px;
+ border:1px solid rgba(255,255,255,.07)}
+.fnbar i{display:block;height:100%;border-radius:99px;transition:width .22s}
+.fnbar.hp i{background:linear-gradient(90deg,#ff5a55,#ffc800 55%,#6dffa8)}
+.fnbar.st i{background:#4aa8ff;opacity:.75}
+.fnside.r .fnbar i{margin-left:auto}
+.fnmeta{display:flex;gap:8px;font-size:10px;font-weight:800;color:var(--mute);margin-top:4px}
+.fnside.r .fnmeta{justify-content:flex-end}
+.fnmid{text-align:center;min-width:92px}
+.fnmid b{display:block;font-size:20px;font-weight:900;line-height:1}
+.fnmid span{display:block;font-size:10px;font-weight:800;color:var(--mute);letter-spacing:.08em}
+.fnmid .live{color:var(--green2,#6dffa8)}
+.fnfeed{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+ max-height:104px;overflow:auto;display:grid;gap:4px;font-size:12px}
+.fnfeed div{color:var(--mute)}
+.fnfeed b{color:#fff}
+.fnfeed .big{color:var(--gold);font-weight:800}
+.fnfeed .ko{color:#ff7a8a;font-weight:900}
+.fnmk h5{margin:10px 0 6px;font-size:10.5px;font-weight:900;color:var(--mute);letter-spacing:.07em}
+.fnmk{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 12px 12px}
+.fnrow{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(86px,1fr))}
+@media(max-width:700px){.fnmid{min-width:70px}.fnmid b{font-size:17px}}
 
 /* ===================== SPORTSBOOK ===================== */
 /* The book is a long scrolling column, not a centred board like the other games */
@@ -1590,6 +1628,26 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
       </div><div class="pop" id="crPop" style="top:26%"><b></b><i></i></div></div>
     </div></section>
 
+    <!-- FIGHT NIGHT -->
+    <section class="view" id="fightView"><div class="shell">
+      <div class="ctrl">
+        <div class="slip" id="fnSlip"></div>
+        <div id="fnOpen"></div>
+        <button class="btn2" id="fnGuideBtn">Betting guide</button>
+        <p class="info" id="fnInfo"></p>
+      </div>
+      <div class="stage" style="align-items:stretch">
+        <div class="fnwrap">
+          <div class="fnhud" id="fnHud"></div>
+          <div class="fnring"><canvas id="fnCv"></canvas></div>
+          <div class="fnfeed" id="fnFeed"></div>
+          <div class="fnmk" id="fnMk"></div>
+          <div id="fnFoot"></div>
+          <div class="pop" id="fnPop"><b></b><i></i></div>
+        </div>
+      </div>
+    </div></section>
+
     <!-- SPORTSBOOK -->
     <section class="view" id="sportsView"><div class="shell">
       <div class="ctrl">
@@ -1770,6 +1828,7 @@ IC.keno='<svg viewBox="0 0 24 24"><path d="M3 3h5v5H3zm6.5 0h5v5h-5zM16 3h5v5h-5
 IC.hilo='<svg viewBox="0 0 24 24"><path d="M12 2l6 7h-4v4h-4V9H6zm0 20-6-7h4v-2h4v2h4z"/></svg>';
 IC.bacc='<svg viewBox="0 0 24 24"><path d="M3 6h8v12H3zM13 6h8v12h-8z" opacity=".5"/><path d="M5 9h4v2H5zm10 0h4v2h-4z"/><text x="12" y="23" font-size="0">b</text></svg>';
 IC.locker='<svg viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 4-3 5 3 5 3-5z"/><path d="M19.5 2l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg>';
+IC.fight='<svg viewBox="0 0 24 24"><path d="M6 8.5C6 6 8 4.5 10.5 4.5h4C17 4.5 19 6 19 8.5v3.2c0 1.4-1.1 2.5-2.5 2.5h-8A2.5 2.5 0 0 1 6 11.7z"/><path d="M8 14.2h8v3.1c0 1.3-1 2.2-2.2 2.2h-3.6c-1.2 0-2.2-.9-2.2-2.2z"/><path d="M6 7.6 4.2 9a2.6 2.6 0 0 0 .4 4.3L6 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9.6 8.4v3M12 8.4v3M14.4 8.4v3" stroke="#0f212e" stroke-width="1.4" stroke-linecap="round"/></svg>';
 IC.sports='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 6.4l3.2 2.3-1.2 3.8h-4l-1.2-3.8z"/><path d="M12 2.7v3.7M4.3 9.2l3.5 1.3M19.7 9.2l-3.5 1.3M7.2 19.4l2.6-3.1M16.8 19.4l-2.6-3.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
 IC.shot='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" /><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 IC.moles='<svg viewBox="0 0 24 24"><ellipse cx="12" cy="19" rx="9" ry="3.4" opacity=".45"/><path d="M12 5c3.3 0 6 2.7 6 6v6H6v-6c0-3.3 2.7-6 6-6z"/><circle cx="9.4" cy="11" r="1.5" fill="#0f212e"/><circle cx="14.6" cy="11" r="1.5" fill="#0f212e"/><path d="M10.7 14h2.6v2.4h-2.6z" fill="#0f212e"/></svg>';
@@ -1779,7 +1838,7 @@ IC.tower='<svg viewBox="0 0 24 24"><path d="M6 21V9l6-6 6 6v12h-5v-5h-2v5z"/><pa
 IC.limbo='<svg viewBox="0 0 24 24"><path d="M3 20 9 9l4 6 3-4 5 9z"/><circle cx="19" cy="5" r="2.5"/></svg>';
 IC.scratch='<svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" opacity=".5"/><path d="M7 8l4 4-4 4M13 16h5" stroke="#0f212e" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 IC.craps='<svg viewBox="0 0 24 24"><rect x="2" y="8" width="12" height="12" rx="3"/><rect x="11" y="3" width="11" height="11" rx="3" opacity=".55"/><circle cx="5.5" cy="11.5" r="1.3" fill="#0f212e"/><circle cx="10.5" cy="16.5" r="1.3" fill="#0f212e"/><circle cx="5.5" cy="16.5" r="1.3" fill="#0f212e"/><circle cx="10.5" cy="11.5" r="1.3" fill="#0f212e"/></svg>';
-const GAMES=[['lobby','Lobby'],['party','Online Party'],['sports','Sportsbook'],['locker','Cosmetics'],['moles','Moles'],['shot','Long Shot'],['tower','Tower'],['limbo','Limbo'],['scratch','Scratch'],['craps','Craps'],['chicken','Chicken Road'],['balloon','Balloon Pump'],['wheel','Fortune Wheel'],['mines','Mines'],['dice','Dice'],['roulette','Roulette'],['keno','Keno'],['hilo','Hi-Lo'],['bacc','Baccarat'],['plinko','Plinko'],['bj','Blackjack'],['poker','Video Poker'],['slots','Slots']];
+const GAMES=[['lobby','Lobby'],['party','Online Party'],['sports','Sportsbook'],['fight','Fight Night'],['locker','Cosmetics'],['moles','Moles'],['shot','Long Shot'],['tower','Tower'],['limbo','Limbo'],['scratch','Scratch'],['craps','Craps'],['chicken','Chicken Road'],['balloon','Balloon Pump'],['wheel','Fortune Wheel'],['mines','Mines'],['dice','Dice'],['roulette','Roulette'],['keno','Keno'],['hilo','Hi-Lo'],['bacc','Baccarat'],['plinko','Plinko'],['bj','Blackjack'],['poker','Video Poker'],['slots','Slots']];
 
 /* ============ AUDIO ============ */
 /* ============================================================================
@@ -2033,7 +2092,7 @@ function buildNav(){const s=$('side'),m=$('mob'),L=navList();
  s.innerHTML='<h4>Casino</h4>'+L.map(([k,n])=>`<button class="nav" data-g="${k}">${IC[k]}${n}</button>`).join('');
  m.innerHTML=L.map(([k,n])=>`<button data-g="${k}">${IC[k]}${n.split(' ').pop()}</button>`).join('');
  document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>go(b.dataset.g))}
-function go(g){SND.click();coOnView(g);document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='sports')fbRender();if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
+function go(g){SND.click();coOnView(g);document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=g==='lobby'?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='sports')fbRender();if(g==='fight'){fnFit();fnUI()}if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild();if(g==='slots'&&!slBusy)slBuild()}
 $('mute').onclick=()=>{SND.on=!SND.on;$('muteIco').style.opacity=SND.on?1:.35;if(SND.on)SND.click()};
 $('refill').onclick=()=>{if(P().bal>=100){flash('Top up unlocks under 100 credits');return}P().bal+=1000;renderBal(true);save();SND.win(3)};
 
@@ -3032,6 +3091,573 @@ function coSbHTML(rm){const o=CO.offer,q=o.q;
   <div class="i">Your wallet, 97% \u2014 nothing moves between you two.</div>
  </div>`}
 
+
+/* ============================================================================
+   FIGHT NIGHT  -  three rounds of pixel boxing, watched live, with a book on it
+
+   PRICING
+   -------
+   Boxing is a state machine - health, stamina, knockdowns, scorecards - and
+   there is no tidy closed form for "P(red wins by KO in round 2)". So instead of
+   inventing an approximation and hoping it matches, THE SIMULATOR IS THE MODEL:
+   to price the book we run the very same fight engine a few thousand times from
+   the current state and count how often each outcome happens.
+
+   That makes the odds exact by construction. There is no second model that can
+   quietly drift out of step with what the player actually watches - the failure
+   mode that the football book had to be explicitly tested against.
+
+   The cost is sampling noise, which biases returns very slightly UP (Jensen:
+   E[0.97/p_hat] > 0.97/p). With 6000 pre-fight samples that is worth a few
+   hundredths of a percent, it lands in the player's favour, and test.js checks
+   the realised RTP stays inside the house rule.
+
+   Accumulators price from the SAME sample set by counting runs where every leg
+   lands, so correlated legs ("red wins" + "inside the distance") are handled
+   exactly, with no product rule to get wrong.
+   ========================================================================== */
+const FN_RTP=.97, FN_ROUNDS=3, FN_TICKS=80, FN_HP=100;
+
+const FN_F=[
+ {id:'raz',n:'Razor Ruiz',   s:'RAZ',c:'#ff5a55',pow:1.16,acc:1.02,chin:0.92,sta:1.00},
+ {id:'cyc',n:'Kid Cyclone',  s:'CYC',c:'#4aa8ff',pow:0.90,acc:1.18,chin:1.06,sta:1.12},
+ {id:'ham',n:'Hammer Hale',  s:'HAM',c:'#ffc800',pow:1.30,acc:0.90,chin:0.96,sta:0.86},
+ {id:'gho',n:'The Ghost',    s:'GHO',c:'#b98cff',pow:0.94,acc:1.10,chin:1.14,sta:1.04},
+ {id:'bul',n:'Bronco Bull',  s:'BUL',c:'#38e8d0',pow:1.08,acc:0.97,chin:1.10,sta:0.94},
+ {id:'sly',n:'Sly Sullivan', s:'SLY',c:'#6dffa8',pow:1.00,acc:1.06,chin:1.00,sta:1.03}];
+const fnF=id=>FN_F.find(f=>f.id===id)||FN_F[0];
+
+/* jab is fast and safe, uppercut is slow and takes heads off */
+/* Damage is scaled so a full three rounds lands ~45 punches for ~65 total
+   damage against 100hp. Get this wrong and the whole card becomes knockouts -
+   the first cut had 93% of fights ending inside the distance. */
+const FN_P=[
+ {k:'jab',  n:'jab',       dmg:1.85,acc:.74, cost:.6},
+ {k:'cross',n:'right hand',dmg:3.45,acc:.55, cost:1.1},
+ {k:'hook', n:'hook',      dmg:4.80,acc:.47, cost:1.5},
+ {k:'upper',n:'uppercut',  dmg:5.90,acc:.38, cost:1.8}];
+
+function fnState(aId,bId){
+ const mk=f=>({f,hp:FN_HP,st:100,down:0,land:0,thrown:0,dmg:0});
+ return{a:mk(fnF(aId)),b:mk(fnF(bId)),rd:1,tick:0,over:false,
+  res:null,cards:[0,0],rdDmg:[0,0],log:[]}}
+
+/* One tick of the fight. Pure: give it a state and an rng, it mutates the state.
+   Both the live fight and every pricing sample run through exactly this. */
+function fnTick(S,r){
+ if(S.over)return;
+ const A=S.a,B=S.b;
+ // stamina slowly bleeds, a bit faster when hurt
+ A.st=Math.max(12,A.st-0.14*(A.hp<40?1.4:1));
+ B.st=Math.max(12,B.st-0.14*(B.hp<40?1.4:1));
+
+ if(r()<0.62){S.tick++;return}                 // feinting / circling
+
+ // who leads the exchange
+ const wa=A.f.acc*(0.55+0.45*A.st/100)*(A.hp<30?0.8:1);
+ const wb=B.f.acc*(0.55+0.45*B.st/100)*(B.hp<30?0.8:1);
+ const atkIsA=r()<wa/(wa+wb);
+ const at=atkIsA?A:B, df=atkIsA?B:A;
+
+ const p=FN_P[Math.floor(r()*r()*FN_P.length)];  // jabs are thrown most often
+ at.thrown++;at.st=Math.max(8,at.st-p.cost);
+
+ const hitChance=p.acc*at.f.acc*(0.6+0.4*at.st/100)*(df.hp<35?1.12:1)*(df.st<30?1.1:1);
+ if(r()>hitChance){
+  if(r()<.4)S.log.push({t:S.tick,rd:S.rd,ev:'miss',who:atkIsA?'a':'b',p:p.k});
+  S.tick++;return}
+
+ let dmg=p.dmg*at.f.pow/df.f.chin*(0.72+0.56*r());
+ if(df.st<30)dmg*=1.15;
+ dmg=Math.round(dmg*10)/10;
+ df.hp=Math.max(0,Math.round((df.hp-dmg)*10)/10);
+ at.land++;at.dmg+=dmg;S.rdDmg[atkIsA?0:1]+=dmg;
+
+ const big=dmg>=4.7;
+ S.log.push({t:S.tick,rd:S.rd,ev:'hit',who:atkIsA?'a':'b',p:p.k,dmg,big,
+  hp:{a:A.hp,b:B.hp}});
+
+ // knockdowns: a big shot, or anything landing on an empty tank
+ // Big shots can drop anyone, not just a fighter who is already spent - without
+ // this, stoppages only ever happened in round 3 and the round 1/2 markets were
+ // permanently suspended.
+ const kdChance=Math.max(0,(dmg-3.6)/18)+(df.hp<30?0.05:0)+(df.hp<14?0.12:0);
+ if(df.hp<=0||r()<kdChance){
+  df.down++;
+  const finished=df.hp<=0||df.down>=3||r()<(0.10+(df.hp<14?0.42:0.04));
+  S.log.push({t:S.tick,rd:S.rd,ev:finished?'ko':'down',who:atkIsA?'a':'b',
+   count:df.down,hp:{a:A.hp,b:B.hp}});
+  if(finished){S.over=true;
+   S.res={win:atkIsA?'a':'b',ko:true,rd:S.rd};return}
+  df.hp=Math.max(8,df.hp);          // beats the count, but on fumes
+  df.st=Math.max(10,df.st-16);
+ }
+ S.tick++}
+
+function fnScoreRound(S){
+ // 10-9, or 10-8 when someone was floored
+ const [da,db]=S.rdDmg;
+ let ca=10,cb=10;
+ if(da>db)cb=9; else if(db>da)ca=9; else {ca=10;cb=10}
+ const dA=S.log.filter(e=>e.rd===S.rd&&e.ev==='down'&&e.who==='b').length;
+ const dB=S.log.filter(e=>e.rd===S.rd&&e.ev==='down'&&e.who==='a').length;
+ cb-=dA;ca-=dB;
+ S.cards[0]+=ca;S.cards[1]+=cb;
+ S.rdDmg=[0,0]}
+
+function fnEndRound(S){
+ fnScoreRound(S);
+ S.rd++;S.tick=0;
+ S.a.st=Math.min(100,S.a.st+26);S.b.st=Math.min(100,S.b.st+26);
+ S.a.hp=Math.min(FN_HP,S.a.hp+5);S.b.hp=Math.min(FN_HP,S.b.hp+5);
+ S.a.down=0;S.b.down=0}
+
+function fnDecision(S){
+ fnScoreRound(S);            // the round in progress still counts
+ const [x,y]=S.cards;
+ S.over=true;
+ S.res={win:x>y?'a':y>x?'b':'d',ko:false,rd:0}}
+
+/* run a state to the final bell (mutates a clone, returns the outcome) */
+function fnPlayOut(S,r){
+ while(!S.over){
+  fnTick(S,r);
+  if(S.over)break;
+  if(S.tick>=FN_TICKS){
+   if(S.rd>=FN_ROUNDS){fnDecision(S);break}
+   fnEndRound(S)}
+ }
+ return S.res}
+
+const fnClone=S=>({a:{...S.a},b:{...S.b},rd:S.rd,tick:S.tick,over:S.over,
+ res:S.res,cards:S.cards.slice(),rdDmg:S.rdDmg.slice(),log:[]});
+
+/* ---- markets ---- */
+const FN_MK={
+ wa:{g:'Winner',l:S=>S.a.f.s+' wins', f:o=>o.win==='a'},
+ wd:{g:'Winner',l:()=>'Draw',          f:o=>o.win==='d'},
+ wb:{g:'Winner',l:S=>S.b.f.s+' wins', f:o=>o.win==='b'},
+ ko:{g:'Distance',l:()=>'Ends inside', f:o=>o.ko},
+ dist:{g:'Distance',l:()=>'Goes the distance', f:o=>!o.ko},
+ r1:{g:'Stoppage round',l:()=>'Round 1', f:o=>o.ko&&o.rd===1},
+ r2:{g:'Stoppage round',l:()=>'Round 2', f:o=>o.ko&&o.rd===2},
+ r3:{g:'Stoppage round',l:()=>'Round 3', f:o=>o.ko&&o.rd===3},
+ ako:{g:'Method',l:S=>S.a.f.s+' by KO',       f:o=>o.win==='a'&&o.ko},
+ adc:{g:'Method',l:S=>S.a.f.s+' on points',   f:o=>o.win==='a'&&!o.ko},
+ bko:{g:'Method',l:S=>S.b.f.s+' by KO',       f:o=>o.win==='b'&&o.ko},
+ bdc:{g:'Method',l:S=>S.b.f.s+' on points',   f:o=>o.win==='b'&&!o.ko}};
+
+/* Sample the engine from wherever the fight is now. Every price comes from here. */
+function fnSample(S,n){
+ const out=[];
+ for(let i=0;i<n;i++){const c=fnClone(S);
+  out.push(c.over?c.res:fnPlayOut(c,Math.random))}
+ return out}
+
+function fnPrices(S,n){
+ const outs=fnSample(S,n||FN.n),P={};
+ for(const k in FN_MK){let c=0;for(const o of outs)if(o&&FN_MK[k].f(o))c++;
+  P[k]=c/outs.length}
+ FN.outs=outs;      // kept so accumulator legs price off the same sample set
+ return P}
+const fnJointP=keys=>{
+ if(!keys.length||!FN.outs)return 0;
+ let c=0;for(const o of FN.outs){let ok=true;
+  for(const k of keys)if(!o||!FN_MK[k].f(o)){ok=false;break}
+  if(ok)c++}
+ return c/FN.outs.length};
+const fnOdds=pr=>pr>0?FN_RTP/pr:0;
+const FN_MINODDS=1.05;
+
+
+/* ---- pixel renderer -------------------------------------------------------
+   Everything is drawn on a 192x108 virtual grid with smoothing off, so one
+   virtual pixel becomes a hard block on screen - actual pixel art rather than
+   smooth vectors pretending. Boxers are built from pixel blocks with the arms
+   positioned per pose, which animates far better than hand-drawn frames and
+   keeps the sprite readable at any scale. */
+const FN_W=192, FN_H=108, FN_FLOOR=84;
+/* Stance distance matters: at 64/128 the gloves stopped a mile short of the
+   other man and nothing looked like it connected. These positions plus the
+   step-in below put the glove on the chin at the moment of impact. */
+const FN_AX=82, FN_BX=110, FN_STEP=7;
+const FN_RED='#e8413c', FN_BLUE='#3d82f0';
+
+const FN={state:null,seed:0,phase:'idle',           // idle|live|rest|done
+ rd:1,tick:0,timer:null,cv:null,cx:null,sc:1,
+ pose:{a:'guard',b:'guard'},poseT:{a:0,b:0},shake:0,fx:[],
+ feed:[],prices:null,n:2600,outs:null,
+ sel:[],mode:'single',open:[],bets:0,profit:0,
+ shared:false,oppProfit:null,liveIdx:0,cd:0,msg:''};
+
+function fnFit(){const c=$('fnCv');if(!c)return;
+ const w=c.parentElement.getBoundingClientRect().width||600;
+ const sc=Math.max(1,Math.floor(w/FN_W));
+ c.width=FN_W*sc;c.height=FN_H*sc;c.style.height=(FN_H*sc)+'px';
+ FN.cv=c;FN.cx=c.getContext('2d');FN.cx.imageSmoothingEnabled=false;FN.sc=sc;
+ fnDraw()}
+const px=(x,y,w,h,col)=>{const X=FN.cx;X.fillStyle=col;
+ X.fillRect(Math.round(x)*FN.sc,Math.round(y)*FN.sc,Math.round(w)*FN.sc,Math.round(h)*FN.sc)};
+
+function fnBoxer(bx,face,col,pose,hp,down,adv){
+ bx+=(adv||0)*face;
+ const sk='#e8b88a',skD='#c2915f',o='#1a1016',gl=col,bt='#2b3442';
+ const y=FN_FLOOR;
+ if(down){ // flat out on the canvas, head toward the near corner
+  const f=face;
+  px(bx-13*f,y-5,26*f,5,o);                            // body outline
+  px(bx-12*f,y-4,10*f,3,gl);                           // trunks
+  px(bx-2*f, y-4,10*f,3,sk);                           // torso
+  px(bx+9*f, y-9,7*f,7,o);px(bx+10*f,y-8,5*f,5,sk);    // head
+  px(bx+11*f,y-7,1*f,1,'#1a1016');                     // shut eye
+  px(bx-15*f,y-4,4*f,4,bt);                            // boots
+  px(bx+4*f, y-11,5*f,5,o);px(bx+5*f,y-10,3*f,3,gl);   // glove flung out
+  px(bx-14*f,y-1,28*f,1,'#00000055');                  // shadow
+  return}
+ const bob=Math.floor(Math.sin(performance.now()/220+bx)*1);
+ const hurt=hp<30, lean=pose==='hit'?(face>0?-2:2):0;
+ const X=bx+lean, Y=y+bob;
+ // legs + boots
+ px(X-5,Y-13,4,10,o);px(X+2,Y-13,4,10,o);
+ px(X-6,Y-3,6,3,bt);px(X+1,Y-3,6,3,bt);
+ // trunks
+ px(X-6,Y-20,12,8,gl);px(X-6,Y-14,12,2,'#00000044');
+ // torso
+ px(X-6,Y-30,12,11,o);px(X-5,Y-29,10,9,sk);
+ px(X-5,Y-25,10,2,skD);
+ // head
+ px(X-5,Y-40,10,10,o);px(X-4,Y-39,8,8,sk);
+ px(X-4,Y-33,8,2,skD);
+ // eyes look toward the opponent
+ const ex=face>0?1:-3;
+ px(X+ex,Y-37,2,2,hurt?'#ff7a8a':'#1a1016');
+ px(X+ex-3*face,Y-37,2,2,hurt?'#ff7a8a':'#1a1016');
+ if(hurt)px(X-4,Y-31,8,1,'#ff5a55');          // split lip
+ // arms: pose decides where the gloves sit
+ const G=(gx,gy)=>{px(gx-3,gy-3,6,6,o);px(gx-2,gy-2,4,4,gl)};
+ const fwd=face;
+ if(pose==='guard'||pose==='hit'){
+  px(X-7,Y-29,3,7,o);px(X+4,Y-29,3,7,o);
+  G(X-4,Y-34);G(X+4,Y-34);
+ }else if(pose==='jab'){
+  px(X-7,Y-29,3,6,o);G(X-4,Y-34);
+  px(X+2*fwd,Y-32,10*fwd,3,o);G(X+12*fwd,Y-31);
+ }else if(pose==='cross'){
+  G(X-4*fwd,Y-34);
+  px(X+2*fwd,Y-31,12*fwd,4,o);G(X+15*fwd,Y-30);
+ }else if(pose==='hook'){
+  G(X-3*fwd,Y-35);
+  px(X+3*fwd,Y-36,10*fwd,4,o);G(X+13*fwd,Y-35);
+ }else if(pose==='upper'){
+  G(X-4*fwd,Y-32);
+  px(X+3*fwd,Y-30,7*fwd,4,o);G(X+10*fwd,Y-38);
+ }else if(pose==='hurt'){
+  px(X-8,Y-27,3,7,o);px(X+5,Y-27,3,7,o);
+  G(X-6,Y-25);G(X+6,Y-25);
+ }}
+
+function fnDraw(){const X=FN.cx;if(!X)return;
+ const S=FN.state;
+ const sh=FN.shake>0?Math.round((Math.random()-.5)*FN.shake):0;
+ // crowd + hall
+ px(0,0,FN_W,FN_H,'#0a0f16');
+ const pop=FN.shake>3;   // crowd lights up when something lands flush
+ for(let i=0;i<150;i++){const cx2=(i*37)%FN_W,cy=(i*23)%38;
+  px(cx2,cy+6,1,1,i%5?'#16202b':(pop&&i%3===0?'#4d6a8a':'#243243'))}
+ px(0,44,FN_W,6,'#111a24');
+ // ring apron + canvas
+ px(6,FN_FLOOR-2,FN_W-12,FN_H-FN_FLOOR+2,'#1d2a36');
+ px(6,FN_FLOOR-2,FN_W-12,2,'#2b3d4d');
+ px(14,50,FN_W-28,FN_FLOOR-48,'#20303d');
+ px(14,50,FN_W-28,2,'#2a3d4d');
+ // ropes
+ ['#c9d4dd','#8fa2b2','#c9d4dd'].forEach((c,i)=>px(12,54+i*10,FN_W-24,1,c));
+ px(12,50,2,40,'#d8dee3');px(FN_W-14,50,2,40,'#d8dee3');
+ if(S){
+  // lean in on the punch, so the blow lands on the chin rather than in the air
+  const punching=p=>p==='jab'||p==='cross'||p==='hook'||p==='upper';
+  fnBoxer(FN_AX+sh,1,FN_RED,FN.pose.a,S.a.hp,FN.pose.a==='down',
+   punching(FN.pose.a)?FN_STEP:0);
+  fnBoxer(FN_BX+sh,-1,FN_BLUE,FN.pose.b,S.b.hp,FN.pose.b==='down',
+   punching(FN.pose.b)?FN_STEP:0);
+ }
+ // impact sparks
+ FN.fx=FN.fx.filter(f=>f.life>0);
+ for(const f of FN.fx){f.x+=f.vx;f.y+=f.vy;f.vy+=.12;f.life-=1;
+  px(f.x,f.y,1,1,f.c)}
+ if(FN.shake>0)FN.shake=Math.max(0,FN.shake-1);
+ // big centre message (round card / KO)
+ if(FN.msg){const w=FN.msg.length*4+6;
+  px(FN_W/2-w/2,26,w,11,'#000000bb');
+  X.fillStyle='#fff';X.font='900 '+(7*FN.sc)+'px Outfit';X.textAlign='center';
+  X.fillText(FN.msg,FN_W/2*FN.sc,35*FN.sc);X.textAlign='left'}}
+
+function fnSpark(x,y,col){for(let i=0;i<9;i++)FN.fx.push({x,y,
+ vx:(Math.random()-.5)*2.4,vy:(Math.random()-.7)*1.8,life:10+Math.random()*8,
+ c:i%3?col:'#ffffff'})}
+
+/* ---- live playback ---- */
+function fnPose(w,p,ms){FN.pose[w]=p;clearTimeout(FN.poseT[w]);
+ FN.poseT[w]=setTimeout(()=>{if(FN.pose[w]===p)FN.pose[w]='guard';fnDraw()},ms||190)}
+
+function fnFeedAdd(txt,cls){FN.feed.push({txt,cls});FN.feed=FN.feed.slice(-40);
+ const el=$('fnFeed');if(el){el.innerHTML=FN.feed.slice(-14).reverse()
+  .map(f=>`<div class="${f.cls||''}">${f.txt}</div>`).join('')}}
+
+function fnStart(){
+ if(FN.phase!=='idle')return;
+ if(FN.shared&&!NET.host){toast('Your mate starts the fight');return}
+ if(FN.shared&&NET.host)send({t:'fnGo'});
+ fnRun()}
+
+function fnRun(){
+ const S=FN.state;if(!S||FN.phase!=='idle')return;
+ FN.phase='live';FN.msg='ROUND 1';setTimeout(()=>{FN.msg='';fnDraw()},1200);
+ SND.reelStop();fnFeedAdd('<b>Round 1</b> \u2014 seconds out');
+ fnUI();
+ FN.timer=setInterval(fnStep,250)}
+
+function fnStep(){
+ const S=FN.state;if(!S)return;
+ if(S.over)return fnFinish();
+ const before=S.log.length;
+ fnTick(S,FN.rng);
+ for(let i=before;i<S.log.length;i++)fnEvent(S.log[i]);
+ if(S.over)return fnFinish();
+ if(S.tick>=FN_TICKS){
+  if(S.rd>=FN_ROUNDS){fnDecision(S);return fnFinish()}
+  fnEndRound(S);
+  FN.phase='rest';clearInterval(FN.timer);
+  fnFeedAdd(`<b>End of round ${S.rd-1}</b> \u2014 cards ${S.cards[0]}\u2013${S.cards[1]}`);
+  FN.msg='ROUND '+S.rd;fnPrice();fnUI();fnDraw();
+  setTimeout(()=>{if(FN.phase!=='rest')return;FN.msg='';FN.phase='live';
+   fnFeedAdd(`<b>Round ${S.rd}</b> \u2014 seconds out`);
+   FN.timer=setInterval(fnStep,250);fnUI();fnDraw()},4200);
+  return}
+ if(S.tick%10===0)fnPrice();
+ fnUI();fnDraw()}
+
+function fnEvent(e){const S=FN.state;
+ const at=e.who==='a'?S.a:S.b, df=e.who==='a'?S.b:S.a;
+ const dx=e.who==='a'?FN_BX-6:FN_AX+6;
+ if(e.ev==='miss'){fnPose(e.who,'jab',150);SND._n({d:.09,v:.06,filt:'bandpass',ff:700,ff2:2200,q:1});return}
+ if(e.ev==='hit'){
+  fnPose(e.who,e.p,200);fnPose(e.who==='a'?'b':'a','hit',200);
+  fnSpark(dx,FN_FLOOR-34,e.who==='a'?FN_RED:FN_BLUE);
+  FN.shake=e.big?4:2;
+  SND._n({d:e.big?.09:.05,v:e.big?.34:.2,ff:e.big?1400:2400,ff2:500,shape:1});
+  SND._o({f:e.big?150:210,f2:60,d:e.big?.2:.12,type:'sine',v:e.big?.34:.2,a:.001});
+  if(e.big){SND._fm({f:420,f2:180,ratio:2.6,idx:700,idx2:20,d:.16,v:.1,dly:.02,rev:.2});
+   fnFeedAdd(`<span class="big">BIG ${e.p.toUpperCase()}!</span> ${esc(at.f.n)} lands flush \u2014 ${esc(df.f.n)} hurt`)}
+  else if(Math.random()<.35)fnFeedAdd(`${esc(at.f.n)} scores with a ${e.p}`);
+  return}
+ if(e.ev==='down'){
+  fnPose(e.who==='a'?'b':'a','down',2400);FN.shake=6;
+  SND.thud();SND.taunt();
+  FN.msg='DOWN!';setTimeout(()=>{if(FN.msg==='DOWN!')FN.msg=''},1600);
+  fnFeedAdd(`<span class="ko">DOWN!</span> ${esc(df.f.n)} hits the canvas \u2014 count ${e.count}`,'ko');
+  for(let i=0;i<14;i++)fnSpark(FN_AX+14+Math.random()*24,FN_FLOOR-4,'#c9d4dd');
+  return}
+ if(e.ev==='ko'){
+  fnPose(e.who==='a'?'b':'a','down',9000);FN.shake=8;
+  SND.thud();SND.big();
+  fnFeedAdd(`<span class="ko">IT'S ALL OVER!</span> ${esc(at.f.n)} stops ${esc(df.f.n)} in round ${e.rd}`,'ko');
+  return}}
+
+function fnFinish(){
+ clearInterval(FN.timer);FN.timer=null;FN.phase='done';
+ const S=FN.state,r=S.res;
+ const wn=r.win==='d'?'Draw':(r.win==='a'?S.a.f.n:S.b.f.n);
+ FN.msg=r.win==='d'?'DRAW':(r.ko?'KO!':'DECISION');
+ fnFeedAdd(r.win==='d'?`<b>Draw</b> \u2014 cards ${S.cards[0]}\u2013${S.cards[1]}`
+  :`<b>${esc(wn)}</b> wins ${r.ko?'by stoppage in round '+r.rd:'on points, '+S.cards[0]+'\u2013'+S.cards[1]}`);
+ burst(70);
+ fnSettle();fnUI();fnDraw();
+ if(!FN.shared||NET.host)setTimeout(fnNext,6000)}
+
+function fnNext(){
+ if(FN.phase!=='done')return;
+ FN.seed=(Math.random()*1e9)>>>0;
+ fnNewFight(true);
+ if(FN.shared&&NET.host)send({t:'fnCard',seed:FN.seed})}
+
+function fnNewFight(keep){
+ clearInterval(FN.timer);FN.timer=null;
+ fnClearBets();
+ if(!keep)FN.seed=(Math.random()*1e9)>>>0;
+ const r=fbRng(FN.seed);
+ const ids=FN_F.map(f=>f.id);
+ for(let i=ids.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]]}
+ FN.state=fnState(ids[0],ids[1]);
+ FN.rng=fbRng((FN.seed^0x9e3779b9)>>>0);
+ FN.phase='idle';FN.sel=[];FN.feed=[];FN.pose={a:'guard',b:'guard'};FN.msg='';
+ fnFeedAdd(`<b>${esc(FN.state.a.f.n)}</b> v <b>${esc(FN.state.b.f.n)}</b> \u2014 3 rounds`);
+ fnPrice(6000);fnUI();fnFit()}
+
+function fnPrice(n){if(!FN.state)return;FN.prices=fnPrices(FN.state,n||FN.n)}
+
+
+/* ---- betting ---- */
+const fnLive=o=>o>=FN_MINODDS;
+const fnFmt=o=>o>=100?o.toFixed(0):o>=10?o.toFixed(1):o.toFixed(2);
+const fnLabel=k=>FN_MK[k]?FN_MK[k].l(FN.state):k;
+const fnAccaP=()=>fnJointP(FN.sel.map(x=>x.key));
+const fnAccaO=()=>fnOdds(fnAccaP());
+
+function fnClearBets(){
+ let ref=0;
+ for(const b of FN.open)if(b.state==='open'){pay(b.stake);ref++}
+ if(ref)toast(ref+' unsettled bet'+(ref>1?'s':'')+' refunded');
+ FN.open=[];FN.sel=[]}
+
+function fnPick(k){
+ if(!FN.prices||FN.phase==='done')return;
+ const i=FN.sel.findIndex(x=>x.key===k);
+ if(i>=0){FN.sel.splice(i,1);SND.click();return fnUI()}
+ const p=FN.prices[k],o=fnOdds(p);
+ if(!(p>0)||!fnLive(o)){toast('That market is suspended');return}
+ FN.sel.push({key:k,p,o,label:fnLabel(k)});SND.chip();fnUI()}
+
+function fnMkRender(){const el=$('fnMk');if(!el||!FN.prices||!FN.state)return;
+ const S=FN.state,P=FN.prices,shut=FN.phase==='done';
+ const cell=k=>{const p=P[k],o=fnOdds(p),open=!shut&&p>0&&fnLive(o);
+  const on=FN.sel.some(x=>x.key===k);
+  return `<button class="odd ${on?'on':''}" data-fk="${k}" ${open?'':'disabled'}>
+   <span>${esc(fnLabel(k))}</span><b>${open?fnFmt(o):(p>0?'\u2014':'\u2013')}</b></button>`};
+ const grp=(t,ks)=>`<h5>${t}</h5><div class="fnrow">${ks.map(cell).join('')}</div>`;
+ el.innerHTML=grp('WINNER',['wa','wd','wb'])
+  +grp('DISTANCE',['ko','dist'])
+  +grp('STOPPAGE ROUND',['r1','r2','r3'])
+  +grp('METHOD',['ako','adc','bko','bdc']);
+ el.querySelectorAll('[data-fk]').forEach(b=>b.onclick=()=>fnPick(b.dataset.fk))}
+
+function fnSlipRender(){const el=$('fnSlip');if(!el)return;
+ const n=FN.sel.length,multi=FN.mode==='acca'&&n>1;
+ const stake=Math.max(0,parseFloat(keepVal('fnStake',10))||0);
+ const jp=multi?fnAccaP():0;
+ const ret=multi?stake*fnOdds(jp):FN.sel.reduce((a,x)=>a+stake*x.o,0);
+ el.innerHTML=`
+  <div class="sliptabs">
+   <button data-fm2="single" class="${multi?'':'on'}">Singles</button>
+   <button data-fm2="acca" class="${multi?'on':''}">Accumulator</button>
+  </div>
+  ${n?FN.sel.map((x,k)=>`<div class="sel">
+    <div style="min-width:0"><b>${esc(x.label)}</b><span>${esc(FN_MK[x.key].g)}</span></div>
+    <div class="pr">${fnFmt(x.o)}</div><button class="x" data-fr="${k}">\u00d7</button></div>`).join('')
+   :'<div class="slipempty">Tap any odds to back a market.<br>Two or more ride together as an accumulator.</div>'}
+  ${n?`<div><div class="lbl">Stake ${multi?'':'per bet'}</div>
+   <div class="betbox"><input id="fnStake" type="number" min="0.1" step="1" value="${stake}" inputmode="decimal">
+   <button data-fmul=".5">\u00bd</button><button data-fmul="2">2\u00d7</button></div></div>
+   ${multi?`<div class="slipsum"><span>Combined odds</span><b>${jp>0?fnFmt(fnOdds(jp)):'\u2014'}</b></div>`:''}
+   <div class="slipsum"><span>Total stake</span><b>${fmt(multi?stake:stake*n)}</b></div>
+   <div class="slipsum"><span>Potential return</span><b>${fmt(ret)}</b></div>
+   <button class="go" id="fnPlace" ${multi&&jp<=0?'disabled':''}>${multi&&jp<=0?'Those cannot all land':'Place '+(multi?'accumulator':n>1?n+' bets':'bet')}</button>
+   <button class="btn2" id="fnClear">Clear slip</button>`:''}`;
+ el.querySelectorAll('[data-fm2]').forEach(b=>b.onclick=()=>{FN.mode=b.dataset.fm2;SND.click();fnUI()});
+ el.querySelectorAll('[data-fr]').forEach(b=>b.onclick=()=>{FN.sel.splice(+b.dataset.fr,1);fnUI()});
+ el.querySelectorAll('[data-fmul]').forEach(b=>b.onclick=()=>{const i=$('fnStake');
+  i.value=Math.max(.1,Math.round((parseFloat(i.value)||0)*parseFloat(b.dataset.fmul)*100)/100);SND.chip();fnSlipRender()});
+ if($('fnStake'))$('fnStake').oninput=()=>fnSlipRender();
+ if($('fnPlace'))$('fnPlace').onclick=fnPlaceBet;
+ if($('fnClear'))$('fnClear').onclick=()=>{FN.sel=[];SND.click();fnUI()}}
+
+function fnPlaceBet(){
+ const n=FN.sel.length;if(!n)return;
+ const stake=Math.round((parseFloat($('fnStake').value)||0)*100)/100;
+ if(!(stake>0)){toast('Enter a stake above 0');return}
+ const multi=FN.mode==='acca'&&n>1;
+ if((multi?stake:stake*n)>P().bal+1e-9){flash('Not enough credits');return}
+ if(multi){const jp=fnAccaP();if(jp<=0)return;
+  if(!take(stake))return;
+  FN.open.push({id:Math.random(),keys:FN.sel.map(x=>x.key),
+   label:n+'-leg acca',stake,odds:fnOdds(jp),state:'open'})}
+ else for(const x of FN.sel){if(!take(stake))break;
+  FN.open.push({id:Math.random(),keys:[x.key],label:x.label,stake,odds:x.o,state:'open'})}
+ FN.sel=[];SND.chip();toast('Bet placed');fnUI()}
+
+/* cash out at fair current value - same rule as the football book */
+function fnCashVal(b){if(b.state!=='open'||!FN.outs)return 0;
+ return Math.round(b.stake*b.odds*fnJointP(b.keys)*100)/100}
+
+function fnOpenRender(){const el=$('fnOpen');if(!el)return;
+ if(!FN.open.length){el.innerHTML='';return}
+ el.innerHTML='<div class="lbl" style="margin-bottom:6px">YOUR BETS</div>'+
+  FN.open.slice().reverse().map(b=>{
+   const cv=fnCashVal(b),d=Math.round((cv-b.stake)*100)/100;
+   return `<div class="obet">
+    <div class="t"><b>${esc(b.label)}</b><span>${fnFmt(b.odds)}</span></div>
+    <div class="l">${b.keys.map(k=>esc(fnLabel(k))).join(' \u00b7 ')}</div>
+    <div class="l ${b.state==='won'?'won':b.state==='lost'?'lost':''}">
+     ${b.state==='open'?`${fmt(b.stake)} to return ${fmt(b.stake*b.odds)}`
+      :b.state==='won'?`WON \u2014 returned ${fmt(b.ret)}`
+      :b.state==='cashed'?`Cashed out for ${fmt(b.ret)}`
+      :`LOST \u2014 ${fmt(b.stake)}`}</div>
+    ${b.state==='open'&&FN.phase!=='idle'&&cv>0?
+      `<button data-fco="${b.id}" class="${d>=0?'up':'down'}">
+        <span>Cash out ${fmt(cv)}</span><i>${d>=0?'+':'\u2212'}${fmt(Math.abs(d))}</i></button>`:''}
+   </div>`}).join('');
+ el.querySelectorAll('[data-fco]').forEach(btn=>btn.onclick=()=>{
+  const b=FN.open.find(x=>String(x.id)===String(btn.dataset.fco));if(!b||b.state!=='open')return;
+  const v=fnCashVal(b);if(!(v>0))return;
+  b.state='cashed';b.ret=v;pay(v);FN.profit+=v-b.stake;
+  log('Fight Night',b.stake,v/b.stake,v);SND.cash(v/b.stake);fnShare();fnUI()})}
+
+function fnSettle(){
+ const r=FN.state&&FN.state.res;if(!r)return;
+ for(const b of FN.open){
+  if(b.state!=='open')continue;
+  const won=b.keys.every(k=>FN_MK[k].f(r));
+  if(won){const ret=Math.round(b.stake*b.odds*100)/100;
+   b.state='won';b.ret=ret;pay(ret);FN.profit+=ret-b.stake;
+   log('Fight Night',b.stake,b.odds,ret);
+   SND.win(b.odds);if(b.odds>=10)bigWin(b.odds,ret);
+   popShow($('fnPop'),fnFmt(b.odds)+'\u00d7','+'+fmt(ret))}
+  else{b.state='lost';b.ret=0;FN.profit-=b.stake;log('Fight Night',b.stake,0,0)}
+ }
+ fnShare()}
+
+/* ---- hud + footer ---- */
+function fnUI(){
+ if(!$('fnHud')||!FN.state)return;
+ const S=FN.state,live=FN.phase==='live';
+ const side=(w,cls)=>{const F=w.f,corner=cls==='l'?'#e8413c':'#3d82f0';
+  return `<div class="fnside ${cls}">
+   <div class="fnnm">${cls==='r'?'':`<span class="fnchip" style="background:${F.c}">${F.s}</span>`}
+    <span>${esc(F.n)}</span>${cls==='r'?`<span class="fnchip" style="background:${F.c}">${F.s}</span>`:''}</div>
+   <div class="fnbar hp" style="box-shadow:inset 0 0 0 1px ${corner}66"><i style="width:${Math.max(0,w.hp)}%"></i></div>
+   <div class="fnbar st"><i style="width:${Math.max(0,w.st)}%"></i></div>
+   <div class="fnmeta"><span>${w.land}/${w.thrown} landed</span><span>${Math.round(w.dmg)} dmg</span></div>
+  </div>`};
+ const secs=Math.max(0,Math.ceil((FN_TICKS-S.tick)*0.25));
+ $('fnHud').innerHTML=side(S.a,'l')
+  +`<div class="fnmid"><b>${FN.phase==='done'?'FT':'R'+Math.min(FN_ROUNDS,S.rd)}</b>
+    <span class="${live?'live':''}">${FN.phase==='idle'?'READY':FN.phase==='rest'?'BREAK':
+      FN.phase==='done'?(S.res.ko?'ROUND '+S.res.rd:'ON POINTS'):secs+'s'}</span>
+    <span>${S.cards[0]}\u2013${S.cards[1]}</span></div>`
+  +side(S.b,'r');
+
+ const guest=FN.shared&&!NET.host;
+ $('fnFoot').innerHTML=FN.phase==='idle'
+  ?`<button class="go" id="fnGo" style="width:100%" ${guest?'disabled':''}>${guest?'Waiting on the host\u2026':'Start the fight'}</button>`
+  :FN.phase==='done'
+  ?`<button class="go" id="fnNew" style="width:100%" ${guest?'disabled':''}>${guest?'Next fight coming up\u2026':'Next fight'}</button>`
+  :`<button class="go" style="width:100%" disabled>${FN.phase==='rest'?'Between rounds\u2026':'Fight in progress\u2026'}</button>`;
+ if($('fnGo'))$('fnGo').onclick=fnStart;
+ if($('fnNew'))$('fnNew').onclick=fnNext;
+
+ $('fnInfo').textContent='Three rounds, priced off the fight engine itself \u2014 the odds come from running this exact simulation thousands of times, so they always match what you are watching. '+
+  'Prices move every few seconds as damage lands. Cash out any time. Every bet returns 97%.';
+ fnMkRender();fnSlipRender();fnOpenRender();fnLead()}
+
+function fnShare(){if(FN.shared&&connected())send({t:'fnP',v:Math.round(FN.profit*100)/100})}
+function fnLead(){/* leaderboard lives in the sportsbook header; fights show it in the feed */}
+
+function fnInit(){
+ if(!$('fnCv'))return;
+ $('fnGuideBtn').onclick=()=>{SND.click();$('fbGuide').classList.add('show')};
+ addEventListener('resize',fnFit);
+ fnNewFight(false)}
+
 /* ============================================================================
    SPORTSBOOK  -  Stack League
    A simulated football league you can bet like a real book: a card of fixtures,
@@ -3418,10 +4044,11 @@ function fbLeadRender(){const el=$('fbLead');if(!el)return;
  el.innerHTML=row(loggedIn()?P().name:'You',mine)+
   (FB.shared&&NET.remote&&FB.oppProfit!=null?row(NET.remote.name,FB.oppProfit):'')}
 
+function fnSyncJoin(){if(NET.host){FN.shared=true;send({t:'fnCard',seed:FN.seed})}}
 function fbSyncJoin(){
  // host owns the card so both sides see identical fixtures and results
  if(NET.host){FB.shared=true;send({t:'fbCard',seed:FB.seed,round:FB.round})}
- fbRender()}
+ fnSyncJoin();fbRender()}
 
 function fbInit(){
  if(!$('fbCard'))return;
@@ -4221,7 +4848,7 @@ function netLost(){if(NET.status!=='connected'&&NET.status!=='joining')return;
  if($('coHud'))$('coHud').classList.remove('show');const who=NET.remote?NET.remote.name:'Friend';NET.remote=null;NET.conn=null;
  if(NET.inPlay>0){pay(NET.inPlay);toast(`Connection lost. Refunded ${fmt(NET.inPlay)} in play.`);NET.inPlay=0}else toast(`${who} disconnected`);
  chatSys(`${who} left the party`);if(NET.host){NET.status='waiting';hostOnGuestLeft()}else{netLeave(true)}partyRender()}
-function netLeave(keepErr){FB.shared=false;FB.oppProfit=null;
+function netLeave(keepErr){FB.shared=false;FB.oppProfit=null;FN.shared=false;FN.oppProfit=null;
  if(CO.bet){pay(CO.bet.stake);CO.bet=null}
  Object.assign(CO,{game:null,theirGame:null,theirBusy:false,on:false,out:null,inReq:null,held:null,offer:null,bet:null,res:null,feed:[]});
  if($('coHud'))$('coHud').classList.remove('show');
@@ -4240,6 +4867,9 @@ function onNet(m){if(!m||typeof m!=='object')return;switch(m.t){
   FB.profit=0;FB.oppProfit=0;fbNewRound(true);break}
  case 'fbGo':fbRun(m.mi);break;
  case 'fbP':FB.oppProfit=m.v;fbLeadRender();break;
+ case 'fnCard':{FN.shared=true;FN.seed=m.seed>>>0;FN.profit=0;fnNewFight(true);break}
+ case 'fnGo':fnRun();break;
+ case 'fnP':FN.oppProfit=m.v;break;
  case 'pres':{CO.theirGame=m.g;CO.theirBusy=!!m.busy;
   if(CO.on&&m.g!==CO.game)coEnd(true);coRender();break}
  case 'jreq':{const r={g:m.g};
@@ -5413,7 +6043,7 @@ function buildTiles(){const d=[['tower','Tower','Climb past the traps'],['limbo'
  if(loggedIn()&&P().suspended){AUTH.err=P().suspendMsg||'This account is suspended.';S.cur=-1;S.session=null}
  if(loggedIn()){P().sessions=(P().sessions||0)+1;P().lastSeen=Date.now();playStart()}
  S.players.forEach(ensureStats);
- S.players.forEach(ensureCos);S.players.forEach(p=>{p.skins=p.skins||{classic:1};for(const k in OLD_SKIN_REFUND)if(p.skins[k]){p.bal+=OLD_SKIN_REFUND[k];delete p.skins[k]}if(!skinOf(p.skin)||skinOf(p.skin).id!==p.skin)p.skin='classic';p.skin=p.skin||'classic'});save();ckBuild();ckUI();ckTraffic();moInit();lsInit();fbInit();buildNav();buildTiles();renderBal();renderHist();slBuild();go('lobby');plResize();authRender();})();
+ S.players.forEach(ensureCos);S.players.forEach(p=>{p.skins=p.skins||{classic:1};for(const k in OLD_SKIN_REFUND)if(p.skins[k]){p.bal+=OLD_SKIN_REFUND[k];delete p.skins[k]}if(!skinOf(p.skin)||skinOf(p.skin).id!==p.skin)p.skin='classic';p.skin=p.skin||'classic'});save();ckBuild();ckUI();ckTraffic();moInit();lsInit();fbInit();fnInit();buildNav();buildTiles();renderBal();renderHist();slBuild();go('lobby');plResize();authRender();})();
 </script>
 </body>
 </html>

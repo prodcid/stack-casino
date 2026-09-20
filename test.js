@@ -195,6 +195,130 @@ async function coop(browser, errs) {
   await A.close(); await B.close();
 }
 
+
+/* ---------------- fight night ---------------- */
+async function fight(ctx, errs) {
+  console.log('\nFIGHT NIGHT');
+  const pg = await newPage(ctx, errs, 'fn', false);
+  const n0 = errs.length;
+  await pg.evaluate("P().bal=1000000;renderBal();go('fight')");
+  await pg.waitForTimeout(700);
+
+  // every fight must terminate, and only in legal ways
+  const sanity = await pg.evaluate(`(()=>{
+    let ko=0,dec=0,draw=0,bad=0,rds={1:0,2:0,3:0};
+    for(let i=0;i<3000;i++){
+      const S=fnState(FN_F[i%6].id, FN_F[(i*3+1)%6].id);
+      const r=fnPlayOut(S,Math.random);
+      if(!r){bad++;continue}
+      if(r.ko){ko++; if(r.rd<1||r.rd>3)bad++; else rds[r.rd]++;}
+      else if(r.win==='d')draw++; else dec++;
+      if(!['a','b','d'].includes(r.win))bad++;
+      if(!r.ko && r.rd!==0)bad++;
+    }
+    return [bad, ko, dec, draw, rds];
+  })()`);
+  sanity[0] === 0 ? pass('every fight resolves legally',
+      sanity[1] + ' KO, ' + sanity[2] + ' decision, ' + sanity[3] + ' draw')
+    : fail('every fight resolves legally', sanity[0] + ' malformed');
+  // A believable card: mostly decisions, a real minority of stoppages, and
+  // stoppages possible in EVERY round - otherwise the round 1/2 markets are
+  // permanently suspended and there is nothing to bet on.
+  const koPct = sanity[1]/3000*100, decPct = sanity[2]/3000*100;
+  (koPct > 8 && koPct < 35 && decPct > 55 && sanity[4][1] > 20 && sanity[4][2] > 20)
+    ? pass('outcome mix looks like boxing',
+           koPct.toFixed(1) + '% KO, ' + decPct.toFixed(1) + '% decision, stoppages by round ' + JSON.stringify(sanity[4]))
+    : fail('outcome mix looks like boxing', JSON.stringify(sanity));
+
+  // market books must be complete
+  const books = await pg.evaluate(`(()=>{
+    const P=FN.prices;
+    return [['winner',P.wa+P.wd+P.wb],['distance',P.ko+P.dist],
+            ['method',P.ako+P.adc+P.bko+P.bdc+P.wd],
+            ['stoppage',P.r1+P.r2+P.r3+P.dist]];
+  })()`);
+  const badBook = books.find(b => Math.abs(b[1]-1) > 0.02);
+  badBook ? fail('market books sum to 1', badBook[0] + ' = ' + badBook[1].toFixed(3))
+          : pass('market books sum to 1', books.map(b=>b[0]).join(', '));
+
+  // THE test: prices come from the same engine the player watches, so realised
+  // returns must land on 97%. Price once, then settle against fresh fights.
+  const rtp = await pg.evaluate(`(()=>{
+    const out=[];
+    for(const k of ['wa','wb','ko','dist','adc','r3']){
+      const P=fnPrices(fnState('raz','cyc'),60000);   // the book's price
+      const price=P[k]; if(!(price>0))continue;
+      const odds=0.97/price;
+      let ret=0;const N=40000;
+      for(let i=0;i<N;i++){
+        const r=fnPlayOut(fnState('raz','cyc'),Math.random);
+        if(r && FN_MK[k].f(r)) ret+=odds;
+      }
+      // tolerance from the estimator's own variance, not a guess: an all-or-
+      // nothing payout at probability p has relative SE ~ 1/sqrt(pN)
+      const se=97*Math.sqrt((1-price)/(price*N));
+      out.push([k, ret/N*100, Math.max(0.6, 4*se)]);
+    }
+    return out;
+  })()`);
+  const rtpBad = rtp.find(r => Math.abs(r[1]-97) > r[2]);
+  rtpBad ? fail('realised RTP sits on 97%', rtpBad[0] + ' = ' + rtpBad[1].toFixed(2) + '% (tol ' + rtpBad[2].toFixed(2) + ')')
+         : pass('realised RTP sits on 97%', rtp.map(r=>r[0]+' '+r[1].toFixed(1)).join(', '));
+
+  // accumulator legs are correlated; joint counting must beat the naive product
+  // 'ham wins' and 'ham by KO' are nested, so the product rule is badly wrong
+  // by construction - exactly the case a naive book gets wrong.
+  const joint = await pg.evaluate(`(()=>{
+    fnPrices(fnState('ham','gho'),40000);
+    const jt=fnJointP(['wa','ako']);
+    const naive=FN.prices.wa*FN.prices.ako;
+    let both=0;const N=40000;
+    for(let i=0;i<N;i++){const r=fnPlayOut(fnState('ham','gho'),Math.random);
+      if(r&&r.win==='a'&&r.ko)both++}
+    return [jt,naive,both/N];
+  })()`);
+  const jErr=Math.abs(joint[0]-joint[2]), nErr=Math.abs(joint[1]-joint[2]);
+  (jErr < 0.02 && nErr > jErr)
+    ? pass('acca legs priced jointly', 'joint off ' + (jErr*100).toFixed(2) + 'pp vs product ' + (nErr*100).toFixed(2) + 'pp')
+    : fail('acca legs priced jointly', JSON.stringify(joint));
+
+  // no price below evens may ever be offered
+  const minOdds = await pg.evaluate(`(()=>{
+    let worst=99,n=0;
+    for(let i=0;i<40;i++){
+      const S=fnState(FN_F[i%6].id,FN_F[(i*5+2)%6].id);
+      for(let t=0;t<30;t++)fnTick(S,Math.random);
+      const P=fnPrices(S,1500);
+      for(const k in FN_MK){const o=fnOdds(P[k]);
+        if(P[k]>0&&fnLive(o)){n++;worst=Math.min(worst,o)}}
+    }
+    return [worst,n];
+  })()`);
+  (minOdds[0] > 1.0 && minOdds[1] > 100)
+    ? pass('no sub-evens price offered', 'lowest ' + minOdds[0].toFixed(3) + ' over ' + minOdds[1] + ' quotes')
+    : fail('no sub-evens price offered', JSON.stringify(minOdds));
+
+  // stake in, correct payout out
+  const flow = await pg.evaluate(`(()=>{
+    FN.open=[];FN.sel=[];FN.mode='single';FN.phase='idle';
+    const S=FN.state;
+    FN.sel.push({key:'wa',p:FN.prices.wa,o:fnOdds(FN.prices.wa),label:'x'});
+    fnSlipRender();$('fnStake').value='100';
+    const b4=P().bal; fnPlaceBet();
+    const took=Math.round((b4-P().bal)*100)/100;
+    S.over=true;S.res={win:'a',ko:true,rd:2};
+    const b5=P().bal; fnSettle();
+    const paid=Math.round((P().bal-b5)*100)/100;
+    return [took,paid,Math.round(100*fnOdds(FN.prices.wa)*100)/100];
+  })()`);
+  (flow[0]===100 && Math.abs(flow[1]-flow[2])<0.02)
+    ? pass('stake taken and winner paid', flow[0]+' in, '+flow[1]+' out')
+    : fail('stake taken and winner paid', JSON.stringify(flow));
+
+  errs.length === n0 ? pass('no fight console errors') : fail('no fight console errors', errs.slice(n0).join(' | '));
+  await pg.close();
+}
+
 /* ---------------- sportsbook ---------------- */
 async function sports(ctx, errs) {
   console.log('\nSPORTSBOOK');
@@ -891,6 +1015,7 @@ async function rtp(ctx, errs) {
     if (which === 'all' || which === 'moles') await moles(ctx, errs);
     if (which === 'all' || which === 'shot') await longshot(ctx, errs);
     if (which === 'all' || which === 'sports') await sports(ctx, errs);
+    if (which === 'all' || which === 'fight') await fight(ctx, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
     if (which === 'all' || which === 'coop') await coop(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
