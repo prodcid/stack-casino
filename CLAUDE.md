@@ -251,6 +251,8 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Side-bet odds are published by the ACTOR's game code (coOffer) because that is the only place that knows them; the HUD is generic. Adding a game is two calls - coOffer when the odds change, coSettle when the outcome lands. Wired for Moles and Long Shot.
 - **2026-09-20** — Sportsbook now shows ONE fixture at a time and rolls to the next automatically. The three-match card pushed the bet slip and its cash-out button below the fold, and cash out is the one control you need in a hurry.
 - **2026-09-20** — Same-match accumulator legs are now ALLOWED and priced from the joint distribution over the score grid, not the product of single probabilities. Multiplying correlated markets (home win AND over 2.5) was 5.00pp wrong against simulation; the joint price is 0.03pp. This replaces the old block on same-match legs, which only existed because the product rule lied.
+- **2026-09-20** — Cash-out buttons now show the offer against the stake as a coloured +/- delta, so you can see at a glance whether taking it banks a profit or cuts a loss. Reviewed, nothing else to record.
+- **2026-09-20** — Open-bet list is wiped when the next fixture loads, so results do not pile up across matches. Anything still unsettled at that point is refunded rather than dropped - it should be impossible, but silently eating a stake would be worse than a stray toast.
 
 ---
 

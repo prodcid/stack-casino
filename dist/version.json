@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.20.19",
-  "notes": "party presence + join + side bets; sportsbook one match at a time",
-  "bytes": 491262,
-  "at": "2026-09-20T05:39:23.882Z"
+  "version": "2026.09.20.21",
+  "notes": "cash out shows coloured profit/loss; bets clear between matches",
+  "bytes": 492259,
+  "at": "2026-09-20T05:52:12.890Z"
 }

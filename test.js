@@ -320,6 +320,48 @@ async function sports(ctx, errs) {
     ? pass('stake taken and winner paid', flow[0] + ' in, ' + flow[1] + ' out')
     : fail('stake taken and winner paid', JSON.stringify(flow));
 
+  // Cash-out buttons must show profit or loss against the stake, colour-coded.
+  const cashUI = await pg.evaluate(`(()=>{
+    const m=FB.card[0];
+    FB.open=[];
+    // price the bets at kick-off, THEN run the match on - otherwise they are
+    // priced against a finished scoreline and one of them is worth nothing
+    m.phase='live';m.min=0;m.ch=0;m.ca=0;FB.live=0;
+    const mk=(key,stake)=>{const {p,o}=fbPriceOf(m,key);
+      FB.open.push({id:Math.random(),legs:[{mi:0,key,p,o,label:fbLabel(m,key),match:'x'}],
+       stake,odds:o,acca:false,state:'open'})};
+    mk('home',100); mk('un',100);
+    m.min=62;m.ch=2;m.ca=0;      // 2-0 up: home is winning, under 2.5 is losing
+    fbRender();
+    return [...document.querySelectorAll('#fbOpen button[data-co]')].map(x=>{
+      const i=x.querySelector('i');
+      return [x.className, i?i.textContent[0]:'?'];
+    });
+  })()`);
+  const up = cashUI.find(c => c[0] === 'up'), dn = cashUI.find(c => c[0] === 'down');
+  (up && up[1] === '+' && dn && dn[1] === '−')
+    ? pass('cash out shows coloured +/- against stake', 'up and down both rendered')
+    : fail('cash out shows coloured +/- against stake', JSON.stringify(cashUI));
+  await pg.evaluate("FB.open=[];FB.card[0].phase='pre';FB.card[0].min=0;FB.card[0].ch=0;FB.card[0].ca=0;FB.live=-1;fbRender()");
+
+  // Bets must not pile up across matches: the next fixture starts with a clean
+  // slate, and anything somehow still open is refunded rather than dropped.
+  const cleared = await pg.evaluate(`(()=>{
+    FB.open=[];FB.profit=0;
+    const m=FB.card[0];
+    m.phase='live';m.min=0;m.ch=0;m.ca=0;FB.live=0;
+    const {p,o}=fbPriceOf(m,'home');
+    FB.open.push({id:1,legs:[{mi:0,key:'home',p,o,label:'x',match:'y'}],stake:50,odds:o,acca:false,state:'open'});
+    FB.open.push({id:2,legs:[{mi:0,key:'away',p,o,label:'x',match:'y'}],stake:50,odds:o,acca:false,state:'lost',ret:0});
+    const before=P().bal;
+    m.phase='done';FB.live=-1;
+    fbAdvance();
+    return [FB.open.length, Math.round((P().bal-before)*100)/100, FB.card[0].phase];
+  })()`);
+  (cleared[0] === 0 && cleared[1] === 50 && cleared[2] === 'pre')
+    ? pass('bets clear between matches', 'unsettled stake refunded')
+    : fail('bets clear between matches', JSON.stringify(cleared));
+
   // A settled market prices below 1.00 (BTTS "yes" at 1-1 is already certain, so
   // 0.97/1 = 0.97). Offering that is a guaranteed loss, so every ENABLED price
   // must clear 1.00 - checked across a whole match, minute by minute.

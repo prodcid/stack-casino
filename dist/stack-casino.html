@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.20.19">
+<meta name="stack-version" content="2026.09.20.21">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -359,8 +359,14 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .obet .l.won{color:var(--green2,#6dffa8)}
 .obet .l.lost{color:#ff7a8a}
 .obet button{background:var(--panel);border:1px solid var(--line);color:#fff;font:inherit;
- font-weight:800;font-size:12px;padding:7px;border-radius:8px;cursor:pointer}
-.obet button:hover{border-color:var(--gold);color:var(--gold)}
+ font-weight:800;font-size:12px;padding:7px 10px;border-radius:8px;cursor:pointer;
+ display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
+.obet button:hover{border-color:var(--gold)}
+.obet button i{font-style:normal;font-weight:900;font-size:12.5px;white-space:nowrap}
+.obet button.up i{color:var(--green2,#6dffa8)}
+.obet button.down i{color:#ff7a8a}
+.obet button.up:hover{border-color:var(--green2,#6dffa8)}
+.obet button.down:hover{border-color:#ff7a8a}
 /* No sportsbook-specific breakpoint: the odds grids above use auto-fit, so they
    reflow to whatever width the stage actually has. Viewport width is the wrong
    thing to key off here anyway - the sidebar and the 300px slip both eat into it. */
@@ -3184,8 +3190,17 @@ const fbLabel=(m,key)=>key.slice(0,3)==='cs:'
  : (FB_MK[key]?FB_MK[key].l(m):key);
 
 /* ---- card / fixtures ---- */
+/* Wipe the slate between matches. Everything settles at full time, so nothing
+   should still be open - but if something ever slipped through, hand the stake
+   back rather than quietly binning it. */
+function fbClearBets(){
+ let refunded=0;
+ for(const b of FB.open)if(b.state==='open'){pay(b.stake);refunded++}
+ if(refunded)toast(refunded+' unsettled bet'+(refunded>1?'s':'')+' refunded');
+ FB.open=[]}
+
 function fbNewRound(keepSeed){
- fbStopTick();
+ fbStopTick();fbClearBets();
  if(!keepSeed)FB.seed=(Math.random()*1e9)>>>0;
  FB.card=fbMakeCard(FB.seed,FB.round).map(fbSim);
  FB.sel=[];FB.live=-1;FB.lastOdds={};
@@ -3323,7 +3338,11 @@ function fbOpenRender(){const el=$('fbOpen');if(!el)return;
       :b.state==='won'?`WON \u2014 returned ${fmt(b.ret)}`
       :b.state==='cashed'?`Cashed out for ${fmt(b.ret)}`
       :`LOST \u2014 ${fmt(b.stake)}`}</div>
-    ${b.state==='open'&&anyLive&&cv>0?`<button data-co="${b.id}">Cash out ${fmt(cv)}</button>`:''}
+    ${b.state==='open'&&anyLive&&cv>0?(()=>{
+      // show the cash-out offer against what it cost, so the decision is obvious
+      const d=Math.round((cv-b.stake)*100)/100;
+      return `<button data-co="${b.id}" class="${d>=0?'up':'down'}">
+       <span>Cash out ${fmt(cv)}</span><i>${d>=0?'+':'−'}${fmt(Math.abs(d))}</i></button>`})():''}
    </div>`}).join('');
  el.querySelectorAll('[data-co]').forEach(btn=>btn.onclick=()=>fbCashOut(btn.dataset.co))}
 
@@ -4218,7 +4237,7 @@ function onNet(m){if(!m||typeof m!=='object')return;switch(m.t){
  case 'dev':P().bal=Math.max(0,Math.round(m.bal*100)/100);renderBal(true);save();toast(`${m.by} set your balance to ${fmt(m.bal)} (dev)`);break;
  case 'adm':onAdminCmd(m);break;
  case 'fbCard':{FB.shared=true;FB.seed=m.seed>>>0;FB.round=m.round||1;
-  FB.open=[];FB.profit=0;FB.oppProfit=0;fbNewRound(true);break}
+  FB.profit=0;FB.oppProfit=0;fbNewRound(true);break}
  case 'fbGo':fbRun(m.mi);break;
  case 'fbP':FB.oppProfit=m.v;fbLeadRender();break;
  case 'pres':{CO.theirGame=m.g;CO.theirBusy=!!m.busy;
