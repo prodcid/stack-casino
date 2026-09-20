@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.20.25">
+<meta name="stack-version" content="2026.09.20.27">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -287,7 +287,8 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .fnfeed b{color:#fff}
 .fnfeed .big{color:var(--gold);font-weight:800}
 .fnfeed .ko{color:#ff7a8a;font-weight:900}
-.fnmk h5{margin:10px 0 6px;font-size:10.5px;font-weight:900;color:var(--mute);letter-spacing:.07em}
+.fnmk h5{margin:12px 0 2px;font-size:10.5px;font-weight:900;color:var(--mute);letter-spacing:.07em}
+.fnmk p.hint{margin:0 0 7px;font-size:11px;color:var(--dim);line-height:1.45}
 .fnmk{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 12px 12px}
 .fnrow{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(86px,1fr))}
 @media(max-width:700px){.fnmid{min-width:70px}.fnmid b{font-size:17px}}
@@ -1807,6 +1808,53 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 
   <button class="go" id="fbGuideClose">Got it</button>
 </div></div>
+<div class="modal" id="fnGuide"><div class="box gbox">
+  <h3>Betting on the fight</h3>
+
+  <h4>READING THE ODDS</h4>
+  <p>Odds are decimal. <b>Stake &times; odds = your total return</b>, stake included.</p>
+  <div class="eg">10.00 at <b>2.50</b> returns <b>25.00</b> &mdash; your 10.00 back plus 15.00 profit.</div>
+  <p>Lower odds means more likely. 1 &divide; odds gives you a rough chance: 2.00 is about 50%, 5.00 about 20%.</p>
+
+  <h4>&ldquo;THE DISTANCE&rdquo; &mdash; WHAT IT MEANS</h4>
+  <p>This is the one bit of boxing jargon worth knowing. <b>The distance is the full scheduled length of the fight</b> &mdash; here, all 3 rounds.</p>
+  <table>
+   <tr><td>Goes all 3</td><td>Nobody gets stopped. The final bell rings and the <b>judges' scorecards</b> decide it. Also called "going the distance".</td></tr>
+   <tr><td>Ends early</td><td>Someone is knocked out or stopped before the final bell. Also called "inside the distance".</td></tr>
+  </table>
+  <p>Those two cover every possible fight between them, so one of them always wins.</p>
+
+  <h4>HOW A FIGHT ENDS</h4>
+  <table>
+   <tr><td>Knockdown</td><td>A fighter hits the canvas and takes a count. They can get up &mdash; a knockdown on its own doesn't end anything.</td></tr>
+   <tr><td>Stoppage / KO</td><td>They can't continue, or go down three times in one round. Fight over on the spot.</td></tr>
+   <tr><td>Decision</td><td>All 3 rounds completed. Each round is scored 10&ndash;9 to whoever did more damage, or 10&ndash;8 if they floored their man. Highest total wins.</td></tr>
+   <tr><td>Draw</td><td>Level scorecards. Rare, but real &mdash; and it beats <i>both</i> fighters, so a bet on either one loses.</td></tr>
+  </table>
+
+  <h4>THE MARKETS</h4>
+  <table>
+   <tr><td>Winner</td><td>Whose hand gets raised, or the draw.</td></tr>
+   <tr><td>How it ends</td><td>Stopped early, or all 3 rounds. See above.</td></tr>
+   <tr><td>Stoppage round</td><td>Which round the stoppage comes in. <b>All three lose if the fight goes the full distance</b> &mdash; you're betting it ends early <i>and</i> picking when.</td></tr>
+   <tr><td>How they win</td><td>Winner and method in one bet. Harder to hit, so it pays more than just picking the winner.</td></tr>
+  </table>
+
+  <h4>WATCHING THE ODDS MOVE</h4>
+  <p>Prices update every few seconds as damage lands. A fighter getting worn down drifts (turns red); the one doing the damage shortens (turns green). A knockdown swings everything hard.</p>
+  <p>Watch the <b>health and stamina bars</b> in the header &mdash; a fighter on empty stamina gets hit far more easily, and that's usually visible before the odds fully catch up.</p>
+  <p class="warn">Markets that can no longer happen get suspended. Once round 1 is over, "stoppage in round 1" is gone.</p>
+
+  <h4>CASH OUT</h4>
+  <p>Take the current value of an open bet instead of waiting for the result. It rises when your bet is winning and falls when it isn't, and the button shows you the profit or loss in green or red.</p>
+  <p class="warn">No margin is shaved off cash-outs here, so taking it and holding on are worth the same on average. Take it whenever you'd rather have the certainty.</p>
+
+  <h4>THE ODDS ARE HONEST</h4>
+  <p>Every price comes from running this exact fight simulation thousands of times &mdash; the odds literally <i>are</i> how often that outcome happens, minus a flat 3%. Every market returns <b>97%</b>, accumulators included. No bet here is a worse deal than another.</p>
+  <p>A draw is around 1 fight in 9, stoppages a bit over a third. That's what the prices reflect.</p>
+
+  <button class="go" id="fnGuideClose">Got it</button>
+</div></div>
 <div class="cohud" id="coHud"></div>
 <div class="gate" id="authGate"></div>
 
@@ -3181,10 +3229,10 @@ function fnTick(S,r){
  // Big shots can drop anyone, not just a fighter who is already spent - without
  // this, stoppages only ever happened in round 3 and the round 1/2 markets were
  // permanently suspended.
- const kdChance=Math.max(0,(dmg-3.6)/18)+(df.hp<30?0.05:0)+(df.hp<14?0.12:0);
+ const kdChance=Math.max(0,(dmg-3.1)/13)+(df.hp<38?0.07:0)+(df.hp<18?0.16:0);
  if(df.hp<=0||r()<kdChance){
   df.down++;
-  const finished=df.hp<=0||df.down>=3||r()<(0.10+(df.hp<14?0.42:0.04));
+  const finished=df.hp<=0||df.down>=3||r()<(0.17+(df.hp<20?0.46:0.06));
   S.log.push({t:S.tick,rd:S.rd,ev:finished?'ko':'down',who:atkIsA?'a':'b',
    count:df.down,hp:{a:A.hp,b:B.hp}});
   if(finished){S.over=true;
@@ -3237,15 +3285,15 @@ const FN_MK={
  wa:{g:'Winner',l:S=>S.a.f.s+' wins', f:o=>o.win==='a'},
  wd:{g:'Winner',l:()=>'Draw',          f:o=>o.win==='d'},
  wb:{g:'Winner',l:S=>S.b.f.s+' wins', f:o=>o.win==='b'},
- ko:{g:'Distance',l:()=>'Ends inside', f:o=>o.ko},
- dist:{g:'Distance',l:()=>'Goes the distance', f:o=>!o.ko},
+ ko:{g:'How it ends',l:()=>'Ends early', f:o=>o.ko},
+ dist:{g:'How it ends',l:()=>'Goes all 3 rounds', f:o=>!o.ko},
  r1:{g:'Stoppage round',l:()=>'Round 1', f:o=>o.ko&&o.rd===1},
  r2:{g:'Stoppage round',l:()=>'Round 2', f:o=>o.ko&&o.rd===2},
  r3:{g:'Stoppage round',l:()=>'Round 3', f:o=>o.ko&&o.rd===3},
- ako:{g:'Method',l:S=>S.a.f.s+' by KO',       f:o=>o.win==='a'&&o.ko},
- adc:{g:'Method',l:S=>S.a.f.s+' on points',   f:o=>o.win==='a'&&!o.ko},
- bko:{g:'Method',l:S=>S.b.f.s+' by KO',       f:o=>o.win==='b'&&o.ko},
- bdc:{g:'Method',l:S=>S.b.f.s+' on points',   f:o=>o.win==='b'&&!o.ko}};
+ ako:{g:'How they win',l:S=>S.a.f.s+' by KO',     f:o=>o.win==='a'&&o.ko},
+ adc:{g:'How they win',l:S=>S.a.f.s+' on points', f:o=>o.win==='a'&&!o.ko},
+ bko:{g:'How they win',l:S=>S.b.f.s+' by KO',     f:o=>o.win==='b'&&o.ko},
+ bdc:{g:'How they win',l:S=>S.b.f.s+' on points', f:o=>o.win==='b'&&!o.ko}};
 
 /* Sample the engine from wherever the fight is now. Every price comes from here. */
 function fnSample(S,n){
@@ -3524,11 +3572,11 @@ function fnMkRender(){const el=$('fnMk');if(!el||!FN.prices||!FN.state)return;
   const on=FN.sel.some(x=>x.key===k);
   return `<button class="odd ${on?'on':''}" data-fk="${k}" ${open?'':'disabled'}>
    <span>${esc(fnLabel(k))}</span><b>${open?fnFmt(o):(p>0?'\u2014':'\u2013')}</b></button>`};
- const grp=(t,ks)=>`<h5>${t}</h5><div class="fnrow">${ks.map(cell).join('')}</div>`;
- el.innerHTML=grp('WINNER',['wa','wd','wb'])
-  +grp('DISTANCE',['ko','dist'])
-  +grp('STOPPAGE ROUND',['r1','r2','r3'])
-  +grp('METHOD',['ako','adc','bko','bdc']);
+ const grp=(t,hint,ks)=>`<h5>${t}</h5><p class="hint">${hint}</p><div class="fnrow">${ks.map(cell).join('')}</div>`;
+ el.innerHTML=grp('WINNER','Who gets their hand raised. A draw is a real result here — it beats both fighters.',['wa','wd','wb'])
+  +grp('HOW IT ENDS','Does someone get stopped, or does it last all 3 rounds and go to the judges\' scorecards?',['ko','dist'])
+  +grp('STOPPAGE ROUND','If it ends early, which round. All three lose if the fight goes the full 3 rounds.',['r1','r2','r3'])
+  +grp('HOW THEY WIN','Winner and method together. "By KO" means stopped early, "on points" means the judges decided it.',['ako','adc','bko','bdc']);
  el.querySelectorAll('[data-fk]').forEach(b=>b.onclick=()=>fnPick(b.dataset.fk))}
 
 function fnSlipRender(){const el=$('fnSlip');if(!el)return;
@@ -3654,7 +3702,9 @@ function fnLead(){/* leaderboard lives in the sportsbook header; fights show it 
 
 function fnInit(){
  if(!$('fnCv'))return;
- $('fnGuideBtn').onclick=()=>{SND.click();$('fbGuide').classList.add('show')};
+ $('fnGuideBtn').onclick=()=>{SND.click();$('fnGuide').classList.add('show')};
+ $('fnGuideClose').onclick=()=>$('fnGuide').classList.remove('show');
+ $('fnGuide').onclick=e=>{if(e.target===$('fnGuide'))$('fnGuide').classList.remove('show')};
  addEventListener('resize',fnFit);
  fnNewFight(false)}
 

@@ -150,9 +150,15 @@ cannot drift apart because they are the same function. Accumulator legs count ru
 where every leg lands, so correlation is exact (nested legs like "wins" + "wins by KO"
 are 4.8pp off under a product rule, 0.03pp off jointly).
 
-Balance is **measured, never eyeballed** — target ~15% KO / ~75% decision / ~10% draw,
-with stoppages possible in **every** round or the round 1/2 markets are permanently
-suspended. `test.js fight` asserts that mix.
+Balance is **measured, never eyeballed** — target ~35% KO / ~53% decision / ~12% draw,
+with stoppages common in **every** round or the round 1/2 markets never land.
+A realistic 3-rounder would mostly go to the cards, but this is a 60-second thing you
+watch and Alex reported that knockouts "basically never happen" at 15%. `test.js fight`
+asserts the mix.
+
+Market names are **plain English, not bookmaker jargon** ("Ends early", not "ends
+inside"), and every heading carries a one-line explanation. There is a separate boxing
+guide (`#fnGuide`) — do not point Fight Night at the football one.
 
 Watch for: `fnScoreRound` (cards) is separate from `fnEndRound` (cards + advance) because
 `fnDecision` must score the round still in progress — missing that scored only rounds 1-2
@@ -279,6 +285,9 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Fighters wear red and blue corner colours in the ring rather than their own brand colour: two of the six are near-identical greens and that bout was unfollowable. Brand colour stays on the HUD chips.
 - **2026-09-20** — Knockdowns used burst() - the gold-coin WIN celebration - which showered coins over a man being counted out. Replaced with ring sparks. Check the emotion of a shared effect before reusing it.
 - **2026-09-20** — Launcher no longer trusts version.json to decide whether to update. GitHub serves version.json and the build from caches that lag INDEPENDENTLY: a real launch pulled version.json at .21 while the HTML was already .23, cached the new build under the old version string, and then believed it was current forever - Fight Night was downloaded but the launcher was pinned. It now always fetches the build when online and takes the version from the build's own meta tag, which is the only self-consistent source. test-launcher.js reproduces the skew.
+- **2026-09-20** — Stoppage rate raised from ~15% to ~35% after Alex reported knockouts basically never happen. A realistic 3-rounder does mostly go to the cards, but this is a 60-second thing you watch and a market has to actually land sometimes. Stoppages now spread evenly enough that round 1 and 2 are live bets.
+- **2026-09-20** — Renamed the boxing markets out of bookmaker jargon: 'ends inside'/'goes the distance' became 'Ends early'/'Goes all 3 rounds', and every market heading now carries a one-line explanation. Alex had to ask what the distance meant, which means the UI was wrong, not him.
+- **2026-09-20** — Fight Night had its guide button wired to the FOOTBALL guide, which explains 1X2 and over/under goals and nothing about boxing. Written a proper boxing guide covering the distance, knockdown vs stoppage vs decision, and why stoppage-round bets lose when it goes the full 3.
 
 ---
 

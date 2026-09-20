@@ -225,7 +225,7 @@ async function fight(ctx, errs) {
   // stoppages possible in EVERY round - otherwise the round 1/2 markets are
   // permanently suspended and there is nothing to bet on.
   const koPct = sanity[1]/3000*100, decPct = sanity[2]/3000*100;
-  (koPct > 8 && koPct < 35 && decPct > 55 && sanity[4][1] > 20 && sanity[4][2] > 20)
+  (koPct > 22 && koPct < 50 && decPct > 40 && sanity[4][1] > 60 && sanity[4][2] > 60)
     ? pass('outcome mix looks like boxing',
            koPct.toFixed(1) + '% KO, ' + decPct.toFixed(1) + '% decision, stoppages by round ' + JSON.stringify(sanity[4]))
     : fail('outcome mix looks like boxing', JSON.stringify(sanity));
@@ -314,6 +314,22 @@ async function fight(ctx, errs) {
   (flow[0]===100 && Math.abs(flow[1]-flow[2])<0.02)
     ? pass('stake taken and winner paid', flow[0]+' in, '+flow[1]+' out')
     : fail('stake taken and winner paid', JSON.stringify(flow));
+
+  // the guide must be the BOXING one, and must actually explain the jargon
+  await pg.evaluate("go('fight')"); await pg.waitForTimeout(200);
+  await pg.click('#fnGuideBtn'); await pg.waitForTimeout(300);
+  const g = await pg.evaluate(`(()=>{
+    const open=!!document.querySelector('#fnGuide.show');
+    const t=$('fnGuide').textContent;
+    return [open, t.includes('the full scheduled length'), t.includes('Stoppage round'),
+            !document.querySelector('#fbGuide.show')];
+  })()`);
+  (g[0] && g[1] && g[2] && g[3])
+    ? pass('boxing guide opens and explains the distance')
+    : fail('boxing guide opens and explains the distance', JSON.stringify(g));
+  await pg.click('#fnGuideClose'); await pg.waitForTimeout(200);
+  (await pg.evaluate("!document.querySelector('#fnGuide.show')"))
+    ? pass('boxing guide closes') : fail('boxing guide closes');
 
   errs.length === n0 ? pass('no fight console errors') : fail('no fight console errors', errs.slice(n0).join(' | '));
   await pg.close();
