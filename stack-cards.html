@@ -552,6 +552,62 @@ html,body{margin:0;height:100%;background:#0f212e;overflow:hidden}
 #tcg .rw-foot b{display:block;font-size:20px;font-weight:900}
 #tcg .rw-foot small{color:var(--mute);font-weight:700}
 /* ============ GRADED FILTERS ============ */
+/* signed: gold-ink autograph across the art */
+#tcg .vsig{position:absolute;left:9%;right:7%;top:24%;z-index:6;pointer-events:none;transform:rotate(-9deg)}
+#tcg .front.fa .vsig,#tcg .front.sir .vsig,#tcg .front.bwr .vsig{top:40%}
+#tcg .vsig svg{display:block;width:100%;height:auto;overflow:visible}
+#tcg .vsig path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+#tcg .vsig .s0{stroke:rgba(30,16,0,.5);stroke-width:5.5}
+#tcg .vsig .s1{stroke:#ffd35a;stroke-width:2.4;filter:drop-shadow(0 0 1.5px rgba(255,230,140,.9))}
+#tcg .vauth{position:absolute;right:0;bottom:-16%;transform:rotate(9deg);font-style:normal;font-size:max(5px,3.2cqi);font-weight:900;letter-spacing:.08em;color:#2a1c00;
+ background:linear-gradient(135deg,#fff3b0,#e9b93a 45%,#fff3b0 60%,#c9921a);border-radius:99px;padding:.3em .7em;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+/* errors: printed wrong at the factory */
+#tcg .front.v-ink .win>*,#tcg .front.v-ink .full>*{filter:hue-rotate(155deg) saturate(1.35)}
+#tcg .front.v-ghost [data-ghost]{position:absolute;inset:0;opacity:.5;translate:3.2cqi 1.8cqi;mix-blend-mode:multiply;filter:saturate(1.6) hue-rotate(-25deg);pointer-events:none}
+#tcg .front.v-flip .win>*,#tcg .front.v-flip .full>*{transform:rotate(180deg)}
+#tcg .front.v-noname .cname{visibility:hidden}
+#tcg .front.v-miscut>*:not(.sheen):not(.glare):not(.mcut):not(.twk){translate:5.5cqi -3.5cqi}
+#tcg .mcut{position:absolute;inset:0;z-index:9;pointer-events:none;
+ background:linear-gradient(90deg,#24374a 0 3cqi,#f2efe6 3cqi 5.5cqi,transparent 5.5cqi),linear-gradient(0deg,#f2efe6 0 3.5cqi,transparent 3.5cqi)}
+#tcg .vtag{position:absolute;top:-8px;left:-4px;z-index:21;border-radius:6px;font-size:10px;font-weight:900;letter-spacing:.05em;padding:1px 6px;
+ background:linear-gradient(90deg,#ff3b6b,#3bd4ff);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+#tcg .vtag.sig{background:linear-gradient(135deg,#fff3b0,#e9b93a 50%,#c9921a);color:#2a1c00}
+#tcg .vrow{max-width:none;margin:0 0 22px}
+#tcg .varpop{position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:95;text-align:center;pointer-events:none;animation:vpop 2.6s ease both}
+#tcg .varpop small{display:block;font-size:12px;font-weight:900;letter-spacing:.2em;color:#9fb3c8}
+#tcg .varpop b{display:block;font-size:clamp(28px,5vw,46px);font-weight:900;letter-spacing:.04em;
+ background:linear-gradient(90deg,#ff3b6b,#fff,#3bd4ff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 14px rgba(0,0,0,.6))}
+#tcg .varpop.sig b{background-image:linear-gradient(90deg,#c9921a,#fff3b0,#e9b93a,#fff3b0)}
+#tcg .varpop em{display:block;font-style:normal;font-weight:900;color:#fff;font-size:15px}
+@keyframes vpop{0%{opacity:0;transform:translateX(-50%) scale(.6)}12%{opacity:1;transform:translateX(-50%) scale(1.08)}20%{transform:translateX(-50%) scale(1)}85%{opacity:1}100%{opacity:0}}
+#tcg .zvar{position:absolute;top:22px;left:0;right:0;text-align:center;pointer-events:none}
+#tcg .zvar b{display:inline-block;font-size:14px;font-weight:900;letter-spacing:.1em;padding:5px 14px;border-radius:99px;background:linear-gradient(90deg,#ff3b6b,#3bd4ff);color:#fff}
+#tcg .zvar.sig b{background:linear-gradient(135deg,#fff3b0,#e9b93a 50%,#c9921a);color:#2a1c00}
+#tcg .zvar small{display:block;margin-top:6px;color:var(--mute);font-weight:700}
+/* trade up */
+#tcg .tuhead{max-width:980px;margin:0 auto 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+#tcg .tuhead b{display:block;font-size:17px;font-weight:900}
+#tcg .tuhead small{display:block;color:var(--mute);font-weight:600;margin-top:3px;line-height:1.4}
+#tcg .tuhead em{display:inline-block;margin-top:8px;font-style:normal;font-size:11.5px;font-weight:800;color:#00e701}
+#tcg .tuslots{max-width:980px;margin:16px auto 0;display:grid;grid-template-columns:repeat(10,1fr) 24px 1.25fr;gap:8px;align-items:center}
+#tcg .tuslot{position:relative;aspect-ratio:63/88;border-radius:6px;border:1.5px dashed rgba(255,255,255,.14);background:rgba(255,255,255,.02);perspective:900px}
+#tcg .tuslot.on{border:0;cursor:pointer}
+#tcg .tuslot .tilt{position:absolute;inset:0}
+#tcg .tuarrow{text-align:center;color:var(--mute);font-weight:900;font-size:20px}
+#tcg .tuout{display:grid;place-content:center;text-align:center;border:1.5px solid rgba(0,231,1,.4);background:radial-gradient(circle,rgba(0,231,1,.12),transparent 70%)}
+#tcg .tuout b{font-size:26px;font-weight:900;color:#00e701}
+#tcg .tuout small{font-size:10.5px;font-weight:800;color:var(--mute)}
+#tcg .tubar{max-width:980px;margin:14px auto 0;display:flex;gap:8px;align-items:center;justify-content:flex-end}
+#tcg .tucount{margin-right:auto;color:var(--mute);font-weight:700}
+#tcg .tucount b{color:#fff;font-size:18px}
+#tcg .btn[disabled]{opacity:.4;pointer-events:none}
+@media(max-width:760px){#tcg .tuslots{grid-template-columns:repeat(5,1fr)}#tcg .tuarrow{display:none}#tcg .tuout{grid-column:span 5;aspect-ratio:auto;padding:10px}}
+#tcg .tufeed{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none;z-index:2}
+#tcg .tufeed i{position:absolute;left:-22px;top:-31px;width:44px;height:62px;border-radius:4px;opacity:0;
+ background:linear-gradient(135deg,#1c3a24,#0b1a10);border:2px solid #00e701;box-shadow:0 0 12px rgba(0,231,1,.5);
+ animation:tufly 1.1s var(--d) cubic-bezier(.5,0,.8,.4) forwards}
+@keyframes tufly{0%{opacity:0;transform:rotate(var(--a)) translateY(-280px) rotate(calc(-1*var(--a)))}
+ 15%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(0) rotate(calc(-1*var(--a))) scale(.3)}}
 #tcg .gfbar{max-width:980px;margin:0 auto 6px;display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 #tcg .gfg{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 #tcg .gfg>span{width:62px;flex:none;font-size:10.5px;font-weight:900;letter-spacing:.1em;color:var(--mute)}
@@ -670,6 +726,45 @@ const GW={10:'GEM MT',9:'MINT',8.5:'NM-MT+',8:'NM-MT',7.5:'NM+',7:'NM',6.5:'EX-M
 let uidN=0;
 function newInst(id){const sd=(Math.random()*4294967295)>>>0;
   return{u:Date.now().toString(36)+(uidN++).toString(36)+sd.toString(36).slice(0,4),id,s:sd,cd:rollCond(rng(sd)),st:'raw'}}
+/* ---------------- SIGNED & ERROR CARDS ----------------
+   Rare one-off copies of any base-set card, rolled per card in a pack (and on a
+   Trade Up). They are individual copies in col.inst with a .v - never counts:
+   a Full Art+ one keeps its condition and can be graded (the slab label names
+   it); a common/holo one sits apart from the plain stack so a Trade Up or trade
+   of "spares" can never eat it by accident. */
+const VAR={sig:{n:'Artist Signed',s:'SIGNED'},ink:{n:'Wrong Ink',s:'ERROR'},ghost:{n:'Double Print',s:'ERROR'},
+  miscut:{n:'Miscut',s:'ERROR'},noname:{n:'Missing Name',s:'ERROR'},flip:{n:'Upside-Down Art',s:'ERROR'}};
+const ERRS=['ink','ghost','miscut','noname','flip'],V_SIG=1/400,V_ERR=1/350;
+const isVar=i=>!!(i&&i.v&&VAR[i.v]);
+const rollVar=()=>{const x=Math.random();return x<V_SIG?'sig':x<V_SIG+V_ERR?ERRS[Math.floor(Math.random()*ERRS.length)]:null};
+const varName=v=>VAR[v].n+(VAR[v].s==='ERROR'?' error':'');
+/* one pulled/received card into the collection */
+function addCard(p){
+  if(p.v&&!HI(p.c.t)){p.ins=p.ins||newInst(p.c.id);p.ins.v=p.v;p.ins.f=p.foil?1:0;col.inst.push(p.ins);return}
+  const e=col[p.c.id]||(col[p.c.id]={n:0,f:0});p.foil?e.f++:e.n++;
+  if(p.ins){if(p.v)p.ins.v=p.v;col.inst.push(p.ins)}}
+/* gold-ink autograph, different for every copy */
+function sigHTML(seed){const r=rng((seed^0x2545f491)>>>0),B=40,P=[];let x=4;
+  // a looped capital, then cursive strokes: tall loops (l h k), small loops (e), descenders (g y), humps (n m)
+  P.push([x,B+4],[x+9,5+r()*5],[x+3,B+2],[x+1,B-9],[x+16,B-14]);x+=16;
+  const n=5+Math.floor(r()*4);
+  for(let k=0;k<n;k++){const q=r();
+    if(q<.3){P.push([x+6,5+r()*7],[x+2,12+r()*5],[x+6,B]);x+=9}
+    else if(q<.55){P.push([x+5,B-12-r()*4],[x+1,B-8],[x+6,B]);x+=8}
+    else if(q<.7){P.push([x+4,B-10],[x+6,B+17+r()*6],[x+1,B+11],[x+9,B-3]);x+=11}
+    else{P.push([x+3,B-12-r()*3],[x+7,B]);x+=7}}
+  const k=Math.min(2.2,176/x);P.forEach(p=>{p[0]=6+p[0]*k});x=6+x*k;
+  const f=v=>v.toFixed(1),cr=p=>{let d=`M${f(p[0][0])} ${f(p[0][1])}`;
+    for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c;
+      d+=` C${f(b[0]+(c[0]-a[0])/6)} ${f(b[1]+(c[1]-a[1])/6)} ${f(c[0]-(e[0]-b[0])/6)} ${f(c[1]-(e[1]-b[1])/6)} ${f(c[0])} ${f(c[1])}`}return d};
+  const d=cr(P),u=`M${f(10+r()*10)} ${f(B+18+r()*4)} C${f(60)} ${f(B+26+r()*4)} ${f(130)} ${f(B+12+r()*6)} ${f(Math.min(196,x+10))} ${f(B+8+r()*6)}`;
+  return `<div class="vsig"><svg viewBox="0 0 200 72"><path class="s0" d="${d}"/><path class="s0" d="${u}"/><path class="s1" d="${d}"/><path class="s1" d="${u}"/></svg><i class="vauth">STK AUTH</i></div>`}
+function varFront(h,ins){h=h.replace('<div class="front ','<div class="front v-'+ins.v+' ');
+  if(ins.v==='sig')h=h.replace('<div class="sheen">',sigHTML(ins.s)+'<div class="sheen">');
+  if(ins.v==='miscut')h=h.replace('<div class="sheen">','<div class="mcut"></div><div class="sheen">');
+  if(ins.v==='ghost')h=h.replace(/(<div class="(?:win|full)">)(<img [^>]*>)/,(m,a,i)=>a+i+i.replace('<img ','<img data-ghost="1" '));
+  return h}
+
 /* Collections from before grading existed only have counts. Give every Full
    Art+ copy a condition the first time we see it, and hand back anything that
    was sitting in trade escrow when the page closed. */
@@ -1649,10 +1744,11 @@ function wearHTML(ins,lod){const cd=ins.cd,r=rng((ins.s^0x9e3779b9)>>>0),W=630,H
   const defs=`<defs><filter id="wb${ins.u}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter></defs>`;
   return `<div class="wear">${sv(base,defs)}</div>${gl?`<div class="wear glint">${sv(gl)}</div>`:''}`}
 /* The printed card plus that copy's condition: off-centre cut and wear */
-function cardFront(c,foil,ins,lod){let h=cardFrontBase(c,foil);if(!ins||!HI(c.t))return h;
-  const x=((ins.cd.ctr-50)/50*4.2*(ins.cd.dir||1)).toFixed(2);
-  h=h.replace('style="--h:',`style="--ctrx:${x}cqi;--h:`);
-  return h.replace('<div class="sheen">',wearHTML(ins,lod)+'<div class="sheen">')}
+function cardFront(c,foil,ins,lod){let h=cardFrontBase(c,foil);
+  if(ins&&HI(c.t)){const x=((ins.cd.ctr-50)/50*4.2*(ins.cd.dir||1)).toFixed(2);
+    h=h.replace('style="--h:',`style="--ctrx:${x}cqi;--h:`);
+    h=h.replace('<div class="sheen">',wearHTML(ins,lod)+'<div class="sheen">')}
+  return isVar(ins)?varFront(h,ins):h}
 /* Knock the sky out of a scene so an animated backdrop can show through behind
    the landscape and creature. Every scene paints its sky as a full-canvas rect
    (url(#sk), url(#sky), or a flat colour on the Mono Rares) - drop the first one,
@@ -1781,7 +1877,7 @@ let root,gyro=null,dragging=false;
 const $=(s,r=root)=>r.querySelector(s);const fmt=n=>n.toLocaleString();
 function mount(el){root=el;root.id='tcg';
   root.innerHTML=`<div class="bar"><div class="title">Stack Cards<small>Mythic collection</small></div>
-   <div class="tabs"><button class="tab on" data-v="shop">Packs</button><button class="tab" data-v="binder">Binder</button><button class="tab" data-v="graded">Graded<i class="tdot" id="tcgDot"></i></button><button class="tab" data-v="trade" id="tcgTradeTab" hidden>Trade</button></div>
+   <div class="tabs"><button class="tab on" data-v="shop">Packs</button><button class="tab" data-v="binder">Binder</button><button class="tab" data-v="graded">Graded<i class="tdot" id="tcgDot"></i></button><button class="tab" data-v="tradeup">Trade Up</button><button class="tab" data-v="trade" id="tcgTradeTab" hidden>Trade</button></div>
    <div class="bal">$<b id="tcgBal"></b></div></div><div class="stage" id="tcgStage"></div>`;
   root.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{SFX.tick();go(b.dataset.v)});
   root.addEventListener('pointermove',e=>{if(!E.el||dragging||E.free||E.swipe||gyro)return;const r=E.el.getBoundingClientRect(),k=E.kind==='pack'?.6:1;
@@ -1793,8 +1889,8 @@ function mount(el){root=el;root.id='tcg';
 const askGyro=()=>{try{DeviceOrientationEvent.requestPermission&&DeviceOrientationEvent.requestPermission().catch(()=>{})}catch(e){}};
 function updBal(){const b=$('#tcgBal'),v=B.getBalance();if(b)b.textContent=isFinite(v)?fmt(Math.floor(v)):'∞';B.onBalance&&B.onBalance()}
 let curView='shop';
-function go(v){const k=['binder','graded','trade'].includes(v)?v:'shop';curView=k;
-  root.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===k));({binder,graded,trade}[k]||shop)()}
+function go(v){const k=['binder','graded','trade','tradeup'].includes(v)?v:'shop';curView=k;
+  root.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===k));({binder,graded,trade,tradeup}[k]||shop)()}
 const stage=()=>$('#tcgStage');
 
 /* ---------------- PACK ---------------- */
@@ -1804,7 +1900,7 @@ const skin=()=>`<div class="pk-skin"><div class="l-foil"></div><div class="l-sce
   <div class="l-spec"></div><div class="l-gsheen"></div><div class="l-seal"></div></div>`;
 let tearP=0,opened=false,pull=[];
 function shop(){const st=stage();opened=false;tearP=0;root.onkeydown=null;
-  st.innerHTML=`<div class="pity"><span>Full Art or better guaranteed in <b>${PITY-(col.pity||0)}</b> ${PITY-(col.pity||0)===1?'pack':'packs'}</span><i><s style="width:${(col.pity||0)/PITY*100}%"></s></i></div><div class="odds">8 cards: 5 commons, 2 reverse holos, 1 hit. Hit: <b>Holo ${Math.round((1-ODDS.fa-ODDS.sir-ODDS.bwr)*100)}%</b>, <b>Full Art ${Math.round(ODDS.fa*100)}%</b>, <b>SIR ${Math.round(ODDS.sir*100)}%</b>, <b>Mono Rare ${Math.round(ODDS.bwr*100)}%</b></div>
+  st.innerHTML=`<div class="pity"><span>Full Art or better guaranteed in <b>${PITY-(col.pity||0)}</b> ${PITY-(col.pity||0)===1?'pack':'packs'}</span><i><s style="width:${(col.pity||0)/PITY*100}%"></s></i></div><div class="odds">8 cards: 5 commons, 2 reverse holos, 1 hit. Hit: <b>Holo ${Math.round((1-ODDS.fa-ODDS.sir-ODDS.bwr)*100)}%</b>, <b>Full Art ${Math.round(ODDS.fa*100)}%</b>, <b>SIR ${Math.round(ODDS.sir*100)}%</b>, <b>Mono Rare ${Math.round(ODDS.bwr*100)}%</b>. Any card: <b>Signed 1 in ${Math.round(1/V_SIG)}</b>, <b>Error 1 in ${Math.round(1/V_ERR)}</b></div>
    <div class="packwrap" id="pw"><div class="pk-shadow"></div><div class="pack" id="pk">
     <div class="pk-piece pk-body">${skin()}</div><div class="pk-piece pk-top" id="pkTop">${skin()}</div>
     <div class="tear"><i></i></div><div class="tear-zone" id="tz"></div></div></div>
@@ -1831,11 +1927,12 @@ function rollPack(){const pick=a=>a[Math.floor(Math.random()*a.length)];
   const ps=[0,1,2,3,4].map(()=>({c:pick(byT('c')),foil:GOD}));            // 5 commons
   ps.push({c:pick(byT('c')),foil:true},{c:pick(byT('c')),foil:true});       // 2 reverse holo slots
   ps.push({c:pick(byT(t_||t)),foil:false});                                       // 1 hit
-  return ps.map(p=>{const e=col[p.c.id];p.isNew=!e||(p.foil?!e.f:!e.n);if(HI(p.c.t))p.ins=newInst(p.c.id);return p})}
+  return ps.map(p=>{const e=col[p.c.id];p.isNew=!e||(p.foil?!e.f:!e.n);p.v=rollVar();
+    if(HI(p.c.t)||p.v)p.ins=newInst(p.c.id);if(p.v){p.ins.v=p.v;if(!HI(p.c.t))p.ins.f=p.foil?1:0}return p})}
 const lineDone=()=>LINES.filter(L=>SET.filter(c=>c.art.startsWith(L.key)).every(c=>col[c.id]&&(col[c.id].n||col[c.id].f))).map(L=>L.key);
 let justDone=[];
 function openPack(){if(opened)return;opened=true;const pk=$('#pk');const before=lineDone();
-  pull.forEach(p=>{const e=col[p.c.id]||(col[p.c.id]={n:0,f:0});p.foil?e.f++:e.n++;if(p.ins)col.inst.push(p.ins)});
+  pull.forEach(addCard);
   justDone=lineDone().filter(k=>!before.includes(k));col.opened=(col.opened||0)+1;
   const hit=pull[pull.length-1].c.t;col.pity=(hit==='h')?(col.pity||0)+1:0;checkCraftable();save();
   const tc={h:'#ffd35a',fa:'#9fd4ff',sir:'#ffb3d9',bwr:`hsl(${pull[pull.length-1].c.h} 95% 55%)`}[hit];
@@ -1860,7 +1957,7 @@ function reveal(pw){const st=stage();
   const setTop=()=>{ctr.querySelectorAll('i').forEach((d,i)=>d.classList.toggle('on',i<=idx));
     const s=slots[idx];activate(s.querySelector('.tilt'),'card');
     const p=pull[idx],flip=s.querySelector('.flip');
-    const doReveal=()=>{if(flip.classList.contains('down')){flip.classList.remove('down');SFX.flip();SFX.ding(440*Math.pow(2,idx/7))}setTimeout(()=>{celebrate(p);if(p.ins)setTimeout(()=>condPop(p.ins),650);if(p.isNew){const n=document.createElement('div');n.className='newpop';n.textContent='NEW!';stage().appendChild(n);SFX.ding(1320);setTimeout(()=>n.remove(),1100)}},idx===0?0:250)};
+    const doReveal=()=>{if(flip.classList.contains('down')){flip.classList.remove('down');SFX.flip();SFX.ding(440*Math.pow(2,idx/7))}setTimeout(()=>{celebrate(p);if(p.v)setTimeout(()=>varPop(p),450);if(p.ins&&HI(p.c.t))setTimeout(()=>condPop(p.ins),650);if(p.isNew){const n=document.createElement('div');n.className='newpop';n.textContent='NEW!';stage().appendChild(n);SFX.ding(1320);setTimeout(()=>n.remove(),1100)}},idx===0?0:250)};
     if(idx===pull.length-1&&p.c.t!=='h'){s.style.setProperty('--gc',p.c.t==='bwr'?`radial-gradient(#fff,hsl(${p.c.h} 90% 50%))`:p.c.t==='sir'?'conic-gradient(#ffb3d9,#b3fff0,#b3d4ff,#fff0b3,#ffb3d9)':'radial-gradient(#fff,#9fd4ff)');
       s.classList.add('charge');SFX.charge();navigator.vibrate&&navigator.vibrate(20);setTimeout(()=>{s.classList.remove('charge');doReveal()},p.c.t==='bwr'?2000:p.c.t==='sir'?1400:1000)}
     else if(idx===0)setTimeout(doReveal,550);else doReveal();
@@ -1893,13 +1990,22 @@ function celebrate(p){const st=stage(),t=p.c.t,rev=p.foil;
     if(rainbow)n.style.cssText+=';background:linear-gradient(90deg,#ffb3d9,#b3fff0,#b3d4ff,#fff0b3);-webkit-background-clip:text;background-clip:text;color:transparent';
     st.appendChild(n);setTimeout(()=>n.remove(),1900)}}
 
+function varPop(p,par){const st=par||stage(),sig=p.v==='sig',el=document.createElement('div');el.className='varpop'+(sig?' sig':'');
+  el.innerHTML=`<small>${sig?'1 in '+Math.round(1/V_SIG)+' cards':'Misprint \u00b7 1 in '+Math.round(1/V_ERR)+' cards'}</small><b>${sig?'ARTIST SIGNED':'ERROR CARD'}</b>${sig?'':`<em>${VAR[p.v].n}</em>`}`;
+  st.appendChild(el);SFX.boom();SFX.reveal('u',true);setTimeout(()=>SFX.reveal('u',true),260);navigator.vibrate&&navigator.vibrate([40,40,80]);
+  const bu=document.createElement('div');bu.className='burst';
+  for(let k=0;k<80;k++){const a=Math.random()*Math.PI*2,d=140+Math.random()*280;
+    bu.innerHTML+=`<i style="--c:${sig?(k%3?'#ffd35a':'#fff'):(k%2?'#ff3b6b':'#3bd4ff')};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
+  st.appendChild(bu);setTimeout(()=>{bu.remove()},1200);setTimeout(()=>el.remove(),2600)}
+const vtag=i=>isVar(i)?`<span class="vtag${i.v==='sig'?' sig':''}">${i.v==='sig'?'\u270d SIGNED':'ERROR'}</span>`:'';
+
 /* ---------------- SUMMARY / BINDER ---------------- */
 const VAL={c:5,h:40,fa:180,sir:450,bwr:1500,obs:5000},RANK={c:0,h:1,fa:2,sir:3,bwr:4,obs:5};
-const cardVal=p=>VAL[p.c.t]*(p.foil?3:1)*(p.isNew?2:1);
+const cardVal=p=>VAL[p.c.t]*(p.foil?3:1)*(p.isNew?2:1)*(p.v?(p.v==='sig'?10:6):1);
 function summary(){const st=stage();root.onkeydown=null;
   let best=0;pull.forEach((p,i)=>{const b=pull[best];if(RANK[p.c.t]*10+(p.foil?1:0)>RANK[b.c.t]*10+(b.foil?1:0))best=i});
   const total=pull.reduce((a,p)=>a+cardVal(p),0),newN=pull.filter(p=>p.isNew).length;
-  st.innerHTML=`<div class="sum"><div class="tally"><small>${GOD?'<span style="color:#ffd35a">GOD PACK · </span>':''}Pack #${col.opened||1} value</small><b id="tally">$0</b><em>${newN?`${newN} new card${newN>1?'s':''} (2× value)`:'No new cards this time'}</em></div><div class="sum-row">${pull.map((p,i)=>`<div class="mini${i===best?' best':''}" data-i="${i}">${i===best?'<div class="bestlab">Best pull</div>':''}${p.isNew?'<div class="new">NEW</div>':''}${cardEl(p.c,p.foil,false,p.ins,1)}</div>`).join('')}</div></div>
+  st.innerHTML=`<div class="sum"><div class="tally"><small>${GOD?'<span style="color:#ffd35a">GOD PACK · </span>':''}Pack #${col.opened||1} value</small><b id="tally">$0</b><em>${newN?`${newN} new card${newN>1?'s':''} (2× value)`:'No new cards this time'}</em></div><div class="sum-row">${pull.map((p,i)=>`<div class="mini${i===best?' best':''}" data-i="${i}">${i===best?'<div class="bestlab">Best pull</div>':''}${p.isNew?'<div class="new">NEW</div>':''}${cardEl(p.c,p.foil,false,p.ins,1)}${vtag(p.ins)}</div>`).join('')}</div></div>
    <div class="dock"><button class="btn ghost" id="toB">Open binder</button><button class="btn" id="again">Open another</button></div>`;
   minis(st);
   {const el=$('#tally'),t0=performance.now(),D=1400;let lastStep=-1;const step=now=>{const k=Math.min(1,(now-t0)/D),e=1-Math.pow(1-k,3),v=Math.round(total*e);el.textContent='$'+v.toLocaleString();
@@ -1927,12 +2033,14 @@ function zInfo(p){const ins=p.ins;
    :ins.st==='grading'?`<div class="zst">At STK \u2014 back in <b class="gtimer" data-u="${ins.u}">${fmtLeft(ins.due)}</b></div>`
    :ins.st==='back'?`<button class="btn" data-z="open">It's back \u2014 open it</button>`:'';
   return `<div class="zinfo"><div class="zcond"><div class="cp-sc"><small>CONDITION</small><b>${condScore(ins.cd).toFixed(1)}</b><i>/ 10</i></div><div class="cp-g">${condGrid(ins.cd)}</div></div>
-   ${copies.length>1?`<div class="zcopies">${copies.map((c,i)=>`<button class="zc${c.u===ins.u?' on':''}" data-c="${c.u}">Copy ${i+1} \u00b7 ${condScore(c.cd).toFixed(1)}</button>`).join('')}</div>`:''}
+   ${copies.length>1?`<div class="zcopies">${copies.map((c,i)=>`<button class="zc${c.u===ins.u?' on':''}" data-c="${c.u}">Copy ${i+1} \u00b7 ${condScore(c.cd).toFixed(1)}${isVar(c)?(c.v==='sig'?' \u00b7 \u270d':' \u00b7 ERR'):''}</button>`).join('')}</div>`:''}
    ${act}</div>`}
 function zoom(p,opt){opt=opt||{};SFX.flip();const z=document.createElement('div');z.className='zoom'+(opt.slab?' zslab':'');
   const body=opt.slab?`<div class="deck sdeck"><div class="slot">${slabHTML(opt.slab)}</div></div>`
     :`<div class="deck"><div class="slot">${cardEl(p.c,p.foil,false,p.ins)}</div></div>`;
+  const vi=opt.slab||p.ins;
   z.innerHTML=body+(!opt.slab&&p.ins&&HI(p.c.t)?zInfo(p):'')
+    +(isVar(vi)?`<div class="zvar${vi.v==='sig'?' sig':''}"><b>${vi.v==='sig'?'ARTIST SIGNED':'ERROR \u00b7 '+hx(VAR[vi.v].n.toUpperCase())}</b><small>${vi.v==='sig'?'Hand-signed \u00b7 1 in '+Math.round(1/V_SIG)+' cards':'Factory misprint \u00b7 1 in '+Math.round(1/V_ERR)+' cards'}</small></div>`:'')
     +`<div class="zhint">${opt.slab?'Drag to tilt the slab.':'Drag to spin it around.'} Tap outside to close.</div>`;
   root.appendChild(z);
   const prev=E.el,prevKind=E.kind,deck=z.querySelector('.deck');activate(z.querySelector('.tilt'),'card');E.k=.05;E.f=.07;
@@ -1954,21 +2062,25 @@ function zoom(p,opt){opt=opt||{};SFX.flip();const z=document.createElement('div'
     const gb=zi.querySelector('[data-z="grade"]');if(gb)gb.onclick=()=>{sendGrade(p.ins);close();if(curView==='binder')binder()};
     const ob=zi.querySelector('[data-z="open"]');if(ob)ob.onclick=()=>{close();openGraded(p.ins)}}
   return close}
-const owns=c=>{const e=col[c.id];return!!((e&&(e.n||e.f))||col.inst.some(i=>i.id===c.id&&i.st!=='raw'))};
+const owns=c=>{const e=col[c.id];return!!((e&&(e.n||e.f))||col.inst.some(i=>i.id===c.id))};
 function binder(){const st=stage();deactivate();root.onkeydown=null;
   const owned=SET.filter(owns).length,foils=SET.filter(c=>col[c.id]&&col[c.id].f).length,slabN=col.inst.filter(i=>i.st==='slab').length;
+  const specials=col.inst.filter(i=>isVar(i)&&i.st==='raw').sort((a,b)=>(b.v==='sig')-(a.v==='sig')||RANK[CARD(b.id).t]-RANK[CARD(a.id).t]||a.id-b.id);
   st.innerHTML=`<div class="binder"><div class="bhead"><span>${owned} of ${SET.length} collected</span><span>${foils} reverse holos${slabN?` \u00b7 ${slabN} graded`:''} \u00b7 ${OBS.filter(o=>col.rew&&col.rew[o.line]).length}/${OBS.length} Obsidian</span></div>
    <div class="prog"><i style="width:${owned/SET.length*100}%"></i></div>
+   ${specials.length?`<div class="grow vrow"><h5>Signed &amp; errors <small>${specials.length}</small></h5><div class="grid">${specials.map(i=>{const c=CARD(i.id);
+     return `<div class="mini" data-id="${c.id}" data-f="${i.f?1:0}" data-n="${c.no}" data-u="${i.u}">${cardEl(c,!!i.f,false,i,1)}${vtag(i)}</div>`}).join('')}</div></div>`:''}
    <div class="grid">${LINES.map(L=>lineOf(L.key).map(c=>{const e=col[c.id]||{n:0,f:0},has=owns(c),hi=HI(c.t);
-     const raws=hi?col.inst.filter(i=>i.id===c.id&&i.st==='raw').sort((a,b)=>condScore(b.cd)-condScore(a.cd)):[];
+     const raws=hi?col.inst.filter(i=>i.id===c.id&&i.st==='raw'&&!isVar(i)).sort((a,b)=>condScore(b.cd)-condScore(a.cd)):[];
+     const nv=hi?col.inst.filter(i=>i.id===c.id&&i.st==='raw'&&isVar(i)).length:0,pn=e.n-nv;
      const away=hi?col.inst.filter(i=>i.id===c.id&&(i.st==='grading'||i.st==='back')):[];
      const slabs=hi?col.inst.filter(i=>i.id===c.id&&i.st==='slab').length:0;
      const show=raws[0]||away[0]||null;
      return `<div class="mini${has?'':' miss'}" data-id="${c.id}" data-f="${e.f?1:0}" data-n="${c.no}" data-u="${show?show.u:''}">${cardEl(c,!!e.f,false,show,1)}
-      ${e.n>1?`<span class="qty">\u00d7${e.n}</span>`:''}${e.f?`<span class="qty f">Rev \u00d7${e.f}</span>`:''}
+      ${pn>1?`<span class="qty">\u00d7${pn}</span>`:''}${e.f?`<span class="qty f">Rev \u00d7${e.f}</span>`:''}
       ${slabs?`<span class="qty s">STK \u00d7${slabs}</span>`:''}
       ${raws[0]?`<span class="cbadge">${condScore(raws[0].cd).toFixed(1)}</span>`:''}
-      ${!e.n&&away.length?`<div class="gsleeve">${away[0].st==='back'?'<b>BACK!</b><small>Open in Graded</small>'
+      ${!pn&&away.length?`<div class="gsleeve">${away[0].st==='back'?'<b>BACK!</b><small>Open in Graded</small>'
         :`<b>AT STK</b><small>Back soon \u00b7 <span class="gtimer" data-u="${away[0].u}">${fmtLeft(away[0].due)}</span></small>`}</div>`:''}
      </div>`}).join('')+obsSlot(L)).join('')}</div>
    ${owned?'':'<p style="text-align:center;color:var(--mute);margin-top:20px;font-weight:600">Buy a pack to start your collection</p>'}</div>`;
@@ -2020,6 +2132,76 @@ function obsSlot(L){const o=OBS.find(x=>x.line===L.key),e=col[o.id];
       :`<em>${have} / ${tot}</em><small>till you can craft</small>`}
     <span class="obtrk"><i style="width:${have/tot*100}%"></i></span></div></div>`}
 
+/* ---------------- TRADE UP ----------------
+   Ten spare copies of one rarity in, one random card of the next rarity out.
+   Spare means: never your last copy of a card, never a signed/error copy, never
+   a slab. Half the time the result is drawn from cards you don't own yet. The
+   result rolls for signed/error like any pack card. */
+const TU_NEXT={c:'h',h:'fa',fa:'sir',sir:'bwr'},TU_N=10,TSH={c:'Common',h:'Holo',fa:'Full Art',sir:'SIR',bwr:'Mono Rare'};
+const TU={t:'c',sel:[]};
+function spareStacks(t){const out=[];
+  byT(t).forEach(c=>{const e=col[c.id]||{n:0,f:0};
+    if(!HI(t)){const sn=e.n>0?e.n-1:0,sf=e.n>0?e.f:Math.max(0,e.f-1);
+      if(sn)out.push({it:{k:'r',id:c.id,f:0},c,max:sn,foil:false});
+      if(sf)out.push({it:{k:'r',id:c.id,f:1},c,max:sf,foil:true});return}
+    const raws=col.inst.filter(i=>i.id===c.id&&i.st==='raw'&&!isVar(i)).sort((a,b)=>condScore(b.cd)-condScore(a.cd));
+    const kept=col.inst.some(i=>i.id===c.id&&(i.st!=='raw'||isVar(i)));   // a slab or special copy already keeps it in the binder
+    raws.slice(kept?0:1).forEach(i=>out.push({it:{k:'i',u:i.u},c,max:1,ins:i}))});
+  return out}
+function tuFit(pool){const cnt={};TU.sel=TU.sel.filter(it=>{const k=itemKey(it),t=pool.find(x=>itemKey(x.it)===k);
+  cnt[k]=(cnt[k]||0)+1;return t&&cnt[k]<=t.max}).slice(0,TU_N)}
+function tuAuto(pool){const left=p=>p.max-TU.sel.filter(x=>itemKey(x)===itemKey(p.it)).length;
+  const order=pool.slice().sort((a,b)=>a.ins&&b.ins?condScore(a.ins.cd)-condScore(b.ins.cd):b.max-a.max||(a.foil-b.foil));
+  // spread across the biggest stacks first, plain before reverse holo, worst condition first
+  while(TU.sel.length<TU_N){const p=order.filter(x=>left(x)>0).sort((a,b)=>a.ins?0:left(b)-left(a))[0];if(!p)break;TU.sel.push(Object.assign({},p.it))}}
+function tradeup(){const st=stage();deactivate();root.onkeydown=null;
+  const pool=spareStacks(TU.t);tuFit(pool);
+  const nt=TU_NEXT[TU.t],full=TU.sel.length===TU_N,spare=pool.reduce((a,t)=>a+t.max,0);
+  st.innerHTML=`<div class="binder tuv">
+   <div class="tuhead"><b>Trade Up</b><small>Put in ${TU_N} spare ${TSH[TU.t]}s, get 1 random ${TNAME[nt]}. Half the time it's one you don't own yet. Your last copy of a card, slabs and signed/error cards are never used.</small>${col.tu?`<em>${col.tu} contract${col.tu>1?'s':''} signed</em>`:''}</div>
+   <div class="gfbar"><div class="gfg"><span>CONTRACT</span>${Object.keys(TU_NEXT).map(t=>`<button class="gchip${TU.t===t?' on':''}" data-tu="${t}">${TSH[t]} \u2192 ${TSH[TU_NEXT[t]]}</button>`).join('')}</div></div>
+   <div class="tuslots">${Array.from({length:TU_N},(_,i)=>{const it=TU.sel[i];if(!it)return'<div class="tuslot"></div>';
+     const t=pool.find(x=>itemKey(x.it)===itemKey(it));return `<div class="tuslot on" data-rm="${i}">${cardEl(t.c,t.foil,false,t.ins,1)}</div>`}).join('')}
+    <div class="tuarrow">\u2192</div><div class="tuslot tuout"><b>?</b><small>${TSH[nt]}</small></div></div>
+   <div class="tubar"><span class="tucount"><b>${TU.sel.length}</b> / ${TU_N}</span><button class="btn ghost" id="tuAuto" ${spare&&!full?'':'disabled'}>Auto-fill</button><button class="btn ghost" id="tuClr" ${TU.sel.length?'':'disabled'}>Clear</button><button class="btn" id="tuGo" ${full?'':'disabled'}>Sign contract</button></div>
+   <div class="grow"><h5>Your spare ${TSH[TU.t]}s <small>${spare}</small></h5>
+    <div class="tgrid">${pool.map(t=>tileHTML(t,'tu',TU.sel)).join('')||`<p class="gempty">No spare ${TSH[TU.t]}s yet \u2014 you need doubles.</p>`}</div></div></div>`;
+  st.querySelectorAll('[data-tu]').forEach(b=>b.onclick=()=>{SFX.tick();TU.t=b.dataset.tu;TU.sel=[];tradeup()});
+  st.querySelectorAll('.ttile').forEach(el=>el.onclick=()=>{const k=el.dataset.k,t=pool.find(x=>itemKey(x.it)===k);if(!t)return;
+    const have=TU.sel.filter(x=>itemKey(x)===k).length;
+    if(have>=t.max||TU.sel.length>=TU_N){if(!have)return;for(let i=TU.sel.length-1;i>=0;i--)if(itemKey(TU.sel[i])===k){TU.sel.splice(i,1);break}}
+    else TU.sel.push(Object.assign({},t.it));SFX.tick();tradeup()});
+  st.querySelectorAll('[data-rm]').forEach(el=>el.onclick=()=>{TU.sel.splice(+el.dataset.rm,1);SFX.tick();tradeup()});
+  $('#tuAuto').onclick=()=>{tuAuto(pool);SFX.tick();tradeup()};
+  $('#tuClr').onclick=()=>{TU.sel=[];SFX.tick();tradeup()};
+  $('#tuGo').onclick=()=>tuSign()}
+function tuSign(){if(TU.sel.length!==TU_N)return null;const t=TU.t,nt=TU_NEXT[t];tuFit(spareStacks(t));
+  if(TU.sel.length!==TU_N)return null;
+  const gone=takeItems(TU.sel);TU.sel=[];if(!gone){if(root&&root.isConnected&&curView==='tradeup')tradeup();return null}
+  const all=byT(nt),miss=all.filter(c=>!owns(c)),from=miss.length&&Math.random()<.5?miss:all,c=from[Math.floor(Math.random()*from.length)];
+  const p={c,foil:false,isNew:!owns(c),v:rollVar()};
+  if(HI(nt)||p.v){p.ins=newInst(c.id);if(p.v){p.ins.v=p.v;if(!HI(nt))p.ins.f=0}}
+  addCard(p);col.tu=(col.tu||0)+1;checkCraftable();save();
+  if(root&&root.isConnected)tuReveal(p,t);return p}
+function tuReveal(p,from){const h=p.c.h??CATS[p.c.cat].h;
+  const ov=document.createElement('div');ov.className='rwov tuov';ov.style.setProperty('--h',h);
+  ov.innerHTML=`<div class="rw-rays"></div><div class="tufeed">${Array.from({length:TU_N},(_,k)=>`<i style="--a:${k*36}deg;--d:${k*45}ms"></i>`).join('')}</div>
+   <div class="rw-head"><small>TRADE UP CONTRACT</small><b>${TU_N} ${hx(TSH[from])}s \u2192 1 ${hx(TNAME[p.c.t])}</b></div>
+   <div class="deck rwdeck"><div class="slot forge">${cardEl(p.c,false,true,p.ins)}</div></div>
+   <div class="rw-foot"><b>${hx(p.c.name)}${p.isNew?' \u00b7 <span style="color:#00e701">NEW</span>':''}</b><small>${numOf(p.c)}${p.ins&&HI(p.c.t)?` \u00b7 condition ${condScore(p.ins.cd).toFixed(1)}`:''} \u00b7 added to your binder</small></div>
+   <div class="dock"><button class="btn ghost" id="tuBinder">Binder</button><button class="btn" id="tuAgain">Another contract</button></div>`;
+  root.appendChild(ov);deactivate();
+  const tl=ov.querySelector('.tilt'),fl=ov.querySelector('.flip');
+  try{SFX.init();SFX.charge()}catch(x){}
+  setTimeout(()=>{ov.querySelector('.slot').classList.remove('forge');fl.classList.remove('down');
+    try{SFX.flip();SFX.reveal(RANK[p.c.t]>=2?'u':'r',true);if(RANK[p.c.t]>=2)SFX.boom()}catch(x){}activate(tl,'card');
+    const bu=document.createElement('div');bu.className='burst';
+    for(let k=0;k<70;k++){const a=Math.random()*Math.PI*2,d=140+Math.random()*260;
+      bu.innerHTML+=`<i style="--c:${k%3?`hsl(${h+Math.random()*80-40} 95% 65%)`:'#fff'};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
+    ov.appendChild(bu);setTimeout(()=>bu.remove(),1300);if(p.v)setTimeout(()=>varPop(p,ov),450)},1500);
+  const done=v=>{ov.remove();deactivate();go(v)};
+  ov.querySelector('#tuBinder').onclick=()=>done('binder');ov.querySelector('#tuAgain').onclick=()=>done('tradeup')}
+
 /* ---------------- GRADING ---------------- */
 const GRADE_MS=60000;
 const note=m=>{if(B.notify)B.notify(m);else{const t=document.createElement('div');t.className='tnote';t.textContent=m;root&&root.appendChild(t);setTimeout(()=>t.remove(),3200)}};
@@ -2061,7 +2243,7 @@ function slabHTML(ins,small){const c=CARD(ins.id),g=ins.grade;
     <div class="sl-label">
      <div class="sl-lt"><div class="sl-l1">2026 STACK CARDS \u00b7 MYTHIC</div>
       <div class="sl-l2">${hx(c.name.toUpperCase())}</div>
-      <div class="sl-l3">${hx((TNAME[c.t]||'').toUpperCase())}${c.mono?' \u00b7 '+hx(c.mono.toUpperCase()):''}</div>
+      <div class="sl-l3">${isVar(ins)?(ins.v==='sig'?'AUTOGRAPH \u00b7 ':'ERROR \u00b7 '+hx(VAR[ins.v].n.toUpperCase())+' \u00b7 '):''}${hx((TNAME[c.t]||'').toUpperCase())}${c.mono?' \u00b7 '+hx(c.mono.toUpperCase()):''}</div>
       <div class="sl-l4">${numOf(c)}</div></div>
      <div class="sl-rt"><div class="sl-gw">${GW[g]||''}</div><div class="sl-gn">${g}</div><div class="sl-veil"></div></div>
      <div class="sl-bar">${barcode(ins.cert||'STK')}<span class="sl-cert">${ins.cert||''}</span><span class="sl-logo">${STK_LOGO}<b>STK</b><i class="sl-holo"></i></span></div>
@@ -2182,12 +2364,12 @@ function takeItems(items){const need={};items.forEach(it=>{const k=itemKey(it);n
     else{const e=col[a];if(!e||(b==='1'?e.f:e.n)<need[k])return null}}
   const out=[];
   items.forEach(it=>{if(it.k==='i'){const i=instBy(it.u);col.inst=col.inst.filter(x=>x.u!==it.u);
-      if(i.st==='raw'&&col[i.id])col[i.id].n--;out.push({k:'i',u:i.u,ins:i})}
+      if(i.st==='raw'&&HI(CARD(i.id).t)&&col[i.id])col[i.id].n--;out.push({k:'i',u:i.u,ins:i})}
     else{const e=col[it.id];it.f?e.f--:e.n--;out.push({k:'r',id:it.id,f:it.f?1:0})}});
   return out}
 function giveItems(items){(items||[]).forEach(it=>{
   if(it.k==='i'&&it.ins){const i=JSON.parse(JSON.stringify(it.ins));if(i.st!=='slab')i.st='raw';
-    if(instBy(i.u))return;col.inst.push(i);if(i.st==='raw'){const e=col[i.id]||(col[i.id]={n:0,f:0});e.n++}}
+    if(instBy(i.u))return;col.inst.push(i);if(i.st==='raw'&&HI(CARD(i.id).t)){const e=col[i.id]||(col[i.id]={n:0,f:0});e.n++}}
   else if(it.k==='r'){const e=col[it.id]||(col[it.id]={n:0,f:0});it.f?e.f++:e.n++}})}
 const canGive=items=>{const bak=JSON.stringify(col),ok=!!takeItems(items);col=JSON.parse(bak);return ok};
 
@@ -2196,15 +2378,16 @@ function tilesOf(snap){const out=[];
   SET.concat(OBS).forEach(c=>{const v=snap.counts[c.id];if(!v)return;
     if(v[0])out.push({it:{k:'r',id:c.id,f:0},c,max:v[0],foil:false});
     if(v[1])out.push({it:{k:'r',id:c.id,f:1},c,max:v[1],foil:true})});
-  snap.inst.forEach(i=>out.push({it:{k:'i',u:i.u},c:CARD(i.id),max:1,ins:i}));
+  snap.inst.forEach(i=>out.push({it:{k:'i',u:i.u},c:CARD(i.id),max:1,ins:i,foil:!!i.f}));
   return out.sort((a,b)=>RANK[b.c.t]-RANK[a.c.t]||(b.ins&&b.ins.st==='slab')-(a.ins&&a.ins.st==='slab')||a.c.id-b.c.id)}
 function tileHTML(t,side,sel){const n=sel.filter(x=>itemKey(x)===itemKey(t.it)).length;
   const inner=t.ins&&t.ins.st==='slab'?`<div class="tslab">${slabHTML(t.ins,1)}</div>`:cardEl(t.c,t.foil,false,t.ins,1);
   return `<div class="ttile${n?' on':''}" data-side="${side}" data-k="${hx(itemKey(t.it))}">${inner}
-    ${t.ins&&t.ins.st==='slab'?`<span class="qty s">STK ${t.ins.grade}</span>`:t.ins?`<span class="cbadge">${condScore(t.ins.cd).toFixed(1)}</span>`:''}
+    ${t.ins&&t.ins.st==='slab'?`<span class="qty s">STK ${t.ins.grade}</span>`:t.ins&&HI(t.c.t)?`<span class="cbadge">${condScore(t.ins.cd).toFixed(1)}</span>`:''}${vtag(t.ins)}
     ${t.max>1?`<span class="qty">\u00d7${t.max}</span>`:''}${n?`<span class="tpick">${n>1?'\u00d7'+n:'\u2713'}</span>`:''}</div>`}
 const itemLabel=(it,snapInst)=>{if(it.k==='i'){const i=it.ins||(snapInst||[]).find(x=>x.u===it.u)||instBy(it.u);if(!i)return'?';
-  return CARD(i.id).name+(i.st==='slab'?` (STK ${i.grade})`:` (${condScore(i.cd).toFixed(1)})`)}
+  const c=CARD(i.id),vv=isVar(i)?' \u00b7 '+VAR[i.v].n:'';
+  return c.name+(i.st==='slab'?` (STK ${i.grade}${vv})`:HI(c.t)?` (${condScore(i.cd).toFixed(1)}${vv})`:vv?` (${vv.slice(3)})`:'')}
   return CARD(it.id).name+(it.f?' (Reverse)':'')};
 
 function trade(){const st=stage();deactivate();root.onkeydown=null;
@@ -2280,6 +2463,7 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
   /* exposed for tests */
   _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,artSrc:k=>Art[k](),
      OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
+     VAR,isVar,rollVar,addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
      get col(){return col},set col(v){col=v}}};
 if(document.getElementById('tcg')&&!window.StackBridge)mount(document.getElementById('tcg'));
 })();

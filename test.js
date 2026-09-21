@@ -523,6 +523,54 @@ async function cards(ctx, errs) {
   still ? pass('zoom keeps the engine (grading, binder hover)') : fail('zoom keeps the engine (grading, binder hover)');
   await pg.evaluate("(()=>{const z=StackCards.root.querySelector('.zoom');z&&z.click()})()"); await pg.waitForTimeout(300);
 
+  // SIGNED & ERROR cards: individual copies, shown in their own binder row, gradeable at Full Art+
+  const vr = await pg.evaluate(`(()=>{const X=StackCards._,S=StackCards.SET,c=X.col;
+    const com=S.find(x=>x.t==='c'),fa=S.filter(x=>x.t==='fa')[3];
+    const n0=(c[com.id]||{n:0}).n,f0=(c[fa.id]||{n:0}).n;
+    X.addCard({c:com,foil:false,v:'sig',ins:X.newInst(com.id)});X.addCard({c:fa,foil:false,v:'miscut',ins:X.newInst(fa.id)});
+    const sig=c.inst.find(i=>i.id===com.id&&i.v==='sig'),err=c.inst.find(i=>i.id===fa.id&&i.v==='miscut');
+    StackCards.go('binder');const R=StackCards.root,row=R.querySelector('.vrow');
+    const shown=row?[...row.querySelectorAll('.mini')].map(m=>m.dataset.u):[];
+    const sigFront=!!(row&&row.querySelector('.mini[data-u="'+sig.u+'"] .front.v-sig .vsig svg path'));
+    const errFront=!!(row&&row.querySelector('.mini[data-u="'+err.u+'"] .front.v-miscut .mcut'));
+    const odds=Object.keys(X.VAR).length;
+    return {comCount:(c[com.id]||{n:0}).n-n0,faCount:c[fa.id].n-f0,shown:shown.includes(sig.u)&&shown.includes(err.u),sigFront,errFront,odds,
+      owns:StackCards.root&&true,sigU:sig.u,errU:err.u}})()`);
+  (vr.comCount === 0 && vr.faCount === 1 && vr.shown && vr.sigFront && vr.errFront)
+    ? pass('signed and error copies render in their own binder row') : fail('signed and error copies render in their own binder row', JSON.stringify(vr));
+  const vg = await pg.evaluate(`(()=>{const X=StackCards._,c=X.col,i=c.inst.find(x=>x.u==='${vr.errU}');
+    i.st='slab';i.grade=9;i.cert='STK 30000001';StackCards.go('graded');
+    const lab=[...StackCards.root.querySelectorAll('.sl-l3')].map(e=>e.textContent).find(t=>t.includes('MISCUT'));
+    i.st='raw';delete i.grade;delete i.cert;return lab||''})()`);
+  vg.includes('ERROR') ? pass('graded error card says so on the slab', vg.trim()) : fail('graded error card says so on the slab', vg);
+  // a signed common trades as its own copy without touching the plain stack
+  const vt = await pg.evaluate(`(()=>{const X=StackCards._,c=X.col,i=c.inst.find(x=>x.u==='${vr.sigU}'),n=c[i.id].n;
+    const inSnap=X.snapshot().inst.some(x=>x.u===i.u),out=X.takeItems([{k:'i',u:i.u}]),n1=c[i.id].n;X.giveItems(out);
+    return {inSnap,n,n1,n2:c[i.id].n,back:!!c.inst.find(x=>x.u===i.u)}})()`);
+  (vt.inSnap && vt.n === vt.n1 && vt.n === vt.n2 && vt.back) ? pass('signed common trades as its own copy', 'plain stack untouched') : fail('signed common trades as its own copy', JSON.stringify(vt));
+
+  // TRADE UP: 10 spares in, 1 of the next rarity out, never your last copy or a special
+  const tu = await pg.evaluate(`(()=>{const X=StackCards._,S=StackCards.SET,c=X.col;
+    S.filter(x=>x.t==='c').slice(0,6).forEach(x=>{c[x.id]={n:3,f:0}});
+    const owned0=S.filter(x=>x.t==='c'&&c[x.id]&&(c[x.id].n||c[x.id].f)).length;
+    const spare0=X.spareStacks('c').reduce((a,t)=>a+t.max,0);
+    X.TU.t='c';X.TU.sel=[];X.tuAuto(X.spareStacks('c'));const picked=X.TU.sel.length;
+    const specials0=c.inst.filter(X.isVar).length,tu0=c.tu||0;
+    const out=X.tuSign();
+    const owned1=S.filter(x=>x.t==='c'&&c[x.id]&&(c[x.id].n||c[x.id].f)).length;
+    const spare1=X.spareStacks('c').reduce((a,t)=>a+t.max,0)+(out&&out.c.t==='c'?1:0);
+    // not enough spares: refuses
+    S.filter(x=>x.t==='fa').forEach(x=>{c.inst=c.inst.filter(i=>!(i.id===x.id&&i.st==='raw'&&!X.isVar(i)))});
+    X.TU.t='fa';X.TU.sel=[];X.tuAuto(X.spareStacks('fa'));const short=X.TU.sel.length,refused=X.tuSign()===null;
+    document.querySelectorAll('.rwov').forEach(e=>e.remove());(StackCards.root.querySelector('.rwov')||{remove(){}}).remove();
+    return {picked,tier:out&&out.c.t,spare:[spare0,spare1],owned:[owned0,owned1],specials:[specials0,c.inst.filter(X.isVar).length-(out&&out.v&&!X.HI(out.c.t)?1:0)],tu:(c.tu||0)-tu0,short,refused}})()`);
+  (tu.picked === 10 && tu.tier === 'h' && tu.spare[0] - tu.spare[1] === 10 && tu.owned[0] === tu.owned[1] && tu.specials[0] === tu.specials[1] && tu.tu === 1)
+    ? pass('trade up turns 10 spare commons into a holo', 'last copies and specials untouched') : fail('trade up turns 10 spare commons into a holo', JSON.stringify(tu));
+  (tu.short < 10 && tu.refused) ? pass('trade up refuses without 10 spares') : fail('trade up refuses without 10 spares', JSON.stringify(tu));
+  await pg.evaluate("StackCards.go('tradeup')"); await pg.waitForTimeout(300);
+  const tuv = await pg.evaluate("(()=>{const R=StackCards.root;return [R.querySelectorAll('.tuslot').length,R.querySelectorAll('[data-tu]').length,!!R.querySelector('#tuGo')]})()");
+  (tuv[0] === 11 && tuv[1] === 4 && tuv[2]) ? pass('trade up tab renders') : fail('trade up tab renders', JSON.stringify(tuv));
+
   errs.length === n0 ? pass('no stack cards console errors') : fail('no stack cards console errors', errs.slice(n0).join(' | '));
   await pg.close();
 }

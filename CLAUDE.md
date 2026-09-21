@@ -183,6 +183,15 @@ automatically; `devkit check` fails if they drift).
   does NOT consume the line and is once per line (`col.rew[line]`). OBS ids are 1000+ and live
   outside `SET` (base set stays 127) — always look cards up with `CARD(id)`. Obsidian is not
   `HI`: no condition, wear or grading, and has no graded-filter chip. It trades like a holo.
+- **Signed & error cards** (`VAR`, `rollVar`, `addCard`). Rolled per card in packs and Trade
+  Ups (signed 1/400, error 1/350: wrong ink, double print, miscut, missing name, upside-down art).
+  Always an individual copy in `col.inst` with `.v`. On a Full Art+ it's also one of the counted
+  raw copies (condition, gradeable, slab label names it). On a common/holo it is NOT in `col[id]`
+  counts — `takeItems/giveItems` only touch counts for HI cards. Rendered by `varFront()` over
+  the normal front; shown in their own "Signed & errors" binder row.
+- **Trade Up** (`tradeup` tab, `spareStacks/tuSign`): 10 spares of a rarity → 1 random card of
+  the next (c→h→fa→sir→bwr), 50% drawn from cards you don't own. Spares never include your last
+  copy, slabs or signed/error copies.
 - **Graded filters** (`GF`): rarity chips, grade-band chips, rows by grade or by rarity.
 - **Art placement.** Generic FA/SIR creature offsets in `PLACE` are DERIVED from the centred
   window pose — don't hand-type x values (that's how they ended up off-centre).
@@ -272,6 +281,7 @@ Two patterns, don't mix them up:
 - Fight Night party sync shares the seed and the host drives start/next, same as the sportsbook. Guest buttons are disabled.
 - Stack Cards packs are FREE: the engine's PACK_COST is 0. The spend path through the casino wallet is wired and tested, so pricing packs is a one-number change in stack-cards.html.
 - Stack Cards trade: if the accept message is lost after the receiver commits (connection drops mid-trade), the sender's escrow is refunded and those cards end up duplicated. No server to arbitrate.
+- test.js sports 'correlated legs priced jointly' is a Monte Carlo check that fails occasionally (failed once in the full run 2026-09-21, passed 4/4 on rerun) - widen its tolerance or raise the sample.
 
 ---
 
@@ -336,6 +346,7 @@ Two patterns, don't mix them up:
 - **2026-09-21** — Obsidian Edition: crafted, not pulled. A black face-hidden slot closes each evo line in the binder (x / y till you can craft); crafting needs every card in the line (graded/at-grading counts) and does NOT consume them. Obsidian ids 1000+ live in OBS outside SET so the base set stays 127; resolve via CARD(id). Not HI: no condition, wear or grading. stripSky knocks out the art's sky plate so an animated .obs-bg shows behind it.
 - **2026-09-21** — Graded view filters: rarity chips, grade-band chips, rows by grade or rarity (Obsidian excluded - never graded). minis() guard: card-less binder slots used to throw and leave later tiles unclickable. Off-centre FA/SIR generic creatures: hand-typed PLACE x offsets were wrong, now derived from the centred window placement; dragon poses lean by design.
 - **2026-09-21** — Zoom/grading: gradeTick used to go(curView) when a grade came back, rebuilding binder/graded under an open zoom or slab opening (jump to top, zoom engine killed). Now softRefresh(): deferred while .zoom/.rwov/.stkwrap is open, keeps scroll. activate() refuses elements outside an open .zoom, and the zoom deck re-grabs the engine on pointerdown - a binder tile could steal it so dragging spun the tile behind.
+- **2026-09-21** — Signed/error cards are individual inst copies (not a flag on counts) so they show, trade and grade on their own and can't be spent as spares; for commons/holos they sit outside col[id] counts. Double print needed a second offset <img> - a drop-shadow on the art was clipped by the window. Trade Up: 10 spares -> next rarity, half the time from unowned cards so it helps completion; last copies, slabs and specials are never spares.
 
 ---
 

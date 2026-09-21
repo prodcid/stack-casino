@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.21.7",
-  "notes": "Stack Cards: zoomed cards spin properly, returning grades no longer yank the view to the top",
-  "bytes": 802698,
-  "at": "2026-09-21T10:30:31.930Z"
+  "version": "2026.09.21.10",
+  "notes": "Stack Cards: Trade Up contracts, signed cards, error cards",
+  "bytes": 820678,
+  "at": "2026-09-21T11:00:22.208Z"
 }
