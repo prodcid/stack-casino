@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.21.3",
-  "notes": "Stack Cards: binder, set numbers, PSA-style grading + STK slabs, card wear, party trading",
-  "bytes": 787539,
-  "at": "2026-09-21T09:27:32.844Z"
+  "version": "2026.09.21.4",
+  "notes": "cards: grade call-out no longer covers the slab label",
+  "bytes": 787765,
+  "at": "2026-09-21T09:44:02.949Z"
 }

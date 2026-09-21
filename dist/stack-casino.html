@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.21.3">
+<meta name="stack-version" content="2026.09.21.4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2349,13 +2349,16 @@ window.StackBridge={
 #tcg .slabrise{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1200px;z-index:10;pointer-events:none}
 #tcg .slabrise .sdeck{animation:rise 1.1s cubic-bezier(.2,1.2,.3,1)}
 @keyframes rise{from{transform:translateY(40vh) scale(.6) rotateX(50deg);opacity:0}60%{opacity:1}}
-#tcg .gradecall{position:absolute;top:84px;left:50%;transform:translateX(-50%);z-index:30;text-align:center;animation:gcall .6s cubic-bezier(.2,1.6,.4,1)}
-#tcg .gradecall small{display:block;font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--mute)}
-#tcg .gradecall b{display:block;font-size:54px;font-weight:900;line-height:1}
+/* sits under the slab, above the buttons - on top it covered the label */
+#tcg .gradecall{position:absolute;bottom:92px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:baseline;gap:10px;
+ white-space:nowrap;background:rgba(9,18,26,.9);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:6px 16px;
+ backdrop-filter:blur(6px);animation:gcall .6s cubic-bezier(.2,1.6,.4,1)}
+#tcg .gradecall small{font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--mute)}
+#tcg .gradecall b{font-size:34px;font-weight:900;line-height:1}
 #tcg .gradecall i{font-style:normal;font-size:14px;font-weight:900;letter-spacing:.12em;color:#ffd35a}
-#tcg .gradecall.gem b{background:linear-gradient(180deg,#b8ffb8,#00e701);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(0,231,1,.6))}
+#tcg .gradecall.gem b{background:linear-gradient(180deg,#b8ffb8,#00e701);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(0,231,1,.6))}
 #tcg .gradecall.gem i{color:#00e701}
-@keyframes gcall{from{opacity:0;transform:translate(-50%,-14px) scale(.7)}}
+@keyframes gcall{from{opacity:0;transform:translate(-50%,14px) scale(.7)}}
 
 /* ============ TRADE ============ */
 #tcg .tradev{padding-bottom:130px}

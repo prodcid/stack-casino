@@ -324,6 +324,7 @@ Two patterns, don't mix them up:
 - **2026-09-21** — Full Art and above became INDIVIDUAL copies (col.inst) so each one can carry its own condition, grade and state. Commons and holos stay as counts. Invariant: col[id].n equals that card's 'raw' copies. Condition is PSA-shaped: centering caps the grade (55/45 for a 10), and the final STK grade follows condition with a little grader variance, halves 1.5-8.5 like PSA. Measured pack-fresh spread: ~11% gem, ~33% 9, ~9% under 7.
 - **2026-09-21** — Card wear is an SVG drawn from each copy's seed, so a copy always looks the same. Every Full Art+ tier has a silver or gold border, where white edge-whitening vanished - wear now mixes dark scuffing with white chips so it reads on metal. Scratches sit on a separate glint layer masked to the light position, so they only flash as you tilt the card.
 - **2026-09-21** — Trades escrow the sender's side on send, so it can't be graded or offered twice while pending; declined, cancelled, disconnected or reloaded offers hand it back. The receiver commits first, then the sender. If the accept message is lost after the receiver commits, the sender gets their escrow back and the traded cards exist twice - accepted for a two-person game with no server.
+- **2026-09-21** — Slab reveal: the STK GRADE call-out sat on top of the slab and covered the label. Moved it under the slab as a single line above the buttons.
 
 ---
 
