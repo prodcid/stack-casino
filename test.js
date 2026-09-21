@@ -554,7 +554,7 @@ async function cards(ctx, errs) {
     for(let k=0;k<4000;k++){S.forEach(c=>{if(c.id!==X.DIA_ID&&X.rollVar(c)==='dia')other++});if(X.rollVar(inf)==='dia')hit++}
     const i=X.newInst(inf.id);X.addCard({c:inf,foil:false,v:'dia',ins:i});StackCards.go('binder');
     const el=StackCards.root.querySelector('.vrow .mini[data-u="'+i.u+'"]');
-    const stones=el?el.querySelectorAll('.front.v-dia .dia ellipse').length:0,glints=el?el.querySelectorAll('.dia .dg').length:0;
+    const stones=el?el.querySelectorAll('.front.v-dia .dstones ellipse').length:0,glints=el?el.querySelectorAll('.dstones .dg').length:0;
     i.st='slab';i.grade=9;i.cert='STK 40000001';StackCards.go('graded');
     const lab=[...StackCards.root.querySelectorAll('.sl-l3')].map(e=>e.textContent).find(t=>t.includes('DIAMOND'))||'';
     return {name:inf.name,t:inf.t,other,rate:hit/4000,stones,glints,lab}})()`);

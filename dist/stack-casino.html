@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.22.6">
+<meta name="stack-version" content="2026.09.22.8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2452,14 +2452,23 @@ window.StackBridge={
 #tcg .vauth{position:absolute;right:0;bottom:-16%;transform:rotate(9deg);font-style:normal;font-size:max(5px,3.2cqi);font-weight:900;letter-spacing:.08em;color:#2a1c00;
  background:linear-gradient(135deg,#fff3b0,#e9b93a 45%,#fff3b0 60%,#c9921a);border-radius:99px;padding:.3em .7em;box-shadow:0 1px 3px rgba(0,0,0,.5)}
 /* diamond: the edge chips re-cut as blue stones that catch the light */
-#tcg .dia{position:absolute;inset:0;z-index:8;pointer-events:none;filter:drop-shadow(0 0 1.2px rgba(120,200,255,.9));animation:diashine 2.4s ease-in-out infinite alternate}
-#tcg .dia svg{display:block;width:100%;height:100%}
-#tcg .dia.dtw{z-index:9;filter:drop-shadow(0 0 3px #bfe9ff);animation:none;mix-blend-mode:screen}
-#tcg .dia .dg{transform-box:fill-box;transform-origin:center;animation:diatw 2.6s ease-in-out infinite;opacity:0}
+#tcg .dstones{position:absolute;inset:0;z-index:8;pointer-events:none;filter:drop-shadow(0 0 1.2px rgba(120,200,255,.9));animation:diashine 2.4s ease-in-out infinite alternate}
+#tcg .dstones svg{display:block;width:100%;height:100%}
+#tcg .dstones.dtw{z-index:9;filter:drop-shadow(0 0 3px #bfe9ff);animation:none;mix-blend-mode:screen}
+#tcg .dstones .dg{transform-box:fill-box;transform-origin:center;animation:diatw 2.6s ease-in-out infinite;opacity:0}
 @keyframes diashine{from{filter:drop-shadow(0 0 1px rgba(120,200,255,.7)) brightness(1)}to{filter:drop-shadow(0 0 3px rgba(160,225,255,1)) brightness(1.35)}}
 @keyframes diatw{0%,70%,100%{opacity:0;transform:scale(.2) rotate(0)}82%{opacity:1;transform:scale(1) rotate(45deg)}}
 #tcg .front.v-dia .full>*,#tcg .front.v-dia .evo>*{filter:hue-rotate(208deg) saturate(.5) brightness(1.95) contrast(.85)}
 #tcg .front.v-dia{box-shadow:0 0 0 1px rgba(160,225,255,.5),0 0 18px rgba(80,170,255,.35),0 18px 32px rgba(0,0,0,.55)}
+#tcg .grid .dialock{cursor:default}
+#tcg .grid .dialock .tilt{filter:blur(1.6px) brightness(.5) saturate(.7)}
+#tcg .dialk{position:absolute;inset:0;z-index:5;display:grid;place-content:center;justify-items:center;gap:3px;text-align:center;padding:6px;pointer-events:none}
+#tcg .dialk b{font-size:13px;font-weight:900;letter-spacing:.14em;padding:3px 9px;border-radius:99px;background:linear-gradient(135deg,#f2fbff,#6cc4ff 50%,#1f6fd6);color:#04203f;box-shadow:0 0 14px rgba(108,196,255,.6)}
+#tcg .dialk small{font-size:10.5px;font-weight:800;color:#dff3ff;text-shadow:0 1px 4px #000}
+#tcg .dialk em{font-style:normal;font-size:10px;font-weight:700;color:#9fdcff;text-shadow:0 1px 4px #000}
+#tcg .grid .diaslot{box-shadow:0 0 18px rgba(108,196,255,.45);border-radius:6px}
+/* at tile size the glow merges the stones into one sheet - keep them crisp */
+#tcg .mini .dstones,#tcg .ttile .dstones,#tcg .tuslot .dstones{filter:none;animation:none}
 #tcg .vtag.dia{background:linear-gradient(135deg,#f2fbff,#6cc4ff 50%,#1f6fd6);color:#04203f}
 #tcg .varpop.dia b{background-image:linear-gradient(90deg,#1f6fd6,#f2fbff,#6cc4ff,#f2fbff)}
 #tcg .zvar.dia b{background:linear-gradient(135deg,#f2fbff,#6cc4ff 50%,#1f6fd6);color:#04203f}
@@ -2867,7 +2876,7 @@ function diaHTML(ins){const r=rng((ins.s^0x6d2b79f5)>>>0),W=630,H=880,R=(a,b)=>a
   spots.sort(()=>r()-.5).slice(0,90).forEach(([x,y])=>{const L=R(7,16);
     tw+=`<path class="dg" style="animation-delay:-${R(0,3.2).toFixed(2)}s;animation-duration:${R(1.8,3.4).toFixed(2)}s" d="M${f1(x)} ${f1(y-L)} Q${f1(x+1.2)} ${f1(y-1.2)} ${f1(x+L)} ${f1(y)} Q${f1(x+1.2)} ${f1(y+1.2)} ${f1(x)} ${f1(y+L)} Q${f1(x-1.2)} ${f1(y+1.2)} ${f1(x-L)} ${f1(y)} Q${f1(x-1.2)} ${f1(y-1.2)} ${f1(x)} ${f1(y-L)}Z" fill="#fff"/>`});
   const sv=i=>`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${i}</svg>`;
-  return `<div class="dia">${sv(g)}</div><div class="dia dtw">${sv(tw)}</div>`}
+  return `<div class="dstones">${sv(g)}</div><div class="dstones dtw">${sv(tw)}</div>`}
 function varFront(h,ins){h=h.replace('<div class="front ','<div class="front v-'+ins.v+' ');
   if(ins.v==='sig')h=h.replace('<div class="sheen">',sigHTML(ins.s)+'<div class="sheen">');
   if(ins.v==='dia'){h=h.replace(/--h:[-\d.]+/,'--h:208');h=h.replace('<div class="sheen">',diaHTML(ins)+'<div class="sheen">')}
@@ -4201,7 +4210,7 @@ function binder(){const st=stage();deactivate();root.onkeydown=null;
       ${raws[0]?`<span class="cbadge">${condScore(raws[0].cd).toFixed(1)}</span>`:''}
       ${!pn&&away.length?`<div class="gsleeve">${away[0].st==='back'?'<b>BACK!</b><small>Open in Graded</small>'
         :`<b>AT STK</b><small>Back soon \u00b7 <span class="gtimer" data-u="${away[0].u}">${fmtLeft(away[0].due)}</span></small>`}</div>`:''}
-     </div>`}).join('')+obsSlot(L)).join('')}</div>
+     </div>`}).join('')+(lineOf(L.key).some(c=>c.id===DIA_ID)?diaSlot():'')+obsSlot(L)).join('')}</div>
    ${owned?'':'<p style="text-align:center;color:var(--mute);margin-top:20px;font-weight:600">Buy a pack to start your collection</p>'}</div>`;
   minis(st);
   st.querySelectorAll('[data-craft]').forEach(el=>{if(el.dataset.craft)el.onclick=()=>{SFX.tick();craft(el.dataset.craft)}})}
@@ -4241,6 +4250,15 @@ function craftReveal(o){const L=LINES.find(l=>l.key===o.line);
       bu.innerHTML+=`<i style="--c:${k%3?`hsl(${o.h+Math.random()*80-40} 95% 65%)`:'#fff'};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
     ov.appendChild(bu);setTimeout(()=>bu.remove(),1300)},1500);
   ov.querySelector('#rwOk').onclick=()=>{ov.remove();deactivate();go('binder')}}
+/* The Light Blue Diamond Infernax sits in the binder right after the Mono Rare it's
+   rolled from. Not pulled yet: a frosted, dimmed preview with the odds, so you know
+   what you're chasing. Pulled: your best copy (raw first, then a slab). */
+function diaSlot(){const c=SET[DIA_ID],own=col.inst.filter(i=>i.id===DIA_ID&&i.v==='dia');
+  if(own.length){const raw=own.filter(i=>i.st==='raw').sort((a,b)=>condScore(b.cd)-condScore(a.cd)),i=raw[0]||own[0];
+    return `<div class="mini diaslot" data-id="${c.id}" data-f="0" data-n="${c.no}" data-u="${i.u}">${cardEl(c,false,false,i,1)}${vtag(i)}
+      ${own.length>1?`<span class="qty">\u00d7${own.length}</span>`:''}${i.st==='slab'?`<span class="qty s">STK ${i.grade}</span>`:''}</div>`}
+  const ghost={u:'diaprev',s:1234567,v:'dia',cd:{ctr:50,dir:1,co:10,ed:10,su:10},st:'raw'};
+  return `<div class="mini dialock">${cardEl(c,false,false,ghost,1)}<div class="dialk"><b>\u25c6 DIAMOND</b><small>Light Blue Diamond Edition</small><em>1 in ${Math.round(1/V_DIA)} Infernax Mono Rares</em></div></div>`}
 /* the slot that closes out each line in the binder */
 function obsSlot(L){const o=OBS.find(x=>x.line===L.key),e=col[o.id];
   if(e&&(e.n||e.f))return `<div class="mini obsown" data-id="${o.id}" data-f="0" data-n="${o.no}" data-u="">${cardEl(o,false,false,null,1)}${e.n>1?`<span class="qty">\u00d7${e.n}</span>`:''}</div>`;
