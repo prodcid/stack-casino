@@ -335,6 +335,7 @@ Two patterns, don't mix them up:
 - **2026-09-21** — Slab reveal: the STK GRADE call-out sat on top of the slab and covered the label. Moved it under the slab as a single line above the buttons.
 - **2026-09-21** — Obsidian Edition: crafted, not pulled. A black face-hidden slot closes each evo line in the binder (x / y till you can craft); crafting needs every card in the line (graded/at-grading counts) and does NOT consume them. Obsidian ids 1000+ live in OBS outside SET so the base set stays 127; resolve via CARD(id). Not HI: no condition, wear or grading. stripSky knocks out the art's sky plate so an animated .obs-bg shows behind it.
 - **2026-09-21** — Graded view filters: rarity chips, grade-band chips, rows by grade or rarity (Obsidian excluded - never graded). minis() guard: card-less binder slots used to throw and leave later tiles unclickable. Off-centre FA/SIR generic creatures: hand-typed PLACE x offsets were wrong, now derived from the centred window placement; dragon poses lean by design.
+- **2026-09-21** — Zoom/grading: gradeTick used to go(curView) when a grade came back, rebuilding binder/graded under an open zoom or slab opening (jump to top, zoom engine killed). Now softRefresh(): deferred while .zoom/.rwov/.stkwrap is open, keeps scroll. activate() refuses elements outside an open .zoom, and the zoom deck re-grabs the engine on pointerdown - a binder tile could steal it so dragging spun the tile behind.
 
 ---
 

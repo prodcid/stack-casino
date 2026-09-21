@@ -507,6 +507,22 @@ async function cards(ctx, errs) {
   Math.max(...off) < 0.2 ? pass('generic creatures are centred', ctr.map(r => r[0] + '@' + r[1]).join(' '))
     : fail('generic creatures are centred', JSON.stringify(ctr));
 
+  // zoomed binder card: a real mouse drag must spin the ZOOMED card, not the binder tile under it
+  await pg.evaluate(`(()=>{const c=StackCards._.col;for(let i=1;i<40;i++)c[i]=c[i]||{n:1,f:0};StackCards.go('binder')})()`);
+  const zr = await pg.evaluate(`(()=>{const m=StackCards.root.querySelector('.mini[data-id="30"]');m.scrollIntoView({block:'center'});const q=m.getBoundingClientRect();return [q.x+q.width/2,q.y+q.height/2]})()`);
+  await pg.mouse.move(zr[0], zr[1]); await pg.waitForTimeout(150); await pg.mouse.click(zr[0], zr[1]); await pg.waitForTimeout(500);
+  const zc = await pg.evaluate(`(()=>{const q=StackCards.root.querySelector('.zoom .tilt').getBoundingClientRect();return [q.x+q.width/2,q.y+q.height/2]})()`);
+  await pg.mouse.move(zc[0], zc[1]); await pg.mouse.down();
+  for (let i = 0; i < 15; i++) { await pg.mouse.move(zc[0] + i * 12, zc[1]); await pg.waitForTimeout(30); }
+  const zl = await pg.evaluate(`(()=>{const R=StackCards.root;return {live:[...R.querySelectorAll('.live')].map(e=>e.closest('.zoom')?'zoom':'binder'),tf:R.querySelector('.zoom .tilt').style.transform}})()`);
+  await pg.mouse.up();
+  (zl.live.join() === 'zoom' && /rotate/.test(zl.tf)) ? pass('dragging a zoomed binder card spins it') : fail('dragging a zoomed binder card spins it', JSON.stringify(zl));
+  // a grade coming back while zoomed must not rebuild the view under you
+  await pg.evaluate(`(()=>{const X=StackCards._,i=X.newInst(X.OBS?StackCards.SET.find(x=>X.HI(x.t)).id:1);i.st='grading';i.due=Date.now()-1;X.col.inst.push(i);StackCards.tick();StackCards.root.querySelectorAll('.grid .mini').forEach(m=>m.onpointerenter&&m.onpointerenter())})()`);
+  const still = await pg.evaluate(`(()=>{const R=StackCards.root;return !!R.querySelector('.zoom .tilt.live')})()`);
+  still ? pass('zoom keeps the engine (grading, binder hover)') : fail('zoom keeps the engine (grading, binder hover)');
+  await pg.evaluate("(()=>{const z=StackCards.root.querySelector('.zoom');z&&z.click()})()"); await pg.waitForTimeout(300);
+
   errs.length === n0 ? pass('no stack cards console errors') : fail('no stack cards console errors', errs.slice(n0).join(' | '));
   await pg.close();
 }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.21.6">
+<meta name="stack-version" content="2026.09.21.7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -3628,7 +3628,10 @@ let GS_H=0;function genSparks(t,rev,seed){const r=rng(seed),out=[];
   if(t==='sir'){add(20,inBorder,{s:.9,gold:1});add(120,inCard,{s:1.1,gold:1});add(60,inCard,{s:.8,white:1})}
   return out}
 function deactivate(){if(E.cv)E.cv.remove();if(E.el){E.el.classList.remove('live');E.el.style.transform=''}E.el=null;E.cv=null}
-function activate(el,kind){if(!el||E.el===el)return;deactivate();
+function activate(el,kind){if(!el||E.el===el)return;
+  // while a card is zoomed nothing behind it may take the engine (a binder tile used to steal it and spin instead)
+  const zm=root&&root.querySelector('.zoom');if(zm&&!zm.contains(el))return;
+  deactivate();
   Object.assign(E,{el,kind,rx:0,ry:0,vx:0,vy:0,bx:0,by:0,hx:0,hy:0,free:false,swipe:false,last:performance.now()});el.classList.add('live');
   const host=kind==='pack'?el:el.querySelector('.front');if(!host)return;
   const cv=document.createElement('canvas');cv.className='twk';host.appendChild(cv);
@@ -3801,7 +3804,7 @@ function summary(){const st=stage();root.onkeydown=null;
 /* tiles without a card in them (the black Obsidian slots) are skipped - one
    null here used to abort the loop and leave every later card unclickable */
 function minis(scope){scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
-  m.onpointerenter=()=>activate(t,'card');
+  m.onpointerenter=()=>{if(!root.querySelector('.zoom'))activate(t,'card')};
   m.onclick=()=>{if(m.classList.contains('miss'))return;const p=m.dataset.id!=null?{c:CARD(+m.dataset.id),foil:m.dataset.f==='1',ins:m.dataset.u?instBy(m.dataset.u):null}:pull[+m.dataset.i];zoom(p)}})}
 const fmtLeft=due=>{const t=Math.max(0,Math.ceil((due-Date.now())/1000));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
 const condGrid=cd=>[['Centering',cd.ctr+'/'+(100-cd.ctr)],['Corners',cd.co.toFixed(1)],['Edges',cd.ed.toFixed(1)],['Surface',cd.su.toFixed(1)]]
@@ -3827,14 +3830,15 @@ function zoom(p,opt){opt=opt||{};SFX.flip();const z=document.createElement('div'
   const prev=E.el,prevKind=E.kind,deck=z.querySelector('.deck');activate(z.querySelector('.tilt'),'card');E.k=.05;E.f=.07;
   let sx,sy,bx,by,lx,ly,lt,vx=0,vy=0,down=false;
   const lim=opt.slab?50:1e9;   // a slab has no back worth showing, so it tilts rather than spins
-  deck.onpointerdown=e=>{e.stopPropagation();down=true;E.free=true;deck.setPointerCapture(e.pointerId);sx=lx=e.clientX;sy=ly=e.clientY;lt=performance.now();bx=E.bx;by=E.by;E.k=.3;E.f=.45;SFX.tick()};
+  const zt=z.querySelector('.tilt');
+  deck.onpointerdown=e=>{e.stopPropagation();if(E.el!==zt){activate(zt,'card');E.k=.05;E.f=.07}down=true;E.free=true;deck.setPointerCapture(e.pointerId);sx=lx=e.clientX;sy=ly=e.clientY;lt=performance.now();bx=E.bx;by=E.by;E.k=.3;E.f=.45;SFX.tick()};
   deck.onpointermove=e=>{if(!down)return;const now=performance.now(),dt=Math.max(1,now-lt);vx=(e.clientX-lx)/dt;vy=(e.clientY-ly)/dt;lx=e.clientX;ly=e.clientY;lt=now;
     E.by=clamp(by+(e.clientX-sx)*.55,-lim,lim);E.bx=clamp(bx-(e.clientY-sy)*.55,-70,70);E.hx=E.hy=0};
   const up=()=>{if(!down)return;down=false;E.free=false;E.k=.05;E.f=.07;
     if(opt.slab){E.by=0;E.bx=0}else{E.vy+=vx*14;E.vx-=vy*10;const proj=E.ry+E.vy*14;E.by=Math.round(proj/180)*180;E.bx=0}
     if(Math.abs(vx)>.8)SFX.swoosh();E.last=performance.now()};
   deck.onpointerup=up;deck.onpointercancel=up;deck.onclick=e=>e.stopPropagation();
-  const close=()=>{z.remove();E.k=.07;E.f=.14;E.bx=E.by=0;if(prev&&prev.isConnected)activate(prev,prevKind);else deactivate()};
+  const close=()=>{z.remove();E.k=.07;E.f=.14;E.bx=E.by=0;if(prev&&prev.isConnected)activate(prev,prevKind);else deactivate();if(refreshDue)softRefresh()};
   z.onclick=close;
   const zi=z.querySelector('.zinfo');
   if(zi){zi.onclick=e=>e.stopPropagation();zi.onpointerdown=e=>e.stopPropagation();
@@ -3914,12 +3918,20 @@ const note=m=>{if(B.notify)B.notify(m);else{const t=document.createElement('div'
 function sendGrade(ins){if(!ins||ins.st!=='raw')return;const e=col[ins.id];if(!e||e.n<1)return;
   e.n--;ins.st='grading';ins.sent=Date.now();ins.due=Date.now()+GRADE_MS;save();
   try{SFX.slide()}catch(x){}note(`${CARD(ins.id).name} sent to STK \u2014 back in 1 minute`)}
+/* re-render binder/graded in the background without yanking the player around:
+   never while a card is zoomed, a slab is being opened or a craft is playing
+   (it waits for them to close), and it keeps the scroll position */
+let refreshDue=false;
+function softRefresh(){if(!root||!root.isConnected||(curView!=='graded'&&curView!=='binder'))return;
+  if(root.querySelector('.zoom,.rwov,.stkwrap')){refreshDue=true;return}
+  refreshDue=false;const st=stage(),y=st?st.scrollTop:0,ry=root.scrollTop;go(curView);
+  if(st)st.scrollTop=y;root.scrollTop=ry}
 function gradeTick(){if(!col||!col.inst)return;const now=Date.now(),back=[];
   col.inst.forEach(i=>{if(i.st==='grading'&&now>=i.due){i.st='back';i.grade=stkGrade(i);
     i.cert='STK '+String(10000000+(i.s%89999999)).slice(-8);back.push(i)}});
   if(back.length){save();back.forEach(i=>note(`${CARD(i.id).name} is back from STK grading \u2014 open it in Stack Cards`));
     try{SFX.ding(880);setTimeout(()=>SFX.ding(1320),120)}catch(x){}
-    if(root&&root.isConnected&&(curView==='graded'||curView==='binder'))go(curView)}
+    softRefresh()}
   if(root&&root.isConnected){
     root.querySelectorAll('.gtimer').forEach(el=>{const i=instBy(el.dataset.u);if(i&&i.due)el.textContent=fmtLeft(i.due)});
     const n=col.inst.filter(i=>i.st==='back').length,dot=root.querySelector('#tcgDot');
@@ -3994,7 +4006,7 @@ function graded(){const st=stage();deactivate();root.onkeydown=null;
   st.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{SFX.tick();openGraded(instBy(b.dataset.open))});
   st.querySelectorAll('[data-gf]').forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.gf.split(':');GF[k]=v;SFX.tick();graded()});
   st.querySelectorAll('.smini').forEach(m=>{const t=m.querySelector('.tilt');light(t,.5,.35,.6);
-    m.onpointerenter=()=>activate(t,'card');m.onclick=()=>zoom(null,{slab:instBy(m.dataset.u)})})}
+    m.onpointerenter=()=>{if(!root.querySelector('.zoom'))activate(t,'card')};m.onclick=()=>zoom(null,{slab:instBy(m.dataset.u)})})}
 
 /* Opening the mailer: drag across the seal, the lid lifts away, light spills
    out and the slab rises - then the grade is unveiled. */
