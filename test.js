@@ -387,7 +387,7 @@ async function cards(ctx, errs) {
 
   // every card carries its set number
   const nums = await pg.evaluate(`(()=>{StackCards.go('binder');
-    const all=[...StackCards.root.querySelectorAll('#tcg .grid .cno')].map(e=>e.textContent);
+    const all=[...StackCards.root.querySelectorAll('#tcg .grid .mini:not(.dialock):not(.diaslot) .cno')].map(e=>e.textContent);
     return [all.length, all[0], all[all.length-1], StackCards.SET.length]})()`);
   (nums[0] === nums[3] && nums[1] === '001/127' && nums[2] === '127/127')
     ? pass('every card is numbered', nums[1] + ' .. ' + nums[2]) : fail('every card is numbered', JSON.stringify(nums));

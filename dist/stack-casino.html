@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.22.8">
+<meta name="stack-version" content="2026.09.22.10">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2462,10 +2462,20 @@ window.StackBridge={
 #tcg .front.v-dia{box-shadow:0 0 0 1px rgba(160,225,255,.5),0 0 18px rgba(80,170,255,.35),0 18px 32px rgba(0,0,0,.55)}
 #tcg .grid .dialock{cursor:default}
 #tcg .grid .dialock .tilt{filter:blur(1.6px) brightness(.5) saturate(.7)}
-#tcg .dialk{position:absolute;inset:0;z-index:5;display:grid;place-content:center;justify-items:center;gap:3px;text-align:center;padding:6px;pointer-events:none}
-#tcg .dialk b{font-size:13px;font-weight:900;letter-spacing:.14em;padding:3px 9px;border-radius:99px;background:linear-gradient(135deg,#f2fbff,#6cc4ff 50%,#1f6fd6);color:#04203f;box-shadow:0 0 14px rgba(108,196,255,.6)}
-#tcg .dialk small{font-size:10.5px;font-weight:800;color:#dff3ff;text-shadow:0 1px 4px #000}
-#tcg .dialk em{font-style:normal;font-size:10px;font-weight:700;color:#9fdcff;text-shadow:0 1px 4px #000}
+#tcg .dialk{position:absolute;inset:0;z-index:5;display:grid;place-items:center;pointer-events:none}
+#tcg .dplate{width:84%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 6px 9px;border-radius:9px;
+ background:linear-gradient(180deg,rgba(14,34,56,.78),rgba(6,16,30,.82));border:1px solid rgba(160,220,255,.4);
+ box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 18px rgba(108,196,255,.28),inset 0 1px 0 rgba(255,255,255,.12)}
+#tcg .dgem{width:34px;height:27px;margin-bottom:6px;overflow:visible;filter:drop-shadow(0 0 6px rgba(108,196,255,.75))}
+#tcg .dgem .dgsh{opacity:0;animation:dgshine 3.2s ease-in-out infinite}
+@keyframes dgshine{0%,78%,100%{opacity:0}86%{opacity:.55}}
+#tcg .dplate b{display:block;white-space:nowrap;font-size:12.5px;font-weight:900;letter-spacing:.22em;padding-left:.22em;line-height:1;
+ background:linear-gradient(180deg,#ffffff,#bfe9ff 55%,#6cc4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#tcg .dplate i{display:block;width:60%;height:1px;margin:7px 0 6px;background:linear-gradient(90deg,transparent,rgba(160,220,255,.8),transparent)}
+#tcg .dplate small{display:block;white-space:nowrap;font-size:9.5px;font-weight:800;letter-spacing:.04em;color:#dff3ff}
+#tcg .dplate em{display:inline-block;margin-top:7px;font-style:normal;white-space:nowrap;font-size:10px;font-weight:900;letter-spacing:.06em;
+ padding:2px 9px;border-radius:99px;color:#04203f;background:linear-gradient(135deg,#f2fbff,#8fd3ff 55%,#3d9cf0)}
+#tcg .dplate span{display:block;margin-top:4px;white-space:nowrap;font-size:8.5px;font-weight:700;color:#9fc9e6}
 #tcg .grid .diaslot{box-shadow:0 0 18px rgba(108,196,255,.45);border-radius:6px}
 /* at tile size the glow merges the stones into one sheet - keep them crisp */
 #tcg .mini .dstones,#tcg .ttile .dstones,#tcg .tuslot .dstones{filter:none;animation:none}
@@ -4253,12 +4263,15 @@ function craftReveal(o){const L=LINES.find(l=>l.key===o.line);
 /* The Light Blue Diamond Infernax sits in the binder right after the Mono Rare it's
    rolled from. Not pulled yet: a frosted, dimmed preview with the odds, so you know
    what you're chasing. Pulled: your best copy (raw first, then a slab). */
+const DGEM='<svg class="dgem" viewBox="0 0 40 32"><defs><linearGradient id="dg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4fcff"/><stop offset="1" stop-color="#8fd3ff"/></linearGradient><linearGradient id="dg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cc4ff"/><stop offset="1" stop-color="#1f6fd6"/></linearGradient></defs>'
+  +'<path d="M8 2h24l8 9-20 21L0 11z" fill="url(#dg2)"/><path d="M8 2h24l8 9H0z" fill="url(#dg1)"/><path d="M13 11 20 2l7 9z" fill="#fff" opacity=".7"/>'
+  +'<path d="M0 11h40M8 2l5 9 7-9 7 9 5-9M13 11l7 21 7-21" fill="none" stroke="#e8f7ff" stroke-width=".9" stroke-linejoin="round" opacity=".8"/><path class="dgsh" d="M8 2h24l8 9-20 21L0 11z" fill="#fff"/></svg>';
 function diaSlot(){const c=SET[DIA_ID],own=col.inst.filter(i=>i.id===DIA_ID&&i.v==='dia');
   if(own.length){const raw=own.filter(i=>i.st==='raw').sort((a,b)=>condScore(b.cd)-condScore(a.cd)),i=raw[0]||own[0];
     return `<div class="mini diaslot" data-id="${c.id}" data-f="0" data-n="${c.no}" data-u="${i.u}">${cardEl(c,false,false,i,1)}${vtag(i)}
       ${own.length>1?`<span class="qty">\u00d7${own.length}</span>`:''}${i.st==='slab'?`<span class="qty s">STK ${i.grade}</span>`:''}</div>`}
   const ghost={u:'diaprev',s:1234567,v:'dia',cd:{ctr:50,dir:1,co:10,ed:10,su:10},st:'raw'};
-  return `<div class="mini dialock">${cardEl(c,false,false,ghost,1)}<div class="dialk"><b>\u25c6 DIAMOND</b><small>Light Blue Diamond Edition</small><em>1 in ${Math.round(1/V_DIA)} Infernax Mono Rares</em></div></div>`}
+  return `<div class="mini dialock">${cardEl(c,false,false,ghost,1)}<div class="dialk"><div class="dplate">${DGEM}<b>DIAMOND</b><i></i><small>Light Blue Edition</small><em>1 in ${Math.round(1/V_DIA)}</em><span>Infernax Mono Rares</span></div></div></div>`}
 /* the slot that closes out each line in the binder */
 function obsSlot(L){const o=OBS.find(x=>x.line===L.key),e=col[o.id];
   if(e&&(e.n||e.f))return `<div class="mini obsown" data-id="${o.id}" data-f="0" data-n="${o.no}" data-u="">${cardEl(o,false,false,null,1)}${e.n>1?`<span class="qty">\u00d7${e.n}</span>`:''}</div>`;

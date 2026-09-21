@@ -363,6 +363,7 @@ Two patterns, don't mix them up:
 - **2026-09-22** — Light Blue Diamond Edition: Alex's mate noticed the white edge-wear chips on a PSA 6 Infernax looked cool; re-cut them as blue stones (same chip sizes) across the whole face, art hue-rotated to light blue. Infernax Mono Rare only, by request, at 1 in 10 of its pulls - 1/100 was dropped because there are only 2 Mono Rares in the set, which would make it ~1 in 6700 packs.
 - **2026-09-22** — Store + booster box: pure CSS 3D (no WebGL/three.js) so it stays one file and the card art reuses the same cached <img>s; lid hinges from the back and its underside is the display header, like a real Pokemon display box. Packs lean back 16deg from their base and the open camera looks down 54deg - at 40deg you only saw crimps. A box pack is removed only when torn, not when picked. PC only from now on per Alex.
 - **2026-09-22** — Diamond Infernax gets a permanent binder slot after the Mono Rare (frosted preview + odds until pulled). Bug: the stone layer was class .dia, which collided with 'vtag dia', 'zvar dia' and 'varpop dia' - the tag/banner/pop inherited position:absolute;inset:0 and covered the whole card. Renamed the layer .dstones.
+- **2026-09-22** — Diamond binder slot redesigned as a frosted plaque: faceted gem icon, DIAMOND on one line with letter-spacing compensated (padding-left = letter-spacing) so it measures dead centre, divider, odds pill. Old pill wrapped the diamond glyph onto its own line.
 
 ---
 
