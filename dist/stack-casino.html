@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.20.27">
+<meta name="stack-version" content="2026.09.21.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -184,6 +184,8 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
 .modal.show{display:grid}
 .modal .box{background:var(--panel);border-radius:12px;padding:22px;width:min(92vw,380px);display:flex;flex-direction:column;gap:12px}
 .modal h3{font-size:20px}
+.hnote{font-size:11px;color:var(--mute);font-weight:600;margin-top:2px;max-width:280px;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gate{position:fixed;inset:0;background:linear-gradient(160deg,#0b1a24,#0f212e 55%,#0b1a24);display:none;place-items:center;z-index:200;padding:20px;overflow:auto}
 .gate.show{display:grid}
 .authbox{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 22px;width:min(94vw,400px);display:flex;flex-direction:column;gap:11px;box-shadow:0 30px 80px rgba(0,0,0,.55)}
@@ -2122,8 +2124,8 @@ const $=id=>document.getElementById(id);
 function renderBal(bump){const e=$('bal');e.querySelector('span').textContent=fmt(P().bal);if(bump){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}$('pname').textContent=P().name;$('av').textContent=P().name[0].toUpperCase();$('av').style.background=P().color;{const pp=P();ensureCos(pp);$('av').className='avatar avx fr-'+pp.frame;$('av').style.setProperty('--c',pp.color);$('av').style.setProperty('--sz','24px')}renderBoard();if(typeof sendProfSoon==='function'&&NET.status!=='off')sendProfSoon()}
 function take(bet){bet=Math.round(bet*100)/100;if(!(bet>0)){flash('Enter a bet above 0');return false}if(bet>P().bal+1e-9){flash('Not enough credits. Hit Top up.');return false}P().bal=Math.round((P().bal-bet)*100)/100;P().bets++;P().wagered=Math.round(((P().wagered||0)+bet)*100)/100;renderBal();save();return true}
 function pay(amt){if(amt<=0)return;P().bal=Math.round((P().bal+amt)*100)/100;P().won=Math.round(((P().won||0)+amt)*100)/100;renderBal(true);save()}
-function log(game,bet,mult,payout){const p=P();if(payout-bet>p.big)p.big=Math.round((payout-bet)*100)/100;S.hist.unshift({game,pl:p.name,c:p.color,bet,mult,payout});S.hist=S.hist.slice(0,20);renderHist();save()}
-function renderHist(){$('hist').innerHTML=S.hist.map(h=>`<tr><td>${h.game}</td><td><span style="color:${h.c}">●</span> ${h.pl}</td><td class="hide-m">${fmt(h.bet)}</td><td class="${h.mult>=1?'w':'l'}">${h.mult.toFixed(2)}×</td><td class="${h.payout>h.bet?'w':'l'}">${h.payout>0?'+':''}${fmt(h.payout)}</td></tr>`).join('')||'<tr><td colspan="5" class="l">No bets yet. Pick a game to start.</td></tr>'}
+function log(game,bet,mult,payout,note){const p=P();if(payout-bet>p.big)p.big=Math.round((payout-bet)*100)/100;S.hist.unshift({game,note:note||'',pl:p.name,c:p.color,bet,mult,payout});S.hist=S.hist.slice(0,20);renderHist();save()}
+function renderHist(){$('hist').innerHTML=S.hist.map(h=>`<tr><td>${h.game}${h.note?`<div class="hnote">${esc(h.note)}</div>`:''}</td><td><span style="color:${h.c}">●</span> ${h.pl}</td><td class="hide-m">${fmt(h.bet)}</td><td class="${h.mult>=1?'w':'l'}">${h.mult.toFixed(2)}×</td><td class="${h.payout>h.bet?'w':'l'}">${h.payout>0?'+':''}${fmt(h.payout)}</td></tr>`).join('')||'<tr><td colspan="5" class="l">No bets yet. Pick a game to start.</td></tr>'}
 function renderBoard(){const rows=(loggedIn()?[P()]:[]).concat(typeof NET!=='undefined'&&NET.remote?[NET.remote]:[]);
  if(!rows.length){$('board').innerHTML='<tr><td colspan="4" class="l">Log in to start stacking.</td></tr>';return}
  $('board').innerHTML=rows.sort((a,b)=>b.bal-a.bal).map((p,i)=>`<tr><td><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${avHTML(p,24)}${plateHTML(p)}${badgeHTML(p.bal)}</div></td><td>${fmt(p.bal)}</td><td class="hide-m w">${fmt(p.big||0)}</td><td>${p.bets||0}</td></tr>`).join('')}
@@ -3066,15 +3068,16 @@ function coOnSettle(yes){
  CO.bet=null;
  const won=(b.side==='yes')===yes;
  if(won){const pay_=Math.round(b.stake*b.mult*100)/100;
-  pay(pay_);log('Side bet',b.stake,b.mult,pay_);
+  pay(pay_);log('Side bet',b.stake,b.mult,pay_,`${b.side==='yes'?'Yes':'No'}: ${b.label}`);
   CO.res={win:1,txt:`Side bet won \u2014 +${fmt(pay_)}`};SND.win(b.mult);burst(36)}
- else{log('Side bet',b.stake,0,0);
+ else{log('Side bet',b.stake,0,0,`${b.side==='yes'?'Yes':'No'}: ${b.label}`);
   CO.res={win:0,txt:`Side bet lost \u2014 \u2212${fmt(b.stake)}`};SND.lose()}
  setTimeout(()=>{CO.res=null;coRender()},4200);
  coRender()}
 
 /* ---- render ---- */
-function coRender(){const el=$('coHud');if(!el)return;
+function coRender(){keepFocus(coRenderRaw)}
+function coRenderRaw(){const el=$('coHud');if(!el)return;
  if(!connected()||!loggedIn()){el.classList.remove('show');return}
  const rm=NET.remote||{name:'Friend',color:'#ffc800'};
  el.classList.add('show');el.classList.toggle('min',CO.min);
@@ -3129,7 +3132,7 @@ function coSbHTML(rm){const o=CO.offer,q=o.q;
  return `<div class="cosb">
   <div class="q">${esc(rm.name)} \u2014 ${esc(o.label)}?</div>
   ${o.info?`<div class="i">${esc(o.info)}</div>`:''}
-  <input id="coStake" type="number" min="0.1" step="1" value="${keepVal('coStake',10)}" inputmode="decimal">
+  <input id="coStake" type="text" autocomplete="off" min="0.1" step="1" value="${keepVal('coStake',10)}" inputmode="decimal">
   <div class="corow">
    <button class="cosbopt" id="coYes" ${py>=1.02?'':'disabled'}>
     <b>${py>=1.02?py.toFixed(2)+'\u00d7':'\u2014'}</b><span>YES \u00b7 ${(q*100).toFixed(0)}%</span></button>
@@ -3545,6 +3548,21 @@ function fnNewFight(keep){
 function fnPrice(n){if(!FN.state)return;FN.prices=fnPrices(FN.state,n||FN.n)}
 
 
+/* Rebuild a chunk of UI without kicking the user out of the box they are
+   typing in. Live odds re-render the slip every few seconds; without this the
+   stake field would lose focus mid-number. */
+/* Stake boxes are type="text" + inputmode="decimal" on purpose: Chrome gives
+   number inputs no selection API, so after a live re-render the caret could
+   not be put back and the next digit landed at the START of the number. */
+function keepFocus(run){
+ const a=document.activeElement,id=a&&a.id;
+ let st=null,en=null;try{st=a.selectionStart;en=a.selectionEnd}catch(e){}
+ const v=id&&a.value;
+ run();
+ if(!id)return;const el=$(id);if(!el||el===a)return;
+ if(v!=null&&el.value!==v)el.value=v;
+ try{el.focus();if(st!=null&&el.setSelectionRange)el.setSelectionRange(st,en)}catch(e){}}
+
 /* ---- betting ---- */
 const fnLive=o=>o>=FN_MINODDS;
 const fnFmt=o=>o>=100?o.toFixed(0):o>=10?o.toFixed(1):o.toFixed(2);
@@ -3594,20 +3612,27 @@ function fnSlipRender(){const el=$('fnSlip');if(!el)return;
     <div class="pr">${fnFmt(x.o)}</div><button class="x" data-fr="${k}">\u00d7</button></div>`).join('')
    :'<div class="slipempty">Tap any odds to back a market.<br>Two or more ride together as an accumulator.</div>'}
   ${n?`<div><div class="lbl">Stake ${multi?'':'per bet'}</div>
-   <div class="betbox"><input id="fnStake" type="number" min="0.1" step="1" value="${stake}" inputmode="decimal">
+   <div class="betbox"><input id="fnStake" type="text" autocomplete="off" min="0.1" step="1" value="${stake}" inputmode="decimal">
    <button data-fmul=".5">\u00bd</button><button data-fmul="2">2\u00d7</button></div></div>
    ${multi?`<div class="slipsum"><span>Combined odds</span><b>${jp>0?fnFmt(fnOdds(jp)):'\u2014'}</b></div>`:''}
-   <div class="slipsum"><span>Total stake</span><b>${fmt(multi?stake:stake*n)}</b></div>
-   <div class="slipsum"><span>Potential return</span><b>${fmt(ret)}</b></div>
+   <div class="slipsum"><span>Total stake</span><b id="fnSumStake">${fmt(multi?stake:stake*n)}</b></div>
+   <div class="slipsum"><span>Potential return</span><b id="fnSumRet">${fmt(ret)}</b></div>
    <button class="go" id="fnPlace" ${multi&&jp<=0?'disabled':''}>${multi&&jp<=0?'Those cannot all land':'Place '+(multi?'accumulator':n>1?n+' bets':'bet')}</button>
    <button class="btn2" id="fnClear">Clear slip</button>`:''}`;
  el.querySelectorAll('[data-fm2]').forEach(b=>b.onclick=()=>{FN.mode=b.dataset.fm2;SND.click();fnUI()});
  el.querySelectorAll('[data-fr]').forEach(b=>b.onclick=()=>{FN.sel.splice(+b.dataset.fr,1);fnUI()});
  el.querySelectorAll('[data-fmul]').forEach(b=>b.onclick=()=>{const i=$('fnStake');
-  i.value=Math.max(.1,Math.round((parseFloat(i.value)||0)*parseFloat(b.dataset.fmul)*100)/100);SND.chip();fnSlipRender()});
- if($('fnStake'))$('fnStake').oninput=()=>fnSlipRender();
+  i.value=Math.max(.1,Math.round((parseFloat(i.value)||0)*parseFloat(b.dataset.fmul)*100)/100);SND.chip();fnSumUpdate()});
+ if($('fnStake'))$('fnStake').oninput=fnSumUpdate;
  if($('fnPlace'))$('fnPlace').onclick=fnPlaceBet;
  if($('fnClear'))$('fnClear').onclick=()=>{FN.sel=[];SND.click();fnUI()}}
+
+function fnSumUpdate(){
+ const n=FN.sel.length,multi=FN.mode==='acca'&&n>1;
+ const stake=Math.max(0,parseFloat($('fnStake').value)||0);
+ const ret=multi?stake*fnOdds(fnAccaP()):FN.sel.reduce((a,x)=>a+stake*x.o,0);
+ if($('fnSumStake'))$('fnSumStake').textContent=fmt(multi?stake:stake*n);
+ if($('fnSumRet'))$('fnSumRet').textContent=fmt(ret)}
 
 function fnPlaceBet(){
  const n=FN.sel.length;if(!n)return;
@@ -3624,6 +3649,8 @@ function fnPlaceBet(){
  FN.sel=[];SND.chip();toast('Bet placed');fnUI()}
 
 /* cash out at fair current value - same rule as the football book */
+const fnNote=b=>(b.keys.length>1?`${b.keys.length}-leg: `:'')+b.keys.map(fnLabel).join(' + ')
+ +(FN.state?` (${FN.state.a.f.s} v ${FN.state.b.f.s})`:'');
 function fnCashVal(b){if(b.state!=='open'||!FN.outs)return 0;
  return Math.round(b.stake*b.odds*fnJointP(b.keys)*100)/100}
 
@@ -3638,7 +3665,7 @@ function fnOpenRender(){const el=$('fnOpen');if(!el)return;
     <div class="l ${b.state==='won'?'won':b.state==='lost'?'lost':''}">
      ${b.state==='open'?`${fmt(b.stake)} to return ${fmt(b.stake*b.odds)}`
       :b.state==='won'?`WON \u2014 returned ${fmt(b.ret)}`
-      :b.state==='cashed'?`Cashed out for ${fmt(b.ret)}`
+      :b.state==='cashed'?`Cashed out for ${fmt(b.ret)} <b style="color:${b.ret>=b.stake?'var(--green2,#6dffa8)':'#ff7a8a'}">${b.ret>=b.stake?'+':'\u2212'}${fmt(Math.abs(b.ret-b.stake))}</b>`
       :`LOST \u2014 ${fmt(b.stake)}`}</div>
     ${b.state==='open'&&FN.phase!=='idle'&&cv>0?
       `<button data-fco="${b.id}" class="${d>=0?'up':'down'}">
@@ -3648,7 +3675,8 @@ function fnOpenRender(){const el=$('fnOpen');if(!el)return;
   const b=FN.open.find(x=>String(x.id)===String(btn.dataset.fco));if(!b||b.state!=='open')return;
   const v=fnCashVal(b);if(!(v>0))return;
   b.state='cashed';b.ret=v;pay(v);FN.profit+=v-b.stake;
-  log('Fight Night',b.stake,v/b.stake,v);SND.cash(v/b.stake);fnShare();fnUI()})}
+  log('Fight Night',b.stake,v/b.stake,v,'Cashed out \u00b7 '+fnNote(b));SND.cash(v/b.stake);
+  fnCashPop(v,b.stake);fnShare();fnUI()})}
 
 function fnSettle(){
  const r=FN.state&&FN.state.res;if(!r)return;
@@ -3657,10 +3685,10 @@ function fnSettle(){
   const won=b.keys.every(k=>FN_MK[k].f(r));
   if(won){const ret=Math.round(b.stake*b.odds*100)/100;
    b.state='won';b.ret=ret;pay(ret);FN.profit+=ret-b.stake;
-   log('Fight Night',b.stake,b.odds,ret);
+   log('Fight Night',b.stake,b.odds,ret,fnNote(b));
    SND.win(b.odds);if(b.odds>=10)bigWin(b.odds,ret);
    popShow($('fnPop'),fnFmt(b.odds)+'\u00d7','+'+fmt(ret))}
-  else{b.state='lost';b.ret=0;FN.profit-=b.stake;log('Fight Night',b.stake,0,0)}
+  else{b.state='lost';b.ret=0;FN.profit-=b.stake;log('Fight Night',b.stake,0,0,fnNote(b))}
  }
  fnShare()}
 
@@ -3695,7 +3723,7 @@ function fnUI(){
 
  $('fnInfo').textContent='Three rounds, priced off the fight engine itself \u2014 the odds come from running this exact simulation thousands of times, so they always match what you are watching. '+
   'Prices move every few seconds as damage lands. Cash out any time. Every bet returns 97%.';
- fnMkRender();fnSlipRender();fnOpenRender();fnLead()}
+ keepFocus(()=>{fnMkRender();fnSlipRender();fnOpenRender()});fnLead()}
 
 function fnShare(){if(FN.shared&&connected())send({t:'fnP',v:Math.round(FN.profit*100)/100})}
 function fnLead(){/* leaderboard lives in the sportsbook header; fights show it in the feed */}
@@ -3882,7 +3910,7 @@ function fbNewRound(keepSeed){
  FB.sel=[];FB.live=-1;FB.lastOdds={};
  fbRender()}
 
-function fbRender(){if(!$('fbCard'))return;fbCardRender();fbSlipRender();fbOpenRender();fbLeadRender();
+function fbRender(){if(!$('fbCard'))return;keepFocus(()=>{fbCardRender();fbSlipRender();fbOpenRender()});fbLeadRender();
  $('fbRound').textContent='ROUND '+FB.round;
  $('fbInfo').textContent='One match at a time. Back a market, build a single or an accumulator, then watch it play out \u2014 the next fixture comes up automatically. '+
   'Odds move live as goals go in, and you can cash out any open bet at its fair value. '+
@@ -3961,20 +3989,27 @@ function fbSlipRender(){const el=$('fbSlip');if(!el)return;
     <button class="x" data-rm="${k}">\u00d7</button></div>`).join('')
    :'<div class="slipempty">Tap any odds to add a selection.<br>Two or more ride together as an accumulator.</div>'}
   ${n?`<div><div class="lbl">Stake ${multi?'':'per bet'}</div>
-   <div class="betbox"><input id="fbStake" type="number" min="0.1" step="1" value="${stake}" inputmode="decimal">
+   <div class="betbox"><input id="fbStake" type="text" autocomplete="off" min="0.1" step="1" value="${stake}" inputmode="decimal">
    <button data-fm=".5">\u00bd</button><button data-fm="2">2\u00d7</button></div></div>
    ${multi&&n>1?`<div class="slipsum"><span>Combined odds</span><b>${fbFmtOdds(fbAccaO())}</b></div>`:''}
-   <div class="slipsum"><span>Total stake</span><b>${fmt(multi?stake:stake*n)}</b></div>
-   <div class="slipsum"><span>Potential return</span><b>${fmt(ret)}</b></div>
+   <div class="slipsum"><span>Total stake</span><b id="fbSumStake">${fmt(multi?stake:stake*n)}</b></div>
+   <div class="slipsum"><span>Potential return</span><b id="fbSumRet">${fmt(ret)}</b></div>
    <button class="go" id="fbPlace">Place ${multi&&n>1?'accumulator':n>1?n+' bets':'bet'}</button>
    <button class="btn2" id="fbClear">Clear slip</button>`:''}`;
  el.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{FB.mode=b.dataset.sm;SND.click();fbRender()});
  el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{FB.sel.splice(+b.dataset.rm,1);fbRender()});
  el.querySelectorAll('[data-fm]').forEach(b=>b.onclick=()=>{const i=$('fbStake');
-  i.value=Math.max(.1,Math.round((parseFloat(i.value)||0)*parseFloat(b.dataset.fm)*100)/100);SND.chip();fbSlipRender()});
- if($('fbStake'))$('fbStake').oninput=()=>fbSlipRender();
+  i.value=Math.max(.1,Math.round((parseFloat(i.value)||0)*parseFloat(b.dataset.fm)*100)/100);SND.chip();fbSumUpdate()});
+ if($('fbStake'))$('fbStake').oninput=fbSumUpdate;
  if($('fbPlace'))$('fbPlace').onclick=fbPlace;
  if($('fbClear'))$('fbClear').onclick=()=>{FB.sel=[];SND.click();fbRender()}}
+
+function fbSumUpdate(){
+ const n=FB.sel.length,multi=FB.mode==='acca';
+ const stake=Math.max(0,parseFloat($('fbStake').value)||0);
+ const ret=multi?stake*fbAccaO():FB.sel.reduce((a,x)=>a+stake*x.o,0);
+ if($('fbSumStake'))$('fbSumStake').textContent=fmt(multi?stake:stake*n);
+ if($('fbSumRet'))$('fbSumRet').textContent=fmt(ret)}
 
 function fbPlace(){
  const n=FB.sel.length;if(!n)return;
@@ -3994,6 +4029,16 @@ function fbPlace(){
 
 /* ---- open bets + cash out ---- */
 /* Fair value, no second margin: stake * price * P(it still wins). */
+/* Cashing out should FEEL like a result: show the profit (or loss) in
+   green/red right where you are looking, not just a line of grey text. */
+function cashPop(el,v,stake){if(!el)return;
+ const d=Math.round((v-stake)*100)/100;
+ popShow(el,(d>=0?'+':'\u2212')+fmt(Math.abs(d)),`Cashed out for ${fmt(v)}`,d<0);
+ if(d>0){SND.win(v/stake);burst(30)}}
+const fbCashPop=(v,s)=>cashPop($('fbPop'),v,s);
+const fnCashPop=(v,s)=>cashPop($('fnPop'),v,s);
+const fbNote=b=>b.acca?`${b.legs.length}-fold: `+b.legs.map(L=>L.label).join(' + ')
+ :`${b.legs[0].label} (${b.legs[0].match})`;
 function fbCashVal(b){
  if(b.state!=='open')return 0;
  const m=FB.card[0];if(!m)return 0;
@@ -4012,7 +4057,7 @@ function fbOpenRender(){const el=$('fbOpen');if(!el)return;
     <div class="l ${b.state==='won'?'won':b.state==='lost'?'lost':''}">
      ${b.state==='open'?`${fmt(b.stake)} to return ${fmt(b.stake*b.odds)}`
       :b.state==='won'?`WON \u2014 returned ${fmt(b.ret)}`
-      :b.state==='cashed'?`Cashed out for ${fmt(b.ret)}`
+      :b.state==='cashed'?`Cashed out for ${fmt(b.ret)} <b style="color:${b.ret>=b.stake?'var(--green2,#6dffa8)':'#ff7a8a'}">${b.ret>=b.stake?'+':'\u2212'}${fmt(Math.abs(b.ret-b.stake))}</b>`
       :`LOST \u2014 ${fmt(b.stake)}`}</div>
     ${b.state==='open'&&anyLive&&cv>0?(()=>{
       // show the cash-out offer against what it cost, so the decision is obvious
@@ -4025,8 +4070,8 @@ function fbOpenRender(){const el=$('fbOpen');if(!el)return;
 function fbCashOut(id){
  const b=FB.open.find(x=>String(x.id)===String(id));if(!b||b.state!=='open')return;
  const v=fbCashVal(b);if(!(v>0))return;
- b.state='cashed';b.ret=v;pay(v);FB.profit+=v-b.stake;
- log('Sportsbook',b.stake,v/b.stake,v);SND.cash(v/b.stake);
+ b.state='cashed';b.ret=v;pay(v);FB.profit+=v-b.stake;fbCashPop(v,b.stake);
+ log('Sportsbook',b.stake,v/b.stake,v,'Cashed out \u00b7 '+fbNote(b));SND.cash(v/b.stake);
  fbShareProfit();fbRender()}
 
 /* ---- settlement ---- */
@@ -4045,10 +4090,10 @@ function fbSettle(){
   if(b.state!=='open')continue;
   const res=b.legs.map(fbLegResult);
   if(res.some(r=>r===false)){b.state='lost';b.ret=0;FB.profit-=b.stake;
-   log('Sportsbook',b.stake,0,0);any=true;continue}
+   log('Sportsbook',b.stake,0,0,fbNote(b));any=true;continue}
   if(res.every(r=>r===true)){const ret=Math.round(b.stake*b.odds*100)/100;
    b.state='won';b.ret=ret;pay(ret);FB.profit+=ret-b.stake;
-   log('Sportsbook',b.stake,b.odds,ret);
+   log('Sportsbook',b.stake,b.odds,ret,fbNote(b));
    SND.win(b.odds);if(b.odds>=10)bigWin(b.odds,ret);else burst(50);
    popShow($('fbPop'),fbFmtOdds(b.odds)+'\u00d7','+'+fmt(ret));any=true}
  }

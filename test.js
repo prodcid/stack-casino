@@ -331,6 +331,34 @@ async function fight(ctx, errs) {
   (await pg.evaluate("!document.querySelector('#fnGuide.show')"))
     ? pass('boxing guide closes') : fail('boxing guide closes');
 
+  // Typing a stake must keep focus across every digit - the slip used to
+  // rebuild on each keystroke and throw you out of the box.
+  await pg.evaluate("FN.sel=[];FN.open=[];FN.phase='idle';fnPick('wa');fnUI()");
+  await pg.waitForTimeout(200);
+  await pg.click('#fnStake', { clickCount: 3 });
+  await pg.keyboard.type('4567', { delay: 60 });
+  const typed = await pg.evaluate("[ $('fnStake').value, document.activeElement && document.activeElement.id, $('fnSumStake').textContent ]");
+  (typed[0] === '4567' && typed[1] === 'fnStake' && typed[2].replace(/,/g,'') === '4567.00')
+    ? pass('stake box keeps focus while typing', 'typed 4567 in one go')
+    : fail('stake box keeps focus while typing', JSON.stringify(typed));
+
+  // and survives a live re-render mid-typing (odds tick while you type)
+  await pg.evaluate("fnUI()");
+  await pg.keyboard.type('8');
+  const kept = await pg.evaluate("[ $('fnStake').value, document.activeElement && document.activeElement.id ]");
+  (kept[0] === '45678' && kept[1] === 'fnStake')
+    ? pass('focus survives a live odds refresh') : fail('focus survives a live odds refresh', JSON.stringify(kept));
+
+  // history must say WHICH bet paid
+  await pg.evaluate("FN.sel=[];fnUI()");
+  const note = await pg.evaluate(`(()=>{
+    FN.open=[{id:9,keys:['wa'],label:'x',stake:10,odds:2,state:'open'}];
+    FN.state.over=true;FN.state.res={win:'a',ko:true,rd:1};
+    fnSettle();
+    return S.hist[0].note||'';
+  })()`);
+  note.includes(' wins') ? pass('history names the winning bet', note) : fail('history names the winning bet', note);
+
   errs.length === n0 ? pass('no fight console errors') : fail('no fight console errors', errs.slice(n0).join(' | '));
   await pg.close();
 }

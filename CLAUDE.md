@@ -288,6 +288,8 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Stoppage rate raised from ~15% to ~35% after Alex reported knockouts basically never happen. A realistic 3-rounder does mostly go to the cards, but this is a 60-second thing you watch and a market has to actually land sometimes. Stoppages now spread evenly enough that round 1 and 2 are live bets.
 - **2026-09-20** — Renamed the boxing markets out of bookmaker jargon: 'ends inside'/'goes the distance' became 'Ends early'/'Goes all 3 rounds', and every market heading now carries a one-line explanation. Alex had to ask what the distance meant, which means the UI was wrong, not him.
 - **2026-09-20** — Fight Night had its guide button wired to the FOOTBALL guide, which explains 1X2 and over/under goals and nothing about boxing. Written a proper boxing guide covering the distance, knockdown vs stoppage vs decision, and why stoppage-round bets lose when it goes the full 3.
+- **2026-09-21** — Stake boxes lost focus on every digit: oninput called the full slip render, which rebuilt the input being typed into. oninput now only rewrites the stake-dependent numbers, and live re-renders go through keepFocus() which restores focus and caret. Stake boxes switched to type=text + inputmode=decimal because Chrome gives number inputs no selection API, so the caret jumped to the start after a rebuild.
+- **2026-09-21** — log() takes an optional note; sportsbook, fight and side bets pass the actual market so the history table says which bet paid. Cash outs pop the profit in green (or loss in red) and the settled row shows it too.
 
 ---
 
