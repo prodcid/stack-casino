@@ -178,6 +178,14 @@ automatically; `devkit check` fails if they drift).
 - **Host contract** `window.StackBridge`: `getBalance / spend / load / save / onBalance /
   notify / party / send / me / onGrading`. Cards save to the **account** (`P().cards`), so every
   login has its own binder; `tcgReload()` runs on login, logout and admin log-in-as.
+- **Obsidian Edition.** A black, face-hidden slot closes each evo line in the binder
+  (`x / y till you can craft`). Owning the whole line (slabbed counts) unlocks Craft; crafting
+  does NOT consume the line and is once per line (`col.rew[line]`). OBS ids are 1000+ and live
+  outside `SET` (base set stays 127) — always look cards up with `CARD(id)`. Obsidian is not
+  `HI`: no condition, wear or grading, and has no graded-filter chip. It trades like a holo.
+- **Graded filters** (`GF`): rarity chips, grade-band chips, rows by grade or by rarity.
+- **Art placement.** Generic FA/SIR creature offsets in `PLACE` are DERIVED from the centred
+  window pose — don't hand-type x values (that's how they ended up off-centre).
 - **Copies.** Commons/holos are counts (`col[id] = {n, f}`). Full Art and above are individual
   copies in `col.inst` — `{u, id, s, cd:{ctr,dir,co,ed,su}, st, due, grade, cert}` with
   `st` = `raw | grading | back | slab`. Invariant: `col[id].n` = that card's `raw` copies.
@@ -325,6 +333,8 @@ Two patterns, don't mix them up:
 - **2026-09-21** — Card wear is an SVG drawn from each copy's seed, so a copy always looks the same. Every Full Art+ tier has a silver or gold border, where white edge-whitening vanished - wear now mixes dark scuffing with white chips so it reads on metal. Scratches sit on a separate glint layer masked to the light position, so they only flash as you tilt the card.
 - **2026-09-21** — Trades escrow the sender's side on send, so it can't be graded or offered twice while pending; declined, cancelled, disconnected or reloaded offers hand it back. The receiver commits first, then the sender. If the accept message is lost after the receiver commits, the sender gets their escrow back and the traded cards exist twice - accepted for a two-person game with no server.
 - **2026-09-21** — Slab reveal: the STK GRADE call-out sat on top of the slab and covered the label. Moved it under the slab as a single line above the buttons.
+- **2026-09-21** — Obsidian Edition: crafted, not pulled. A black face-hidden slot closes each evo line in the binder (x / y till you can craft); crafting needs every card in the line (graded/at-grading counts) and does NOT consume them. Obsidian ids 1000+ live in OBS outside SET so the base set stays 127; resolve via CARD(id). Not HI: no condition, wear or grading. stripSky knocks out the art's sky plate so an animated .obs-bg shows behind it.
+- **2026-09-21** — Graded view filters: rarity chips, grade-band chips, rows by grade or rarity (Obsidian excluded - never graded). minis() guard: card-less binder slots used to throw and leave later tiles unclickable. Off-centre FA/SIR generic creatures: hand-typed PLACE x offsets were wrong, now derived from the centred window placement; dragon poses lean by design.
 
 ---
 

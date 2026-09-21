@@ -453,6 +453,60 @@ async function cards(ctx, errs) {
     const n=h=>(h.match(/<(circle|ellipse|path|rect)/g)||[]).length;return [n(X.wearHTML(a,0)),n(X.wearHTML(b,0))]})()`);
   (wear[1] > wear[0] * 4) ? pass('wear scales with condition', wear[0] + ' marks vs ' + wear[1]) : fail('wear scales with condition', JSON.stringify(wear));
 
+  // OBSIDIAN: a black slot closes every line; complete the line and you can craft it
+  const ob = await pg.evaluate(`(()=>{const X=StackCards._,c=X.col;
+    const own=k=>X.lineOf(k).forEach(x=>{if(X.HI(x.t))c.inst.push(X.newInst(x.id));c[x.id]=c[x.id]||{n:0,f:0};c[x.id].n++});
+    own('owl');X.lineOf('hare').slice(0,2).forEach(x=>{c[x.id]={n:1,f:0}});
+    StackCards.go('binder');
+    const r=StackCards.root,locks=r.querySelectorAll('.grid .obslock').length,ready=r.querySelectorAll('.grid .obslock.ready').length;
+    const hareSlot=[...r.querySelectorAll('.grid .obslock em')].map(e=>e.textContent).find(t=>t.startsWith('2 /'));
+    const shows=r.querySelector('.grid .obslock .tilt');           // the design must stay hidden
+    const first=X.craft('owl'),again=X.craft('owl');
+    const o=X.OBS.find(x=>x.line==='owl');
+    return {locks,ready,hareSlot,hidden:!shows,first,again,have:c[o.id]&&c[o.id].n,gradeable:X.HI('obs'),num:X.numOf(o)}})()`);
+  (ob.locks === 25 && ob.ready === 1 && ob.hareSlot === '2 / 5' && ob.hidden)
+    ? pass('each line ends in a hidden Obsidian slot', 'hare shows ' + ob.hareSlot) : fail('each line ends in a hidden Obsidian slot', JSON.stringify(ob));
+  (ob.first === true && ob.again === false && ob.have === 1)
+    ? pass('a finished line crafts its Obsidian once', ob.num) : fail('a finished line crafts its Obsidian once', JSON.stringify(ob));
+  !ob.gradeable ? pass('Obsidian is not part of grading') : fail('Obsidian is not part of grading');
+  await pg.waitForTimeout(1800);
+  await pg.evaluate("(()=>{const b=StackCards.root.querySelector('#rwOk');b&&b.click()})()");
+  await pg.waitForTimeout(600);
+
+  // its sky is knocked out so the animated backdrop shows behind the creature
+  const sky = await pg.evaluate(`(()=>{const X=StackCards._,o=X.OBS[0],raw=X.artSrc(o.art),st=X.stripSky(raw);
+    const n=h=>(h.match(/<rect width="200" height="280"/g)||[]).length;
+    const el=StackCards.root.querySelector('.grid .obsown .ob1');
+    return [n(raw),n(st),el?getComputedStyle(el).animationName:'']})()`);
+  (sky[1] < sky[0] && sky[2] === 'obspin') ? pass('Obsidian sky is live and animated', sky[0] + ' -> ' + sky[1] + ' backdrop rects')
+    : fail('Obsidian sky is live and animated', JSON.stringify(sky));
+
+  // every binder card stays clickable - a card-less slot used to crash the wiring
+  const clickable = await pg.evaluate(`(()=>{StackCards.go('binder');const m=[...StackCards.root.querySelectorAll('.grid .mini:not(.miss)')];
+    return [m.length, m.filter(x=>typeof x.onclick==='function').length]})()`);
+  (clickable[0] > 0 && clickable[0] === clickable[1]) ? pass('every owned card is clickable', clickable[1] + ' tiles')
+    : fail('every owned card is clickable', JSON.stringify(clickable));
+
+  // graded filters: a row of chips per filter, slabs grouped into labelled rows
+  const gf = await pg.evaluate(`(()=>{const X=StackCards._,SET=StackCards.SET,c=X.col;
+    const hi=SET.filter(x=>X.HI(x.t));[10,10,9,8.5,7].forEach((g,k)=>{const i=X.newInst(hi[k*5].id);i.st='slab';i.grade=g;i.cert='STK 2000000'+k;c.inst.push(i)});
+    X.GF.rar='all';X.GF.gr='all';X.GF.by='grade';StackCards.go('graded');
+    const r=StackCards.root,chipRows=r.querySelectorAll('.gfbar .gfg').length,rows=[...r.querySelectorAll('.grow h5')].map(h=>h.firstChild.textContent.trim());
+    X.GF.gr='10';StackCards.go('graded');const tens=r.querySelectorAll('.grow .smini').length;
+    X.GF.gr='all';X.GF.by='rarity';StackCards.go('graded');const rrows=r.querySelectorAll('.grow').length;
+    X.GF.by='grade';return {chipRows,rows,tens,rrows,obsChip:!!r.querySelector('[data-gf="rar:obs"]')}})()`);
+  (gf.chipRows === 3 && gf.rows[0] && gf.rows[0].startsWith('GEM MT') && gf.tens >= 2 && gf.rrows >= 1 && !gf.obsChip)
+    ? pass('graded filters sort slabs into rows', gf.rows.join(' / ')) : fail('graded filters sort slabs into rows', JSON.stringify(gf));
+
+  // generic creatures are centred: derived placement, not hand-typed offsets
+  const ctr = await pg.evaluate(`(()=>{const X=StackCards._;
+    return ['golemFA','knightSIR','slimeFA','koiFA'].map(k=>{const m=X.artSrc(k).match(/<g transform="translate\\(([-0-9.]+) [-0-9.]+\\) scale\\(([0-9.]+)\\)">/);return m?[k,+m[1],+m[2]]:[k,null]})})()`);
+  // centre of a biped/blob is 60 local units, a fish 62.86: x + c*s must be ~100
+  const cOf = k => /koi/.test(k) ? 62.857 : 60;
+  const off = ctr.map(([k, x, sc]) => x == null ? 999 : Math.abs(x + cOf(k) * sc - 100));
+  Math.max(...off) < 0.2 ? pass('generic creatures are centred', ctr.map(r => r[0] + '@' + r[1]).join(' '))
+    : fail('generic creatures are centred', JSON.stringify(ctr));
+
   errs.length === n0 ? pass('no stack cards console errors') : fail('no stack cards console errors', errs.slice(n0).join(' | '));
   await pg.close();
 }

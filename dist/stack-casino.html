@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.21.4">
+<meta name="stack-version" content="2026.09.21.6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2391,6 +2391,66 @@ window.StackBridge={
 #tcg .tofr-act{display:flex;gap:8px;justify-content:flex-end}
 @media(max-width:760px){#tcg .tcols{grid-template-columns:1fr}#tcg .tgrid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}}
 
+/* ============ OBSIDIAN EDITION ============ */
+#tcg .front.obs{background:linear-gradient(150deg,#1d1d23 0%,#060608 28%,#111116 52%,#010102 78%,#18181e 100%);
+ box-shadow:0 18px 32px rgba(0,0,0,.7),inset 0 0 0 .5cqi rgba(255,255,255,.08),inset 0 .5cqi 1cqi rgba(255,255,255,.1)}
+#tcg .obs .full{inset:3.2% 4.2%;border-radius:1.8%/1.3%;overflow:hidden;z-index:2}
+#tcg .obs .full::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ box-shadow:inset 0 0 0 .45cqi rgba(255,255,255,.32),inset 0 0 0 .85cqi rgba(0,0,0,.55)}
+#tcg .obs-bg{position:absolute;inset:3.2% 4.2%;border-radius:1.8%/1.3%;overflow:hidden;background:#05040c;z-index:1;transform:translateX(var(--ctrx,0))}
+#tcg .obs-bg i{position:absolute;display:block}
+#tcg .obs-bg .ob1{inset:-60%;opacity:.9;filter:blur(8cqi) saturate(1.5);animation:obspin 16s linear infinite;
+ background:conic-gradient(from 0deg,hsl(var(--h) 95% 55%),hsl(calc(var(--h) + 70) 95% 62%),hsl(calc(var(--h) - 50) 90% 38%),hsl(calc(var(--h) + 150) 90% 60%),hsl(var(--h) 95% 55%))}
+#tcg .obs-bg .ob2{inset:0;opacity:.85;animation:obstars 10s linear infinite;
+ background-image:radial-gradient(circle,#fff 0 .35cqi,transparent .5cqi),radial-gradient(circle,rgba(255,255,255,.75) 0 .22cqi,transparent .35cqi);
+ background-size:13cqi 13cqi,7cqi 9cqi;background-position:0 0,3cqi 5cqi}
+#tcg .obs-bg .ob3{inset:-20%;mix-blend-mode:screen;animation:obwave 6s linear infinite;
+ background:repeating-linear-gradient(115deg,transparent 0 6cqi,hsla(var(--h),100%,78%,.2) 6cqi 7cqi,transparent 7cqi 14cqi)}
+@keyframes obspin{to{transform:rotate(360deg)}}
+@keyframes obstars{to{background-position:13cqi 26cqi,-4cqi 23cqi}}
+@keyframes obwave{to{transform:translateX(14cqi)}}
+#tcg .obsfoil{position:absolute;inset:0;z-index:3;pointer-events:none;mix-blend-mode:screen;
+ background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.18) var(--pos,50%),transparent 70%)}
+#tcg .front .obs-bg{transform:translateX(var(--ctrx,0))}
+/* the hidden slot: pure black, no hint of the art until it's crafted */
+#tcg .grid .obslock{cursor:default;border-radius:5px;display:grid;place-items:center;
+ background:linear-gradient(150deg,#141418 0%,#030304 38%,#0b0b0e 62%,#000 100%);
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),0 8px 18px rgba(0,0,0,.5)}
+#tcg .grid .obslock::after{content:none}
+#tcg .grid .obslock.ready{cursor:pointer;animation:obready 1.6s ease-in-out infinite alternate;
+ box-shadow:inset 0 0 0 1px rgba(0,231,1,.6),0 0 22px rgba(0,231,1,.35)}
+@keyframes obready{to{box-shadow:inset 0 0 0 1px rgba(0,231,1,.9),0 0 34px rgba(0,231,1,.6)}}
+#tcg .oblk em{display:block;font-style:normal;font-size:20px;font-weight:900;color:#fff;margin:4px 0 0;font-variant-numeric:tabular-nums}
+#tcg .obcraft{display:inline-block;margin:6px 0 2px;background:#00e701;color:#05250a;border-radius:7px;padding:5px 12px;font-weight:900;font-size:12px}
+#tcg .slot.forge .tilt{filter:brightness(1.6) saturate(1.4);animation:forge .5s ease-in-out infinite alternate}
+@keyframes forge{from{transform:scale(.97)}to{transform:scale(1.02)}}
+#tcg .oblk{text-align:center;padding:8px;width:100%}
+#tcg .oblk b{display:block;font-size:12px;font-weight:900;color:#e2e2ea;margin:3px 0}
+#tcg .oblk small{display:block;font-size:10px;color:var(--mute);font-weight:800;letter-spacing:.04em}
+#tcg .obtrk{display:block;height:4px;border-radius:99px;background:rgba(255,255,255,.1);margin:7px auto 0;width:80%;overflow:hidden}
+#tcg .obtrk i{display:block;height:100%;background:linear-gradient(90deg,#00e701,#b8ffb8)}
+#tcg .rwov{position:absolute;inset:0;z-index:96;display:flex;align-items:center;justify-content:center;perspective:1200px;overflow:hidden;
+ background:radial-gradient(circle at 50% 45%,rgba(22,22,30,.94),rgba(0,0,0,.98));animation:rwin .5s}
+@keyframes rwin{from{opacity:0}}
+#tcg .rw-rays{position:absolute;inset:-40%;pointer-events:none;animation:obspin 34s linear infinite;
+ background:repeating-conic-gradient(from 0deg,hsla(var(--h),90%,60%,.14) 0 6deg,transparent 6deg 18deg)}
+#tcg .rw-head{position:absolute;top:80px;left:0;right:0;text-align:center;padding:0 12px}
+#tcg .rw-head small{display:block;font-size:12px;font-weight:900;letter-spacing:.22em;color:hsl(var(--h) 90% 70%);margin-bottom:4px}
+#tcg .rw-head b{font-size:clamp(15px,2.2vw,20px);font-weight:900}
+#tcg .rwdeck{--cw:min(60vw,280px)}
+#tcg .rw-foot{position:absolute;bottom:96px;left:0;right:0;text-align:center}
+#tcg .rw-foot b{display:block;font-size:20px;font-weight:900}
+#tcg .rw-foot small{color:var(--mute);font-weight:700}
+/* ============ GRADED FILTERS ============ */
+#tcg .gfbar{max-width:980px;margin:0 auto 6px;display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+#tcg .gfg{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#tcg .gfg>span{width:62px;flex:none;font-size:10.5px;font-weight:900;letter-spacing:.1em;color:var(--mute)}
+#tcg .gchip{background:var(--bg);border:1px solid var(--line)!important;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800;color:var(--mute)}
+#tcg .gchip.on{background:var(--panel2);color:#fff;border-color:var(--green)!important}
+#tcg .grow{max-width:980px;margin:18px auto 0}
+#tcg .grow h5{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;letter-spacing:.04em;margin:0 0 12px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+#tcg .grow h5 small{background:var(--panel2);border-radius:99px;padding:1px 8px;font-size:11px;color:var(--mute)}
+
 /*<</STACK-CARDS-CSS>>*/
 /* embedded: fill the host box instead of the whole viewport */
 #tcg{min-height:0!important;height:100%!important}
@@ -2451,7 +2511,7 @@ const SET=[];LINES.forEach(L=>{
 SET.forEach((c,i)=>{c.id=i;c.no=String(i+1).padStart(3,'0')});
 const byT=t=>SET.filter(c=>c.t===t);
 const ODDS={fa:.18,sir:.09,bwr:.03};
-const TNAME={c:'Common',h:'Holo Rare',fa:'Full Art',sir:'Special Illustration Rare',bwr:'Mono Rare'};
+const TNAME={c:'Common',h:'Holo Rare',fa:'Full Art',sir:'Special Illustration Rare',bwr:'Mono Rare',obs:'Obsidian Edition'};
 /* ---------------- CONDITION + GRADING MODEL ----------------
    Commons and holos are fungible, so they stay as simple counts. Full Art and
    above are INDIVIDUAL copies: each one rolls its own centering, corners, edges
@@ -2459,9 +2519,19 @@ const TNAME={c:'Common',h:'Holo Rare',fa:'Full Art',sir:'Special Illustration Ra
    sent off to be graded. col.inst holds them:
      {u, id, s(seed), cd:{ctr,dir,co,ed,su}, st:'raw'|'grading'|'back'|'slab', due, grade, cert}
    Invariant: for a Full Art+ card, col[id].n == number of its copies in 'raw'. */
-const HI=t=>t==='fa'||t==='sir'||t==='bwr';
+const HI=t=>t==='fa'||t==='sir'||t==='bwr';   // Obsidian is crafted, pristine, and never graded
 const TOTAL=SET.length;
-const cno=c=>`<span class="cno">${c.no}/${String(TOTAL).padStart(3,'0')}</span>`;
+/* OBSIDIAN EDITION - one per evolution line, earned by owning every card in it.
+   It takes the line's highest-rarity art (SIR, or Mono Rare for the two dragon
+   lines), gets a black border and an animated sky. Kept OUT of SET so the base
+   set stays 127 and every existing set number stays exactly where it is. */
+const OBS=LINES.map((L,i)=>({cat:'Mythic',name:L.names[2],t:'obs',h:L.h,line:L.key,mono:null,
+  art:L.key+(L.mono?'MONO':'SIR'),stage:2,cost:3,prev:L.key+'1',id:1000+i,no:String(i+1).padStart(2,'0')}));
+const OBSI={};OBS.forEach(o=>{OBSI[o.id]=o});
+const CARD=id=>SET[id]||OBSI[id];
+const lineOf=key=>SET.filter(c=>c.art.startsWith(key));
+const numOf=c=>c.t==='obs'?`OBS ${c.no}/${String(OBS.length).padStart(2,'0')}`:`#${c.no}/${String(TOTAL).padStart(3,'0')}`;
+const cno=c=>`<span class="cno">${c.t==='obs'?numOf(c):c.no+'/'+String(TOTAL).padStart(3,'0')}</span>`;
 const hx=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function loadCol(){let c=null;try{c=B.load&&B.load()}catch(e){}
   c=c&&typeof c==='object'?JSON.parse(JSON.stringify(c)):{};
@@ -2497,10 +2567,10 @@ function newInst(id){const sd=(Math.random()*4294967295)>>>0;
    was sitting in trade escrow when the page closed. */
 function backfill(){let ch=false;
   if(col.escrow){Object.keys(col.escrow).forEach(k=>{giveItems(col.escrow[k]);ch=true});delete col.escrow}
-  SET.forEach(c=>{if(!HI(c.t))return;const n=col[c.id]?col[c.id].n:0;
+  SET.concat(OBS).forEach(c=>{if(!HI(c.t))return;const n=col[c.id]?col[c.id].n:0;
     const have=col.inst.filter(i=>i.id===c.id&&i.st==='raw').length;
     for(let k=have;k<n;k++){col.inst.push(newInst(c.id));ch=true}});
-  if(ch)save()}
+  if(ch)save();checkCraftable()}
 
 /* ---------------- AUDIO ---------------- */
 const SFX=(()=>{let ctx,noise;
@@ -3302,7 +3372,15 @@ const TH={
    win:(r,st)=>stars(r,30,200,80)+`<circle cx="150" cy="30" r="12" fill="#fff8e0"/><circle cx="150" cy="30" r="28" fill="#fff" opacity=".25" filter="url(#bl8)"/>`+fog(96,30,'#c8b8ff',.3)+`<path d="M0 116 C50 108 130 118 200 110 L200 145 L0 145Z" fill="#141022"/>`+[20,60,150,180].map((x,i)=>tomb(x,118+i%2*4,.9)).join('')}
 };
 const SKEL={golem:biped,yeti:biped,knight:biped,koi:fish,angler:fish,puffer:fish,slime:blob,jelly:blob,ghost:blob};
-const PLACE={biped:{win:[40,14,1],fa:[-20,100,1.6],sir:[4,108,1.34]},fish:{win:[34,16,1.05],fa:[-4,64,1.5],sir:[18,80,1.3]},blob:{win:[40,14,1],fa:[-20,64,1.6],sir:[6,82,1.35]}};
+/* Full Art and SIR placements are DERIVED from the window placement, which is
+   centred: the creature's own centre is c=(100-win.x)/win.s, so at any other scale
+   s it lands centred at x=100-c*s. The hand-typed values this replaced put golem,
+   yeti, knight, slime, jelly and ghost ~24 units (12% of the card) left of centre
+   on Full Arts and ~13-16 left on SIRs; fish sat ~10 left. */
+const PLACE=(()=>{const P={biped:{win:[40,14,1],fa:[0,100,1.6],sir:[0,108,1.34]},fish:{win:[34,16,1.05],fa:[0,64,1.5],sir:[0,80,1.3]},blob:{win:[40,14,1],fa:[0,64,1.6],sir:[0,82,1.35]}};
+  for(const k in P){const w=P[k].win,c=(100-w[0])/w[2];
+    P[k].fa[0]=+(100-c*P[k].fa[2]).toFixed(1);P[k].sir[0]=+(100-c*P[k].sir[2]).toFixed(1)}
+  return P})();
 const skelOf=k=>SKEL[k]===biped?'biped':SKEL[k]===fish?'fish':'blob';
 function nWin(kind,st){const T=TH[kind],A=ctx([-.6,-.8],6,2.2),r=rngS(1100+st*7+kind.length*31),cb=SKEL[kind](A,st,r,kind),p=PLACE[skelOf(kind)].win;
   const bg=T.uw?T.win(r,st):`<rect width="200" height="145" fill="url(#sky)"/>`+T.win(r,st);
@@ -3467,10 +3545,22 @@ function cardFront(c,foil,ins,lod){let h=cardFrontBase(c,foil);if(!ins||!HI(c.t)
   const x=((ins.cd.ctr-50)/50*4.2*(ins.cd.dir||1)).toFixed(2);
   h=h.replace('style="--h:',`style="--ctrx:${x}cqi;--h:`);
   return h.replace('<div class="sheen">',wearHTML(ins,lod)+'<div class="sheen">')}
+/* Knock the sky out of a scene so an animated backdrop can show through behind
+   the landscape and creature. Every scene paints its sky as a full-canvas rect
+   (url(#sk), url(#sky), or a flat colour on the Mono Rares) - drop the first one,
+   plus any further sky plates. */
+function stripSky(svg){let n=0;
+  return svg.replace(/<rect width="200" height="280"([^>]*)\/>/g,(m,attrs)=>{n++;return(n===1||/url\(#sky?\)/.test(attrs))?'':m})}
 function cardFrontBase(c,foil){const h=c.h??CATS[c.cat].h;
   const EVO=c.prev?`<div class="evo">${artImg(c.prev,Art[c.prev])}</div>`:'';
   const IA=c.art?artImg(c.art,Art[c.art]):null;
   const shade='<div class="sheen"></div><div class="glare"></div>';
+  if(c.t==='obs') return `<div class="front obs${c.prev?' hasevo':''}" style="--h:${h}">${EVO}
+     <div class="obs-bg"><i class="ob1"></i><i class="ob2"></i><i class="ob3"></i></div>
+     <div class="full">${artImg(c.art+'_OBS',()=>stripSky(Art[c.art]()))}</div>
+     <div class="obsfoil"></div><div class="glit"></div>
+     <div class="ui"><div class="panel"></div><div class="nbar"><span class="cname">${c.name}</span><span class="cost-gem" title="Energy cost">${c.cost}</span></div>
+     <div class="atks">${atk(2)}${desc(86,58)}${atk(3)}</div>${wrr()}<div class="bot">${cno(c)}<span class="syms"><b class="star"></b><b class="star"></b><b class="star"></b><b class="star"></b></span></div></div>${shade}</div>`;
   if(c.t==='c'||c.t==='h') return `<div class="front std ${c.t}${c.prev?' hasevo':''}" style="--h:${h}">${EVO}<div class="body">
      <div class="nbar"><span class="cname">${c.name}</span><span class="cost-gem" title="Energy cost">${c.cost}</span></div>
      <div class="win">${IA||artImg('s'+c.id,()=>artStd(c))}${c.t==='h'?'<div class="cosmos"></div>':''}</div>
@@ -3534,6 +3624,7 @@ let GS_H=0;function genSparks(t,rev,seed){const r=rng(seed),out=[];
     if(t==='h')add(80,inWin,{s:1});}
   if(t==='fa'){add(20,inBorder,{s:.8,white:1});add(130,inCard,{s:1.05})}
   if(t==='bwr'){add(24,inBorder,{s:.9,white:1});add(170,inCard,{s:1.1,hueFix:1})}
+  if(t==='obs'){add(30,inBorder,{s:1,white:1});add(150,inCard,{s:1.15,hueFix:1});add(40,inCard,{s:.8,white:1})}
   if(t==='sir'){add(20,inBorder,{s:.9,gold:1});add(120,inCard,{s:1.1,gold:1});add(60,inCard,{s:.8,white:1})}
   return out}
 function deactivate(){if(E.cv)E.cv.remove();if(E.el){E.el.classList.remove('live');E.el.style.transform=''}E.el=null;E.cv=null}
@@ -3544,7 +3635,7 @@ function activate(el,kind){if(!el||E.el===el)return;deactivate();
   const dpr=Math.min(MOB?1.25:2,window.devicePixelRatio||1);cv.width=host.offsetWidth*dpr;cv.height=host.offsetHeight*dpr;
   E.cv=cv;E.ctx=cv.getContext('2d');E.dpr=dpr;
   if(kind==='pack'){GS_H=125;E.sp=genSparks('pack',0,99);E.gain=.55}
-  else{const t=el.dataset.t,rev=el.dataset.rev==='1';GS_H=+el.dataset.h||0;E.sp=genSparks(t,rev,+el.dataset.id*7+(rev?3:0));E.gain={c:rev?1:.45,h:1,fa:1.1,sir:1.25,bwr:1.45}[t]}}
+  else{const t=el.dataset.t,rev=el.dataset.rev==='1';GS_H=+el.dataset.h||0;E.sp=genSparks(t,rev,+el.dataset.id*7+(rev?3:0));E.gain={c:rev?1:.45,h:1,fa:1.1,sir:1.25,bwr:1.45,obs:1.5}[t]}}
 function star(ctx,x,y,L,col,a){ctx.globalAlpha=a;
   const g=ctx.createRadialGradient(x,y,0,x,y,L*.45);g.addColorStop(0,'#fff');g.addColorStop(.3,col);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,L*.45,0,6.283);ctx.fill();
   const ln=(dx,dy,w,len)=>{const lg=ctx.createLinearGradient(x-dx*len,y-dy*len,x+dx*len,y+dy*len);lg.addColorStop(0,'rgba(0,0,0,0)');lg.addColorStop(.5,'#fff');lg.addColorStop(1,'rgba(0,0,0,0)');
@@ -3635,7 +3726,7 @@ let justDone=[];
 function openPack(){if(opened)return;opened=true;const pk=$('#pk');const before=lineDone();
   pull.forEach(p=>{const e=col[p.c.id]||(col[p.c.id]={n:0,f:0});p.foil?e.f++:e.n++;if(p.ins)col.inst.push(p.ins)});
   justDone=lineDone().filter(k=>!before.includes(k));col.opened=(col.opened||0)+1;
-  const hit=pull[pull.length-1].c.t;col.pity=(hit==='h')?(col.pity||0)+1:0;save();
+  const hit=pull[pull.length-1].c.t;col.pity=(hit==='h')?(col.pity||0)+1:0;checkCraftable();save();
   const tc={h:'#ffd35a',fa:'#9fd4ff',sir:'#ffb3d9',bwr:`hsl(${pull[pull.length-1].c.h} 95% 55%)`}[hit];
   $('#pw').style.setProperty('--tease',tc);$('#pw').classList.add('tease',hit==='h'?'t1':'t2');
   if(E.cv)E.cv.style.opacity=0;SFX.rip();navigator.vibrate&&navigator.vibrate([10,30,20]);$('#pkTop').classList.add('gone');
@@ -3646,7 +3737,7 @@ function openPack(){if(opened)return;opened=true;const pk=$('#pk');const before=
   setTimeout(()=>{SFX.slide();reveal($('#pw'))},GOD?2300:500)}
 
 /* ---------------- REVEAL ---------------- */
-const TC={c:'#e3e8ee',h:'#ffd35a',fa:'#cfe8ff',sir:'#ffc27a',bwr:'#fff'};
+const TC={c:'#e3e8ee',h:'#ffd35a',fa:'#cfe8ff',sir:'#ffc27a',bwr:'#fff',obs:'#fff'};
 function reveal(pw){const st=stage();
   const deck=document.createElement('div');deck.className='deck';
   deck.innerHTML=pull.map((p,i)=>`<div class="slot" style="z-index:${10-i};transform:translateY(60vh) scale(.9)">${cardEl(p.c,p.foil,i>0,p.ins)}</div>`).join('');
@@ -3692,7 +3783,7 @@ function celebrate(p){const st=stage(),t=p.c.t,rev=p.foil;
     st.appendChild(n);setTimeout(()=>n.remove(),1900)}}
 
 /* ---------------- SUMMARY / BINDER ---------------- */
-const VAL={c:5,h:40,fa:180,sir:450,bwr:1500},RANK={c:0,h:1,fa:2,sir:3,bwr:4};
+const VAL={c:5,h:40,fa:180,sir:450,bwr:1500,obs:5000},RANK={c:0,h:1,fa:2,sir:3,bwr:4,obs:5};
 const cardVal=p=>VAL[p.c.t]*(p.foil?3:1)*(p.isNew?2:1);
 function summary(){const st=stage();root.onkeydown=null;
   let best=0;pull.forEach((p,i)=>{const b=pull[best];if(RANK[p.c.t]*10+(p.foil?1:0)>RANK[b.c.t]*10+(b.foil?1:0))best=i});
@@ -3707,9 +3798,11 @@ function summary(){const st=stage();root.onkeydown=null;
       const bu=document.createElement('div');bu.className='burst';for(let i=0;i<70;i++){const a=Math.random()*Math.PI*2,d=120+Math.random()*260;bu.innerHTML+=`<i style="--c:hsl(${L.h+Math.random()*60-30} 95% 65%);--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
       st.appendChild(bu);setTimeout(()=>{b.remove();bu.remove()},2600)},j*2700))},1700);
   $('#toB').onclick=()=>{SFX.tick();go('binder')};$('#again').onclick=()=>{SFX.tick();shop();setTimeout(()=>$('#buy')&&$('#buy').click(),50)}}
-function minis(scope){scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');light(t,.5,.35,.6);
+/* tiles without a card in them (the black Obsidian slots) are skipped - one
+   null here used to abort the loop and leave every later card unclickable */
+function minis(scope){scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
   m.onpointerenter=()=>activate(t,'card');
-  m.onclick=()=>{if(m.classList.contains('miss'))return;const p=m.dataset.id!=null?{c:SET[+m.dataset.id],foil:m.dataset.f==='1',ins:m.dataset.u?instBy(m.dataset.u):null}:pull[+m.dataset.i];zoom(p)}})}
+  m.onclick=()=>{if(m.classList.contains('miss'))return;const p=m.dataset.id!=null?{c:CARD(+m.dataset.id),foil:m.dataset.f==='1',ins:m.dataset.u?instBy(m.dataset.u):null}:pull[+m.dataset.i];zoom(p)}})}
 const fmtLeft=due=>{const t=Math.max(0,Math.ceil((due-Date.now())/1000));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
 const condGrid=cd=>[['Centering',cd.ctr+'/'+(100-cd.ctr)],['Corners',cd.co.toFixed(1)],['Edges',cd.ed.toFixed(1)],['Surface',cd.su.toFixed(1)]]
   .map(([k,v])=>`<span><small>${k}</small><b>${v}</b></span>`).join('');
@@ -3752,9 +3845,9 @@ function zoom(p,opt){opt=opt||{};SFX.flip();const z=document.createElement('div'
 const owns=c=>{const e=col[c.id];return!!((e&&(e.n||e.f))||col.inst.some(i=>i.id===c.id&&i.st!=='raw'))};
 function binder(){const st=stage();deactivate();root.onkeydown=null;
   const owned=SET.filter(owns).length,foils=SET.filter(c=>col[c.id]&&col[c.id].f).length,slabN=col.inst.filter(i=>i.st==='slab').length;
-  st.innerHTML=`<div class="binder"><div class="bhead"><span>${owned} of ${SET.length} collected</span><span>${foils} reverse holos${slabN?` \u00b7 ${slabN} graded`:''}</span></div>
+  st.innerHTML=`<div class="binder"><div class="bhead"><span>${owned} of ${SET.length} collected</span><span>${foils} reverse holos${slabN?` \u00b7 ${slabN} graded`:''} \u00b7 ${OBS.filter(o=>col.rew&&col.rew[o.line]).length}/${OBS.length} Obsidian</span></div>
    <div class="prog"><i style="width:${owned/SET.length*100}%"></i></div>
-   <div class="grid">${SET.map(c=>{const e=col[c.id]||{n:0,f:0},has=owns(c),hi=HI(c.t);
+   <div class="grid">${LINES.map(L=>lineOf(L.key).map(c=>{const e=col[c.id]||{n:0,f:0},has=owns(c),hi=HI(c.t);
      const raws=hi?col.inst.filter(i=>i.id===c.id&&i.st==='raw').sort((a,b)=>condScore(b.cd)-condScore(a.cd)):[];
      const away=hi?col.inst.filter(i=>i.id===c.id&&(i.st==='grading'||i.st==='back')):[];
      const slabs=hi?col.inst.filter(i=>i.id===c.id&&i.st==='slab').length:0;
@@ -3765,20 +3858,66 @@ function binder(){const st=stage();deactivate();root.onkeydown=null;
       ${raws[0]?`<span class="cbadge">${condScore(raws[0].cd).toFixed(1)}</span>`:''}
       ${!e.n&&away.length?`<div class="gsleeve">${away[0].st==='back'?'<b>BACK!</b><small>Open in Graded</small>'
         :`<b>AT STK</b><small>Back soon \u00b7 <span class="gtimer" data-u="${away[0].u}">${fmtLeft(away[0].due)}</span></small>`}</div>`:''}
-     </div>`}).join('')}</div>
+     </div>`}).join('')+obsSlot(L)).join('')}</div>
    ${owned?'':'<p style="text-align:center;color:var(--mute);margin-top:20px;font-weight:600">Buy a pack to start your collection</p>'}</div>`;
-  minis(st)}
+  minis(st);
+  st.querySelectorAll('[data-craft]').forEach(el=>{if(el.dataset.craft)el.onclick=()=>{SFX.tick();craft(el.dataset.craft)}})}
+
+/* ---------------- OBSIDIAN EDITION (crafted) ----------------
+   Every evolution line ends in a black, face-hidden slot in the binder showing
+   how much of the line you own. Own all of it - raw, at grading, or slabbed, so
+   sending a card off never locks you out - and the slot becomes a Craft button.
+   Crafting does NOT consume the line. Crafted cards are pristine collector
+   pieces: no condition, no wear, and they can't be sent for grading.
+   col.rew[line] = when it was crafted (once per line). */
+const lineHave=key=>lineOf(key).filter(owns).length;
+const canCraft=key=>!(col.rew&&col.rew[key])&&lineHave(key)===lineOf(key).length;
+function checkCraftable(){col.ready=col.ready||{};let n=0;
+  LINES.forEach(L=>{if(canCraft(L.key)&&!col.ready[L.key]){col.ready[L.key]=1;n++;
+    note(`${L.names[2]} line complete \u2014 your Obsidian Edition is ready to craft in the binder`)}});
+  if(n)save();return n}
+function craft(key){if(!canCraft(key))return false;const o=OBS.find(x=>x.line===key);
+  col.rew=col.rew||{};col.rew[key]=Date.now();(col[o.id]||(col[o.id]={n:0,f:0})).n++;save();
+  if(root&&root.isConnected)craftReveal(o);return true}
+function craftReveal(o){const L=LINES.find(l=>l.key===o.line);
+  const ov=document.createElement('div');ov.className='rwov';ov.style.setProperty('--h',o.h);
+  ov.innerHTML=`<div class="rw-rays"></div>
+   <div class="rw-head"><small>OBSIDIAN EDITION \u00b7 CRAFTING</small><b>${hx(L.names[0])} \u2192 ${hx(L.names[1])} \u2192 ${hx(L.names[2])}</b></div>
+   <div class="deck rwdeck"><div class="slot forge">${cardEl(o,false,true)}</div></div>
+   <div class="rw-foot"><b>${hx(o.name)} crafted</b><small>${numOf(o)} \u00b7 added to your binder</small></div>
+   <div class="dock"><button class="btn" id="rwOk">Back to binder</button></div>`;
+  root.appendChild(ov);deactivate();
+  const t=ov.querySelector('.tilt'),fl=ov.querySelector('.flip');
+  try{SFX.init();SFX.charge()}catch(x){}
+  setTimeout(()=>{ov.querySelector('.slot').classList.remove('forge');fl.classList.remove('down');
+    try{SFX.flip();SFX.boom();SFX.reveal('u',true);setTimeout(()=>SFX.reveal('u',true),350)}catch(x){}
+    activate(t,'card');root.classList.remove('shake2');void root.offsetWidth;root.classList.add('shake2','shake-bwr');
+    setTimeout(()=>root.classList.remove('shake2','shake-bwr'),900);
+    const bu=document.createElement('div');bu.className='burst';
+    for(let k=0;k<110;k++){const a=Math.random()*Math.PI*2,d=140+Math.random()*300;
+      bu.innerHTML+=`<i style="--c:${k%3?`hsl(${o.h+Math.random()*80-40} 95% 65%)`:'#fff'};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
+    ov.appendChild(bu);setTimeout(()=>bu.remove(),1300)},1500);
+  ov.querySelector('#rwOk').onclick=()=>{ov.remove();deactivate();go('binder')}}
+/* the slot that closes out each line in the binder */
+function obsSlot(L){const o=OBS.find(x=>x.line===L.key),e=col[o.id];
+  if(e&&(e.n||e.f))return `<div class="mini obsown" data-id="${o.id}" data-f="0" data-n="${o.no}" data-u="">${cardEl(o,false,false,null,1)}${e.n>1?`<span class="qty">\u00d7${e.n}</span>`:''}</div>`;
+  const tot=lineOf(L.key).length,have=lineHave(L.key),ready=canCraft(L.key);
+  return `<div class="mini miss obslock${ready?' ready':''}" data-craft="${ready?L.key:''}"><div class="oblk">
+    <small>${numOf(o)}</small><b>OBSIDIAN</b>
+    ${ready?`<span class="obcraft">Craft</span><small>Line complete</small>`
+      :`<em>${have} / ${tot}</em><small>till you can craft</small>`}
+    <span class="obtrk"><i style="width:${have/tot*100}%"></i></span></div></div>`}
 
 /* ---------------- GRADING ---------------- */
 const GRADE_MS=60000;
 const note=m=>{if(B.notify)B.notify(m);else{const t=document.createElement('div');t.className='tnote';t.textContent=m;root&&root.appendChild(t);setTimeout(()=>t.remove(),3200)}};
 function sendGrade(ins){if(!ins||ins.st!=='raw')return;const e=col[ins.id];if(!e||e.n<1)return;
   e.n--;ins.st='grading';ins.sent=Date.now();ins.due=Date.now()+GRADE_MS;save();
-  try{SFX.slide()}catch(x){}note(`${SET[ins.id].name} sent to STK \u2014 back in 1 minute`)}
+  try{SFX.slide()}catch(x){}note(`${CARD(ins.id).name} sent to STK \u2014 back in 1 minute`)}
 function gradeTick(){if(!col||!col.inst)return;const now=Date.now(),back=[];
   col.inst.forEach(i=>{if(i.st==='grading'&&now>=i.due){i.st='back';i.grade=stkGrade(i);
     i.cert='STK '+String(10000000+(i.s%89999999)).slice(-8);back.push(i)}});
-  if(back.length){save();back.forEach(i=>note(`${SET[i.id].name} is back from STK grading \u2014 open it in Stack Cards`));
+  if(back.length){save();back.forEach(i=>note(`${CARD(i.id).name} is back from STK grading \u2014 open it in Stack Cards`));
     try{SFX.ding(880);setTimeout(()=>SFX.ding(1320),120)}catch(x){}
     if(root&&root.isConnected&&(curView==='graded'||curView==='binder'))go(curView)}
   if(root&&root.isConnected){
@@ -3796,14 +3935,14 @@ function barcode(sv){let x=0,h='';const r=rng([...sv].reduce((a,ch)=>(a*31+ch.ch
 
 /* The slab: thick clear acrylic, a framed label with the grade, and the card
    floating in an inner well. Modelled on a PSA case, in Stack's colours. */
-function slabHTML(ins,small){const c=SET[ins.id],g=ins.grade;
+function slabHTML(ins,small){const c=CARD(ins.id),g=ins.grade;
   return `<div class="tilt slabt" data-h="${c.h??0}" data-t="${c.t}" data-rev="0" data-id="${c.id}">
    <div class="slab${small?' sm':''}${g===10?' gem':''}">
     <div class="sl-label">
      <div class="sl-lt"><div class="sl-l1">2026 STACK CARDS \u00b7 MYTHIC</div>
       <div class="sl-l2">${hx(c.name.toUpperCase())}</div>
       <div class="sl-l3">${hx((TNAME[c.t]||'').toUpperCase())}${c.mono?' \u00b7 '+hx(c.mono.toUpperCase()):''}</div>
-      <div class="sl-l4">#${c.no}/${String(TOTAL).padStart(3,'0')}</div></div>
+      <div class="sl-l4">${numOf(c)}</div></div>
      <div class="sl-rt"><div class="sl-gw">${GW[g]||''}</div><div class="sl-gn">${g}</div><div class="sl-veil"></div></div>
      <div class="sl-bar">${barcode(ins.cert||'STK')}<span class="sl-cert">${ins.cert||''}</span><span class="sl-logo">${STK_LOGO}<b>STK</b><i class="sl-holo"></i></span></div>
     </div>
@@ -3813,26 +3952,47 @@ function slabHTML(ins,small){const c=SET[ins.id],g=ins.grade;
    </div></div>`}
 
 /* The mailer it comes back in */
-function stkBoxFace(ins,mini){const c=SET[ins.id];
+function stkBoxFace(ins,mini){const c=CARD(ins.id);
   return `<div class="sbf${mini?' mini':''}"><div class="sbf-foil"></div>
    <div class="sbf-logo">${STK_LOGO}</div><div class="sbf-t1">STACK GRADING</div><div class="sbf-t2">SERVICES</div>
    <div class="sbf-rule"></div><div class="sbf-t3">AUTHENTICATED \u00b7 GRADED \u00b7 ENCAPSULATED</div>
    <div class="sbf-slip"><span>ORDER ${ins.cert||''}</span><b>${hx(c.name.toUpperCase())}</b><span>1 ITEM \u00b7 ${hx(TNAME[c.t].toUpperCase())}</span></div>
    <div class="sbf-seal">SEALED</div></div>`}
 
+/* Graded view: one row of chips per filter (rarity, then grade, then how to
+   group), and the slabs laid out in labelled rows - by grade, or by rarity. */
+const GF={rar:'all',gr:'all',by:'grade'};
+const GR_BANDS=[['all','All'],['10','10'],['9','9'],['8','8\u20138.5'],['7','7\u20137.5'],['low','6.5 & under']];
+const inBand=(g,b)=>b==='all'||(b==='10'?g===10:b==='9'?g===9:b==='8'?g>=8&&g<9:b==='7'?g>=7&&g<8:g<7);
+function slabFilters(all){
+  const rars=[['all','All'],['fa','Full Art'],['sir','SIR'],['bwr','Mono Rare']];
+  const chips=(k,opts)=>opts.map(([v,l])=>`<button class="gchip${GF[k]===v?' on':''}" data-gf="${k}:${v}">${l}</button>`).join('');
+  const list=all.filter(i=>(GF.rar==='all'||CARD(i.id).t===GF.rar)&&inBand(i.grade,GF.gr));
+  let rows;
+  if(GF.by==='rarity')rows=['bwr','sir','fa'].map(t=>({title:TNAME[t],items:list.filter(i=>CARD(i.id).t===t)}));
+  else{const gs=[...new Set(list.map(i=>i.grade))].sort((a,b)=>b-a);
+    rows=gs.map(g=>({title:`${GW[g]} ${g}`,items:list.filter(i=>i.grade===g)}))}
+  rows=rows.filter(r=>r.items.length);
+  return `<div class="gfbar">
+    <div class="gfg"><span>RARITY</span>${chips('rar',rars)}</div>
+    <div class="gfg"><span>GRADE</span>${chips('gr',GR_BANDS)}</div>
+    <div class="gfg"><span>ROWS</span>${chips('by',[['grade','By grade'],['rarity','By rarity']])}</div></div>
+   ${rows.length?rows.map(r=>`<div class="grow"><h5>${r.title}<small>${r.items.length}</small></h5>
+     <div class="sgrid">${r.items.map(i=>`<div class="smini" data-u="${i.u}">${slabHTML(i,1)}</div>`).join('')}</div></div>`).join('')
+    :'<p class="gempty">No slabs match those filters.</p>'}`}
 function graded(){const st=stage();deactivate();root.onkeydown=null;
   const back=col.inst.filter(i=>i.st==='back'),away=col.inst.filter(i=>i.st==='grading');
-  const slabs=col.inst.filter(i=>i.st==='slab').sort((a,b)=>b.grade-a.grade||RANK[SET[b.id].t]-RANK[SET[a.id].t]);
+  const slabs=col.inst.filter(i=>i.st==='slab').sort((a,b)=>b.grade-a.grade||RANK[CARD(b.id).t]-RANK[CARD(a.id).t]);
   st.innerHTML=`<div class="binder gradedv">
    <div class="ghero"><div class="ghx">${STK_LOGO}</div><div><b>Stack Grading Services</b>
     <small>Full Art and above can be graded. Tap one in your binder and send it off \u2014 it comes back sealed in an STK slab with an official grade from 1 to 10.</small></div></div>
    ${back.length?`<h4 class="gh">Back from grading \u00b7 ready to open</h4><div class="gpk">${back.map(i=>`<div class="gbx">${stkBoxFace(i,1)}<button class="btn" data-open="${i.u}">Open</button></div>`).join('')}</div>`:''}
-   ${away.length?`<h4 class="gh">At STK</h4><div class="gaway">${away.map(i=>`<div class="garow"><span>${hx(SET[i.id].name)} <small>${TNAME[SET[i.id].t]} \u00b7 condition ${condScore(i.cd).toFixed(1)}</small></span><b class="gtimer" data-u="${i.u}">${fmtLeft(i.due)}</b></div>`).join('')}</div>`:''}
+   ${away.length?`<h4 class="gh">At STK</h4><div class="gaway">${away.map(i=>`<div class="garow"><span>${hx(CARD(i.id).name)} <small>${TNAME[CARD(i.id).t]} \u00b7 condition ${condScore(i.cd).toFixed(1)}</small></span><b class="gtimer" data-u="${i.u}">${fmtLeft(i.due)}</b></div>`).join('')}</div>`:''}
    <h4 class="gh">Your slabs${slabs.length?` \u00b7 ${slabs.length}`:''}</h4>
-   ${slabs.length?`<div class="sgrid">${slabs.map(i=>`<div class="smini" data-u="${i.u}">${slabHTML(i,1)}</div>`).join('')}</div>`
-    :'<p class="gempty">No graded cards yet. Pull a Full Art or better, then send it from your binder.</p>'}
+   ${slabs.length?slabFilters(slabs):'<p class="gempty">No graded cards yet. Pull a Full Art or better, then send it from your binder.</p>'}
   </div>`;
   st.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{SFX.tick();openGraded(instBy(b.dataset.open))});
+  st.querySelectorAll('[data-gf]').forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.gf.split(':');GF[k]=v;SFX.tick();graded()});
   st.querySelectorAll('.smini').forEach(m=>{const t=m.querySelector('.tilt');light(t,.5,.35,.6);
     m.onpointerenter=()=>activate(t,'card');m.onclick=()=>zoom(null,{slab:instBy(m.dataset.u)})})}
 
@@ -3893,7 +4053,7 @@ function gradeFX(g){const st=stage();
      {k:'i', u, ins}  one individual Full Art+ copy or slab, condition and all  */
 const TR={mate:null,sel:{give:[],want:[]},incoming:null,waiting:null};
 const itemKey=it=>it.k==='i'?'i:'+it.u:'r:'+it.id+':'+(it.f?1:0);
-function snapshot(){const counts={};SET.forEach(c=>{const e=col[c.id];if(e&&(e.n||e.f))counts[c.id]=[HI(c.t)?0:e.n,e.f]});
+function snapshot(){const counts={};SET.concat(OBS).forEach(c=>{const e=col[c.id];if(e&&(e.n||e.f))counts[c.id]=[HI(c.t)?0:e.n,e.f]});
   return{counts,inst:col.inst.filter(i=>i.st==='raw'||i.st==='slab').map(i=>JSON.parse(JSON.stringify(i)))}}
 /* remove items from our collection; returns their full payloads, or null if any are missing */
 function takeItems(items){const need={};items.forEach(it=>{const k=itemKey(it);need[k]=(need[k]||0)+1});
@@ -3913,10 +4073,10 @@ const canGive=items=>{const bak=JSON.stringify(col),ok=!!takeItems(items);col=JS
 
 /* tiles for a whole collection (ours, or the snapshot of theirs) */
 function tilesOf(snap){const out=[];
-  SET.forEach(c=>{const v=snap.counts[c.id];if(!v)return;
+  SET.concat(OBS).forEach(c=>{const v=snap.counts[c.id];if(!v)return;
     if(v[0])out.push({it:{k:'r',id:c.id,f:0},c,max:v[0],foil:false});
     if(v[1])out.push({it:{k:'r',id:c.id,f:1},c,max:v[1],foil:true})});
-  snap.inst.forEach(i=>out.push({it:{k:'i',u:i.u},c:SET[i.id],max:1,ins:i}));
+  snap.inst.forEach(i=>out.push({it:{k:'i',u:i.u},c:CARD(i.id),max:1,ins:i}));
   return out.sort((a,b)=>RANK[b.c.t]-RANK[a.c.t]||(b.ins&&b.ins.st==='slab')-(a.ins&&a.ins.st==='slab')||a.c.id-b.c.id)}
 function tileHTML(t,side,sel){const n=sel.filter(x=>itemKey(x)===itemKey(t.it)).length;
   const inner=t.ins&&t.ins.st==='slab'?`<div class="tslab">${slabHTML(t.ins,1)}</div>`:cardEl(t.c,t.foil,false,t.ins,1);
@@ -3924,8 +4084,8 @@ function tileHTML(t,side,sel){const n=sel.filter(x=>itemKey(x)===itemKey(t.it)).
     ${t.ins&&t.ins.st==='slab'?`<span class="qty s">STK ${t.ins.grade}</span>`:t.ins?`<span class="cbadge">${condScore(t.ins.cd).toFixed(1)}</span>`:''}
     ${t.max>1?`<span class="qty">\u00d7${t.max}</span>`:''}${n?`<span class="tpick">${n>1?'\u00d7'+n:'\u2713'}</span>`:''}</div>`}
 const itemLabel=(it,snapInst)=>{if(it.k==='i'){const i=it.ins||(snapInst||[]).find(x=>x.u===it.u)||instBy(it.u);if(!i)return'?';
-  return SET[i.id].name+(i.st==='slab'?` (STK ${i.grade})`:` (${condScore(i.cd).toFixed(1)})`)}
-  return SET[it.id].name+(it.f?' (Reverse)':'')};
+  return CARD(i.id).name+(i.st==='slab'?` (STK ${i.grade})`:` (${condScore(i.cd).toFixed(1)})`)}
+  return CARD(it.id).name+(it.f?' (Reverse)':'')};
 
 function trade(){const st=stage();deactivate();root.onkeydown=null;
   const party=B.party&&B.party();
@@ -3962,7 +4122,7 @@ function sendOffer(){const give=TR.sel.give.slice(),want=TR.sel.want.slice();if(
   TR.waiting=oid;TR.sel={give:[],want:[]};SFX.slide&&SFX.slide();note('Offer sent');trade()}
 
 function settleOffer(m,silent){const esc=col.escrow&&col.escrow[m.oid];if(TR.waiting===m.oid)TR.waiting=null;
-  if(m.ok){giveItems(m.items);if(col.escrow)delete col.escrow[m.oid];save();note('Trade complete!');
+  if(m.ok){giveItems(m.items);if(col.escrow)delete col.escrow[m.oid];save();note('Trade complete!');checkCraftable();
     try{SFX.reveal('u',true);SFX.boom()}catch(x){}}
   else{if(esc)giveItems(esc);if(col.escrow)delete col.escrow[m.oid];save();if(!silent)note(m.why==='missing'?'Trade failed \u2014 they no longer had those cards':'Trade declined')}
   TR.mate=null;if(root&&root.isConnected&&(curView==='trade'||curView==='binder'))go(curView)}
@@ -3978,7 +4138,7 @@ function showOffer(m){closeOffer();const el=document.createElement('div');el.cla
   $('#tDec').onclick=()=>{B.send({t:'tcgResp',oid:m.oid,ok:false});TR.incoming=null;closeOffer()};
   $('#tAcc').onclick=()=>{const out=takeItems(m.want);
     if(!out){B.send({t:'tcgResp',oid:m.oid,ok:false,why:'missing'});closeOffer();return}
-    giveItems(m.give);save();B.send({t:'tcgResp',oid:m.oid,ok:true,items:out});TR.incoming=null;closeOffer();
+    giveItems(m.give);save();B.send({t:'tcgResp',oid:m.oid,ok:true,items:out});TR.incoming=null;closeOffer();checkCraftable();
     note('Trade complete!');try{SFX.reveal('u',true);SFX.boom()}catch(x){}TR.mate=null;if(curView==='trade'||curView==='binder')go(curView)}}
 const closeOffer=()=>{const o=root&&root.querySelector('.tofr');o&&o.remove()};
 
@@ -3998,7 +4158,8 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
   /* the host calls this when the player leaves for another game */
   pause:()=>{deactivate();const z=root&&root.querySelector('.zoom');z&&z.remove()},
   /* exposed for tests */
-  _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,
+  _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,artSrc:k=>Art[k](),
+     OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
      get col(){return col},set col(v){col=v}}};
 if(document.getElementById('tcg')&&!window.StackBridge)mount(document.getElementById('tcg'));
 })();
