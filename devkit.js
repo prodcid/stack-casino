@@ -80,8 +80,18 @@ function check() {
   } else console.log('ok all $() ids resolve');
 
   // 4. unbalanced script tags
-  const opens = (html.match(/<script>/g) || []).length, closes = (html.match(/<\/script>/g) || []).length;
-  if (opens !== closes || opens !== 1) { console.log(`!  ${opens} <script> / ${closes} </script> — expected exactly 1 of each`); }
+  // The main game is the one bare <script>. Stack Cards adds two tagged ones
+  // (id="stack-bridge", id="stack-cards") that sync-cards.js owns and checks.
+  const opens = (html.match(/<script[\s>]/g) || []).length, closes = (html.match(/<\/script>/g) || []).length;
+  const bare = (html.match(/<script>/g) || []).length;
+  if (opens !== closes || bare !== 1) { console.log(`!  ${opens} <script> / ${closes} </script>, ${bare} bare — expected them balanced and exactly 1 bare`); }
+
+  // 4b. the inlined card engine must match stack-cards.html
+  if (fs.existsSync(path.join(__dirname, 'sync-cards.js'))) {
+    try { require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'sync-cards.js'), '--check'], { stdio: 'pipe' });
+      console.log('ok Stack Cards in sync'); }
+    catch (e) { console.log('x  Stack Cards is out of sync with stack-cards.html — run: node sync-cards.js'); bad++; }
+  }
 
   // 5. memory freshness — the game must not move on without CLAUDE.md moving with it
   if (!fs.existsSync(MEM)) {

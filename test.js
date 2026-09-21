@@ -363,6 +363,148 @@ async function fight(ctx, errs) {
   await pg.close();
 }
 
+
+/* ---------------- stack cards ---------------- */
+async function cards(ctx, errs) {
+  console.log('\nSTACK CARDS');
+  const pg = await newPage(ctx, errs, 'tc', false);
+  const n0 = errs.length;
+  await pg.evaluate("P().bal=5000;renderBal();go('cards')");
+  await pg.waitForTimeout(900);
+
+  const mounted = await pg.evaluate("!!document.querySelector('#tcgHost').shadowRoot && !!StackCards.root.querySelector('.tabs') && StackCards.root.offsetHeight>400");
+  mounted ? pass('cards mount inside the casino') : fail('cards mount inside the casino');
+
+  const bal = await pg.evaluate("StackCards.root.querySelector('#tcgBal').textContent.replace(/,/g,'')");
+  bal === '5000' ? pass('cards show the casino wallet', bal) : fail('cards show the casino wallet', bal);
+
+  // Isolation: the engine renders in a Shadow DOM so the 14 class names it shares
+  // with the casino (.bal .flip .win .stage ...) cannot bleed in. The tell-tale
+  // was the header bar: the Balloon Pump's .bal rule blew it up to 288px tall.
+  const iso = await pg.evaluate(`[StackCards.root.querySelector('.bar').offsetHeight, getComputedStyle(document.querySelector('.main')).overflowY]`);
+  (iso[0] < 100 && iso[1] === 'auto') ? pass('card game is isolated from casino CSS', 'header ' + iso[0] + 'px')
+    : fail('card game is isolated from casino CSS', JSON.stringify(iso));
+
+  // every card carries its set number
+  const nums = await pg.evaluate(`(()=>{StackCards.go('binder');
+    const all=[...StackCards.root.querySelectorAll('#tcg .grid .cno')].map(e=>e.textContent);
+    return [all.length, all[0], all[all.length-1], StackCards.SET.length]})()`);
+  (nums[0] === nums[3] && nums[1] === '001/127' && nums[2] === '127/127')
+    ? pass('every card is numbered', nums[1] + ' .. ' + nums[2]) : fail('every card is numbered', JSON.stringify(nums));
+
+  // pulls save to the ACCOUNT and survive a reload
+  await pg.evaluate(`(()=>{const X=StackCards._,SET=StackCards.SET,fa=SET.find(c=>c.t==='fa');
+    const c=X.col;c[SET[0].id]={n:2,f:1};const i=X.newInst(fa.id);c.inst.push(i);(c[fa.id]||(c[fa.id]={n:0,f:0})).n++;
+    window.StackBridge.save(c)})()`);
+  await pg.reload(); await pg.waitForTimeout(900);
+  const kept = await pg.evaluate("(()=>{const c=P().cards||{};return [c[0]&&c[0].n,c[0]&&c[0].f,(c.inst||[]).length]})()");
+  (kept[0] === 2 && kept[1] === 1 && kept[2] === 1) ? pass('collection saved to the account', JSON.stringify(kept))
+    : fail('collection saved to the account', JSON.stringify(kept));
+
+  // ...and another account gets its own, empty binder
+  const sep = await pg.evaluate(`(()=>{const mine=P().user;
+    const a={user:'other',name:'other',pass:hashPw('other','pw123'),bal:1000,color:'#fff'};ensureCos(a);ensureStats(a);
+    S.players.push(a);S.cur=S.players.length-1;tcgReload();
+    const col=StackCards.collection,theirs=(col.inst||[]).length+Object.keys(col).filter(k=>/^[0-9]+$/.test(k)).length;
+    S.cur=acctIdx(mine);tcgReload();
+    return [theirs,(StackCards.collection.inst||[]).length]})()`);
+  (sep[0] === 0 && sep[1] === 1) ? pass('each account has its own binder') : fail('each account has its own binder', JSON.stringify(sep));
+
+  // grading: leaves the binder, comes back after the timer, notifies you elsewhere
+  const g = await pg.evaluate(`(()=>{const X=StackCards._,i=X.col.inst.find(x=>x.st==='raw');
+    const before=X.col[i.id].n;X.sendGrade(i);const gone=X.col[i.id].n===before-1&&i.st==='grading';
+    return [gone,Math.round((i.due-Date.now())/1000),i.u]})()`);
+  (g[0] && g[1] >= 58 && g[1] <= 60) ? pass('grading takes the card for a minute', g[1] + 's') : fail('grading takes the card for a minute', JSON.stringify(g));
+
+  await pg.evaluate("go('dice')"); await pg.waitForTimeout(200);
+  await pg.evaluate(`(()=>{const i=StackCards._.col.inst.find(x=>x.u==='${g[2]}');i.due=Date.now()-1;StackCards.tick()})()`);
+  await pg.waitForTimeout(400);
+  const back = await pg.evaluate(`(()=>{const i=StackCards._.col.inst.find(x=>x.u==='${g[2]}');
+    return [i.st,i.grade,!!document.querySelector('[data-g="cards"] .nbadge'),[...document.querySelectorAll('.toast')].some(t=>/back from STK/.test(t.textContent))]})()`);
+  (back[0] === 'back' && back[1] >= 1 && back[1] <= 10 && back[2] && back[3])
+    ? pass('it comes back graded and pings you in another game', 'STK ' + back[1])
+    : fail('it comes back graded and pings you in another game', JSON.stringify(back));
+
+  // open the mailer -> it becomes a slab with the PSA-style label
+  await pg.evaluate("go('cards')"); await pg.waitForTimeout(400);
+  await pg.evaluate("StackCards.go('graded')"); await pg.waitForTimeout(400);
+  await pg.click('#tcg [data-open]'); await pg.waitForTimeout(500);
+  const box = await (await pg.$('#tcg #sz')).boundingBox();
+  await pg.mouse.move(box.x + 4, box.y + box.height / 2); await pg.mouse.down();
+  for (let k = 0; k < 3; k++) { await pg.mouse.move(box.x + box.width - 4, box.y + box.height / 2, { steps: 6 }); await pg.mouse.move(box.x + 4, box.y + box.height / 2, { steps: 6 }); }
+  await pg.mouse.up(); await pg.waitForTimeout(2800);
+  const slab = await pg.evaluate(`(()=>{const i=StackCards._.col.inst.find(x=>x.u==='${g[2]}');
+    const lab=StackCards.root.querySelector('#tcg .slabrise .sl-label');
+    return [i.st,!!lab,lab?lab.querySelector('.sl-gn').textContent:'',lab?lab.querySelector('.sl-l4').textContent:'',/^STK [0-9]{8}$/.test(i.cert||'')]})()`);
+  (slab[0] === 'slab' && slab[1] && slab[2] === String(back[1]) && /^#[0-9]{3}\/127$/.test(slab[3]) && slab[4])
+    ? pass('mailer opens into a graded slab', 'grade ' + slab[2] + ', ' + slab[3]) : fail('mailer opens into a graded slab', JSON.stringify(slab));
+
+  // PSA-like spread from pack-fresh copies: mostly 8-10, gems uncommon but real
+  const dist = await pg.evaluate(`(()=>{const X=StackCards._;const h={};let gem=0,low=0;const N=4000;
+    for(let k=0;k<N;k++){const i=X.newInst(0);const gr=X.stkGrade(i);h[gr]=(h[gr]||0)+1;if(gr===10)gem++;if(gr<7)low++}
+    return {gem:gem/N*100,low:low/N*100,nine:(h[9]||0)/N*100}})()`);
+  (dist.gem > 5 && dist.gem < 40 && dist.nine > 15 && dist.low < 25)
+    ? pass('grade spread looks like real pack-fresh pops', dist.gem.toFixed(0)+'% gem, '+dist.nine.toFixed(0)+'% 9, '+dist.low.toFixed(0)+'% under 7')
+    : fail('grade spread looks like real pack-fresh pops', JSON.stringify(dist));
+
+  // wear must scale with condition: a wrecked copy draws far more than a gem
+  const wear = await pg.evaluate(`(()=>{const X=StackCards._;
+    const a=X.newInst(0);a.cd={ctr:50,dir:1,co:9.9,ed:9.9,su:9.9};const b=X.newInst(0);b.cd={ctr:75,dir:1,co:2.5,ed:2.5,su:2.5};
+    const n=h=>(h.match(/<(circle|ellipse|path|rect)/g)||[]).length;return [n(X.wearHTML(a,0)),n(X.wearHTML(b,0))]})()`);
+  (wear[1] > wear[0] * 4) ? pass('wear scales with condition', wear[0] + ' marks vs ' + wear[1]) : fail('wear scales with condition', JSON.stringify(wear));
+
+  errs.length === n0 ? pass('no stack cards console errors') : fail('no stack cards console errors', errs.slice(n0).join(' | '));
+  await pg.close();
+}
+
+/* ---------------- stack cards: trading ---------------- */
+async function cardtrade(browser, errs) {
+  console.log('\nSTACK CARDS TRADING');
+  const [A, B] = await connectPair(browser, errs);
+  if (await A.evaluate("NET.status") !== 'connected') { fail('trade: no connection'); await A.close(); await B.close(); return; }
+  const seed = `(()=>{const X=StackCards._,SET=StackCards.SET,c=X.col;
+    c[SET[1].id]={n:3,f:0};const sir=SET.find(x=>x.t==='sir');const i=X.newInst(sir.id);c.inst.push(i);(c[sir.id]||(c[sir.id]={n:0,f:0})).n++;
+    window.StackBridge.save(c);return i.u})()`;
+  await A.evaluate("go('cards')"); await B.evaluate("go('cards')"); await A.waitForTimeout(700);
+  const aU = await A.evaluate(seed);
+  const bU = await B.evaluate(seed);
+
+  await A.evaluate("StackCards.go('trade')"); await A.waitForTimeout(900);
+  const sees = await A.evaluate(`!!StackCards.root.querySelector('#tcg .ttile[data-k="i:${bU}"]')`);
+  sees ? pass("you can see your mate's binder") : fail("you can see your mate's binder");
+
+  await A.evaluate(`StackCards.root.querySelector('#tcg .ttile[data-side="give"][data-k="i:${aU}"]').click()`);
+  await A.waitForTimeout(150);
+  await A.evaluate(`StackCards.root.querySelector('#tcg .ttile[data-side="want"][data-k="i:${bU}"]').click()`);
+  await A.waitForTimeout(150);
+  await A.click('#tcg #tSend'); await A.waitForTimeout(700);
+  const esc = await A.evaluate(`[!StackCards._.col.inst.some(i=>i.u==='${aU}'), Object.keys(StackCards._.col.escrow||{}).length]`);
+  (esc[0] && esc[1] === 1) ? pass('your side is held in escrow while they decide') : fail('your side is held in escrow while they decide', JSON.stringify(esc));
+
+  const offered = await B.evaluate("!!StackCards.root.querySelector('#tcg .tofr')");
+  offered ? pass('they get the offer') : fail('they get the offer');
+  await B.click('#tcg #tAcc'); await B.waitForTimeout(900);
+
+  const aHas = await A.evaluate(`[StackCards._.col.inst.some(i=>i.u==='${bU}'), StackCards._.col.inst.some(i=>i.u==='${aU}'), Object.keys(StackCards._.col.escrow||{}).length]`);
+  const bHas = await B.evaluate(`[StackCards._.col.inst.some(i=>i.u==='${aU}'), StackCards._.col.inst.some(i=>i.u==='${bU}')]`);
+  (aHas[0] && !aHas[1] && aHas[2] === 0 && bHas[0] && !bHas[1])
+    ? pass('accepted trade swaps the exact copies', 'condition travels with the card')
+    : fail('accepted trade swaps the exact copies', JSON.stringify({aHas, bHas}));
+
+  await A.evaluate("StackCards.go('trade')"); await A.waitForTimeout(800);
+  const cid = await A.evaluate("StackCards.SET[1].id");
+  const before = await A.evaluate(`StackCards._.col[${cid}].n`);
+  await A.evaluate(`StackCards.root.querySelector('#tcg .ttile[data-side="give"][data-k="r:${cid}:0"]').click()`);
+  await A.waitForTimeout(150); await A.click('#tcg #tSend'); await A.waitForTimeout(700);
+  const during = await A.evaluate(`StackCards._.col[${cid}].n`);
+  await B.click('#tcg #tDec'); await B.waitForTimeout(800);
+  const after = await A.evaluate(`StackCards._.col[${cid}].n`);
+  (during === before - 1 && after === before) ? pass('declined offer returns your cards', before + ' -> ' + during + ' -> ' + after)
+    : fail('declined offer returns your cards', [before, during, after].join(' -> '));
+
+  await A.close(); await B.close();
+}
+
 /* ---------------- sportsbook ---------------- */
 async function sports(ctx, errs) {
   console.log('\nSPORTSBOOK');
@@ -1060,6 +1202,8 @@ async function rtp(ctx, errs) {
     if (which === 'all' || which === 'shot') await longshot(ctx, errs);
     if (which === 'all' || which === 'sports') await sports(ctx, errs);
     if (which === 'all' || which === 'fight') await fight(ctx, errs);
+    if (which === 'all' || which === 'cards') await cards(ctx, errs);
+    if (which === 'all' || which === 'cards' || which === 'trade') await cardtrade(browser, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
     if (which === 'all' || which === 'coop') await coop(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);

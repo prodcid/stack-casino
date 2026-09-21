@@ -42,6 +42,7 @@ node test.js shot       # Long Shot drag-aiming (real mouse drags)
 node test.js sports     # Sportsbook pricing, accas, cash out, suspensions, layout
 node test.js coop       # two-window presence, join invites, side bets
 node test.js fight      # Fight Night engine, outcome mix, RTP, joint accas
+node test.js cards      # Stack Cards: isolation, numbering, saving, grading, slab, wear + trading
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -75,7 +76,7 @@ storage/account layer.
 
 ## 2. Current scope
 
-18 single-player games + sportsbook + fight night, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+18 single-player games + sportsbook + fight night + Stack Cards, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -164,6 +165,32 @@ Watch for: `fnScoreRound` (cards) is separate from `fnEndRound` (cards + advance
 `fnDecision` must score the round still in progress — missing that scored only rounds 1-2
 and drew 45% of fights. Ring uses **red/blue corner colours**, not fighter brand colours.
 
+**Stack Cards** (`cards` view) — the trading card game. **`stack-cards.html` is the source
+of truth**; it still opens on its own (demo mode). Never edit the inlined copy in
+`stack-casino.html` — edit `stack-cards.html`, then `node sync-cards.js` (ship does it
+automatically; `devkit check` fails if they drift).
+
+- **Shadow DOM.** It mounts into `#tcgHost`'s shadow root with its CSS cloned from the inert
+  `<template id="stack-cards-css">`. Required, not cosmetic: 14 class names collide with the
+  casino (`.bal .flip .win .stage .grid .flash .sheen …`) and the casino's rules leaked in
+  (Balloon Pump's `.bal` made the card header 288px tall). `@property --hr` is declared in the
+  document because shadow roots can't register it.
+- **Host contract** `window.StackBridge`: `getBalance / spend / load / save / onBalance /
+  notify / party / send / me / onGrading`. Cards save to the **account** (`P().cards`), so every
+  login has its own binder; `tcgReload()` runs on login, logout and admin log-in-as.
+- **Copies.** Commons/holos are counts (`col[id] = {n, f}`). Full Art and above are individual
+  copies in `col.inst` — `{u, id, s, cd:{ctr,dir,co,ed,su}, st, due, grade, cert}` with
+  `st` = `raw | grading | back | slab`. Invariant: `col[id].n` = that card's `raw` copies.
+- **Grading** is PSA-shaped: centering caps the grade (≤55/45 for a 10), `stkGrade()` follows
+  `condScore()` with small grader variance, halves 1.5–8.5. Sending takes the copy out of the
+  binder for `GRADE_MS` (60s); `gradeTick()` returns it, toasts, and badges the sidebar.
+- **Wear** is SVG from the copy's seed. Metallic borders need dark scuffing, not just white
+  whitening, or it disappears. Scratches are a glint layer masked to `--mx/--my`.
+- **Trading** (party only): sender's side goes into `col.escrow` on send and comes back on
+  decline, cancel, disconnect or reload. Receiver commits first. Messages `tcgReq tcgCol
+  tcgOffer tcgResp tcgCancel` are routed to `StackCards.onNet`.
+- Every card shows its set number `NNN/127` in the bottom strip.
+
 **Party HUD** (`CO` state, `#coHud`) — a floating panel, only while `connected()`.
 Shows what your mate is playing, sends a join invite they accept, and offers side bets
 on their live round.
@@ -235,6 +262,8 @@ Two patterns, don't mix them up:
 - Sportsbook: host drives kick-off and the roll to the next match; the guest's buttons are disabled. A guest joining mid-match gets a fresh fixture and any open bets on the old one are cleared.
 - Party HUD side bets are wired for Moles and Long Shot only. Other games show presence and join, but no side-bet offer until they call coOffer/coSettle.
 - Fight Night party sync shares the seed and the host drives start/next, same as the sportsbook. Guest buttons are disabled.
+- Stack Cards packs are FREE: the engine's PACK_COST is 0. The spend path through the casino wallet is wired and tested, so pricing packs is a one-number change in stack-cards.html.
+- Stack Cards trade: if the accept message is lost after the receiver commits (connection drops mid-trade), the sender's escrow is refunded and those cards end up duplicated. No server to arbitrate.
 
 ---
 
@@ -290,6 +319,11 @@ Two patterns, don't mix them up:
 - **2026-09-20** — Fight Night had its guide button wired to the FOOTBALL guide, which explains 1X2 and over/under goals and nothing about boxing. Written a proper boxing guide covering the distance, knockdown vs stoppage vs decision, and why stoppage-round bets lose when it goes the full 3.
 - **2026-09-21** — Stake boxes lost focus on every digit: oninput called the full slip render, which rebuilt the input being typed into. oninput now only rewrites the stake-dependent numbers, and live re-renders go through keepFocus() which restores focus and caret. Stake boxes switched to type=text + inputmode=decimal because Chrome gives number inputs no selection API, so the caret jumped to the start after a rebuild.
 - **2026-09-21** — log() takes an optional note; sportsbook, fight and side bets pass the actual market so the history table says which bet paid. Cash outs pop the profit in green (or loss in red) and the settled row shows it too.
+- **2026-09-21** — Stack Cards integrated. stack-cards.html stays the SOURCE OF TRUTH and still opens standalone; sync-cards.js inlines its CSS and script into the casino, ship.js runs it before every build, and devkit check fails if the copies drift. The casino supplies window.StackBridge (wallet, per-account save into P().cards, party send, notify, grading badge).
+- **2026-09-21** — Stack Cards renders inside a SHADOW DOM. Its #tcg scoping stopped it leaking out, but nothing stopped the casino leaking in: 14 class names collide (.bal .flip .win .stage .grid .flash .sheen ...). Balloon Pump's .bal rule turned the card header into a 288px wall that swallowed the grading mailer's tear strip. Patching classes one by one would break again with the next game; the shadow root is a permanent boundary. Its CSS lives in an inert <template>; @property can't register inside a shadow root so --hr is declared in the document.
+- **2026-09-21** — Full Art and above became INDIVIDUAL copies (col.inst) so each one can carry its own condition, grade and state. Commons and holos stay as counts. Invariant: col[id].n equals that card's 'raw' copies. Condition is PSA-shaped: centering caps the grade (55/45 for a 10), and the final STK grade follows condition with a little grader variance, halves 1.5-8.5 like PSA. Measured pack-fresh spread: ~11% gem, ~33% 9, ~9% under 7.
+- **2026-09-21** — Card wear is an SVG drawn from each copy's seed, so a copy always looks the same. Every Full Art+ tier has a silver or gold border, where white edge-whitening vanished - wear now mixes dark scuffing with white chips so it reads on metal. Scratches sit on a separate glint layer masked to the light position, so they only flash as you tilt the card.
+- **2026-09-21** — Trades escrow the sender's side on send, so it can't be graded or offered twice while pending; declined, cancelled, disconnected or reloaded offers hand it back. The receiver commits first, then the sender. If the accept message is lost after the receiver commits, the sender gets their escrow back and the traded cards exist twice - accepted for a two-person game with no server.
 
 ---
 
@@ -302,6 +336,8 @@ Two patterns, don't mix them up:
 - `launcher.html` — the only file the mate keeps. Fetches `dist/version.json`, downloads `dist/stack-casino.html` when the version moves, caches it in `localStorage`, and `document.write`s it so the game stays on the launcher's origin and accounts survive updates. Falls back to the cached build when offline.
 - `test-launcher.js` — end-to-end proof that the auto-update path works. `npm run test:launcher`.
 - `SHIPPING.md` — the one-time GitHub setup and the day-to-day ship commands.
+- `stack-cards.html` — **source of truth for Stack Cards**. Opens standalone as a demo.
+- `sync-cards.js` — inlines `stack-cards.html` into the casino between the `STACK-CARDS` markers. `--check` verifies they match.
 - `1-5 *.cmd` + `_findnode.cmd` — double-click shortcuts so Alex never needs a terminal. Keep them working; he uses these, not the CLI.
 - `dist/` — published output. Generated; never hand-edit.
 - `DESIGN.md` — scratch ticket research, all RTP tables, game-by-game maths. Read before touching payouts.

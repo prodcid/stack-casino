@@ -159,6 +159,12 @@ function status() {
 
 /* ---------- ship ---------- */
 function ship(notes, local) {
+  // 0. pull the latest Stack Cards engine into the single-file build
+  if (fs.existsSync(path.join(ROOT, 'sync-cards.js'))) {
+    try { execFileSync(process.execPath, ['sync-cards.js'], { cwd: ROOT, stdio: 'inherit' }); }
+    catch (e) { die('Stack Cards failed to sync - fix stack-cards.html first.'); }
+  }
+
   // 1. never ship something that doesn't pass its own checks.
   // process.execPath, not 'node': a freshly installed Node is missing from PATH in
   // already-open shells, and the .cmd shortcuts launch us by full path.
