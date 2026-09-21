@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.22.3">
+<meta name="stack-version" content="2026.09.22.6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2510,6 +2510,184 @@ window.StackBridge={
  animation:tufly 1.1s var(--d) cubic-bezier(.5,0,.8,.4) forwards}
 @keyframes tufly{0%{opacity:0;transform:rotate(var(--a)) translateY(-280px) rotate(calc(-1*var(--a)))}
  15%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(0) rotate(calc(-1*var(--a))) scale(.3)}}
+/* ================= STORE ================= */
+#tcg .store{position:absolute;inset:0;overflow-y:auto;touch-action:pan-y;padding:66px 14px 60px;
+ background:radial-gradient(90% 40% at 50% 0%,rgba(0,231,1,.07),transparent 60%),linear-gradient(180deg,#10202c,#0b1720)}
+#tcg .st-sign{position:relative;max-width:1000px;margin:0 auto 20px;text-align:center;padding-top:24px}
+#tcg .st-awning{position:absolute;left:0;right:0;top:0;height:20px;border-radius:0 0 6px 6px;background:repeating-linear-gradient(90deg,#00b301 0 38px,#e9f7e9 38px 76px);box-shadow:0 8px 16px rgba(0,0,0,.35)}
+#tcg .st-awning::after{content:"";position:absolute;left:0;right:0;top:100%;height:11px;
+ background:radial-gradient(circle at 19px 0,#00b301 0 11px,transparent 12px) 0 0/76px 11px repeat-x,radial-gradient(circle at 19px 0,#e9f7e9 0 11px,transparent 12px) 38px 0/76px 11px repeat-x}
+#tcg .st-neon{display:inline-flex;gap:12px;align-items:baseline;margin-top:18px;font-weight:900}
+#tcg .st-neon b{font-size:clamp(32px,5vw,48px);letter-spacing:.06em;color:#eaffea;text-shadow:0 0 6px #00e701,0 0 18px #00e701,0 0 40px rgba(0,231,1,.55);animation:neon 5s infinite}
+#tcg .st-neon span{font-size:clamp(14px,2.2vw,19px);letter-spacing:.34em;color:#fff;opacity:.85}
+@keyframes neon{0%,90%,100%{opacity:1}91%{opacity:.35}92%{opacity:1}95%{opacity:.6}96%{opacity:1}}
+#tcg .st-sign small{display:block;margin-top:4px;color:var(--mute);font-size:11px;font-weight:800;letter-spacing:.18em}
+#tcg .st-feature{position:relative;max-width:1000px;margin:0 auto 18px;display:grid;grid-template-columns:1.3fr 1fr;align-items:center;
+ background:linear-gradient(180deg,#132634,#0e1b25);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+#tcg .st-spot{position:absolute;left:0;top:-60px;width:60%;height:140%;pointer-events:none;background:radial-gradient(42% 55% at 50% 40%,rgba(255,244,214,.17),transparent 72%)}
+#tcg .st-plinth{position:relative;height:350px;display:flex;align-items:center;justify-content:center;perspective:1400px}
+#tcg .st-plinth::before{content:"";position:absolute;bottom:40px;left:50%;width:300px;height:46px;transform:translateX(-50%);border-radius:50%;
+ background:radial-gradient(closest-side,#2c4556,#142430);box-shadow:0 18px 30px rgba(0,0,0,.55),inset 0 -6px 12px rgba(0,0,0,.4)}
+#tcg .st-turn{position:relative;width:0;height:0;transform-style:preserve-3d;animation:stturn 20s linear infinite;margin-top:-18px}
+@keyframes stturn{from{transform:rotateX(-18deg) rotateY(20deg) scale(.56)}to{transform:rotateX(-18deg) rotateY(-340deg) scale(.56)}}
+#tcg .st-info{position:relative;padding:24px 26px 24px 8px}
+#tcg .st-info small{font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--green)}
+#tcg .st-info>b{display:block;font-size:28px;font-weight:900;margin:6px 0 8px}
+#tcg .st-info p{color:var(--mute);font-weight:600;line-height:1.5;margin-bottom:18px}
+#tcg .st-tag:empty{display:none}
+#tcg .st-tag{font-size:22px;font-weight:900;margin-bottom:10px}
+#tcg .st-grid{max-width:1000px;margin:0 auto 18px;display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+#tcg .st-panel{position:relative;max-width:1000px;margin:0 auto 18px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+#tcg .st-grid .st-panel{margin:0}
+#tcg .st-panel h5{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;letter-spacing:.06em;margin-bottom:12px}
+#tcg .st-panel h5 small{background:var(--panel2);border-radius:99px;padding:1px 8px;font-size:11px;color:var(--mute)}
+#tcg .st-shelf{display:flex;justify-content:space-around;gap:10px;padding:4px 8px 0}
+#tcg .st-ghost{position:relative;width:88px;height:128px;border-radius:5px 5px 0 0;overflow:hidden;background:linear-gradient(160deg,#243a4a,#132330);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+#tcg .st-ghost::before{content:"?";position:absolute;inset:0;display:grid;place-items:center;font-size:44px;font-weight:900;color:rgba(255,255,255,.08)}
+#tcg .st-ghost i{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.13) 45%,transparent 60%);background-size:260% 100%;animation:ghostsh 3.4s linear infinite}
+#tcg .st-ghost span{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%) rotate(-12deg);white-space:nowrap;background:#ffc800;color:#2b2000;font-size:9.5px;font-weight:900;padding:3px 7px;border-radius:3px;letter-spacing:.08em}
+@keyframes ghostsh{from{background-position:130% 0}to{background-position:-130% 0}}
+#tcg .st-plank{height:14px;margin:0 -6px;border-radius:3px;background:linear-gradient(180deg,#9a6a40,#5d3a1f);box-shadow:0 10px 14px rgba(0,0,0,.4)}
+#tcg .st-single{display:flex;flex-direction:column;align-items:center}
+#tcg .st-single h5{align-self:flex-start}
+#tcg .st-peg{position:relative;height:172px;width:100%;display:flex;justify-content:center}
+#tcg .st-hook{position:absolute;top:0;left:50%;width:6px;height:28px;border-radius:3px;transform:translateX(-50%);background:linear-gradient(90deg,#8a969f,#f2f5f7,#8a969f)}
+#tcg .st-pack{position:relative;margin-top:18px;width:94px;height:142px;border-radius:5px;overflow:hidden;transform-origin:50% 0;animation:swing 4.5s ease-in-out infinite;box-shadow:0 12px 22px rgba(0,0,0,.5)}
+#tcg .st-pack img{display:block;width:100%;height:100%;object-fit:cover}
+#tcg .st-pack b{position:absolute;left:0;right:0;top:16px;text-align:center;font-weight:900;letter-spacing:.12em;text-shadow:0 2px 6px #000}
+#tcg .st-pack::before{content:"";position:absolute;left:50%;top:5px;z-index:2;width:18px;height:6px;border-radius:4px;background:#0b1620;transform:translateX(-50%)}
+@keyframes swing{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+#tcg .st-boxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+#tcg .st-box{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:var(--panel2);border:1px solid var(--line)!important;border-radius:10px;padding:12px}
+#tcg .st-box:hover{border-color:var(--green)!important}
+#tcg .st-box small{color:var(--mute);font-weight:700}
+#tcg .st-boxic{width:48px;height:28px;margin-bottom:6px;border-radius:3px;background:linear-gradient(135deg,#0e3a1e,#00a301);box-shadow:inset 0 -9px 0 rgba(0,0,0,.25)}
+#tcg .st-boxic.sealed{box-shadow:inset 0 -9px 0 rgba(0,0,0,.25),inset 0 0 0 2px rgba(255,255,255,.35)}
+#tcg .st-glass{display:flex;justify-content:center;gap:20px;padding:16px;border-radius:10px;
+ background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01));box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 34px 40px -30px rgba(255,255,255,.14)}
+#tcg .st-slab{position:relative;width:112px;aspect-ratio:.62}
+#tcg .st-slab .tslab{position:absolute;inset:0}
+#tcg .stfade{position:absolute;inset:0;z-index:99;background:#0a0705;pointer-events:none;animation:stfade 1.05s ease forwards}
+@keyframes stfade{0%{opacity:0}40%,55%{opacity:1}100%{opacity:0}}
+@media(max-width:760px){#tcg .st-feature{grid-template-columns:1fr}#tcg .st-plinth{height:270px}#tcg .st-info{padding:0 18px 20px}#tcg .st-grid{grid-template-columns:1fr}}
+
+/* ================= BOOSTER BOX (3D) ================= */
+#tcg .bx3{position:absolute;left:0;top:0;transform-style:preserve-3d}
+#tcg .bxhinge,#tcg .bxlid,#tcg .bxwrap{position:absolute;left:0;top:0;transform-style:preserve-3d}
+#tcg .bxhinge{transition:transform 1.3s cubic-bezier(.5,.02,.2,1)}
+#tcg .bx3.open{--lid:104deg}
+#tcg .bf{position:absolute;left:0;top:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+#tcg .bf img{-webkit-user-drag:none}
+#tcg .f-front,#tcg .f-side,#tcg .f-back{background:linear-gradient(180deg,#07170d,#0e3a1e 55%,#052410)}
+#tcg .f-bottom{background:#05110a}
+#tcg .f-in{background:linear-gradient(180deg,#eadfc6,#cbb993);box-shadow:inset 0 0 50px rgba(60,40,10,.35)}
+#tcg .f-in.floor{background:#bba985}
+#tcg .f-div{background:linear-gradient(180deg,#eadfc6,#cbb993);backface-visibility:visible}
+#tcg .bxfront-art,#tcg .bxside-art,#tcg .ltop-art{position:absolute;inset:0}
+#tcg .bxfront-art img,#tcg .bxside-art img,#tcg .ltop-art img{display:block;width:100%;height:100%;object-fit:cover}
+#tcg .bxfront-art{opacity:.6;-webkit-mask:linear-gradient(90deg,#000 40%,transparent);mask:linear-gradient(90deg,#000 40%,transparent)}
+#tcg .bxside-art{opacity:.32}
+#tcg .bxfront-t{position:absolute;left:18px;bottom:16px;right:90px}
+#tcg .bxfront-t b{display:block;font-size:19px;font-weight:900;letter-spacing:.08em;text-shadow:0 2px 8px #000}
+#tcg .bxfront-t small{font-size:10px;font-weight:800;letter-spacing:.14em;color:#b8ffb8}
+#tcg .f-front .stkhex{position:absolute;right:18px;bottom:16px;width:48px;height:48px;filter:drop-shadow(0 0 8px rgba(0,231,1,.6))}
+#tcg .bxside-t{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:19px;font-weight:900;letter-spacing:.12em}
+#tcg .bxside-t small{display:block;font-size:10px;letter-spacing:.34em;color:var(--green)}
+#tcg .bxback-t{position:absolute;left:20px;right:150px;top:72px;font-size:9.5px;line-height:1.45;color:#cfe8d4;font-weight:600}
+#tcg .bxback-t b{display:block;font-size:13px;color:#fff;margin-bottom:5px;letter-spacing:.08em}
+#tcg .bxbar{position:absolute;right:18px;bottom:16px;width:110px;height:42px;padding:5px 7px;border-radius:2px;background:#fff}
+#tcg .bxbar svg{display:block;width:100%;height:100%}
+#tcg .l-top{background:#052410}
+#tcg .ltop-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,22,9,.6)),radial-gradient(70% 70% at 75% 40%,transparent,rgba(0,0,0,.45))}
+#tcg .l-top::after,#tcg .l-under::after{content:"";position:absolute;inset:9px;border-radius:6px;pointer-events:none;border:3px solid #00e701;
+ box-shadow:0 0 12px rgba(0,231,1,.55),inset 0 0 12px rgba(0,231,1,.35)}
+#tcg .ltop-b{position:absolute;left:0;right:0;bottom:20px;text-align:center;font-size:11px;font-weight:900;letter-spacing:.22em;color:#eaffea}
+#tcg .bxlogo{position:absolute;left:26px;top:22px;z-index:3;line-height:.86;font-weight:900;font-style:italic}
+#tcg .bxlogo span{display:block;font-size:48px;letter-spacing:.01em;background:linear-gradient(180deg,#fff 10%,#c8ffc8 55%,#00c801);-webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 3px 0 #04320f) drop-shadow(0 7px 10px rgba(0,0,0,.6))}
+#tcg .bxlogo .bxl2{font-size:31px;margin-left:34px}
+#tcg .bxlogo em{display:inline-block;margin:7px 0 0 38px;font-style:normal;font-size:11px;letter-spacing:.32em;background:#00e701;color:#04250a;padding:3px 8px;border-radius:3px}
+#tcg .bxlogo.dsp{left:0;right:0;top:52px;text-align:center}
+#tcg .bxlogo.dsp span{display:inline-block;margin:0 5px}
+#tcg .bxlogo.dsp span{font-size:38px}#tcg .bxlogo.dsp .bxl2{font-size:24px;margin-left:0}#tcg .bxlogo.dsp em{margin-left:0}
+#tcg .bxfan{position:absolute;right:26px;top:34px;width:210px;height:170px;z-index:2}
+#tcg .bxc{position:absolute;left:50%;top:6px;width:84px;height:117px;margin-left:-42px;transform-origin:50% 130%;border-radius:4px;box-shadow:0 8px 16px rgba(0,0,0,.55)}
+#tcg .bxfan.dsp{left:50%;right:auto;top:auto;bottom:0;margin-left:-105px}
+#tcg .l-under{background:radial-gradient(90% 90% at 50% 100%,#0f6128,#052410 70%)}
+#tcg .lund-rays{position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg at 50% 60%,rgba(0,231,1,.14) 0 6deg,transparent 6deg 16deg);animation:obspin 50s linear infinite}
+#tcg .l-front,#tcg .l-back,#tcg .l-side{background:linear-gradient(180deg,#0d3f1d,#052410);box-shadow:inset 0 -3px 0 rgba(0,231,1,.55)}
+#tcg .lf-t{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:900;letter-spacing:.2em;color:#eaffea}
+#tcg .lf-r{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--green)}
+#tcg .bxtab{position:absolute;left:50%;bottom:-2px;width:78px;height:40px;margin-left:-39px;border-radius:40px 40px 0 0;display:grid;place-items:center;
+ background:linear-gradient(180deg,#135c2b,#0a3318);border:2px dashed rgba(234,255,234,.6)!important;border-bottom:0!important;color:#eaffea;font-size:10px;font-weight:900;letter-spacing:.16em;cursor:default;transition:transform .15s,filter .15s}
+#tcg .bxtab span{margin-top:8px}
+#tcg .ph-boxed .bxtab{cursor:pointer;animation:tabpulse 1.3s ease-in-out infinite}
+@keyframes tabpulse{50%{box-shadow:0 0 0 4px rgba(0,231,1,.45),0 0 26px rgba(0,231,1,.7)}}
+#tcg .bxtab.pushed{transform:scale(.9);filter:brightness(.6);animation:none}
+/* shrink-wrap */
+#tcg .wr{background-color:rgba(225,240,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 22px rgba(255,255,255,.08);
+ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='132' height='70'><g opacity='.26'><path d='M16 2 29 9v14L16 30 3 23V9z' transform='translate(4 6) scale(.62)' fill='%2300e701'/><text x='28' y='20' font-family='Arial Black,Arial' font-weight='900' font-size='12' fill='white'>STACK</text></g><g opacity='.26' transform='translate(66 35)'><path d='M16 2 29 9v14L16 30 3 23V9z' transform='translate(4 6) scale(.62)' fill='%2300e701'/><text x='28' y='20' font-family='Arial Black,Arial' font-weight='900' font-size='12' fill='white'>STACK</text></g></svg>")}
+#tcg .wr::before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(112deg,rgba(255,255,255,.36) 0%,rgba(255,255,255,.07) 16%,transparent 32%,rgba(255,255,255,.22) 50%,transparent 62%,rgba(255,255,255,.12) 86%,transparent)}
+#tcg .wr::after{content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(46px 28px at 0 0,rgba(255,255,255,.3),transparent 70%),radial-gradient(46px 28px at 100% 0,rgba(255,255,255,.26),transparent 70%),
+ radial-gradient(52px 32px at 0 100%,rgba(255,255,255,.22),transparent 70%),radial-gradient(52px 32px at 100% 100%,rgba(255,255,255,.28),transparent 70%),
+ repeating-linear-gradient(97deg,transparent 0 46px,rgba(255,255,255,.06) 47px,transparent 51px)}
+#tcg .wseal{position:absolute;left:50%;top:50%;z-index:2;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;display:grid;place-content:center;justify-items:center;text-align:center;
+ color:#063015;background:radial-gradient(circle at 35% 30%,#fff,#e6f4e6 60%,#c5d8c5);box-shadow:0 2px 6px rgba(0,0,0,.35);transform:rotate(-14deg)}
+#tcg .wf .wseal{left:auto;top:auto;right:26px;bottom:20px;margin:0}
+#tcg .wseal .stkhex{width:26px;height:26px}
+#tcg .wseal b{font-size:14px;font-weight:900;letter-spacing:.12em;line-height:1.1}
+#tcg .wseal small{font-size:6.5px;font-weight:900;letter-spacing:.14em}
+#tcg .wr-cut{display:flex;align-items:center;overflow:visible}
+#tcg .wr-cut i{flex:1;height:3px;margin:0 1.5px;border-radius:2px;background:#fff;box-shadow:0 0 5px rgba(0,231,1,.9)}
+#tcg .wr-cut i:nth-child(even){opacity:.2}
+#tcg .ph-sealed .wr-cut i:not(.c){animation:cutglow 1.1s ease-in-out infinite alternate}
+@keyframes cutglow{to{box-shadow:0 0 10px #00e701,0 0 2px #fff}}
+#tcg .wr-cut i.c{height:5px;opacity:1!important;background:#030805;box-shadow:0 1px 0 rgba(255,255,255,.7),0 -1px 0 rgba(255,255,255,.4);animation:none}
+#tcg .wr.fall{animation:wrfall 1.4s cubic-bezier(.45,0,.8,.45) forwards}
+@keyframes wrfall{0%{translate:0 0 0;opacity:1}14%{translate:0 -14px 0;opacity:1}100%{translate:var(--fx) 620px var(--fz);rotate:var(--fr);opacity:0}}
+/* packs in the box */
+#tcg .bpk{position:absolute;left:0;top:0;overflow:hidden;transform-origin:50% 100%;border-radius:4px 4px 3px 3px;backface-visibility:hidden;cursor:pointer;
+ transition:translate .35s cubic-bezier(.3,1.4,.5,1),filter .2s,opacity .5s;box-shadow:0 -2px 8px rgba(0,0,0,.4)}
+#tcg .bpk img{display:block;width:100%;height:100%;object-fit:cover}
+#tcg .bpk-f{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.3),transparent 30%,rgba(0,231,1,.2) 55%,transparent 75%)}
+#tcg .bpk-c{position:absolute;left:0;right:0;height:6px;background:repeating-linear-gradient(90deg,#dfe8ee 0 2px,#8a969f 2px 4px)}
+#tcg .bpk-c.t{top:0}#tcg .bpk-c.b{bottom:0}
+#tcg .bpk-n{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:14px;font-weight:900;letter-spacing:.14em;text-shadow:0 2px 6px #000}
+#tcg .desk:not(.ph-open) .bpk{pointer-events:none}
+#tcg .ph-open .bpk:hover{translate:0 -44px 0;filter:brightness(1.15)}
+#tcg .bpk.sel{translate:0 -118px 0!important;filter:brightness(1.2) drop-shadow(0 0 14px rgba(0,231,1,.85))}
+#tcg .bpk.fly{transition:translate .6s cubic-bezier(.5,0,.3,1),opacity .55s;translate:0 -300px 520px!important;opacity:0}
+/* ================= DESK ================= */
+#tcg .desk{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,#15110d 0%,#241b14 45%,#2e2117 100%)}
+#tcg .dk-wall{position:absolute;inset:0;background:radial-gradient(60% 70% at 30% 0%,rgba(255,214,150,.16),transparent 65%)}
+#tcg .dk-lamp{position:absolute;inset:0;z-index:5;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(55% 50% at 34% 34%,rgba(255,215,150,.16),transparent 70%)}
+#tcg .dk-cam{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1500px;perspective-origin:50% 26%}
+#tcg .dk-rig{position:relative;width:0;height:0;transform-style:preserve-3d;--bx:-46deg;--by:0deg;--bs:1;--ty:60px;
+ transform:translateY(var(--ty)) rotateX(calc(var(--bx) + var(--ox,0deg))) rotateY(calc(var(--by) + var(--oy,0deg))) scale(calc(var(--bs) * var(--zm,1)));transition:transform 1.3s cubic-bezier(.3,.7,.2,1)}
+#tcg .dk-rig.drag{transition:none}
+@media(max-width:700px){#tcg .desk{--zm:.74}}@media(max-width:430px){#tcg .desk{--zm:.6}}
+#tcg .ph-boxed .dk-rig,#tcg .ph-cutting .dk-rig{--bx:-26deg;--by:-28deg;--ty:50px}
+#tcg .ph-open .dk-rig,#tcg .ph-opening .dk-rig{--bx:-54deg;--by:0deg;--ty:150px;--bs:1}
+#tcg .dk-plane{backface-visibility:visible;background-color:#6e4628;
+ background-image:radial-gradient(34% 30% at 50% 50%,rgba(255,214,160,.2),transparent 70%),
+ url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='320'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.0035 0.085' numOctaves='3' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.22  0 0 0 0 0.12  0 0 0 0 0.05  0 0 0 -1.2 1.05'/></filter><rect width='640' height='320' filter='url(%23w)'/></svg>"),
+ repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,rgba(255,220,180,.05) 2px 3px,transparent 3px 150px);
+ background-size:auto,640px 320px,100% 150px}
+#tcg .dk-shadow{background:radial-gradient(closest-side,rgba(0,0,0,.7),rgba(0,0,0,.35) 60%,transparent);backface-visibility:visible}
+#tcg .dk-cutter{overflow:visible;backface-visibility:visible;filter:drop-shadow(0 6px 4px rgba(0,0,0,.45))}
+#tcg .dk-cutter svg,#tcg .cutter-cur svg{display:block;width:100%;height:100%}
+#tcg .ph-sealed .dk-cutter{opacity:0}
+#tcg .cutter-cur{position:absolute;left:0;top:0;z-index:30;width:140px;height:40px;pointer-events:none;display:none;transform-origin:5px 20px;filter:drop-shadow(0 8px 6px rgba(0,0,0,.5))}
+#tcg .ph-sealed .cutter-cur.on{display:block}
+#tcg .desk.ph-sealed{cursor:none}
+#tcg .dk-top{position:absolute;top:66px;left:16px;right:16px;z-index:30;display:flex;align-items:center;justify-content:space-between;color:#f3e6d0;font-weight:800}
+#tcg .btn.sm{padding:8px 14px;font-size:13px}
+#tcg .dk-hint{z-index:30;color:#f3e6d0;text-shadow:0 2px 6px #000}
+#tcg .desk.enter .bx3{animation:bxdrop .8s cubic-bezier(.5,0,.75,0) both}
+@keyframes bxdrop{0%{transform:translateY(-520px) rotateY(-25deg)}80%{transform:translateY(0) rotateY(0)}90%{transform:translateY(-10px)}100%{transform:none}}
+
 #tcg .gfbar{max-width:980px;margin:0 auto 6px;display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 #tcg .gfg{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 #tcg .gfg>span{width:62px;flex:none;font-size:10.5px;font-weight:900;letter-spacing:.1em;color:var(--mute)}
@@ -3809,7 +3987,7 @@ let root,gyro=null,dragging=false;
 const $=(s,r=root)=>r.querySelector(s);const fmt=n=>n.toLocaleString();
 function mount(el){root=el;root.id='tcg';
   root.innerHTML=`<div class="bar"><div class="title">Stack Cards<small>Mythic collection</small></div>
-   <div class="tabs"><button class="tab on" data-v="shop">Packs</button><button class="tab" data-v="binder">Binder</button><button class="tab" data-v="graded">Graded<i class="tdot" id="tcgDot"></i></button><button class="tab" data-v="tradeup">Trade Up</button><button class="tab" data-v="trade" id="tcgTradeTab" hidden>Trade</button></div>
+   <div class="tabs"><button class="tab on" data-v="store">Store</button><button class="tab" data-v="shop">Packs</button><button class="tab" data-v="binder">Binder</button><button class="tab" data-v="graded">Graded<i class="tdot" id="tcgDot"></i></button><button class="tab" data-v="tradeup">Trade Up</button><button class="tab" data-v="trade" id="tcgTradeTab" hidden>Trade</button></div>
    <div class="bal">$<b id="tcgBal"></b></div></div><div class="stage" id="tcgStage"></div>`;
   root.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{SFX.tick();go(b.dataset.v)});
   root.addEventListener('pointermove',e=>{if(!E.el||dragging||E.free||E.swipe||gyro)return;const r=E.el.getBoundingClientRect(),k=E.kind==='pack'?.6:1;
@@ -3817,12 +3995,13 @@ function mount(el){root=el;root.id='tcg';
   root.addEventListener('pointerleave',()=>{E.hx=E.hy=0});
   window.addEventListener('deviceorientation',e=>{if(e.gamma==null||!E.el||E.free||E.swipe)return;gyro=1;E.hx=clamp(-(e.beta-45)/2,-16,16);E.hy=clamp(e.gamma/1.6,-20,20);E.last=performance.now()});
   root.addEventListener('error',e=>{if(e.target.tagName==='IMG')artFallback(e.target)},true);
-  try{bakeCrinkle()}catch(e){}backfill();updBal();go('shop');gradeTick()}
+  try{bakeCrinkle()}catch(e){}backfill();updBal();go('store');gradeTick()}
 const askGyro=()=>{try{DeviceOrientationEvent.requestPermission&&DeviceOrientationEvent.requestPermission().catch(()=>{})}catch(e){}};
 function updBal(){const b=$('#tcgBal'),v=B.getBalance();if(b)b.textContent=isFinite(v)?fmt(Math.floor(v)):'∞';B.onBalance&&B.onBalance()}
 let curView='shop';
-function go(v){const k=['binder','graded','trade','tradeup'].includes(v)?v:'shop';curView=k;
-  root.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===k));({binder,graded,trade,tradeup}[k]||shop)()}
+function go(v){const k=['binder','graded','trade','tradeup','store'].includes(v)?v:v==='desk'&&DESK?'desk':'shop';curView=k;BOXCTX=null;
+  if(k==='desk')return desk(DESK.u);
+  root.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===k));({binder,graded,trade,tradeup,store}[k]||shop)()}
 const stage=()=>$('#tcgStage');
 
 /* ---------------- PACK ---------------- */
@@ -3831,7 +4010,7 @@ const skin=()=>`<div class="pk-skin"><div class="l-foil"></div><div class="l-sce
   <div class="l-title"><div class="t3d t1"><span class="ex">STACK</span><span class="fc">STACK</span></div><div class="t3d t2"><span class="ex">CARDS</span><span class="fc">CARDS</span></div><div class="l-badge">8 CARDS</div></div>
   <div class="l-spec"></div><div class="l-gsheen"></div><div class="l-seal"></div></div>`;
 let tearP=0,opened=false,pull=[];
-function shop(){const st=stage();opened=false;tearP=0;root.onkeydown=null;
+function shop(opt){opt=opt||{};const st=stage();opened=false;tearP=0;root.onkeydown=null;if(opt.box){curView='shop';tabOn('store')}
   st.innerHTML=`<div class="pity"><span>Full Art or better guaranteed in <b>${PITY-(col.pity||0)}</b> ${PITY-(col.pity||0)===1?'pack':'packs'}</span><i><s style="width:${(col.pity||0)/PITY*100}%"></s></i></div><div class="odds">8 cards: 5 commons, 2 reverse holos, 1 hit. Hit: <b>Holo ${Math.round((1-ODDS.fa-ODDS.sir-ODDS.bwr)*100)}%</b>, <b>Full Art ${Math.round(ODDS.fa*100)}%</b>, <b>SIR ${Math.round(ODDS.sir*100)}%</b>, <b>Mono Rare ${Math.round(ODDS.bwr*100)}%</b>. Any card: <b>Signed 1 in ${Math.round(1/V_SIG)}</b>, <b>Error 1 in ${Math.round(1/V_ERR)}</b>. Infernax Mono Rare: <b>Diamond 1 in ${Math.round(1/V_DIA)}</b></div>
    <div class="packwrap" id="pw"><div class="pk-shadow"></div><div class="pack" id="pk">
     <div class="pk-piece pk-body">${skin()}</div><div class="pk-piece pk-top" id="pkTop">${skin()}</div>
@@ -3850,6 +4029,8 @@ function shop(){const st=stage();opened=false;tearP=0;root.onkeydown=null;
     bar.style.setProperty('--tp',tearP*100+'%');if(tearP-last>.06){last=tearP;SFX.tickP(tearP);navigator.vibrate&&navigator.vibrate(4)}if(tearP>=1)openPack()};
   tz.onpointerup=()=>{sx=null};
   pk.tabIndex=0;pk.onkeydown=e=>{if(e.key==='Enter'&&bought)openPack()};
+  if(opt.box&&BOXCTX){SFX.init();bought=true;pull=rollPack();const bb=$('#buy');bb.className='btn ghost';bb.id='toBox';bb.textContent='Back to box';
+    const u=BOXCTX.u;bb.onclick=()=>{SFX.tick();desk(u)};$('#hint').textContent='Drag across the top edge to tear';SFX.crinkle(5)}
 }
 const PITY=10;let GOD=false,FORCE_GOD=false;
 function rollPack(){const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -3865,6 +4046,7 @@ const lineDone=()=>LINES.filter(L=>SET.filter(c=>c.art.startsWith(L.key)).every(
 let justDone=[];
 function openPack(){if(opened)return;opened=true;const pk=$('#pk');const before=lineDone();
   pull.forEach(addCard);
+  if(BOXCTX){const bx=boxBy(BOXCTX.u);if(bx&&bx.packs[BOXCTX.i]){bx.packs[BOXCTX.i]=0;if(!boxLeft(bx))bx.st='done'}}
   justDone=lineDone().filter(k=>!before.includes(k));col.opened=(col.opened||0)+1;
   const hit=pull[pull.length-1].c.t;col.pity=(hit==='h')?(col.pity||0)+1:0;checkCraftable();save();
   const tc={h:'#ffd35a',fa:'#9fd4ff',sir:'#ffb3d9',bwr:`hsl(${pull[pull.length-1].c.h} 95% 55%)`}[hit];
@@ -3947,7 +4129,11 @@ function summary(){const st=stage();root.onkeydown=null;
       b.innerHTML=`<small>Evolution line complete</small><b>${L.names[2]}</b>`;b.style.setProperty('--h',L.h);st.appendChild(b);SFX.reveal('u',true);SFX.boom();
       const bu=document.createElement('div');bu.className='burst';for(let i=0;i<70;i++){const a=Math.random()*Math.PI*2,d=120+Math.random()*260;bu.innerHTML+=`<i style="--c:hsl(${L.h+Math.random()*60-30} 95% 65%);--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
       st.appendChild(bu);setTimeout(()=>{b.remove();bu.remove()},2600)},j*2700))},1700);
-  $('#toB').onclick=()=>{SFX.tick();go('binder')};$('#again').onclick=()=>{SFX.tick();shop();setTimeout(()=>$('#buy')&&$('#buy').click(),50)}}
+  $('#toB').onclick=()=>{SFX.tick();go('binder')};$('#again').onclick=()=>{SFX.tick();shop();setTimeout(()=>$('#buy')&&$('#buy').click(),50)};
+  if(BOXCTX){const u=BOXCTX.u,bx=boxBy(u),nx=bx?bx.packs.findIndex(v=>v):-1;
+    $('#toB').textContent='Back to box';$('#toB').onclick=()=>{SFX.tick();nx<0?go('store'):desk(u)};
+    if(nx<0){$('#again').textContent='Box finished \u2014 to the store';$('#again').onclick=()=>{SFX.tick();go('store')}}
+    else{$('#again').textContent=`Next pack (${boxLeft(bx)} left)`;$('#again').onclick=()=>{SFX.tick();BOXCTX={u,i:nx};shop({box:1})}}}}
 /* tiles without a card in them (the black Obsidian slots) are skipped - one
    null here used to abort the loop and leave every later card unclickable */
 function minis(scope){scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
@@ -4134,6 +4320,151 @@ function tuReveal(p,from){const h=p.c.h??CATS[p.c.cat].h;
     ov.appendChild(bu);setTimeout(()=>bu.remove(),1300);if(p.v)setTimeout(()=>varPop(p,ov),450)},1500);
   const done=v=>{ov.remove();deactivate();go(v)};
   ov.querySelector('#tuBinder').onclick=()=>done('binder');ov.querySelector('#tuAgain').onclick=()=>done('tradeup')}
+
+/* ---------------- STORE + BOOSTER BOX ----------------
+   The store front: a featured sealed booster box turning on a lit plinth, a
+   limited-edition shelf (coming soon), single packs on a peg, your boxes, and a
+   glass cabinet of your best slabs. Buying a box (BOX_COST - free for now) cuts
+   to a wooden desk: slice the shrink-wrap along the top with the box cutter,
+   push the tab on the lid, and the lid folds back into a display over 36 packs
+   standing in two rows of 18. Tap a pack to pull it up, tap again to open it.
+   col.boxes = [{u, st:'sealed'|'boxed'|'open'|'done', packs:[36 x 1/0]}]. A pack
+   only leaves the box once it's actually torn open (openPack), so backing out
+   of the tear screen never loses one. */
+const BOX_COST=0,BOX_N=36,BW=420,BD=272,BH=150,LH=58,CUT_BINS=28;
+let DESK=null,BOXCTX=null;
+const boxBy=u=>(col.boxes||[]).find(b=>b.u===u)||null;
+const boxLeft=b=>b?b.packs.reduce((a,v)=>a+v,0):0;
+const tabOn=k=>root.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===k));
+/* one face of a cuboid, centred on its group's origin */
+const bf=(cls,w,h,tf,inner='')=>`<div class="bf ${cls}" style="width:${w}px;height:${h}px;margin:${-h/2}px 0 0 ${-w/2}px;transform:${tf}">${inner}</div>`;
+const CUTTER_SVG='<svg viewBox="0 0 180 52"><path d="M40 10h120a10 10 0 0 1 10 10v12a10 10 0 0 1-10 10H40z" fill="#ffc800" stroke="#2b2000" stroke-width="2"/><rect x="58" y="18" width="84" height="16" rx="8" fill="#2b2b2b"/><rect x="68" y="21" width="24" height="10" rx="4" fill="#777"/><path d="M40 12 6 26 40 40z" fill="#dfe6ec" stroke="#6b7680" stroke-width="2"/><path d="M40 12 6 26h34z" fill="#fff" opacity=".6"/><path d="M150 14v24" stroke="#2b2000" stroke-width="2" opacity=".35"/></svg>';
+const bxLogo=cls=>`<div class="bxlogo ${cls||''}"><span class="bxl1">STACK</span><span class="bxl2">CARDS</span><em>MYTHIC</em></div>`;
+function bxFan(n,cls){const pool=SET.filter(c=>c.t==='sir'||c.t==='bwr'),out=[];
+  for(let i=0;i<n;i++){const c=pool[(i*5+2)%pool.length],d=i-(n-1)/2;
+    out.push(`<div class="bxc" style="transform:rotate(${d*13}deg) translateY(${Math.abs(d)*9}px);z-index:${10-Math.abs(d)}">${cardFrontBase(c,false)}</div>`)}
+  return `<div class="bxfan ${cls||''}">${out.join('')}</div>`}
+function boxHTML(o){o=o||{};const W=BW,D=BD,H=BH,LW=W+6,LD=D+6,PA=artImg('packArt',Art.packArt);
+  const side=`<div class="bxside-art">${PA}</div><div class="bxside-t">STACK CARDS<small>MYTHIC</small></div>`;
+  let h=bf('f-front',W,H,`translateZ(${D/2}px)`,`<div class="bxfront-art">${PA}</div><div class="bxfront-t"><b>BOOSTER DISPLAY BOX</b><small>36 BOOSTER PACKS \u00b7 8 CARDS PER PACK</small></div>${STK_LOGO}`)
+   +bf('f-back',W,H,`rotateY(180deg) translateZ(${D/2}px)`,`<div class="bxback-t"><b>STACK CARDS \u00b7 MYTHIC</b>Contains 36 sealed booster packs. Every pack holds 8 cards: 5 commons, 2 reverse holos and 1 hit. Full Art or better at least every ${PITY} packs.</div><div class="bxbar">${barcode('BOX-MYTHIC-036')}</div>`)
+   +bf('f-side',D,H,`rotateY(90deg) translateZ(${W/2}px)`,side)+bf('f-side',D,H,`rotateY(-90deg) translateZ(${W/2}px)`,side)
+   +bf('f-bottom',W,D,`rotateX(-90deg) translateZ(${H/2}px)`)
+   +bf('f-in',W,H,`translateZ(${D/2-1}px) rotateY(180deg)`)+bf('f-in',W,H,`translateZ(${-D/2+1}px)`)
+   +bf('f-in',D,H,`rotateY(90deg) translateZ(${W/2-1}px) rotateY(180deg)`)+bf('f-in',D,H,`rotateY(-90deg) translateZ(${W/2-1}px) rotateY(180deg)`)
+   +bf('f-in floor',W,D,`rotateX(90deg) translateZ(${-H/2+1}px)`)
+   +bf('f-div',D-4,H*.7,`translateY(${H*.15}px) rotateY(90deg)`);
+  // 36 packs, two rows of 18 front to back. Each leans back from its base so the top
+  // band of every pack shows, the way a real display box fans them
+  if(o.packs){const PH=H-12,PW=W/2-26,LEAN=16,sl=Math.sin(LEAN*Math.PI/180),step=(D-18-PH*sl)/(BOX_N/2-1);
+    o.packs.forEach((v,i)=>{if(!v)return;const row=i%2,k=Math.floor(i/2),x=(row?1:-1)*W/4,z=D/2-12-k*step,y=H/2-PH/2-2;
+      h+=`<div class="bpk" data-i="${i}" style="width:${PW}px;height:${PH}px;margin:${-PH/2}px 0 0 ${-PW/2}px;transform:translate3d(${x}px,${y}px,${z}px) rotateX(${LEAN}deg)">${PA}<i class="bpk-f"></i><i class="bpk-c t"></i><i class="bpk-c b"></i><b class="bpk-n">STACK</b></div>`})}
+  // the lid, hinged at the back: the underside is the printed display header
+  h+=`<div class="bxhinge" style="transform:translate3d(0,${-H/2-3}px,${-D/2-3}px) rotateX(var(--lid,0deg))"><div class="bxlid" style="transform:translate3d(0,${LH/2}px,${D/2+3}px)">
+    ${bf('l-top',LW,LD,`rotateX(90deg) translateZ(${LH/2}px)`,`<div class="ltop-art">${PA}</div>${bxFan(3,'top')}${bxLogo()}<div class="ltop-b">BOOSTER DISPLAY BOX \u00b7 36 PACKS</div>`)}
+    ${bf('l-under',LW,LD,`rotateX(-90deg) translateZ(${-LH/2+1}px)`,`<div class="lund-rays"></div>${bxFan(5,'dsp')}${bxLogo('dsp')}`)}
+    ${bf('l-front',LW,LH,`translateZ(${LD/2}px)`,`<div class="lf-t">STACK CARDS \u00b7 MYTHIC</div><div class="lf-r">36 PACKS</div><button class="bxtab" id="bxTab"><span>PUSH</span></button>`)}
+    ${bf('l-back',LW,LH,`rotateY(180deg) translateZ(${LD/2}px)`,`<div class="lf-t">STACK CARDS</div>`)}
+    ${bf('l-side',LD,LH,`rotateY(90deg) translateZ(${LW/2}px)`,`<div class="lf-t">MYTHIC</div>`)}${bf('l-side',LD,LH,`rotateY(-90deg) translateZ(${LW/2}px)`,`<div class="lf-t">MYTHIC</div>`)}
+   </div></div>`;
+  // shrink-wrap: clear film printed with the Stack logo, a seal sticker, and a cut line over the top
+  if(o.wrap){const ww=W+12,wd=D+12,wh=H+12,cy=-2,seal=`<div class="wseal">${STK_LOGO}<b>STACK</b><small>FACTORY SEALED</small></div>`;
+    const wf=(cls,w,hh,tf,inner='')=>bf('wr '+cls,w,hh,`translateY(${cy}px) ${tf}`,inner);
+    h+=`<div class="bxwrap">`+wf('wf',ww,wh,`translateZ(${wd/2}px)`,seal)+wf('wb',ww,wh,`rotateY(180deg) translateZ(${wd/2}px)`)
+      +wf('ws',wd,wh,`rotateY(90deg) translateZ(${ww/2}px)`)+wf('ws',wd,wh,`rotateY(-90deg) translateZ(${ww/2}px)`)
+      +wf('wt',ww,wd/2,`rotateX(90deg) translateZ(${wh/2}px) translateY(${wd/4}px)`)
+      +wf('wt',ww,wd/2,`rotateX(90deg) translateZ(${wh/2}px) translateY(${-wd/4}px)`,seal)
+      +(o.cut?bf('wr-cut" id="wrCut',ww-34,18,`translateY(${cy}px) rotateX(90deg) translateZ(${wh/2+1}px)`,'<i></i>'.repeat(CUT_BINS)):'')+`</div>`}
+  return h}
+
+function store(){const st=stage();deactivate();root.onkeydown=null;DESK=null;
+  const mine=(col.boxes||[]).filter(b=>b.st!=='done');
+  const slabs=col.inst.filter(i=>i.st==='slab').sort((a,b)=>b.grade-a.grade||RANK[CARD(b.id).t]-RANK[CARD(a.id).t]).slice(0,3);
+  st.innerHTML=`<div class="store">
+   <div class="st-sign"><div class="st-awning"></div><div class="st-neon"><b>STACK</b><span>CARD SHOP</span></div><small>SEALED PRODUCT \u00b7 SINGLES \u00b7 GRADING</small></div>
+   <section class="st-feature"><div class="st-spot"></div>
+    <div class="st-plinth"><div class="st-turn"><div class="bx3">${boxHTML({wrap:1})}</div></div></div>
+    <div class="st-info"><small>FEATURED \u00b7 FACTORY SEALED</small><b>Mythic Booster Box</b>
+     <p>36 sealed booster packs, 8 cards each. Slice the wrap, pop the lid and pull packs straight from the display.</p>
+     <div class="st-tag">${BOX_COST?'$'+fmt(BOX_COST):''}</div><button class="btn" id="stBuy">Buy booster box</button></div></section>
+   <div class="st-grid">
+    <section class="st-panel st-lim"><h5>Limited editions</h5><div class="st-shelf">${[0,1,2].map(()=>'<div class="st-ghost"><i></i><span>COMING SOON</span></div>').join('')}</div><div class="st-plank"></div></section>
+    <section class="st-panel st-single"><h5>Single packs</h5><div class="st-peg"><div class="st-hook"></div><div class="st-pack">${artImg('packArt',Art.packArt)}<b>STACK</b></div></div><button class="btn ghost" id="stPack">Open a pack</button></section>
+   </div>
+   <section class="st-panel st-mine"><h5>Your boxes <small>${mine.length}</small></h5>${mine.length?`<div class="st-boxes">${mine.map(b=>`<button class="st-box" data-box="${b.u}"><div class="st-boxic${b.st==='sealed'?' sealed':''}"></div><b>${b.st==='sealed'?'Sealed box':b.st==='boxed'?'Unwrapped box':'Open box'}</b><small>${boxLeft(b)} of ${BOX_N} packs left</small></button>`).join('')}</div>`:'<p class="gempty">No boxes yet \u2014 grab one above.</p>'}</section>
+   <section class="st-panel st-cab"><h5>Display cabinet <small>your best slabs</small></h5><div class="st-glass">${slabs.length?slabs.map(i=>`<div class="st-slab"><div class="tslab">${slabHTML(i,1)}</div></div>`).join(''):'<p class="gempty">Grade a card and your best slabs go on show here.</p>'}</div></section>
+  </div>`;
+  $('#stBuy').onclick=buyBox;$('#stPack').onclick=()=>{SFX.tick();go('shop')};
+  st.querySelectorAll('[data-box]').forEach(b=>b.onclick=()=>{SFX.tick();desk(b.dataset.box)})}
+function buyBox(){SFX.init();if(!B.spend(BOX_COST)){SFX.no();return null}updBal();SFX.buy();
+  col.boxes=col.boxes||[];const b={u:'bx'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),st:'sealed',packs:Array(BOX_N).fill(1),at:Date.now()};
+  col.boxes.push(b);save();
+  if(root&&root.isConnected){const f=document.createElement('div');f.className='stfade';root.appendChild(f);
+    setTimeout(()=>{desk(b.u,true)},420);setTimeout(()=>f.remove(),1050)}
+  return b}
+
+function desk(u,enter){const b=boxBy(u);if(!b||b.st==='done')return go('store');
+  const st=stage();deactivate();root.onkeydown=null;curView='desk';BOXCTX=null;tabOn('store');
+  DESK={u,phase:b.st==='open'?'open':b.st==='boxed'?'boxed':'sealed',sel:null,ox:0,oy:0};
+  st.innerHTML=`<div class="desk ph-${DESK.phase}${enter?' enter':''}" id="dk"><div class="dk-wall"></div>
+   <div class="dk-cam"><div class="dk-rig" id="dkRig">
+    ${bf('dk-plane',3000,2200,`rotateX(90deg) translateZ(${-BH/2-1}px)`)}
+    ${bf('dk-shadow',BW+140,BD+140,`rotateX(90deg) translateZ(${-BH/2}px)`)}
+    ${bf('dk-cutter',180,52,`rotateX(90deg) translateZ(${-BH/2+.5}px) translate(${BW/2+150}px,40px) rotate(-24deg)`,CUTTER_SVG)}
+    <div class="bx3${b.st==='open'?' open':''}" id="bx">${boxHTML({wrap:b.st==='sealed',cut:1,packs:b.packs})}</div>
+   </div></div><div class="dk-lamp"></div>
+   <div class="cutter-cur" id="cur">${CUTTER_SVG}</div>
+   <div class="dk-top"><button class="btn ghost sm" id="dkBack">\u2190 Store</button><span id="dkCount"></span></div>
+   <div class="hint dk-hint" id="dkHint"></div><div class="dock" id="dkDock"></div></div>`;
+  if(enter)setTimeout(()=>{try{SFX.boom()}catch(x){}},650);
+  const dk=$('#dk'),rig=$('#dkRig'),cur=$('#cur'),done=new Set();let cutting=false,lastK=-1,orb=null;
+  const cutAt=e=>{const c=$('#wrCut');if(!c||DESK.phase!=='sealed')return;const q=c.getBoundingClientRect();
+    if(e.clientY<q.top-34||e.clientY>q.bottom+34||e.clientX<q.left-14||e.clientX>q.right+14){lastK=-1;return}
+    const k=Math.max(0,Math.min(CUT_BINS-1,Math.floor((e.clientX-q.left)/q.width*CUT_BINS)));
+    const a=lastK<0?k:Math.min(k,lastK),z=lastK<0?k:Math.max(k,lastK);lastK=k;let fresh=0;
+    for(let j=a;j<=z;j++)if(!done.has(j)){done.add(j);c.children[j].classList.add('c');fresh++}
+    if(fresh){try{SFX.tickP(done.size/CUT_BINS)}catch(x){}navigator.vibrate&&navigator.vibrate(3)}
+    if(done.size>=Math.ceil(CUT_BINS*.86))cutDone()};
+  dk.onpointerdown=e=>{if(e.target.closest('button,.bpk'))return;SFX.init();
+    if(DESK.phase==='sealed'){cutting=true;lastK=-1;dk.setPointerCapture(e.pointerId);cutAt(e);return}
+    if(DESK.phase==='boxed'||DESK.phase==='open'){orb={x:e.clientX,y:e.clientY,ox:DESK.ox,oy:DESK.oy};dk.setPointerCapture(e.pointerId)}};
+  dk.onpointermove=e=>{const q=dk.getBoundingClientRect();cur.classList.add('on');cur.style.transform=`translate(${e.clientX-q.left-5}px,${e.clientY-q.top-20}px) rotate(-16deg)`;
+    if(cutting)cutAt(e);
+    if(orb){const dx=e.clientX-orb.x,dy=e.clientY-orb.y;if(Math.abs(dx)+Math.abs(dy)>4)rig.classList.add('drag');
+      DESK.oy=clamp(orb.oy+dx*.25,-55,55);DESK.ox=clamp(orb.ox-dy*.15,-16,22);rig.style.setProperty('--oy',DESK.oy+'deg');rig.style.setProperty('--ox',DESK.ox+'deg')}};
+  dk.onpointerup=dk.onpointercancel=()=>{cutting=false;lastK=-1;orb=null;rig.classList.remove('drag')};
+  $('#dkBack').onclick=()=>{SFX.tick();go('store')};
+  $('#bxTab').onclick=e=>{e.stopPropagation();if(DESK.phase!=='boxed')return;openLid()};
+  $('#bx').querySelectorAll('.bpk').forEach(el=>el.onclick=e=>{e.stopPropagation();if(DESK.phase!=='open')return;const i=+el.dataset.i;
+    if(DESK.sel===i)return boxPackOpen(i);
+    $('#bx').querySelectorAll('.bpk.sel').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');DESK.sel=i;try{SFX.crinkle(2)}catch(x){}deskUI()});
+  deskUI()}
+function deskUI(){if(!DESK)return;const b=boxBy(DESK.u),p=DESK.phase,n=boxLeft(b),dk=$('#dk');if(!dk)return;
+  dk.classList.remove('ph-sealed','ph-cutting','ph-boxed','ph-opening','ph-open');dk.classList.add('ph-'+p);
+  $('#dkCount').textContent=p==='open'?`${n} of ${BOX_N} packs left`:'';
+  $('#dkHint').textContent=p==='sealed'?'Grab the box cutter and slice along the dotted line across the top'
+    :p==='cutting'||p==='opening'?'':p==='boxed'?'Push the tab on the front of the lid to open it'
+    :n?(DESK.sel!=null?'Tap it again, or hit Open, to rip it open':'Pick a pack \u2014 any pack. Drag the desk to look around'):'Box finished \u2014 every pack is open';
+  const dock=$('#dkDock');
+  dock.innerHTML=p==='open'?(n?`<button class="btn" id="dkOpen" ${DESK.sel==null?'disabled':''}>Open this pack</button>`:'<button class="btn" id="dkMore">Back to the store</button>'):'';
+  const o=$('#dkOpen');if(o)o.onclick=()=>{if(DESK.sel!=null)boxPackOpen(DESK.sel)};
+  const m=$('#dkMore');if(m)m.onclick=()=>go('store')}
+function cutDone(){if(!DESK||DESK.phase!=='sealed')return;DESK.phase='cutting';deskUI();
+  try{SFX.rip();setTimeout(()=>SFX.crinkle(8),240)}catch(x){}navigator.vibrate&&navigator.vibrate([20,30,40]);
+  const w=$('#bx').querySelector('.bxwrap'),c=$('#wrCut');c&&c.remove();
+  w.querySelectorAll('.wr').forEach((f,k)=>{const sg=k%2?1:-1;
+    f.style.setProperty('--fx',(Math.random()*420-210).toFixed(0)+'px');f.style.setProperty('--fz',(160+Math.random()*300).toFixed(0)+'px');
+    f.style.setProperty('--fr',`${(Math.random()-.5).toFixed(2)} 1 ${(Math.random()-.5).toFixed(2)} ${(sg*(50+Math.random()*90)).toFixed(0)}deg`);
+    f.style.animationDelay=(k*60)+'ms';f.classList.add('fall')});
+  const b=boxBy(DESK.u);b.st='boxed';save();
+  setTimeout(()=>{w.remove();if(DESK&&DESK.phase==='cutting'){DESK.phase='boxed';deskUI()}},1500)}
+function openLid(){const b=boxBy(DESK.u),t=$('#bxTab');t&&t.classList.add('pushed');SFX.tick();
+  b.st='open';save();DESK.phase='opening';deskUI();
+  setTimeout(()=>{$('#bx').classList.add('open');try{SFX.slide();setTimeout(()=>SFX.flip(),520)}catch(x){}},240);
+  setTimeout(()=>{if(!DESK)return;DESK.phase='open';deskUI();try{SFX.reveal('r',true)}catch(x){}},1500)}
+function boxPackOpen(i){const b=boxBy(DESK.u);if(!b||!b.packs[i])return;const el=$('#bx').querySelector(`.bpk[data-i="${i}"]`);
+  el&&el.classList.add('fly');try{SFX.swoosh()}catch(x){}const u=DESK.u;
+  setTimeout(()=>{BOXCTX={u,i};shop({box:1})},560)}
 
 /* ---------------- GRADING ---------------- */
 const GRADE_MS=60000;
@@ -4396,7 +4727,8 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
   /* exposed for tests */
   _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,artSrc:k=>Art[k](),
      OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
-     VAR,isVar,rollVar,diaHTML,DIA_ID,addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
+     VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
+     get DESK(){return DESK},get BOXCTX(){return BOXCTX},addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
      get col(){return col},set col(v){col=v}}};
 if(document.getElementById('tcg')&&!window.StackBridge)mount(document.getElementById('tcg'));
 })();

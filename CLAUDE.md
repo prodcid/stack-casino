@@ -67,7 +67,7 @@ storage/account layer.
 ## 1. Project identity
 
 - **File:** `stack-casino.html` — one file, no build step, no dependencies to install.
-- **Runs:** open in any browser. Must work on desktop and phone (test at 390px).
+- **Runs:** open in any browser. **PC only** — Alex said 2026-09-22 not to spend time on phone layouts from now on. Don't test or tune at phone widths.
 - **Money:** fake credits, one wallet per account, saved to `localStorage` (and `window.storage` when hosted).
 - **Ship:** `node ship.js "what changed"` → `dist/` → your mate's `launcher.html` self-updates. See `SHIPPING.md`.
 - **Net:** PeerJS over WebRTC, loaded from CDN at runtime. Host-authoritative.
@@ -193,6 +193,15 @@ automatically; `devkit check` fails if they drift).
   (`DIA_ID=36`, #037), 1 in 10 of its pulls — Alex asked for that card specifically, don't widen it.
   Stones are the edge-wear chip sizes (see `wearHTML`) in blues, on the edges AND the whole
   face; the art is hue-rotated to light blue and `--h` forced to 208. Gradeable like any Mono Rare.
+- **Store** (`store` tab, the default view) + **booster box**. Store front: featured sealed box
+  turning on a plinth (`boxHTML({wrap:1})`), limited-edition shelf (coming soon — future limited
+  packs go here), single packs, "your boxes", slab cabinet. `BOX_COST=0` for now (goes through
+  `B.spend` so a price is a one-line change). Buying cuts to `desk(u)`: pure CSS 3D (`bf()` faces,
+  `BW/BD/BH`), shrink-wrap with the Stack logo → drag the box cutter along `#wrCut` (bins, 86%)
+  → wrap pieces fall → push `#bxTab` → lid hinges back 104° (its underside is the display
+  header) → 36 packs (2×18, leaning back 16° from the base so every top shows). Pick a pack →
+  `shop({box:1})` tear screen with `BOXCTX`; the pack only leaves `col.boxes[].packs` in
+  `openPack`, so backing out never loses one. Box `st`: sealed → boxed → open → done.
 - **Trade Up** (`tradeup` tab, `spareStacks/tuSign`): 10 spares of a rarity → 1 random card of
   the next (c→h→fa→sir→bwr), 50% drawn from cards you don't own. Spares never include your last
   copy, slabs or signed/error copies.
@@ -352,6 +361,7 @@ Two patterns, don't mix them up:
 - **2026-09-21** — Zoom/grading: gradeTick used to go(curView) when a grade came back, rebuilding binder/graded under an open zoom or slab opening (jump to top, zoom engine killed). Now softRefresh(): deferred while .zoom/.rwov/.stkwrap is open, keeps scroll. activate() refuses elements outside an open .zoom, and the zoom deck re-grabs the engine on pointerdown - a binder tile could steal it so dragging spun the tile behind.
 - **2026-09-21** — Signed/error cards are individual inst copies (not a flag on counts) so they show, trade and grade on their own and can't be spent as spares; for commons/holos they sit outside col[id] counts. Double print needed a second offset <img> - a drop-shadow on the art was clipped by the window. Trade Up: 10 spares -> next rarity, half the time from unowned cards so it helps completion; last copies, slabs and specials are never spares.
 - **2026-09-22** — Light Blue Diamond Edition: Alex's mate noticed the white edge-wear chips on a PSA 6 Infernax looked cool; re-cut them as blue stones (same chip sizes) across the whole face, art hue-rotated to light blue. Infernax Mono Rare only, by request, at 1 in 10 of its pulls - 1/100 was dropped because there are only 2 Mono Rares in the set, which would make it ~1 in 6700 packs.
+- **2026-09-22** — Store + booster box: pure CSS 3D (no WebGL/three.js) so it stays one file and the card art reuses the same cached <img>s; lid hinges from the back and its underside is the display header, like a real Pokemon display box. Packs lean back 16deg from their base and the open camera looks down 54deg - at 40deg you only saw crimps. A box pack is removed only when torn, not when picked. PC only from now on per Alex.
 
 ---
 

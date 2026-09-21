@@ -585,6 +585,29 @@ async function cards(ctx, errs) {
   const tuv = await pg.evaluate("(()=>{const R=StackCards.root;return [R.querySelectorAll('.tuslot').length,R.querySelectorAll('[data-tu]').length,!!R.querySelector('#tuGo')]})()");
   (tuv[0] === 11 && tuv[1] === 4 && tuv[2]) ? pass('trade up tab renders') : fail('trade up tab renders', JSON.stringify(tuv));
 
+  // STORE + BOOSTER BOX: buy -> desk -> cut the wrap -> push the tab -> 36 packs -> open one
+  await pg.evaluate("StackCards.go('store')"); await pg.waitForTimeout(400);
+  const sf = await pg.evaluate("(()=>{const R=StackCards.root;return [!!R.querySelector('.st-feature .bx3 .wr'),!!R.querySelector('#stBuy'),R.querySelectorAll('.st-ghost').length]})()");
+  (sf[0] && sf[1] && sf[2] === 3) ? pass('store front shows a sealed box and the shelves') : fail('store front shows a sealed box and the shelves', JSON.stringify(sf));
+  await pg.evaluate("StackCards.root.querySelector('#stBuy').click()"); await pg.waitForTimeout(1500);
+  const cr = await pg.evaluate("(()=>{const r=StackCards.root.querySelector('#wrCut').getBoundingClientRect();return [r.left,r.top,r.width,r.height]})()");
+  await pg.mouse.move(cr[0] - 6, cr[1] + cr[3] / 2); await pg.mouse.down();
+  for (let i = 0; i <= 30; i++) { await pg.mouse.move(cr[0] + cr[2] * i / 30, cr[1] + cr[3] / 2); await pg.waitForTimeout(12); }
+  await pg.mouse.up(); await pg.waitForTimeout(1900);
+  const bx1 = await pg.evaluate("(()=>{const X=StackCards._;return [X.DESK.phase,X.boxBy(X.DESK.u).st,!!StackCards.root.querySelector('.bxwrap')]})()");
+  (bx1[0] === 'boxed' && bx1[1] === 'boxed' && !bx1[2]) ? pass('box cutter slices the wrap off') : fail('box cutter slices the wrap off', JSON.stringify(bx1));
+  const tb = await pg.evaluate("(()=>{const r=StackCards.root.querySelector('#bxTab').getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]})()");
+  await pg.mouse.click(tb[0], tb[1]); await pg.waitForTimeout(1900);
+  const bx2 = await pg.evaluate("(()=>{const X=StackCards._,R=StackCards.root;return [X.DESK.phase,X.boxBy(X.DESK.u).st,R.querySelectorAll('#bx .bpk').length,getComputedStyle(R.querySelector('#bx')).getPropertyValue('--lid').trim()]})()");
+  (bx2[0] === 'open' && bx2[1] === 'open' && bx2[2] === 36 && bx2[3] === '104deg') ? pass('tab opens the lid onto 36 packs') : fail('tab opens the lid onto 36 packs', JSON.stringify(bx2));
+  await pg.evaluate("(()=>{const X=StackCards._;X.boxPackOpen(0)})()"); await pg.waitForTimeout(900);
+  const tear = await pg.evaluate("(()=>{const R=StackCards.root,X=StackCards._;return [!!R.querySelector('#pk'),!!R.querySelector('#toBox'),!R.querySelector('#buy'),X.boxLeft(X.boxBy(X.BOXCTX.u))]})()");
+  (tear[0] && tear[1] && tear[2] && tear[3] === 36) ? pass('picked pack goes to the tear screen, still in the box until torn') : fail('picked pack goes to the tear screen, still in the box until torn', JSON.stringify(tear));
+  await pg.evaluate("(()=>{const p=StackCards.root.querySelector('#pk');p.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}))})()"); await pg.waitForTimeout(700);
+  const aft = await pg.evaluate("(()=>{const X=StackCards._,b=X.col.boxes[X.col.boxes.length-1];return [X.boxLeft(b),b.packs[0]]})()");
+  (aft[0] === 35 && aft[1] === 0) ? pass('tearing it takes that pack out of the box', '35 left') : fail('tearing it takes that pack out of the box', JSON.stringify(aft));
+  await pg.evaluate("StackCards.go('store')"); await pg.waitForTimeout(300);
+
   errs.length === n0 ? pass('no stack cards console errors') : fail('no stack cards console errors', errs.slice(n0).join(' | '));
   await pg.close();
 }
