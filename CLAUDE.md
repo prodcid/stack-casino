@@ -189,6 +189,10 @@ automatically; `devkit check` fails if they drift).
   raw copies (condition, gradeable, slab label names it). On a common/holo it is NOT in `col[id]`
   counts — `takeItems/giveItems` only touch counts for HI cards. Rendered by `varFront()` over
   the normal front; shown in their own "Signed & errors" binder row.
+- **Light Blue Diamond Edition** (`v:'dia'`, `diaHTML`). ONE card only: Infernax Mono Rare
+  (`DIA_ID=36`, #037), 1 in 10 of its pulls — Alex asked for that card specifically, don't widen it.
+  Stones are the edge-wear chip sizes (see `wearHTML`) in blues, on the edges AND the whole
+  face; the art is hue-rotated to light blue and `--h` forced to 208. Gradeable like any Mono Rare.
 - **Trade Up** (`tradeup` tab, `spareStacks/tuSign`): 10 spares of a rarity → 1 random card of
   the next (c→h→fa→sir→bwr), 50% drawn from cards you don't own. Spares never include your last
   copy, slabs or signed/error copies.
@@ -347,6 +351,7 @@ Two patterns, don't mix them up:
 - **2026-09-21** — Graded view filters: rarity chips, grade-band chips, rows by grade or rarity (Obsidian excluded - never graded). minis() guard: card-less binder slots used to throw and leave later tiles unclickable. Off-centre FA/SIR generic creatures: hand-typed PLACE x offsets were wrong, now derived from the centred window placement; dragon poses lean by design.
 - **2026-09-21** — Zoom/grading: gradeTick used to go(curView) when a grade came back, rebuilding binder/graded under an open zoom or slab opening (jump to top, zoom engine killed). Now softRefresh(): deferred while .zoom/.rwov/.stkwrap is open, keeps scroll. activate() refuses elements outside an open .zoom, and the zoom deck re-grabs the engine on pointerdown - a binder tile could steal it so dragging spun the tile behind.
 - **2026-09-21** — Signed/error cards are individual inst copies (not a flag on counts) so they show, trade and grade on their own and can't be spent as spares; for commons/holos they sit outside col[id] counts. Double print needed a second offset <img> - a drop-shadow on the art was clipped by the window. Trade Up: 10 spares -> next rarity, half the time from unowned cards so it helps completion; last copies, slabs and specials are never spares.
+- **2026-09-22** — Light Blue Diamond Edition: Alex's mate noticed the white edge-wear chips on a PSA 6 Infernax looked cool; re-cut them as blue stones (same chip sizes) across the whole face, art hue-rotated to light blue. Infernax Mono Rare only, by request, at 1 in 10 of its pulls - 1/100 was dropped because there are only 2 Mono Rares in the set, which would make it ~1 in 6700 packs.
 
 ---
 

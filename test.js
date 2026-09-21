@@ -549,6 +549,20 @@ async function cards(ctx, errs) {
     return {inSnap,n,n1,n2:c[i.id].n,back:!!c.inst.find(x=>x.u===i.u)}})()`);
   (vt.inSnap && vt.n === vt.n1 && vt.n === vt.n2 && vt.back) ? pass('signed common trades as its own copy', 'plain stack untouched') : fail('signed common trades as its own copy', JSON.stringify(vt));
 
+  // DIAMOND EDITION: Infernax Mono Rare only, blue stones on the edges, named on the slab
+  const dm = await pg.evaluate(`(()=>{const X=StackCards._,S=StackCards.SET,inf=S[X.DIA_ID];let other=0,hit=0;
+    for(let k=0;k<4000;k++){S.forEach(c=>{if(c.id!==X.DIA_ID&&X.rollVar(c)==='dia')other++});if(X.rollVar(inf)==='dia')hit++}
+    const i=X.newInst(inf.id);X.addCard({c:inf,foil:false,v:'dia',ins:i});StackCards.go('binder');
+    const el=StackCards.root.querySelector('.vrow .mini[data-u="'+i.u+'"]');
+    const stones=el?el.querySelectorAll('.front.v-dia .dia ellipse').length:0,glints=el?el.querySelectorAll('.dia .dg').length:0;
+    i.st='slab';i.grade=9;i.cert='STK 40000001';StackCards.go('graded');
+    const lab=[...StackCards.root.querySelectorAll('.sl-l3')].map(e=>e.textContent).find(t=>t.includes('DIAMOND'))||'';
+    return {name:inf.name,t:inf.t,other,rate:hit/4000,stones,glints,lab}})()`);
+  (dm.name === 'Infernax' && dm.t === 'bwr' && dm.other === 0 && dm.rate > 0.06 && dm.rate < 0.14)
+    ? pass('diamond only rolls on the Infernax Mono Rare', 'rate ' + dm.rate.toFixed(3)) : fail('diamond only rolls on the Infernax Mono Rare', JSON.stringify(dm));
+  (dm.stones > 100 && dm.glints > 10 && dm.lab.includes('DIAMOND'))
+    ? pass('diamond edges render and grade', dm.stones + ' stones, ' + dm.glints + ' glints') : fail('diamond edges render and grade', JSON.stringify(dm));
+
   // TRADE UP: 10 spares in, 1 of the next rarity out, never your last copy or a special
   const tu = await pg.evaluate(`(()=>{const X=StackCards._,S=StackCards.SET,c=X.col;
     S.filter(x=>x.t==='c').slice(0,6).forEach(x=>{c[x.id]={n:3,f:0}});

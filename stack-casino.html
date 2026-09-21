@@ -2451,6 +2451,18 @@ window.StackBridge={
 #tcg .vsig .s1{stroke:#ffd35a;stroke-width:2.4;filter:drop-shadow(0 0 1.5px rgba(255,230,140,.9))}
 #tcg .vauth{position:absolute;right:0;bottom:-16%;transform:rotate(9deg);font-style:normal;font-size:max(5px,3.2cqi);font-weight:900;letter-spacing:.08em;color:#2a1c00;
  background:linear-gradient(135deg,#fff3b0,#e9b93a 45%,#fff3b0 60%,#c9921a);border-radius:99px;padding:.3em .7em;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+/* diamond: the edge chips re-cut as blue stones that catch the light */
+#tcg .dia{position:absolute;inset:0;z-index:8;pointer-events:none;filter:drop-shadow(0 0 1.2px rgba(120,200,255,.9));animation:diashine 2.4s ease-in-out infinite alternate}
+#tcg .dia svg{display:block;width:100%;height:100%}
+#tcg .dia.dtw{z-index:9;filter:drop-shadow(0 0 3px #bfe9ff);animation:none;mix-blend-mode:screen}
+#tcg .dia .dg{transform-box:fill-box;transform-origin:center;animation:diatw 2.6s ease-in-out infinite;opacity:0}
+@keyframes diashine{from{filter:drop-shadow(0 0 1px rgba(120,200,255,.7)) brightness(1)}to{filter:drop-shadow(0 0 3px rgba(160,225,255,1)) brightness(1.35)}}
+@keyframes diatw{0%,70%,100%{opacity:0;transform:scale(.2) rotate(0)}82%{opacity:1;transform:scale(1) rotate(45deg)}}
+#tcg .front.v-dia .full>*,#tcg .front.v-dia .evo>*{filter:hue-rotate(208deg) saturate(.5) brightness(1.95) contrast(.85)}
+#tcg .front.v-dia{box-shadow:0 0 0 1px rgba(160,225,255,.5),0 0 18px rgba(80,170,255,.35),0 18px 32px rgba(0,0,0,.55)}
+#tcg .vtag.dia{background:linear-gradient(135deg,#f2fbff,#6cc4ff 50%,#1f6fd6);color:#04203f}
+#tcg .varpop.dia b{background-image:linear-gradient(90deg,#1f6fd6,#f2fbff,#6cc4ff,#f2fbff)}
+#tcg .zvar.dia b{background:linear-gradient(135deg,#f2fbff,#6cc4ff 50%,#1f6fd6);color:#04203f}
 /* errors: printed wrong at the factory */
 #tcg .front.v-ink .win>*,#tcg .front.v-ink .full>*{filter:hue-rotate(155deg) saturate(1.35)}
 #tcg .front.v-ghost [data-ghost]{position:absolute;inset:0;opacity:.5;translate:3.2cqi 1.8cqi;mix-blend-mode:multiply;filter:saturate(1.6) hue-rotate(-25deg);pointer-events:none}
@@ -2624,11 +2636,13 @@ function newInst(id){const sd=(Math.random()*4294967295)>>>0;
    a Full Art+ one keeps its condition and can be graded (the slab label names
    it); a common/holo one sits apart from the plain stack so a Trade Up or trade
    of "spares" can never eat it by accident. */
-const VAR={sig:{n:'Artist Signed',s:'SIGNED'},ink:{n:'Wrong Ink',s:'ERROR'},ghost:{n:'Double Print',s:'ERROR'},
+const VAR={dia:{n:'Light Blue Diamond Edition',s:'DIAMOND'},sig:{n:'Artist Signed',s:'SIGNED'},ink:{n:'Wrong Ink',s:'ERROR'},ghost:{n:'Double Print',s:'ERROR'},
   miscut:{n:'Miscut',s:'ERROR'},noname:{n:'Missing Name',s:'ERROR'},flip:{n:'Upside-Down Art',s:'ERROR'}};
-const ERRS=['ink','ghost','miscut','noname','flip'],V_SIG=1/400,V_ERR=1/350;
+const ERRS=['ink','ghost','miscut','noname','flip'],V_SIG=1/400,V_ERR=1/350,V_DIA=1/10,DIA_ID=36;
 const isVar=i=>!!(i&&i.v&&VAR[i.v]);
-const rollVar=()=>{const x=Math.random();return x<V_SIG?'sig':x<V_SIG+V_ERR?ERRS[Math.floor(Math.random()*ERRS.length)]:null};
+/* Diamond exists on ONE card only: Infernax, the Crimson Mono Rare (#037). Its stones are the
+   edge-wear chips at the same size and spread, re-cut in blues. */
+const rollVar=c=>{if(c&&c.id===DIA_ID&&Math.random()<V_DIA)return'dia';const x=Math.random();return x<V_SIG?'sig':x<V_SIG+V_ERR?ERRS[Math.floor(Math.random()*ERRS.length)]:null};
 const varName=v=>VAR[v].n+(VAR[v].s==='ERROR'?' error':'');
 /* one pulled/received card into the collection */
 function addCard(p){
@@ -2651,8 +2665,34 @@ function sigHTML(seed){const r=rng((seed^0x2545f491)>>>0),B=40,P=[];let x=4;
       d+=` C${f(b[0]+(c[0]-a[0])/6)} ${f(b[1]+(c[1]-a[1])/6)} ${f(c[0]-(e[0]-b[0])/6)} ${f(c[1]-(e[1]-b[1])/6)} ${f(c[0])} ${f(c[1])}`}return d};
   const d=cr(P),u=`M${f(10+r()*10)} ${f(B+18+r()*4)} C${f(60)} ${f(B+26+r()*4)} ${f(130)} ${f(B+12+r()*6)} ${f(Math.min(196,x+10))} ${f(B+8+r()*6)}`;
   return `<div class="vsig"><svg viewBox="0 0 200 72"><path class="s0" d="${d}"/><path class="s0" d="${u}"/><path class="s1" d="${d}"/><path class="s1" d="${u}"/></svg><i class="vauth">STK AUTH</i></div>`}
+function diaHTML(ins){const r=rng((ins.s^0x6d2b79f5)>>>0),W=630,H=880,R=(a,b)=>a+r()*(b-a),f1=v=>v.toFixed(1);
+  const BL=['#f2fbff','#c9ecff','#9fdcff','#6cc4ff','#3d9cf0','#1f6fd6','#8fd3ff'],pick=()=>BL[Math.floor(r()*BL.length)];
+  let g='',tw='';const spots=[];
+  // edges: exactly the sizes a heavily worn edge uses (dE ~ .9)
+  for(let i=0;i<440;i++){const side=Math.floor(r()*4),t=r(),dep=Math.pow(r(),2.2)*11;
+    const x=side===0?t*W:side===1?W-dep:side===2?t*W:dep,y=side===0?dep:side===1?t*H:side===2?H-dep:t*H,rot=(side%2?90:0)+R(-25,25);
+    g+=`<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(R(1,6.9))}" ry="${f1(R(.6,3.4))}" transform="rotate(${rot.toFixed(0)} ${f1(x)} ${f1(y)})" fill="${pick()}" opacity="${R(.6,1).toFixed(2)}"/>`;
+    if(r()<.1)spots.push([x,y])}
+  for(let i=0;i<6;i++){const side=Math.floor(r()*4),t0=r(),len=R(20,186);let path='';
+    for(let k=0;k<=10;k++){const t=t0+(k/10)*len/(side%2?H:W),j=R(.4,5.6);
+      const x=side===0?t*W:side===1?W-j:side===2?t*W:j,y=side===0?j:side===1?t*H:side===2?H-j:t*H;path+=(k?'L':'M')+f1(x)+' '+f1(y)}
+    g+=`<path d="${path}" stroke="${pick()}" stroke-width="${f1(R(1,4))}" fill="none" stroke-linecap="round" opacity="${R(.6,.95).toFixed(2)}"/>`}
+  // the whole face: the same chip sizes, scattered edge to edge
+  for(let i=0;i<620;i++){const x=R(4,W-4),y=R(4,H-4),rot=R(0,180);
+    g+=`<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(R(1,6.9))}" ry="${f1(R(.6,3.4))}" transform="rotate(${rot.toFixed(0)} ${f1(x)} ${f1(y)})" fill="${pick()}" opacity="${R(.45,.95).toFixed(2)}"/>`;
+    if(r()<.07)spots.push([x,y])}
+  // corners: a clustered pavé like a heavily worn corner
+  [[0,0,1,1],[W,0,-1,1],[W,H,-1,-1],[0,H,1,-1]].forEach(([cx,cy,sx,sy])=>{const rad=36;
+    for(let i=0;i<38;i++){const a=r()*Math.PI/2,dist=Math.pow(r(),1.6)*rad,x=cx+sx*Math.cos(a)*dist*(.7+r()*.5),y=cy+sy*Math.sin(a)*dist*(.7+r()*.5);
+      g+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(R(.6,4.2))}" fill="${pick()}" opacity="${R(.7,1).toFixed(2)}"/>`;if(r()<.15)spots.push([x,y])}});
+  // glints: four-point stars on some of the stones, each on its own clock
+  spots.sort(()=>r()-.5).slice(0,90).forEach(([x,y])=>{const L=R(7,16);
+    tw+=`<path class="dg" style="animation-delay:-${R(0,3.2).toFixed(2)}s;animation-duration:${R(1.8,3.4).toFixed(2)}s" d="M${f1(x)} ${f1(y-L)} Q${f1(x+1.2)} ${f1(y-1.2)} ${f1(x+L)} ${f1(y)} Q${f1(x+1.2)} ${f1(y+1.2)} ${f1(x)} ${f1(y+L)} Q${f1(x-1.2)} ${f1(y+1.2)} ${f1(x-L)} ${f1(y)} Q${f1(x-1.2)} ${f1(y-1.2)} ${f1(x)} ${f1(y-L)}Z" fill="#fff"/>`});
+  const sv=i=>`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${i}</svg>`;
+  return `<div class="dia">${sv(g)}</div><div class="dia dtw">${sv(tw)}</div>`}
 function varFront(h,ins){h=h.replace('<div class="front ','<div class="front v-'+ins.v+' ');
   if(ins.v==='sig')h=h.replace('<div class="sheen">',sigHTML(ins.s)+'<div class="sheen">');
+  if(ins.v==='dia'){h=h.replace(/--h:[-\d.]+/,'--h:208');h=h.replace('<div class="sheen">',diaHTML(ins)+'<div class="sheen">')}
   if(ins.v==='miscut')h=h.replace('<div class="sheen">','<div class="mcut"></div><div class="sheen">');
   if(ins.v==='ghost')h=h.replace(/(<div class="(?:win|full)">)(<img [^>]*>)/,(m,a,i)=>a+i+i.replace('<img ','<img data-ghost="1" '));
   return h}
@@ -3792,7 +3832,7 @@ const skin=()=>`<div class="pk-skin"><div class="l-foil"></div><div class="l-sce
   <div class="l-spec"></div><div class="l-gsheen"></div><div class="l-seal"></div></div>`;
 let tearP=0,opened=false,pull=[];
 function shop(){const st=stage();opened=false;tearP=0;root.onkeydown=null;
-  st.innerHTML=`<div class="pity"><span>Full Art or better guaranteed in <b>${PITY-(col.pity||0)}</b> ${PITY-(col.pity||0)===1?'pack':'packs'}</span><i><s style="width:${(col.pity||0)/PITY*100}%"></s></i></div><div class="odds">8 cards: 5 commons, 2 reverse holos, 1 hit. Hit: <b>Holo ${Math.round((1-ODDS.fa-ODDS.sir-ODDS.bwr)*100)}%</b>, <b>Full Art ${Math.round(ODDS.fa*100)}%</b>, <b>SIR ${Math.round(ODDS.sir*100)}%</b>, <b>Mono Rare ${Math.round(ODDS.bwr*100)}%</b>. Any card: <b>Signed 1 in ${Math.round(1/V_SIG)}</b>, <b>Error 1 in ${Math.round(1/V_ERR)}</b></div>
+  st.innerHTML=`<div class="pity"><span>Full Art or better guaranteed in <b>${PITY-(col.pity||0)}</b> ${PITY-(col.pity||0)===1?'pack':'packs'}</span><i><s style="width:${(col.pity||0)/PITY*100}%"></s></i></div><div class="odds">8 cards: 5 commons, 2 reverse holos, 1 hit. Hit: <b>Holo ${Math.round((1-ODDS.fa-ODDS.sir-ODDS.bwr)*100)}%</b>, <b>Full Art ${Math.round(ODDS.fa*100)}%</b>, <b>SIR ${Math.round(ODDS.sir*100)}%</b>, <b>Mono Rare ${Math.round(ODDS.bwr*100)}%</b>. Any card: <b>Signed 1 in ${Math.round(1/V_SIG)}</b>, <b>Error 1 in ${Math.round(1/V_ERR)}</b>. Infernax Mono Rare: <b>Diamond 1 in ${Math.round(1/V_DIA)}</b></div>
    <div class="packwrap" id="pw"><div class="pk-shadow"></div><div class="pack" id="pk">
     <div class="pk-piece pk-body">${skin()}</div><div class="pk-piece pk-top" id="pkTop">${skin()}</div>
     <div class="tear"><i></i></div><div class="tear-zone" id="tz"></div></div></div>
@@ -3819,7 +3859,7 @@ function rollPack(){const pick=a=>a[Math.floor(Math.random()*a.length)];
   const ps=[0,1,2,3,4].map(()=>({c:pick(byT('c')),foil:GOD}));            // 5 commons
   ps.push({c:pick(byT('c')),foil:true},{c:pick(byT('c')),foil:true});       // 2 reverse holo slots
   ps.push({c:pick(byT(t_||t)),foil:false});                                       // 1 hit
-  return ps.map(p=>{const e=col[p.c.id];p.isNew=!e||(p.foil?!e.f:!e.n);p.v=rollVar();
+  return ps.map(p=>{const e=col[p.c.id];p.isNew=!e||(p.foil?!e.f:!e.n);p.v=rollVar(p.c);
     if(HI(p.c.t)||p.v)p.ins=newInst(p.c.id);if(p.v){p.ins.v=p.v;if(!HI(p.c.t))p.ins.f=p.foil?1:0}return p})}
 const lineDone=()=>LINES.filter(L=>SET.filter(c=>c.art.startsWith(L.key)).every(c=>col[c.id]&&(col[c.id].n||col[c.id].f))).map(L=>L.key);
 let justDone=[];
@@ -3882,14 +3922,15 @@ function celebrate(p){const st=stage(),t=p.c.t,rev=p.foil;
     if(rainbow)n.style.cssText+=';background:linear-gradient(90deg,#ffb3d9,#b3fff0,#b3d4ff,#fff0b3);-webkit-background-clip:text;background-clip:text;color:transparent';
     st.appendChild(n);setTimeout(()=>n.remove(),1900)}}
 
-function varPop(p,par){const st=par||stage(),sig=p.v==='sig',el=document.createElement('div');el.className='varpop'+(sig?' sig':'');
-  el.innerHTML=`<small>${sig?'1 in '+Math.round(1/V_SIG)+' cards':'Misprint \u00b7 1 in '+Math.round(1/V_ERR)+' cards'}</small><b>${sig?'ARTIST SIGNED':'ERROR CARD'}</b>${sig?'':`<em>${VAR[p.v].n}</em>`}`;
+function varPop(p,par){const st=par||stage(),sig=p.v==='sig',dia=p.v==='dia',el=document.createElement('div');el.className='varpop'+(sig?' sig':dia?' dia':'');
+  el.innerHTML=dia?`<small>1 in ${Math.round(1/V_DIA)} Infernax Mono Rares</small><b>LIGHT BLUE DIAMOND</b>`
+    :`<small>${sig?'1 in '+Math.round(1/V_SIG)+' cards':'Misprint \u00b7 1 in '+Math.round(1/V_ERR)+' cards'}</small><b>${sig?'ARTIST SIGNED':'ERROR CARD'}</b>${sig?'':`<em>${VAR[p.v].n}</em>`}`;
   st.appendChild(el);SFX.boom();SFX.reveal('u',true);setTimeout(()=>SFX.reveal('u',true),260);navigator.vibrate&&navigator.vibrate([40,40,80]);
   const bu=document.createElement('div');bu.className='burst';
   for(let k=0;k<80;k++){const a=Math.random()*Math.PI*2,d=140+Math.random()*280;
-    bu.innerHTML+=`<i style="--c:${sig?(k%3?'#ffd35a':'#fff'):(k%2?'#ff3b6b':'#3bd4ff')};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
+    bu.innerHTML+=`<i style="--c:${dia?['#fff','#9fdcff','#3d9cf0'][k%3]:sig?(k%3?'#ffd35a':'#fff'):(k%2?'#ff3b6b':'#3bd4ff')};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></i>`}
   st.appendChild(bu);setTimeout(()=>{bu.remove()},1200);setTimeout(()=>el.remove(),2600)}
-const vtag=i=>isVar(i)?`<span class="vtag${i.v==='sig'?' sig':''}">${i.v==='sig'?'\u270d SIGNED':'ERROR'}</span>`:'';
+const vtag=i=>isVar(i)?`<span class="vtag${i.v==='sig'?' sig':i.v==='dia'?' dia':''}">${i.v==='sig'?'\u270d SIGNED':i.v==='dia'?'\u25c6 DIAMOND':'ERROR'}</span>`:'';
 
 /* ---------------- SUMMARY / BINDER ---------------- */
 const VAL={c:5,h:40,fa:180,sir:450,bwr:1500,obs:5000},RANK={c:0,h:1,fa:2,sir:3,bwr:4,obs:5};
@@ -3925,14 +3966,14 @@ function zInfo(p){const ins=p.ins;
    :ins.st==='grading'?`<div class="zst">At STK \u2014 back in <b class="gtimer" data-u="${ins.u}">${fmtLeft(ins.due)}</b></div>`
    :ins.st==='back'?`<button class="btn" data-z="open">It's back \u2014 open it</button>`:'';
   return `<div class="zinfo"><div class="zcond"><div class="cp-sc"><small>CONDITION</small><b>${condScore(ins.cd).toFixed(1)}</b><i>/ 10</i></div><div class="cp-g">${condGrid(ins.cd)}</div></div>
-   ${copies.length>1?`<div class="zcopies">${copies.map((c,i)=>`<button class="zc${c.u===ins.u?' on':''}" data-c="${c.u}">Copy ${i+1} \u00b7 ${condScore(c.cd).toFixed(1)}${isVar(c)?(c.v==='sig'?' \u00b7 \u270d':' \u00b7 ERR'):''}</button>`).join('')}</div>`:''}
+   ${copies.length>1?`<div class="zcopies">${copies.map((c,i)=>`<button class="zc${c.u===ins.u?' on':''}" data-c="${c.u}">Copy ${i+1} \u00b7 ${condScore(c.cd).toFixed(1)}${isVar(c)?(c.v==='sig'?' \u00b7 \u270d':c.v==='dia'?' \u00b7 \u25c6':' \u00b7 ERR'):''}</button>`).join('')}</div>`:''}
    ${act}</div>`}
 function zoom(p,opt){opt=opt||{};SFX.flip();const z=document.createElement('div');z.className='zoom'+(opt.slab?' zslab':'');
   const body=opt.slab?`<div class="deck sdeck"><div class="slot">${slabHTML(opt.slab)}</div></div>`
     :`<div class="deck"><div class="slot">${cardEl(p.c,p.foil,false,p.ins)}</div></div>`;
   const vi=opt.slab||p.ins;
   z.innerHTML=body+(!opt.slab&&p.ins&&HI(p.c.t)?zInfo(p):'')
-    +(isVar(vi)?`<div class="zvar${vi.v==='sig'?' sig':''}"><b>${vi.v==='sig'?'ARTIST SIGNED':'ERROR \u00b7 '+hx(VAR[vi.v].n.toUpperCase())}</b><small>${vi.v==='sig'?'Hand-signed \u00b7 1 in '+Math.round(1/V_SIG)+' cards':'Factory misprint \u00b7 1 in '+Math.round(1/V_ERR)+' cards'}</small></div>`:'')
+    +(isVar(vi)?`<div class="zvar${vi.v==='sig'?' sig':vi.v==='dia'?' dia':''}"><b>${vi.v==='sig'?'ARTIST SIGNED':vi.v==='dia'?'\u25c6 LIGHT BLUE DIAMOND EDITION':'ERROR \u00b7 '+hx(VAR[vi.v].n.toUpperCase())}</b><small>${vi.v==='sig'?'Hand-signed \u00b7 1 in '+Math.round(1/V_SIG)+' cards':vi.v==='dia'?'Diamond-set \u00b7 1 in '+Math.round(1/V_DIA)+' Infernax Mono Rares':'Factory misprint \u00b7 1 in '+Math.round(1/V_ERR)+' cards'}</small></div>`:'')
     +`<div class="zhint">${opt.slab?'Drag to tilt the slab.':'Drag to spin it around.'} Tap outside to close.</div>`;
   root.appendChild(z);
   const prev=E.el,prevKind=E.kind,deck=z.querySelector('.deck');activate(z.querySelector('.tilt'),'card');E.k=.05;E.f=.07;
@@ -3957,10 +3998,10 @@ function zoom(p,opt){opt=opt||{};SFX.flip();const z=document.createElement('div'
 const owns=c=>{const e=col[c.id];return!!((e&&(e.n||e.f))||col.inst.some(i=>i.id===c.id))};
 function binder(){const st=stage();deactivate();root.onkeydown=null;
   const owned=SET.filter(owns).length,foils=SET.filter(c=>col[c.id]&&col[c.id].f).length,slabN=col.inst.filter(i=>i.st==='slab').length;
-  const specials=col.inst.filter(i=>isVar(i)&&i.st==='raw').sort((a,b)=>(b.v==='sig')-(a.v==='sig')||RANK[CARD(b.id).t]-RANK[CARD(a.id).t]||a.id-b.id);
+  const specials=col.inst.filter(i=>isVar(i)&&i.st==='raw').sort((a,b)=>(b.v==='dia')-(a.v==='dia')||(b.v==='sig')-(a.v==='sig')||RANK[CARD(b.id).t]-RANK[CARD(a.id).t]||a.id-b.id);
   st.innerHTML=`<div class="binder"><div class="bhead"><span>${owned} of ${SET.length} collected</span><span>${foils} reverse holos${slabN?` \u00b7 ${slabN} graded`:''} \u00b7 ${OBS.filter(o=>col.rew&&col.rew[o.line]).length}/${OBS.length} Obsidian</span></div>
    <div class="prog"><i style="width:${owned/SET.length*100}%"></i></div>
-   ${specials.length?`<div class="grow vrow"><h5>Signed &amp; errors <small>${specials.length}</small></h5><div class="grid">${specials.map(i=>{const c=CARD(i.id);
+   ${specials.length?`<div class="grow vrow"><h5>Diamond, signed &amp; errors <small>${specials.length}</small></h5><div class="grid">${specials.map(i=>{const c=CARD(i.id);
      return `<div class="mini" data-id="${c.id}" data-f="${i.f?1:0}" data-n="${c.no}" data-u="${i.u}">${cardEl(c,!!i.f,false,i,1)}${vtag(i)}</div>`}).join('')}</div></div>`:''}
    <div class="grid">${LINES.map(L=>lineOf(L.key).map(c=>{const e=col[c.id]||{n:0,f:0},has=owns(c),hi=HI(c.t);
      const raws=hi?col.inst.filter(i=>i.id===c.id&&i.st==='raw'&&!isVar(i)).sort((a,b)=>condScore(b.cd)-condScore(a.cd)):[];
@@ -4071,7 +4112,7 @@ function tuSign(){if(TU.sel.length!==TU_N)return null;const t=TU.t,nt=TU_NEXT[t]
   if(TU.sel.length!==TU_N)return null;
   const gone=takeItems(TU.sel);TU.sel=[];if(!gone){if(root&&root.isConnected&&curView==='tradeup')tradeup();return null}
   const all=byT(nt),miss=all.filter(c=>!owns(c)),from=miss.length&&Math.random()<.5?miss:all,c=from[Math.floor(Math.random()*from.length)];
-  const p={c,foil:false,isNew:!owns(c),v:rollVar()};
+  const p={c,foil:false,isNew:!owns(c),v:rollVar(c)};
   if(HI(nt)||p.v){p.ins=newInst(c.id);if(p.v){p.ins.v=p.v;if(!HI(nt))p.ins.f=0}}
   addCard(p);col.tu=(col.tu||0)+1;checkCraftable();save();
   if(root&&root.isConnected)tuReveal(p,t);return p}
@@ -4135,7 +4176,7 @@ function slabHTML(ins,small){const c=CARD(ins.id),g=ins.grade;
     <div class="sl-label">
      <div class="sl-lt"><div class="sl-l1">2026 STACK CARDS \u00b7 MYTHIC</div>
       <div class="sl-l2">${hx(c.name.toUpperCase())}</div>
-      <div class="sl-l3">${isVar(ins)?(ins.v==='sig'?'AUTOGRAPH \u00b7 ':'ERROR \u00b7 '+hx(VAR[ins.v].n.toUpperCase())+' \u00b7 '):''}${hx((TNAME[c.t]||'').toUpperCase())}${c.mono?' \u00b7 '+hx(c.mono.toUpperCase()):''}</div>
+      <div class="sl-l3">${isVar(ins)?(ins.v==='sig'?'AUTOGRAPH \u00b7 ':ins.v==='dia'?'DIAMOND \u00b7 ':'ERROR \u00b7 '+hx(VAR[ins.v].n.toUpperCase())+' \u00b7 '):''}${hx((TNAME[c.t]||'').toUpperCase())}${c.mono?' \u00b7 '+hx(c.mono.toUpperCase()):''}</div>
       <div class="sl-l4">${numOf(c)}</div></div>
      <div class="sl-rt"><div class="sl-gw">${GW[g]||''}</div><div class="sl-gn">${g}</div><div class="sl-veil"></div></div>
      <div class="sl-bar">${barcode(ins.cert||'STK')}<span class="sl-cert">${ins.cert||''}</span><span class="sl-logo">${STK_LOGO}<b>STK</b><i class="sl-holo"></i></span></div>
@@ -4355,7 +4396,7 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
   /* exposed for tests */
   _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,artSrc:k=>Art[k](),
      OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
-     VAR,isVar,rollVar,addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
+     VAR,isVar,rollVar,diaHTML,DIA_ID,addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
      get col(){return col},set col(v){col=v}}};
 if(document.getElementById('tcg')&&!window.StackBridge)mount(document.getElementById('tcg'));
 })();
