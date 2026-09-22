@@ -587,8 +587,8 @@ async function cards(ctx, errs) {
 
   // STORE + BOOSTER BOX: buy -> desk -> cut the wrap -> push the tab -> 36 packs -> open one
   await pg.evaluate("StackCards.go('store')"); await pg.waitForTimeout(400);
-  const sf = await pg.evaluate("(()=>{const R=StackCards.root;return [!!R.querySelector('.st-feature .bx3 .wr'),!!R.querySelector('#stBuy'),R.querySelectorAll('.st-fe .front.fe').length]})()");
-  (sf[0] && sf[1] && sf[2] === 6) ? pass('store front shows a sealed box and the shelves') : fail('store front shows a sealed box and the shelves', JSON.stringify(sf));
+  const sf = await pg.evaluate("(()=>{const R=StackCards.root;return [!!R.querySelector('.st-feature .bx3 .wr'),!!R.querySelector('#stBuy'),R.querySelectorAll('.st-vpk .vpk').length]})()");
+  (sf[0] && sf[1] && sf[2] === 2) ? pass('store front shows a sealed box and the shelves') : fail('store front shows a sealed box and the shelves', JSON.stringify(sf));
   await pg.evaluate("StackCards.root.querySelector('#stBuy').click()"); await pg.waitForTimeout(600);
   // wait for the box to finish dropping onto the desk before measuring the cut line
   await pg.waitForFunction("(()=>{const b=StackCards.root&&StackCards.root.querySelector('#bx');return !!b&&b.getAnimations().every(a=>a.playState==='finished')})()", null, { timeout: 5000 });
@@ -609,6 +609,18 @@ async function cards(ctx, errs) {
   const aft = await pg.evaluate("(()=>{const X=StackCards._,b=X.col.boxes[X.col.boxes.length-1];return [X.boxLeft(b),b.packs[0]]})()");
   (aft[0] === 35 && aft[1] === 0) ? pass('tearing it takes that pack out of the box', '35 left') : fail('tearing it takes that pack out of the box', JSON.stringify(aft));
   await pg.evaluate("StackCards.go('store')"); await pg.waitForTimeout(300);
+
+  // VINTAGE 1st Edition: 27-card set, 6-card packs (5 commons + 1 rare/holo), into the binder, pity untouched
+  const vpk = await pg.evaluate(`(()=>{const X=StackCards._;const pity0=X.col.pity||0;StackCards.go('store');StackCards.root.querySelector('#stVint').click();
+    StackCards.root.querySelector('#buy').click();const rars=StackCards._.VINT?null:'x';
+    return {set:X.FE_CARDS.length,rar:['holo','rare','common'].map(k=>X.FE_CARDS.filter(c=>c.rar===k).length).join('/'),vint:X.VINT,pity0}})()`);
+  await pg.evaluate("(()=>{const p=StackCards.root.querySelector('#pk');p.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}))})()"); await pg.waitForTimeout(700);
+  const va = await pg.evaluate(`(()=>{const X=StackCards._;const got=X.FE_CARDS.filter(c=>X.col[c.id]&&X.col[c.id].n);return {owned:got.length,commons:got.filter(c=>c.rar==='common').length,hits:got.filter(c=>c.rar!=='common').length,pity:X.col.pity||0}})()`);
+  (vpk.set === 27 && vpk.rar === '9/9/9' && vpk.vint && va.hits === 1 && va.owned >= 2 && va.pity === vpk.pity0)
+    ? pass('vintage pack rips 1st Edition cards', vpk.rar + ' holo/rare/common, pity untouched') : fail('vintage pack rips 1st Edition cards', JSON.stringify([vpk, va]));
+  await pg.evaluate("StackCards.go('binder')"); await pg.waitForTimeout(300);
+  const vb = await pg.evaluate("[!!StackCards.root.querySelector('.vsec-fe'), StackCards.root.querySelectorAll('.vsec-fe .mini').length]");
+  (vb[0] && vb[1] === 27) ? pass('binder shows the 1st Edition set') : fail('binder shows the 1st Edition set', JSON.stringify(vb));
 
   errs.length === n0 ? pass('no stack cards console errors') : fail('no stack cards console errors', errs.slice(n0).join(' | '));
   await pg.close();

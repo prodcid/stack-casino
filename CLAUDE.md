@@ -206,6 +206,15 @@ automatically; `devkit check` fails if they drift).
 - **Trade Up** (`tradeup` tab, `spareStacks/tuSign`): 10 spares of a rarity → 1 random card of
   the next (c→h→fa→sir→bwr), 50% drawn from cards you don't own. Spares never include your last
   copy, slabs or signed/error copies.
+- **1st Edition vintage set** (`FE_LINES` → `FE_CARDS`, `t:'fe'`, ids 2000+ in `FEI`, resolved by
+  `CARD()`). 9 lines × common baby / rare final / holo rare final = 27 cards, numbered holos 1–9,
+  rares 10–18, commons 19–27. Classic 1999 layout in `feFront` (own type symbols `FE_SYM`,
+  "Creature" wording — no Pokémon marks). Holo = cosmos glitter only behind the creature
+  (`feSky` strips the sky). Counts live in `col[id]`; they trade and show in a binder section.
+  **Vintage booster** (`vskin`, `rollVintage`, `shop({vintage:1})`, `VINT`): yellow or blue retro
+  wrapper in Titan One (Google Font, added to both heads), 6 cards = 5 commons + 1 rare, 1 in 3
+  rares holo. Vintage packs never touch `col.pity`. `feT(p)` maps fe rarity → c/h/fa for the
+  reveal/celebrate/summary code.
 - **Stack Clash** (`clash` tab) — lane battle game, built from `stack-clash-game-spec.md`. (The
   spec references a `stack-cards-battle-mockup.html` that was never in the folder; built from the
   written rules.) 6 crystals, 3 lanes, energy 1→6, play babies then stack teens/finals on top for
@@ -399,6 +408,7 @@ Two patterns, don't mix them up:
 - **2026-09-22** — Alex's perf report (Intel Arc, GPU on, dpr 1.25): scrolling/idle 60fps in every phase; the lag was hover - pointerenter interactions took ~136ms (event timing = until next paint). activate() now reads the card size before any DOM writes (it forced a full ~10k-node binder layout), and binder/graded tiles use hover intent (90ms settle) so sweeping the mouse no longer promotes + re-rasterises every card passed over. Diagnose gained hover-sweep and hover-rest phases.
 - **2026-09-22** — Binder scroll lag (Alex saw fps tank on real wheel scrolling; diagnose glides 9px/frame so never showed it): 127 unique vector arts, 9.5MB SVG, ~6.5ms (max 22ms) to rasterise each as tiles enter view - a wheel flick brings a row in at once. Grid tiles (binder/trade/deck builder/trade up) now swap to pre-rendered 360px WebP bitmaps built in requestIdleCallback (BMP cache, ~4s idle for all 127, in-memory per session); zoom/pack/slabs keep vector. Hover activation is suppressed while scrolling. Perf panel gained 'Record my scroll' (8s real use, long-animation-frame script/style/render breakdown).
 - **2026-09-22** — Alex's recorded scroll: 36fps, 18 long frames (worst 303ms) with ~0 script/layout/render attributed and only 101/127 bitmaps ready - bitmap building (sync drawImage + main-thread WebP base64 encode) was running while he scrolled. Now: all art keys queued at mount (bmpPrime, 1.5s after load, ~9s to finish in idle), one per idle slot, paused while SCROLLING, encoded via async canvas.toBlob -> object URL (PC only, blob: OK). Report now includes bitmap work during the recording and unattributed main-thread ms.
+- **2026-09-22** — 1st Edition vintage set: 6 more lines (wolf, owl, lion, hare, turt, rdr) + the original 3, each as common/rare/holo = 27 cards. Chose base-set structure (rare AND holo rare per final) as 'their rare versions'. Vintage booster is a separate pack (not mixed into the main set) with its own retro yellow/blue wrapper and Titan One logo; 6 cards, 1/3 rares holo, pity untouched. Also fixed a pre-existing pack bug: leaving the pack screen <0.5s after tearing threw in the delayed reveal/hint timeouts.
 
 ---
 
