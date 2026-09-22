@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.22.14">
+<meta name="stack-version" content="2026.09.22.15">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2709,8 +2709,9 @@ window.StackBridge={
 #tcg .fe-art img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.8) contrast(.9) brightness(1.06) blur(.25px)}
 #tcg .fe-art::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;
  background:radial-gradient(ellipse at 50% 45%,transparent 50%,rgba(255,245,220,.55)),repeating-linear-gradient(35deg,rgba(255,255,255,.07) 0 .4cqi,rgba(0,0,0,.04) .4cqi .8cqi)}
-#tcg .festamp{position:absolute;left:1.2cqi;top:47.5%;width:7.6cqi;height:7.6cqi;z-index:3}
-#tcg .fe-strip{margin:1.2cqi 4% 1.4cqi;padding:.6cqi 1cqi;text-align:center;font-size:2.35cqi;font-style:italic;font-weight:700;
+#tcg .fe-srow{display:flex;align-items:center;gap:1.4cqi;margin:1.1cqi 0 1.3cqi}
+#tcg .festamp{display:block;flex:none;width:10cqi;height:10cqi;filter:drop-shadow(0 .3cqi .4cqi rgba(0,0,0,.35))}
+#tcg .fe-strip{flex:1;margin:0;padding:.6cqi 1cqi;text-align:center;font-size:2.35cqi;font-style:italic;font-weight:700;
  background:linear-gradient(180deg,#f7e39a,#dcbc55);clip-path:polygon(2% 0,98% 0,100% 50%,98% 100%,2% 100%,0 50%)}
 #tcg .fe-atks{flex:1;display:flex;flex-direction:column;justify-content:center;gap:1cqi}
 #tcg .fe-atk{display:flex;align-items:center;gap:1.4cqi}
@@ -4957,15 +4958,14 @@ const FE_CARDS=[
   atk:[[['verdant'],'Leaf Nip',10,''],[['verdant','verdant'],'Budding Bloom',20,'Remove 1 damage counter from Sproutling.']],
   weak:'flame',res:'tide',ret:1,flav:'The bud on its back drinks in sunlight. On rainy days it naps with the bud closed tight.'}
 ].map((f,i)=>{const b=lineOf(f.key)[0];return Object.assign({},f,{cat:'Mythic',name:b.name,t:'fe',h:b.h,art:b.art,stage:0,id:2000+i,no:String(i+1)})});
-const FE_STAMP='<svg class="festamp" viewBox="0 0 40 40"><defs><path id="feArc" d="M8 22a12 12 0 0 0 24 0"/></defs><circle cx="20" cy="20" r="18" fill="#fff" stroke="#111" stroke-width="2.4"/><text x="20" y="22" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="17" fill="#111">1</text><text x="26.5" y="15" font-family="Arial" font-weight="900" font-size="5.5" fill="#111">ST</text><text font-family="Arial" font-weight="900" font-size="5.2" letter-spacing=".6" fill="#111"><textPath href="#feArc" startOffset="50%" text-anchor="middle">EDITION</textPath></text></svg>';
+const FE_STAMP='<svg class="festamp" viewBox="0 0 48 48"><defs><path id="feArc" d="M10.5 25a13.5 13.5 0 0 0 27 0"/></defs><circle cx="24" cy="24" r="22" fill="#fff" stroke="#111" stroke-width="2.6"/><circle cx="24" cy="24" r="18.6" fill="none" stroke="#111" stroke-width=".9"/><text x="22" y="25.5" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="19" fill="#111">1</text><text x="28.2" y="15.6" font-family="Arial Black,Arial" font-weight="900" font-size="7" fill="#111">ST</text><text font-family="Arial Black,Arial" font-weight="900" font-size="6.4" letter-spacing=".4" fill="#111"><textPath href="#feArc" startOffset="50%" text-anchor="middle">EDITION</textPath></text></svg>';
 function feFront(c){
   const atks=c.atk.map(([cost,nm,dmg,txt])=>`<div class="fe-atk"><div class="fe-cost">${cost.map(feSym).join('')}</div>
     <div class="fe-at"><b>${nm}</b>${txt?` <span>${txt}</span>`:''}</div><div class="fe-dmg">${dmg||''}</div></div>`).join('<i class="fe-rule"></i>');
   return `<div class="front fe fe-${c.type}" style="--h:${c.h}"><div class="fe-in">
     <div class="fe-top"><small>Basic Creature</small><b>${hx(c.name)}</b><span class="fe-hp">${c.hp} HP</span>${feSym(c.type)}</div>
     <div class="fe-frame"><div class="fe-art">${artImg(c.art,Art[c.art])}</div></div>
-    ${FE_STAMP}
-    <div class="fe-strip">${c.kind} Creature. Length: ${c.len}, Weight: ${c.wt}</div>
+    <div class="fe-srow">${FE_STAMP}<div class="fe-strip">${c.kind} Creature. Length: ${c.len}, Weight: ${c.wt}</div></div>
     <div class="fe-atks">${atks}</div>
     <div class="fe-wrr"><div><small>weakness</small>${feSym(c.weak)}</div><div><small>resistance</small>${c.res?feSym(c.res)+'<em>-30</em>':''}</div><div><small>retreat cost</small>${Array(c.ret).fill(feSym('any')).join('')}</div></div>
     <div class="fe-flav">${hx(c.flav)} <b>LV. ${c.lv}</b></div>

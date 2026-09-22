@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 /* test.js â€” browser regression for the single-file build.
    node test.js            everything
    node test.js solo       single-player games + tickets + cosmetics
@@ -589,7 +589,9 @@ async function cards(ctx, errs) {
   await pg.evaluate("StackCards.go('store')"); await pg.waitForTimeout(400);
   const sf = await pg.evaluate("(()=>{const R=StackCards.root;return [!!R.querySelector('.st-feature .bx3 .wr'),!!R.querySelector('#stBuy'),R.querySelectorAll('.st-fe .front.fe').length]})()");
   (sf[0] && sf[1] && sf[2] === 3) ? pass('store front shows a sealed box and the shelves') : fail('store front shows a sealed box and the shelves', JSON.stringify(sf));
-  await pg.evaluate("StackCards.root.querySelector('#stBuy').click()"); await pg.waitForTimeout(1500);
+  await pg.evaluate("StackCards.root.querySelector('#stBuy').click()"); await pg.waitForTimeout(600);
+  // wait for the box to finish dropping onto the desk before measuring the cut line
+  await pg.waitForFunction("(()=>{const b=StackCards.root&&StackCards.root.querySelector('#bx');return !!b&&b.getAnimations().every(a=>a.playState==='finished')})()", null, { timeout: 5000 });
   const cr = await pg.evaluate("(()=>{const r=StackCards.root.querySelector('#wrCut').getBoundingClientRect();return [r.left,r.top,r.width,r.height]})()");
   await pg.mouse.move(cr[0] - 6, cr[1] + cr[3] / 2); await pg.mouse.down();
   for (let i = 0; i <= 30; i++) { await pg.mouse.move(cr[0] + cr[2] * i / 30, cr[1] + cr[3] / 2); await pg.waitForTimeout(12); }
