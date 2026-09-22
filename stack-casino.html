@@ -4293,7 +4293,7 @@ function mount(el){root=el;root.id='tcg';
   root.addEventListener('pointerleave',()=>{E.hx=E.hy=0});
   window.addEventListener('deviceorientation',e=>{if(e.gamma==null||!E.el||E.free||E.swipe)return;gyro=1;E.hx=clamp(-(e.beta-45)/2,-16,16);E.hy=clamp(e.gamma/1.6,-20,20);E.last=performance.now()});
   root.addEventListener('error',e=>{if(e.target.tagName==='IMG')artFallback(e.target)},true);
-  try{bakeCrinkle()}catch(e){}backfill();updBal();go('store');gradeTick()}
+  try{bakeCrinkle()}catch(e){}backfill();updBal();go('store');gradeTick();setTimeout(bmpPrime,1500)}
 const askGyro=()=>{try{DeviceOrientationEvent.requestPermission&&DeviceOrientationEvent.requestPermission().catch(()=>{})}catch(e){}};
 function updBal(){const b=$('#tcgBal'),v=B.getBalance();if(b)b.textContent=isFinite(v)?fmt(Math.floor(v)):'∞';B.onBalance&&B.onBalance()}
 let curView='shop';
@@ -4449,13 +4449,19 @@ function watchOff(scope){if(!window.IntersectionObserver)return;const sc=scope.c
    ~2x tile size, made in idle time. Zoom, pack opening and slabs keep the vector art. */
 const BMP={},BMPQ=[],BMPW=360;let bmpBusy=false;
 const bmpTiles=scope=>scope.querySelectorAll('.grid .mini img[data-k],.tgrid img[data-k],.clgrid img[data-k],.tuslot img[data-k]');
-function bmpApply(scope){bmpTiles(scope).forEach(im=>{const k=im.dataset.k;if(BMP[k]){if(im.src!==BMP[k])im.src=BMP[k]}else if(BMPQ.indexOf(k)<0)BMPQ.push(k)});bmpPump()}
-function bmpPump(){if(bmpBusy||!BMPQ.length)return;bmpBusy=true;const idle=window.requestIdleCallback||(f=>setTimeout(()=>f({timeRemaining:()=>8}),30));
-  idle(async dl=>{let n=0;while(BMPQ.length&&(n===0||dl.timeRemaining()>6)){const k=BMPQ.shift();if(BMP[k]||!IMG[k])continue;n++;
-      try{const src=IMG[k],im=new Image();im.src=src;await im.decode();const vb=(SVGS[k]||'').match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/),w=BMPW,h=Math.round(w*(vb?vb[2]/vb[1]:280/200));
-        const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);BMP[k]=cv.toDataURL('image/webp',.92);
-        if(root)root.querySelectorAll('img[data-k="'+k+'"]').forEach(x=>{if(x.closest('.grid .mini,.tgrid,.clgrid,.tuslot'))x.src=BMP[k]})}catch(e){BMP[k]=null}}
-    bmpBusy=false;if(BMPQ.length)bmpPump()},{timeout:1500})}
+function bmpApply(scope){bmpTiles(scope).forEach(im=>{const k=im.dataset.k;if(BMP[k]){if(im.src!==BMP[k])im.src=BMP[k]}else if(BMP[k]===undefined&&BMPQ.indexOf(k)<0)BMPQ.unshift(k)});bmpPump()}
+/* built async off the main thread (toBlob -> object URL, PC only so blob: is fine), never while
+   scrolling, and the whole set is queued as soon as Stack Cards mounts so it's ready before the binder */
+const bmpSet=(k,url)=>{BMP[k]=url;if(root)root.querySelectorAll('img[data-k="'+k+'"]').forEach(x=>{if(x.closest('.grid .mini,.tgrid,.clgrid,.tuslot'))x.src=url})};
+function bmpOne(k){return new Promise(res=>{const src=IMG[k];if(!src){BMP[k]=null;return res()}const t0=performance.now(),im=new Image();im.src=src;
+  im.decode().then(()=>{const vb=(SVGS[k]||'').match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/),w=BMPW,h=Math.round(w*(vb?vb[2]/vb[1]:280/200));
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);PERF.bmpMs=(PERF.bmpMs||0)+(performance.now()-t0);PERF.bmpN=(PERF.bmpN||0)+1;
+    cv.toBlob(bl=>{if(bl)bmpSet(k,URL.createObjectURL(bl));else BMP[k]=null;res()},'image/webp',.92)}).catch(()=>{BMP[k]=null;res()})})}
+function bmpPump(){if(bmpBusy||!BMPQ.length)return;bmpBusy=true;const idle=window.requestIdleCallback||(f=>setTimeout(()=>f({timeRemaining:()=>8}),40));
+  const next=()=>idle(async dl=>{if(SCROLLING){setTimeout(next,250);return}
+    const k=BMPQ.shift();if(k&&BMP[k]===undefined)await bmpOne(k);
+    if(BMPQ.length)next();else bmpBusy=false},{timeout:2000});next()}
+function bmpPrime(){SET.forEach(c=>{[c.art,c.prev].forEach(k=>{if(k&&BMP[k]===undefined&&BMPQ.indexOf(k)<0){artImg(k,Art[k]);BMPQ.push(k)}})});bmpPump()}
 /* no hover effects while the page is scrolling - cards sliding under the cursor used to light up */
 let SCROLLT=0,SCROLLING=false;
 function markScroll(){SCROLLING=true;clearTimeout(SCROLLT);SCROLLT=setTimeout(()=>{SCROLLING=false},160)}
@@ -5170,17 +5176,18 @@ async function perfDiagnose(){if(PERF.busy)return;PERF.busy=true;PERF.log=[];con
 function perfRecord(){if(PERF.busy)return;PERF.busy=true;const m=root.querySelector('#pfMsg');let left=3;
   const tick=()=>{if(left>0){m.textContent='Starting in '+left--+'\u2026 go to the binder';setTimeout(tick,1000);return}
     m.textContent='RECORDING \u2014 scroll up and down like normal for 8s';PERF.frames=[];PERF.lt=0;const loaf=[];let ob=null,scr=0;
-    const onS=()=>scr++;root.addEventListener('scroll',onS,{capture:true,passive:true});
+    const onS=()=>scr++;root.addEventListener('scroll',onS,{capture:true,passive:true});const bn0=PERF.bmpN||0,bm0=PERF.bmpMs||0;
     try{ob=new PerformanceObserver(l=>l.getEntries().forEach(e=>{const sc=(e.scripts||[]).map(x=>({fn:(x.sourceFunctionName||x.invoker||'?').toString().slice(0,50),ms:Math.round(x.duration)}));
       loaf.push({d:Math.round(e.duration),block:Math.round(e.blockingDuration||0),script:Math.round(sc.reduce((a,b)=>a+b.ms,0)),
         styleLayout:e.styleAndLayoutStart?Math.round(e.startTime+e.duration-e.styleAndLayoutStart):0,render:e.renderStart?Math.round(e.startTime+e.duration-e.renderStart):0,top:sc.sort((a,b)=>b.ms-a.ms).slice(0,2)})}));
       ob.observe({type:'long-animation-frame',buffered:false})}catch(e){}
     setTimeout(()=>{ob&&ob.disconnect();root.removeEventListener('scroll',onS,{capture:true});const st=perfStats(8200);
       const sum=k=>loaf.reduce((a,b)=>a+b[k],0),fns={};loaf.forEach(f=>f.top.forEach(t=>{fns[t.fn]=(fns[t.fn]||0)+t.ms}));
-      PERF.report={when:new Date().toISOString(),kind:'recorded scroll',env:perfEnv(),counts:perfCounts(),bitmapsReady:Object.keys(BMP).filter(k=>BMP[k]).length,
+      PERF.report={when:new Date().toISOString(),kind:'recorded scroll',env:perfEnv(),counts:perfCounts(),bitmapsReady:Object.keys(BMP).filter(k=>BMP[k]).length+'/'+(Object.keys(BMP).length+BMPQ.length),
+        bitmapWorkDuringRecord:{n:(PERF.bmpN||0)-bn0,ms:Math.round((PERF.bmpMs||0)-bm0)},
         frames:{fps:st.fps,worstMs:st.worst,p99Ms:st.p99,slowPct:st.slow},scrollEvents:scr,
         longFrames:{count:loaf.length,totalMs:sum('d'),scriptMs:sum('script'),styleLayoutMs:sum('styleLayout'),renderMs:sum('render'),
-          topScripts:Object.entries(fns).sort((a,b)=>b[1]-a[1]).slice(0,6),worst:loaf.sort((a,b)=>b.d-a.d).slice(0,5)}};
+          unattributedMs:sum('d')-sum('script')-sum('render'),topScripts:Object.entries(fns).sort((a,b)=>b[1]-a[1]).slice(0,6),worst:loaf.sort((a,b)=>b.d-a.d).slice(0,5)}};
       m.textContent='Done \u2014 hit Copy report';PERF.busy=false},8200)};tick()}
 function perfCopy(){const rep=PERF.report||{when:new Date().toISOString(),env:perfEnv(),counts:perfCounts(),live5s:perfStats(5000),slowEvents:PERF.ev.slice(-8),note:'no diagnosis run'};
   const txt='STACK CARDS PERF REPORT\n'+JSON.stringify(rep,null,1);const m=root.querySelector('#pfMsg');

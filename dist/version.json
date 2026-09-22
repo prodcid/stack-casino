@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.22.20",
-  "notes": "Stack Cards: binder scroll performance (bitmap art tiles), record-my-scroll tracker",
-  "bytes": 952442,
-  "at": "2026-09-22T10:16:50.090Z"
+  "version": "2026.09.22.21",
+  "notes": "Stack Cards: art bitmaps prebuilt at launch, paused while scrolling, async encode",
+  "bytes": 953372,
+  "at": "2026-09-22T10:20:55.713Z"
 }
