@@ -889,7 +889,7 @@ html,body{margin:0;height:100%;background:#0f212e;overflow:hidden}
 #tcg .barr{display:flex;align-items:center;gap:8px}
 #tcg .perfbtn{background:var(--panel);border:1px solid var(--line)!important;border-radius:8px;padding:8px 10px;font-weight:900;font-size:11px;letter-spacing:.08em;color:var(--mute)}
 #tcg .perfbtn:hover{color:#fff}
-#tcg .perfp{position:absolute;right:14px;top:62px;z-index:120;width:290px;background:rgba(12,24,33,.96);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 16px 40px rgba(0,0,0,.5);font-size:12px}
+#tcg .perfp{position:absolute;right:14px;top:62px;z-index:120;width:330px;background:rgba(12,24,33,.96);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 16px 40px rgba(0,0,0,.5);font-size:12px}
 #tcg .pf-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 #tcg .pf-h b{font-size:13px;font-weight:900}
 #tcg .pf-x{background:none;color:var(--mute);font-size:18px;line-height:1}
@@ -2395,6 +2395,7 @@ function mount(el){root=el;root.id='tcg';
    <div class="barr"><button class="perfbtn" id="perfBtn" title="Performance tracker">FPS</button><div class="bal">$<b id="tcgBal"></b></div></div></div><div class="stage" id="tcgStage"></div>`;
   root.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{SFX.tick();go(b.dataset.v)});
   root.querySelector('#perfBtn').onclick=()=>perfToggle();
+  root.addEventListener('scroll',markScroll,{capture:true,passive:true});root.addEventListener('wheel',markScroll,{passive:true});
   root.addEventListener('pointermove',e=>{if(!E.el||dragging||E.free||E.swipe||gyro)return;const r=E.el.getBoundingClientRect(),k=E.kind==='pack'?.6:1;
     E.hx=clamp(((r.top+r.height/2)-e.clientY)/r.height,-1,1)*14*k;E.hy=clamp((e.clientX-(r.left+r.width/2))/r.width,-1,1)*18*k;E.last=performance.now()});
   root.addEventListener('pointerleave',()=>{E.hx=E.hy=0});
@@ -2550,12 +2551,28 @@ let OFFIO=null;
 function watchOff(scope){if(!window.IntersectionObserver)return;const sc=scope.closest('.binder,.store,.clash')||null;
   if(OFFIO)OFFIO.disconnect();OFFIO=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('off',!e.isIntersecting)),{root:sc,rootMargin:'250px 0px'});
   scope.querySelectorAll('.mini,.ttile,.smini').forEach(el=>OFFIO.observe(el))}
+/* BINDER ART BITMAPS. Every artwork is a 35-117KB vector drawing; the browser re-renders
+   it the first time a tile scrolls into view, and a mouse-wheel flick brings a whole row in
+   at once (127 arts, ~6.5ms each, up to 22ms). Grid tiles swap to a pre-rendered bitmap at
+   ~2x tile size, made in idle time. Zoom, pack opening and slabs keep the vector art. */
+const BMP={},BMPQ=[],BMPW=360;let bmpBusy=false;
+const bmpTiles=scope=>scope.querySelectorAll('.grid .mini img[data-k],.tgrid img[data-k],.clgrid img[data-k],.tuslot img[data-k]');
+function bmpApply(scope){bmpTiles(scope).forEach(im=>{const k=im.dataset.k;if(BMP[k]){if(im.src!==BMP[k])im.src=BMP[k]}else if(BMPQ.indexOf(k)<0)BMPQ.push(k)});bmpPump()}
+function bmpPump(){if(bmpBusy||!BMPQ.length)return;bmpBusy=true;const idle=window.requestIdleCallback||(f=>setTimeout(()=>f({timeRemaining:()=>8}),30));
+  idle(async dl=>{let n=0;while(BMPQ.length&&(n===0||dl.timeRemaining()>6)){const k=BMPQ.shift();if(BMP[k]||!IMG[k])continue;n++;
+      try{const src=IMG[k],im=new Image();im.src=src;await im.decode();const vb=(SVGS[k]||'').match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/),w=BMPW,h=Math.round(w*(vb?vb[2]/vb[1]:280/200));
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);BMP[k]=cv.toDataURL('image/webp',.92);
+        if(root)root.querySelectorAll('img[data-k="'+k+'"]').forEach(x=>{if(x.closest('.grid .mini,.tgrid,.clgrid,.tuslot'))x.src=BMP[k]})}catch(e){BMP[k]=null}}
+    bmpBusy=false;if(BMPQ.length)bmpPump()},{timeout:1500})}
+/* no hover effects while the page is scrolling - cards sliding under the cursor used to light up */
+let SCROLLT=0,SCROLLING=false;
+function markScroll(){SCROLLING=true;clearTimeout(SCROLLT);SCROLLT=setTimeout(()=>{SCROLLING=false},160)}
 /* hover intent: only bring a card to life once the mouse settles on it - sweeping across the
    binder used to promote and re-rasterise every card you passed over */
 let HOVT=0;
-function hoverOn(t){clearTimeout(HOVT);HOVT=setTimeout(()=>{if(t.isConnected&&!root.querySelector('.zoom'))activate(t,'card')},90)}
+function hoverOn(t){clearTimeout(HOVT);HOVT=setTimeout(function tryOn(){if(SCROLLING){HOVT=setTimeout(tryOn,120);return}if(t.isConnected&&!root.querySelector('.zoom'))activate(t,'card')},90)}
 function hoverOff(){clearTimeout(HOVT)}
-function minis(scope){requestAnimationFrame(()=>watchOff(scope));scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
+function minis(scope){requestAnimationFrame(()=>{watchOff(scope);bmpApply(scope)});scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
   m.onpointerenter=()=>hoverOn(t);m.onpointerleave=hoverOff;
   m.onclick=()=>{if(m.classList.contains('miss'))return;const p=m.dataset.id!=null?{c:CARD(+m.dataset.id),foil:m.dataset.f==='1',ins:m.dataset.u?instBy(m.dataset.u):null}:pull[+m.dataset.i];zoom(p)}})}
 const fmtLeft=due=>{const t=Math.max(0,Math.ceil((due-Date.now())/1000));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
@@ -3230,9 +3247,9 @@ function perfToggle(){PERF.on=!PERF.on;const old=root.querySelector('.perfp');ol
   perfObs();const g=perfGPU(),el=document.createElement('div');el.className='perfp';
   el.innerHTML=`<div class="pf-h"><b>Performance</b><button class="pf-x" id="pfX">\u00d7</button></div><div class="pf-live"></div>
    <div class="pf-gpu${g.soft?' bad':''}">${g.soft?'\u26a0 Hardware acceleration looks OFF \u2014 ':''}GPU: ${hx(g.gpu)}</div>
-   <div class="pf-btns"><button class="btn sm" id="pfDiag">Diagnose binder</button><button class="btn ghost sm" id="pfCopy">Copy report</button></div><div class="pf-msg" id="pfMsg"></div>`;
+   <div class="pf-btns"><button class="btn sm" id="pfRec">Record my scroll</button><button class="btn ghost sm" id="pfDiag">Diagnose</button><button class="btn ghost sm" id="pfCopy">Copy report</button></div><div class="pf-msg" id="pfMsg"></div>`;
   root.appendChild(el);PERF.lt=0;PERF.frames=[];PERF.raf=requestAnimationFrame(perfLoop);
-  el.querySelector('#pfX').onclick=()=>perfToggle();el.querySelector('#pfDiag').onclick=()=>perfDiagnose();
+  el.querySelector('#pfX').onclick=()=>perfToggle();el.querySelector('#pfDiag').onclick=()=>perfDiagnose();el.querySelector('#pfRec').onclick=()=>perfRecord();
   el.querySelector('#pfCopy').onclick=()=>perfCopy()}
 const perfWait=ms=>new Promise(r=>setTimeout(r,ms));
 async function perfPhase(name,ms,setup,each){if(setup)setup();await perfWait(400);const t0=performance.now();PERF.frames=[];PERF.lt=0;
@@ -3257,6 +3274,22 @@ async function perfDiagnose(){if(PERF.busy)return;PERF.busy=true;PERF.log=[];con
   deactivate();
   PERF.report={when:new Date().toISOString(),env:perfEnv(),counts:perfCounts(),binderBuildMs:buildMs,phases:PERF.log,slowEvents:PERF.ev.slice(-8)};
   m.textContent='Done \u2014 hit Copy report and paste it to Claude.';PERF.busy=false}
+/* record the player's own scrolling: frames + long-animation-frame breakdown (script / style+layout / render) */
+function perfRecord(){if(PERF.busy)return;PERF.busy=true;const m=root.querySelector('#pfMsg');let left=3;
+  const tick=()=>{if(left>0){m.textContent='Starting in '+left--+'\u2026 go to the binder';setTimeout(tick,1000);return}
+    m.textContent='RECORDING \u2014 scroll up and down like normal for 8s';PERF.frames=[];PERF.lt=0;const loaf=[];let ob=null,scr=0;
+    const onS=()=>scr++;root.addEventListener('scroll',onS,{capture:true,passive:true});
+    try{ob=new PerformanceObserver(l=>l.getEntries().forEach(e=>{const sc=(e.scripts||[]).map(x=>({fn:(x.sourceFunctionName||x.invoker||'?').toString().slice(0,50),ms:Math.round(x.duration)}));
+      loaf.push({d:Math.round(e.duration),block:Math.round(e.blockingDuration||0),script:Math.round(sc.reduce((a,b)=>a+b.ms,0)),
+        styleLayout:e.styleAndLayoutStart?Math.round(e.startTime+e.duration-e.styleAndLayoutStart):0,render:e.renderStart?Math.round(e.startTime+e.duration-e.renderStart):0,top:sc.sort((a,b)=>b.ms-a.ms).slice(0,2)})}));
+      ob.observe({type:'long-animation-frame',buffered:false})}catch(e){}
+    setTimeout(()=>{ob&&ob.disconnect();root.removeEventListener('scroll',onS,{capture:true});const st=perfStats(8200);
+      const sum=k=>loaf.reduce((a,b)=>a+b[k],0),fns={};loaf.forEach(f=>f.top.forEach(t=>{fns[t.fn]=(fns[t.fn]||0)+t.ms}));
+      PERF.report={when:new Date().toISOString(),kind:'recorded scroll',env:perfEnv(),counts:perfCounts(),bitmapsReady:Object.keys(BMP).filter(k=>BMP[k]).length,
+        frames:{fps:st.fps,worstMs:st.worst,p99Ms:st.p99,slowPct:st.slow},scrollEvents:scr,
+        longFrames:{count:loaf.length,totalMs:sum('d'),scriptMs:sum('script'),styleLayoutMs:sum('styleLayout'),renderMs:sum('render'),
+          topScripts:Object.entries(fns).sort((a,b)=>b[1]-a[1]).slice(0,6),worst:loaf.sort((a,b)=>b.d-a.d).slice(0,5)}};
+      m.textContent='Done \u2014 hit Copy report';PERF.busy=false},8200)};tick()}
 function perfCopy(){const rep=PERF.report||{when:new Date().toISOString(),env:perfEnv(),counts:perfCounts(),live5s:perfStats(5000),slowEvents:PERF.ev.slice(-8),note:'no diagnosis run'};
   const txt='STACK CARDS PERF REPORT\n'+JSON.stringify(rep,null,1);const m=root.querySelector('#pfMsg');
   const fallback=()=>{const ta=document.createElement('textarea');ta.className='pf-ta';ta.value=txt;root.querySelector('.perfp').appendChild(ta);ta.select();m.textContent='Copy blocked \u2014 select all in the box and copy it'};
@@ -3676,7 +3709,7 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
   /* exposed for tests */
   _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,artSrc:k=>Art[k](),
      OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
-     FE_CARDS,feFront,perfToggle,perfDiagnose,perfGPU,get PERF(){return PERF},VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
+     FE_CARDS,feFront,perfToggle,perfRecord,BMP,bmpApply,perfDiagnose,perfGPU,get PERF(){return PERF},VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
      get DESK(){return DESK},get BOXCTX(){return BOXCTX},addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
      CL,clStarter,clStart,clPlay,clCanPlay,clAttack,clEndTurn,clEffAtk,clAIStep,clInfo,clStat,ID2LINE,clData,clBonds,clStStart:clStart,clBegin,clDoEnd,CL_TYPE,CL_TRAIT,clRoute,clMenu,clBuilder,clBoard,clLobbyInit,clLobby,clHostStart,clNet,clActive,
      get col(){return col},set col(v){col=v}}};
