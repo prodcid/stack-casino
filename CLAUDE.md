@@ -43,6 +43,7 @@ node test.js sports     # Sportsbook pricing, accas, cash out, suspensions, layo
 node test.js coop       # two-window presence, join invites, side bets
 node test.js fight      # Fight Night engine, outcome mix, RTP, joint accas
 node test.js cards      # Stack Cards: isolation, numbering, saving, grading, slab, wear + trading
+node test.js clash      # Stack Clash: two-window party battle (lobby, ready sync, start, move sync)
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -76,7 +77,7 @@ storage/account layer.
 
 ## 2. Current scope
 
-18 single-player games + sportsbook + fight night + Stack Cards, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+18 single-player games + sportsbook + fight night + Stack Cards (with the Stack Clash battle game), 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -205,6 +206,31 @@ automatically; `devkit check` fails if they drift).
 - **Trade Up** (`tradeup` tab, `spareStacks/tuSign`): 10 spares of a rarity → 1 random card of
   the next (c→h→fa→sir→bwr), 50% drawn from cards you don't own. Spares never include your last
   copy, slabs or signed/error copies.
+- **Stack Clash** (`clash` tab) — lane battle game, built from `stack-clash-game-spec.md`. (The
+  spec references a `stack-cards-battle-mockup.html` that was never in the folder; built from the
+  written rules.) 6 crystals, 3 lanes, energy 1→6, play babies then stack teens/finals on top for
+  +1 attack per card underneath, attack the enemy across, empty lane hits crystals, KO shatters by
+  stage (1/2/3). 8 types (`CL_TYPE`, +2 on advantage `CL_STRONG`) and a trait per line (`CL_TRAIT`,
+  `CL_TR` for names/icons). Stats are baseline-by-stage (`CL_BA`) with small per-line shifts
+  (`CL_ADJ`); **rarity is cosmetic, never changes stats**. `ID2LINE` maps a card id → line by exact
+  art suffix. Bond = baby+teen+final of a line in the deck → that line evolves for 1 less.
+  - **Engine** is pure and fully JSON-serializable (creatures are plain objects; no functions in
+    state). `clStart / clPlay / clAttack / clDice / clEndTurn`, KO/heal/reflect helpers. Randomness
+    (shuffle, dice, coin-flip traits) runs on the acting device and is baked into the state.
+  - **Multiplayer is hot-potato authoritative**: the player whose turn it is owns the state and
+    `clBroadcast()`s the whole game after every action (`clashState`); the other side renders it
+    read-only until `g.turn` flips. Lobby: both pick a deck + ready (`clashHello/Ready/Unready`),
+    host (higher name) sends `clashStart` with the built game, joiner is side 1. `clashLeave` /
+    `tcgLost` abort to the menu. Host routes clash msgs via the casino net switch → `StackCards.onNet` → `clNet`.
+  - **Modes:** solo vs AI (`clAIStep`, easy=random / normal=heuristic / hard=normal+finisher dice),
+    pass-and-play (one device, `clPassScreen` cover between turns, `clRel()` follows `g.turn`), party.
+  - **Decks** live in `col.clash.decks` (≤5, ≤2 of a card, 20-card target, ≥6 babies warning). A
+    starter deck (`clStarter`) is always available so you can play with an empty collection.
+  - **Verified** by 300 headless AI-vs-AI games (no errors, all terminate ≤14 turns) and a
+    two-window party test (`test.js clash`).
+  - **Deferred (spec phase 2/3, not built):** Mastery/Legend/Champion/awakened powers, style points
+    & finisher cinematics, Gauntlet/Daily Puzzle/Draft, share-code play. Undertow (swap) works; Gust
+    is displayed but inert; Foresight auto-resolves.
 - **Graded filters** (`GF`): rarity chips, grade-band chips, rows by grade or by rarity.
 - **Art placement.** Generic FA/SIR creature offsets in `PLACE` are DERIVED from the centred
   window pose — don't hand-type x values (that's how they ended up off-centre).
@@ -364,6 +390,7 @@ Two patterns, don't mix them up:
 - **2026-09-22** — Store + booster box: pure CSS 3D (no WebGL/three.js) so it stays one file and the card art reuses the same cached <img>s; lid hinges from the back and its underside is the display header, like a real Pokemon display box. Packs lean back 16deg from their base and the open camera looks down 54deg - at 40deg you only saw crimps. A box pack is removed only when torn, not when picked. PC only from now on per Alex.
 - **2026-09-22** — Diamond Infernax gets a permanent binder slot after the Mono Rare (frosted preview + odds until pulled). Bug: the stone layer was class .dia, which collided with 'vtag dia', 'zvar dia' and 'varpop dia' - the tag/banner/pop inherited position:absolute;inset:0 and covered the whole card. Renamed the layer .dstones.
 - **2026-09-22** — Diamond binder slot redesigned as a frosted plaque: faceted gem icon, DIAMOND on one line with letter-spacing compensated (padding-left = letter-spacing) so it measures dead centre, divider, odds pill. Old pill wrapped the diamond glyph onto its own line.
+- **2026-09-22** — Stack Clash battle game (new Clash tab). Pure JSON-serializable engine; multiplayer is hot-potato authoritative - the active player broadcasts full state (clashState) each action and the other renders read-only until g.turn flips, so randomness/traits run only on the acting device and never desync. Chose that over lockstep (25 traits + dice would desync) and over hidden-info sync (spec itself proposes share-codes/full-state). Pure CSS card tokens reuse cardFrontBase art. Icons: detailed faceted-gem crystals and lightning-bolt energy per Alex. Deferred spec phase 2/3 (Mastery/Legend/Gauntlet/finishers); Gust inert, Foresight auto.
 
 ---
 

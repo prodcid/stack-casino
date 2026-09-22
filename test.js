@@ -1344,6 +1344,43 @@ async function rtp(ctx, errs) {
   await pg.close();
 }
 
+async function clashbattle(browser, errs) {
+  console.log('\nSTACK CLASH (party battle)');
+  const [A, B] = await connectPair(browser, errs);
+  if (await A.evaluate("NET.status") !== 'connected') { fail('clash: no connection'); await A.close(); await B.close(); return; }
+  await A.evaluate("go('cards')"); await B.evaluate("go('cards')"); await A.waitForTimeout(400);
+  await A.evaluate("StackCards.go('clash')"); await B.evaluate("StackCards.go('clash')"); await A.waitForTimeout(200);
+  // both open the battle lobby and pick decks
+  await A.evaluate("StackCards._.CL.screen='lobby';StackCards._.clLobbyInit()");
+  await B.evaluate("StackCards._.CL.screen='lobby';StackCards._.clLobbyInit()");
+  await A.waitForTimeout(500);
+  const sees = await A.evaluate("[!!StackCards._.CL.lobby, StackCards._.CL.lobby&&StackCards._.CL.lobby.theirName]");
+  (sees[0] && sees[1]) ? pass('battle lobby shows your mate', sees[1]) : fail('battle lobby shows your mate', JSON.stringify(sees));
+  // both ready up
+  await A.evaluate("StackCards.root.querySelector('#clLReady').click()");
+  await B.evaluate("StackCards.root.querySelector('#clLReady').click()");
+  await A.waitForTimeout(500);
+  const hostSees = await B.evaluate("[StackCards._.CL.lobby.ready, StackCards._.CL.lobby.theirReady, !!StackCards.root.querySelector('#clLStart')]");
+  const aHost = await A.evaluate("!!StackCards.root.querySelector('#clLStart')");
+  const host = aHost ? A : B, join = aHost ? B : A;
+  (hostSees[0] && hostSees[1]) ? pass('both ready syncs across the wire') : fail('both ready syncs across the wire', JSON.stringify(hostSees));
+  // host starts the battle
+  await host.evaluate("StackCards.root.querySelector('#clLStart').click()");
+  await A.waitForTimeout(700);
+  const hb = await host.evaluate("[StackCards._.CL.screen, StackCards._.CL.side, !!StackCards._.CL.game]");
+  const jb = await join.evaluate("[StackCards._.CL.screen, StackCards._.CL.side, !!StackCards._.CL.game]");
+  (hb[0] === 'board' && hb[1] === 0 && hb[2] && jb[0] === 'board' && jb[1] === 1 && jb[2]) ? pass('battle starts on both sides, host is player 1') : fail('battle starts on both sides', JSON.stringify([hb, jb]));
+  // the active player plays a baby; it must appear on the other screen
+  const turn = await host.evaluate("StackCards._.CL.game.turn");
+  const sideA = await A.evaluate("StackCards._.CL.side");
+  const active = turn === sideA ? A : B, passive = turn === sideA ? B : A;
+  const played = await active.evaluate(`(()=>{const X=StackCards._,g=X.CL.game,sd=X.CL.side;const hi=g.players[sd].hand.findIndex(id=>StackCards.SET[id].stage===0);if(hi<0)return 'nobaby';let ln=[0,1,2].find(l=>X.clCanPlay(g,sd,hi,l));if(ln==null)return 'cant';X.CL.sel=hi;StackCards.root.querySelector('.cl-row.you .cllane[data-ln="'+ln+'"]').click();return 'ok:'+ln})()`);
+  await A.waitForTimeout(500);
+  const synced = await passive.evaluate(`(()=>{const g=StackCards._.CL.game,t=${turn};return g.players[t].lanes.some(x=>x)})()`);
+  (played.indexOf('ok') === 0 && synced) ? pass('a move on your turn syncs to your mate', played) : fail('a move syncs to your mate', JSON.stringify([played, synced]));
+  await A.close(); await B.close();
+}
+
 /* ---------------- run ---------------- */
 (async () => {
   const which = (process.argv[2] || 'all').toLowerCase();
@@ -1360,6 +1397,7 @@ async function rtp(ctx, errs) {
     if (which === 'all' || which === 'cards') await cards(ctx, errs);
     if (which === 'all' || which === 'cards' || which === 'trade') await cardtrade(browser, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
+    if (which === 'all' || which === 'clash') await clashbattle(browser, errs);
     if (which === 'all' || which === 'coop') await coop(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);

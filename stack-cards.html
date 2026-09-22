@@ -552,6 +552,169 @@ html,body{margin:0;height:100%;background:#0f212e;overflow:hidden}
 #tcg .rw-foot b{display:block;font-size:20px;font-weight:900}
 #tcg .rw-foot small{color:var(--mute);font-weight:700}
 /* ============ GRADED FILTERS ============ */
+/* ================= STACK CLASH ================= */
+#tcg .clash{position:absolute;inset:0;overflow-y:auto;touch-action:pan-y;padding:60px 16px 20px;background:radial-gradient(80% 45% at 50% 0%,rgba(0,231,1,.06),transparent 60%),linear-gradient(180deg,#0e1f2b,#0a141c)}
+/* menu */
+#tcg .clmenu{max-width:760px;margin:0 auto}
+#tcg .cl-hero{text-align:center;margin:8px 0 22px}
+#tcg .cl-logo{font-weight:900;font-style:italic;line-height:.82;margin-bottom:8px}
+#tcg .cl-logo b{display:block;font-size:34px;letter-spacing:.02em;background:linear-gradient(180deg,#fff,#c8ffc8 55%,#00c801);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #04320f)}
+#tcg .cl-logo span{display:block;font-size:50px;letter-spacing:.04em;margin-top:-4px;background:linear-gradient(180deg,#ffe9a8,#ffb03a 60%,#c9721a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #3a2100)}
+#tcg .cl-hero p{color:var(--mute);font-weight:600;max-width:440px;margin:0 auto;line-height:1.5}
+#tcg .cl-deckpick{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
+#tcg .cl-deckpick small{font-size:10px;font-weight:900;letter-spacing:.2em;color:var(--green)}
+#tcg .cl-deckpick>b{font-size:18px;font-weight:900}
+#tcg .cl-deckpick>span{color:var(--mute);font-weight:600;font-size:13px}
+#tcg .cl-deckpick .lnk{margin-top:6px}
+#tcg .lnk{background:none;color:var(--green);font-weight:800;font-size:13px;text-decoration:underline;padding:2px}
+#tcg .cl-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+#tcg .cl-mode{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--panel2);border:1px solid var(--line)!important;border-radius:14px;padding:18px 10px;transition:transform .1s,border-color .15s}
+#tcg .cl-mode:hover{transform:translateY(-3px);border-color:var(--green)!important}
+#tcg .cl-mode.off{opacity:.45}
+#tcg .cl-mode.off:hover{transform:none;border-color:var(--line)!important}
+#tcg .cl-mi{font-size:30px;line-height:1}
+#tcg .cl-mode b{font-size:15px;font-weight:900}
+#tcg .cl-mode small{color:var(--mute);font-weight:600;font-size:11.5px;text-align:center}
+#tcg .cl-diff{display:flex;align-items:center;justify-content:center;gap:8px}
+#tcg .cl-diff span{color:var(--mute);font-weight:700;font-size:13px}
+#tcg .clpill{background:var(--bg);border:1px solid var(--line)!important;border-radius:999px;padding:6px 14px;font-weight:800;font-size:12px;color:var(--mute)}
+#tcg .clpill.on{background:var(--panel2);color:#fff;border-color:var(--green)!important}
+/* builder */
+#tcg .clbuild{max-width:1000px;margin:0 auto}
+#tcg .cl-btop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+#tcg .cl-btop b{font-size:17px;font-weight:900;margin-right:auto}
+#tcg .cl-btop input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;width:180px}
+#tcg .btn.sm{padding:9px 15px;font-size:13px}
+#tcg .cl-bcols{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+#tcg .cl-pooltop,#tcg .cl-dhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+#tcg .cl-pooltop b,#tcg .cl-dhead b{font-size:14px;font-weight:900}
+#tcg .cl-pooltop small,#tcg .cl-dhead span{color:var(--mute);font-weight:700;font-size:12px}
+#tcg .cl-dhead .warn{color:#ffb03a}
+#tcg .clgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px;max-height:60vh;overflow-y:auto;padding:2px}
+#tcg .clown{position:relative;aspect-ratio:63/88;border-radius:6px;overflow:visible;background:none;transition:transform .1s}
+#tcg .clown:hover{transform:translateY(-3px)}
+#tcg .clown.in{outline:2px solid var(--green);outline-offset:1px;border-radius:6px}
+#tcg .clownart{position:absolute;inset:0;border-radius:6px;overflow:hidden}
+#tcg .clminichip{position:absolute;bottom:-6px;z-index:3;font-size:10px;font-weight:900;padding:1px 5px;border-radius:5px;color:#fff}
+#tcg .clminichip.a{left:-3px;background:#c0392b}#tcg .clminichip.h{right:-3px;background:#1e7a3a}
+#tcg .clown em{position:absolute;top:4px;left:4px;width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(0,0,0,.4)}
+#tcg .clhave{position:absolute;top:-6px;right:-6px;z-index:4;background:var(--green);color:#05250a;font-size:11px;font-weight:900;width:19px;height:19px;border-radius:50%;display:grid;place-items:center}
+#tcg .cl-deck{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column}
+#tcg .cl-curve{display:flex;gap:10px;align-items:flex-end;height:60px;margin-bottom:12px;padding:0 4px}
+#tcg .clcv{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative}
+#tcg .clcv i{width:52%;max-width:26px;min-height:3px;background:linear-gradient(180deg,#00e701,#00a301);border-radius:3px 3px 0 0}
+#tcg .clcv small{position:absolute;bottom:-16px;font-size:9px;color:var(--mute);font-weight:700}
+#tcg .clcv b{position:absolute;top:-14px;font-size:11px;font-weight:900}
+#tcg .cl-dlist{flex:1;max-height:40vh;overflow-y:auto;margin:14px 0 8px;display:flex;flex-direction:column;gap:4px}
+#tcg .cllrow{display:flex;align-items:center;gap:8px;background:var(--panel2);border-radius:7px;padding:6px 8px;cursor:pointer}
+#tcg .cllrow:hover{background:#2a4150}
+#tcg .clcost{width:20px;height:20px;border-radius:50%;background:var(--green);color:#05250a;font-weight:900;font-size:12px;display:grid;place-items:center;flex:none}
+#tcg .cllrow b{font-size:13px;font-weight:800}#tcg .cllrow small{color:var(--mute);font-size:11px;margin-left:auto}
+#tcg .cllrow i{font-style:normal;color:#ff6a6a;font-weight:900;padding-left:6px}
+#tcg .cl-dfoot{display:flex;justify-content:space-between;padding-top:6px;border-top:1px solid var(--line)}
+#tcg .cl-decks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+#tcg .cldeckchip{background:var(--bg);border:1px solid var(--line)!important;border-radius:99px;padding:5px 11px;font-size:12px;font-weight:800;color:var(--mute)}
+#tcg .cldeckchip.on{background:var(--panel2);color:#fff;border-color:var(--green)!important}
+#tcg .cldeckchip.add{color:var(--green)}
+/* battle board */
+#tcg .clplay{display:flex;flex-direction:column;padding:54px 12px 8px;height:100%;overflow:hidden}
+#tcg .btn.ghost.xs{padding:5px 11px;font-size:14px;box-shadow:0 3px 0 #0b1a24}
+#tcg .cl-deckcount{font-weight:800;color:var(--mute);font-size:13px}
+#tcg .cl-topbar{position:absolute;top:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;z-index:20}
+#tcg .cl-deckcount{color:var(--mute);font-weight:700;font-size:12px}
+#tcg .cl-oppbar,#tcg .cl-youbar{display:flex;align-items:center;gap:12px;padding:6px 4px;max-width:640px;width:100%;margin:0 auto}
+#tcg .cl-oppbar b{font-weight:900;font-size:14px}
+#tcg .cl-youbar{margin-top:6px}
+#tcg .cl-end{margin-left:auto;padding:11px 20px;font-size:14px}
+#tcg .cl-end:disabled{opacity:.4;pointer-events:none}
+#tcg .clhand{font-weight:800;color:var(--mute);font-size:13px}
+#tcg .clcrys{display:flex;gap:2px}
+#tcg .clgem{width:18px;height:18px;display:block;filter:drop-shadow(0 0 4px rgba(108,196,255,.6))}
+#tcg .clgem.off{filter:none;opacity:.85}
+#tcg .clnrg{display:flex;gap:1px}
+#tcg .clbolt{width:15px;height:17px;display:block;filter:drop-shadow(0 0 4px rgba(55,226,63,.65))}
+#tcg .clbolt.off{filter:none;opacity:.8}
+#tcg .cl-rows{flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;min-height:0}
+#tcg .cl-row{display:grid;grid-template-columns:repeat(3,minmax(0,128px));justify-content:center;gap:18px;width:100%}
+#tcg .cl-mid{display:flex;align-items:center;justify-content:space-between;max-width:520px;width:100%;margin:0 auto;min-height:30px;padding:0 6px}
+#tcg .cl-log{font-size:11px;color:var(--mute);font-weight:600;line-height:1.35;max-width:70%}
+#tcg .cl-turn{font-weight:900;font-size:14px;color:var(--green)}
+#tcg .clplay:not(.myturn) .cl-turn{color:#ffb03a}
+#tcg .cllane{position:relative;aspect-ratio:63/74;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:box-shadow .15s}
+#tcg .cllane.empty{border:2px dashed rgba(255,255,255,.1);background:rgba(255,255,255,.02)}
+#tcg .cllane.empty .cllane-x{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.05)}
+#tcg .clplay.myturn .cl-row.you .cllane.empty{cursor:pointer}
+#tcg .clplay.myturn .cl-row.you .cllane.ready{box-shadow:0 0 0 2px rgba(255,200,0,.8),0 0 16px rgba(255,200,0,.4);cursor:pointer;border-radius:12px}
+#tcg .cllane.drop{box-shadow:0 0 0 2px var(--green),0 0 14px rgba(0,231,1,.4)!important;cursor:pointer;border-radius:12px}
+#tcg .cltok{position:relative;width:100%;height:100%;border-radius:10px;overflow:visible}
+#tcg .cltok.hurt{filter:saturate(.8)}
+#tcg .clunder{position:absolute;inset:0;border-radius:9px;background:#0a1a10;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+#tcg .clart{position:absolute;inset:0;border-radius:9px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.5)}
+#tcg .clblob{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,#7ad0ff,#2a7fbf);border-radius:9px}
+#tcg .cltype{position:absolute;top:-6px;left:-6px;z-index:4;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;color:#05250a;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+#tcg .cltrait{position:absolute;top:-6px;right:-6px;z-index:4;width:22px;height:22px;border-radius:50%;background:#0a1620;border:1px solid rgba(255,255,255,.25);display:grid;place-items:center;font-size:12px}
+#tcg .clstk{position:absolute;bottom:22px;left:-5px;z-index:4;background:#ffc800;color:#2b2000;font-size:10px;font-weight:900;padding:1px 5px;border-radius:5px}
+#tcg .clhpbar{position:absolute;left:5%;right:5%;bottom:20px;height:4px;border-radius:2px;background:rgba(0,0,0,.55);overflow:hidden;z-index:3}
+#tcg .clhpbar i{display:block;height:100%;background:linear-gradient(90deg,#00e701,#7dff7d);border-radius:2px;transition:width .3s}
+#tcg .clstats{position:absolute;left:0;right:0;bottom:-8px;z-index:5;display:flex;justify-content:space-between;padding:0 2px}
+#tcg .clstats span{min-width:22px;text-align:center;font-size:13px;font-weight:900;color:#fff;border-radius:6px;padding:1px 4px}
+#tcg .clatk{background:#c0392b}#tcg .clatk.up{background:#e8892b}
+#tcg .clhp{background:#1e7a3a}
+#tcg .clact.swap{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);z-index:6;background:#39b6ff;color:#04203f;width:22px;height:22px;border-radius:50%;font-size:13px;font-weight:900;display:grid;place-items:center;box-shadow:0 2px 5px rgba(0,0,0,.5)}
+#tcg .cl-hand{display:flex;gap:8px;justify-content:center;align-items:flex-end;padding:10px 4px 4px;min-height:96px;overflow-x:auto}
+#tcg .cl-nohand{color:var(--mute);font-weight:700;padding:20px}
+#tcg .clhc{position:relative;width:76px;flex:none;aspect-ratio:63/88;border-radius:7px;transition:transform .12s;cursor:pointer}
+#tcg .clhc .clart{border-radius:7px;box-shadow:0 4px 10px rgba(0,0,0,.5)}
+#tcg .clhc.can:hover{transform:translateY(-10px)}
+#tcg .clhc.cant{opacity:.55}
+#tcg .clhc.sel{transform:translateY(-14px);box-shadow:0 0 0 2px #ffc800,0 0 16px rgba(255,200,0,.5);border-radius:7px}
+#tcg .clhc-cost{position:absolute;top:-6px;left:-6px;z-index:4;width:22px;height:22px;border-radius:50%;background:var(--green);color:#05250a;font-weight:900;font-size:12px;display:grid;place-items:center}
+#tcg .clhc-cost.bond{background:#ffc800;color:#2b2000}
+#tcg .clhc-b{position:absolute;left:0;right:0;bottom:0;z-index:3;background:linear-gradient(0deg,rgba(0,0,0,.85),transparent);border-radius:0 0 7px 7px;padding:8px 4px 3px;text-align:center}
+#tcg .clhc-b b{display:block;font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tcg .clhc-b em{font-style:normal;font-size:10px;font-weight:900;padding:0 3px}
+#tcg .clhc-b em.a{color:#ff8a7a}#tcg .clhc-b em.h{color:#7dff9d}
+#tcg .clplay.myturn.cl-sel .cllane.empty{cursor:pointer}
+/* dice + overlays */
+#tcg .cldice{position:absolute;inset:0;z-index:90;display:grid;place-items:center;background:rgba(5,12,18,.78)}
+#tcg .cldice-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 26px;text-align:center;width:min(88%,320px)}
+#tcg .cldice-box b{display:block;font-size:17px;font-weight:900}
+#tcg .cldice-box small{display:block;color:var(--mute);font-weight:600;font-size:12px;margin-top:3px}
+#tcg .clfaces{font-size:76px;line-height:1;margin:14px 0;color:#fff}
+#tcg .clfaces.done.good{color:#00e701}#tcg .clfaces.done.crit{color:#ffc800;animation:clpop .4s}#tcg .clfaces.done.bad{color:#ff5a5a}
+@keyframes clpop{0%{transform:scale(.5)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+#tcg .cldice-btns{display:flex;gap:10px;justify-content:center}
+#tcg .cldice-res{margin-top:12px;font-size:20px;font-weight:900;color:#ffc800}
+#tcg .clover{position:absolute;inset:0;z-index:95;display:grid;place-items:center;background:rgba(5,12,18,.8)}
+#tcg .clover-box{text-align:center;padding:30px 34px;border-radius:18px;background:var(--panel);border:1px solid var(--line)}
+#tcg .clover-box.win{box-shadow:0 0 40px rgba(0,231,1,.4)}
+#tcg .clover-box.lose{box-shadow:0 0 40px rgba(255,60,60,.25)}
+#tcg .clover-box small{font-size:12px;font-weight:900;letter-spacing:.2em;color:var(--mute)}
+#tcg .clover-box b{display:block;font-size:32px;font-weight:900;margin:6px 0 18px}
+#tcg .clover-box.win b{color:#00e701}
+#tcg .clover-btns{display:flex;gap:10px;justify-content:center}
+#tcg .clpass{position:absolute;inset:0;display:grid;place-items:center}
+#tcg .cl-passbox{text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:34px 40px}
+#tcg .cl-passbox .cl-mi{font-size:40px;margin-bottom:8px}
+#tcg .cl-passbox b{display:block;font-size:22px;font-weight:900;line-height:1.2;margin-bottom:6px}
+#tcg .cl-passbox small{display:block;color:var(--mute);font-weight:600;margin-bottom:18px}
+/* lobby */
+#tcg .cllobby{max-width:720px;margin:0 auto}
+#tcg .cl-lobcols{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:20px 0}
+#tcg .cl-lobme,#tcg .cl-lobthem{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+#tcg .cl-lobme small,#tcg .cl-lobthem small{font-size:10px;font-weight:900;letter-spacing:.2em;color:var(--green)}
+#tcg .cl-lobme>b,#tcg .cl-lobthem>b{display:block;font-size:19px;font-weight:900;margin:4px 0 12px}
+#tcg .cl-lobdeck{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+#tcg .cl-lobdeck span{color:var(--mute);font-weight:700;font-size:12px}
+#tcg .cl-lobdeck select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:#fff;font-weight:700}
+#tcg .cl-lobdeck i{font-style:normal;font-weight:800}
+#tcg .cl-lstat{font-weight:800;color:var(--mute);margin-bottom:12px;font-size:13px}
+#tcg .cl-lstat.ready{color:var(--green)}
+#tcg .cl-lobvs{font-weight:900;font-size:20px;color:var(--mute)}
+#tcg .cl-lobfoot{text-align:center;min-height:50px}
+#tcg .btn.big{padding:15px 34px;font-size:17px}
+#tcg .cl-waiting{color:var(--mute);font-weight:700}
+@media(max-width:640px){#tcg .cl-modes{grid-template-columns:1fr}#tcg .cl-bcols{grid-template-columns:1fr}}
 /* signed: gold-ink autograph across the art */
 #tcg .vsig{position:absolute;left:9%;right:7%;top:24%;z-index:6;pointer-events:none;transform:rotate(-9deg)}
 #tcg .front.fa .vsig,#tcg .front.sir .vsig,#tcg .front.bwr .vsig{top:40%}
@@ -2114,7 +2277,7 @@ let root,gyro=null,dragging=false;
 const $=(s,r=root)=>r.querySelector(s);const fmt=n=>n.toLocaleString();
 function mount(el){root=el;root.id='tcg';
   root.innerHTML=`<div class="bar"><div class="title">Stack Cards<small>Mythic collection</small></div>
-   <div class="tabs"><button class="tab on" data-v="store">Store</button><button class="tab" data-v="shop">Packs</button><button class="tab" data-v="binder">Binder</button><button class="tab" data-v="graded">Graded<i class="tdot" id="tcgDot"></i></button><button class="tab" data-v="tradeup">Trade Up</button><button class="tab" data-v="trade" id="tcgTradeTab" hidden>Trade</button></div>
+   <div class="tabs"><button class="tab on" data-v="store">Store</button><button class="tab" data-v="shop">Packs</button><button class="tab" data-v="binder">Binder</button><button class="tab" data-v="graded">Graded<i class="tdot" id="tcgDot"></i></button><button class="tab" data-v="tradeup">Trade Up</button><button class="tab" data-v="clash">Clash</button><button class="tab" data-v="trade" id="tcgTradeTab" hidden>Trade</button></div>
    <div class="bal">$<b id="tcgBal"></b></div></div><div class="stage" id="tcgStage"></div>`;
   root.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{SFX.tick();go(b.dataset.v)});
   root.addEventListener('pointermove',e=>{if(!E.el||dragging||E.free||E.swipe||gyro)return;const r=E.el.getBoundingClientRect(),k=E.kind==='pack'?.6:1;
@@ -2126,8 +2289,9 @@ function mount(el){root=el;root.id='tcg';
 const askGyro=()=>{try{DeviceOrientationEvent.requestPermission&&DeviceOrientationEvent.requestPermission().catch(()=>{})}catch(e){}};
 function updBal(){const b=$('#tcgBal'),v=B.getBalance();if(b)b.textContent=isFinite(v)?fmt(Math.floor(v)):'∞';B.onBalance&&B.onBalance()}
 let curView='shop';
-function go(v){const k=['binder','graded','trade','tradeup','store'].includes(v)?v:v==='desk'&&DESK?'desk':'shop';curView=k;BOXCTX=null;
+function go(v){const k=['binder','graded','trade','tradeup','store','clash'].includes(v)?v:v==='desk'&&DESK?'desk':'shop';curView=k;BOXCTX=null;
   if(k==='desk')return desk(DESK.u);
+  if(k==='clash'){root.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===k));return clRoute()}
   root.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===k));({binder,graded,trade,tradeup,store}[k]||shop)()}
 const stage=()=>$('#tcgStage');
 
@@ -2459,6 +2623,386 @@ function tuReveal(p,from){const h=p.c.h??CATS[p.c.cat].h;
     ov.appendChild(bu);setTimeout(()=>bu.remove(),1300);if(p.v)setTimeout(()=>varPop(p,ov),450)},1500);
   const done=v=>{ov.remove();deactivate();go(v)};
   ov.querySelector('#tuBinder').onclick=()=>done('binder');ov.querySelector('#tuAgain').onclick=()=>done('tradeup')}
+
+/* ================= STACK CLASH (battle) =================
+   A lane battle game on top of the collection. 3 lanes each, 6 crystals, energy
+   ramps 1->6, play babies, stack teens/finals on top for +attack, attack across,
+   KO an enemy to shatter their crystals. Types give +2, each line has a trait,
+   and you can gamble a dice roll after an attack. Solo (AI), pass-and-play, and
+   party (organise decks then battle your mate). Full game state is JSON and, in a
+   party, the player whose turn it is is authoritative and broadcasts it. */
+const CL_TYPE={fox:'flame',wyrm:'tide',lion:'light',owl:'shadow',hare:'frost',gdr:'verdant',rdr:'flame',wolf:'storm',turt:'stone',moth:'verdant',cat:'shadow',stag:'light',phx:'flame',sky:'storm',gem:'stone',tig:'verdant',golem:'stone',yeti:'frost',knight:'verdant',koi:'tide',angler:'tide',puffer:'tide',slime:'tide',jelly:'tide',ghost:'shadow'};
+const CL_TRAIT={fox:'kindle',wyrm:'undertow',lion:'pride',owl:'foresight',hare:'chill',gdr:'regrow',rdr:'scorch',wolf:'surge',turt:'shell',moth:'metamorph',cat:'pounce',stag:'guide',phx:'rebirth',sky:'gust',gem:'refract',tig:'ferocity',golem:'bulwark',yeti:'avalanche',knight:'thorns',koi:'ascend',angler:'lure',puffer:'spines',slime:'split',jelly:'sting',ghost:'phase'};
+const CL_ADJ={golem:[-1,1],turt:[-1,1],puffer:[-1,0],phx:[1,-1],tig:[1,-1]};
+const CL_STRONG={flame:['verdant','frost'],tide:['flame','stone'],verdant:['tide','stone'],stone:['flame','storm'],storm:['tide','frost'],frost:['verdant','storm'],shadow:['light'],light:['shadow']};
+const CL_TC={flame:'#ff6a3d',tide:'#39b6ff',verdant:'#57d06a',stone:'#c8a86a',storm:'#ffd23d',frost:'#8fe3ff',shadow:'#b57cff',light:'#ffe066'};
+const CL_TN={flame:'Flame',tide:'Tide',verdant:'Verdant',stone:'Stone',storm:'Storm',frost:'Frost',shadow:'Shadow',light:'Light'};
+const CL_TR={kindle:['Kindle','Deal 1 to the enemy across at the start of your turn','\uD83D\uDD25'],undertow:['Undertow','Once a turn, swap places with another of your creatures','\uD83D\uDD00'],pride:['Pride','+1 attack for each other creature you have','\uD83D\uDC51'],foresight:['Foresight','On play, may send the top card of your deck to the bottom','\uD83D\uDC41'],chill:['Chill','Foes it hits deal 1 less damage next turn','\u2744'],regrow:['Regrow','Heals 2 at the start of your turn','\uD83C\uDF3F'],scorch:['Scorch','Attacks also deal 1 to the neighbouring lanes','\uD83D\uDD25'],surge:['Surge','A dice roll of 5 also counts as a double','\u26A1'],shell:['Shell','Takes 1 less damage from every hit','\uD83D\uDEE1'],metamorph:['Metamorph','Evolves free after 2 turns if you hold its next stage','\uD83E\uDD8B'],pounce:['Pounce','Can attack the turn it is played','\uD83D\uDC3E'],guide:['Guide','On play, add a baby from your deck to your hand','\u2728'],rebirth:['Rebirth','When KO\u2019d, coin flip to return it to your hand','\uD83D\uDD25'],gust:['Gust','Once a game, move an enemy to an empty lane','\uD83D\uDCA8'],refract:['Refract','The first hit it takes each turn deals 0','\uD83D\uDC8E'],ferocity:['Ferocity','+2 attack against damaged foes','\uD83D\uDC2F'],bulwark:['Bulwark','Foes can\u2019t hit your crystals past its lane','\uD83D\uDDFF'],avalanche:['Avalanche','When it evolves, deal 2 to the enemy across','\uD83C\uDFD4'],thorns:['Thorns','Creatures that attack it take 1','\uD83C\uDF35'],ascend:['Ascend','+3 attack with a full stack','\uD83C\uDF0A'],lure:['Lure','On play, pull an enemy into the lane across','\uD83C\uDFA3'],spines:['Spines','Attackers take 2 damage','\uD83E\uDD94'],split:['Split','Leaves a 1/1 Blob when KO\u2019d','\uD83E\uDEE7'],sting:['Sting','Coin flip: the foe it hits skips its next attack','\uD83E\uDEB8'],phase:['Phase','The first attack against it each game may miss','\uD83D\uDC7B']};
+const CL_BA={atk:[2,4,6],hp:[4,7,10],cost:[1,2,3],cry:[1,2,3]};
+const ID2LINE={},CSUF=['0','1','2','FA','SIR','MONO'];
+LINES.forEach(L=>SET.forEach(c=>{if(CSUF.some(x=>c.art===L.key+x))ID2LINE[c.id]=L.key}));
+function clStat(line,stage){const a=CL_ADJ[line]||[0,0];return {atk:Math.max(0,CL_BA.atk[stage]+a[0]),hp:CL_BA.hp[stage]+a[1],cost:CL_BA.cost[stage],cry:CL_BA.cry[stage]}}
+function clInfo(id){const c=CARD(id),line=ID2LINE[id],st=clStat(line,c.stage);
+  return {id,name:c.name,line,stage:c.stage,type:CL_TYPE[line],trait:CL_TRAIT[line],cost:st.cost,atk:st.atk,hp:st.hp,cry:st.cry}}
+const clFinal=key=>lineOf(key).find(c=>c.stage===2);           // holo final id for art defaults
+function clStarter(){const keys=['fox','wyrm','gdr','turt','owl','lion'],d=[];
+  keys.forEach(k=>{const l=lineOf(k);d.push(l[0].id,l[1].id,l[2].id)});
+  d.push(lineOf('fox')[0].id,lineOf('wyrm')[0].id);return d}
+/* deck storage on the account, next to the collection */
+function clData(){col.clash=col.clash||{decks:[],active:0};if(!col.clash.decks.length)col.clash.decks.push({name:'Starter deck',cards:clStarter(),cover:clFinal('rdr').id});return col.clash}
+const clActive=()=>{const d=clData();return d.decks[Math.min(d.active,d.decks.length-1)]||d.decks[0]};
+const clCounts=cards=>{const m={};cards.forEach(id=>m[id]=(m[id]||0)+1);return m};
+const clBabies=cards=>cards.filter(id=>CARD(id).stage===0).length;
+/* bond: baby+teen+final of a line all in the deck -> that line evolves for 1 less */
+function clBonds(cards){const has={},b={};cards.forEach(id=>{const k=ID2LINE[id],st=CARD(id).stage;(has[k]=has[k]||{})[st]=1});
+  Object.keys(has).forEach(k=>{if(has[k][0]&&has[k][1]&&has[k][2])b[k]=1});return b}
+
+/* ---- battle state ---- */
+const CL={screen:'menu',game:null,side:0,mode:'solo',diff:'normal',sel:null,swap:null,busy:false,cover:false,anim:null,lobby:null};
+let clUID=0;
+function clCreature(id){const f=clInfo(id);return {u:++clUID,id,line:f.line,stage:f.stage,type:f.type,trait:f.trait,name:f.name,
+  atk:f.atk,hp:f.hp,maxHp:f.hp,cry:f.cry,stack:[],canAttack:false,refractUsed:false,phaseUsed:false,skip:false,chillAtk:0,moth:0,gustUsed:false,blob:false}}
+function clBlob(){return {u:++clUID,id:null,line:'slime',stage:0,type:'tide',trait:null,name:'Blob',atk:1,hp:1,maxHp:1,cry:0,stack:[],canAttack:false,blob:true,refractUsed:false,phaseUsed:false,skip:false,chillAtk:0,moth:0}}
+function clShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function clDealHand(deck){for(let tries=0;tries<40;tries++){const d=clShuffle(deck),hand=d.slice(0,4);
+  if(hand.some(id=>CARD(id).stage===0))return {deck:d.slice(4),hand};}
+  const d=clShuffle(deck);return {deck:d.slice(4),hand:d.slice(0,4)}}
+function clPlayer(deck,name,isAI){const {deck:dk,hand}=clDealHand(deck);
+  return {name,isAI:!!isAI,deck:dk,hand,lanes:[null,null,null],crystals:6,energy:0,maxEnergy:0,bonds:clBonds(deck),swapped:false,mull:false}}
+function clStart(deck0,deck1,opt){opt=opt||{};
+  const g={players:[clPlayer(deck0,opt.n0||'You',opt.ai0),clPlayer(deck1,opt.n1||'Opponent',opt.ai1)],
+    turn:Math.random()<.5?0:1,first:0,log:[],winner:null,seq:0};
+  g.first=g.turn;g.players[1-g.turn]._second=true;   // player going second draws an extra on turn 1
+  clBeginTurn(g,true);return g}
+function clBeginTurn(g,firstEver){const p=g.players[g.turn];
+  p.maxEnergy=Math.min(6,p.maxEnergy+1);p.energy=p.maxEnergy;p.swapped=false;
+  // draw
+  let n=1;if(firstEver&&g.turn!==g.first)n=2;   // whoever is second draws 2 on their first turn (1 normal + 1 bonus)
+  for(let i=0;i<n;i++)clDraw(g,g.turn);
+  // per-creature start-of-turn
+  p.lanes.forEach((cr,ln)=>{if(!cr)return;cr.canAttack=true;cr.refractUsed=false;
+    if(cr.trait==='kindle'){const e=g.players[1-g.turn].lanes[ln];if(e){clHurt(g,1-g.turn,ln,1);clLog(g,cr.name+' kindles for 1')}}
+    if(cr.trait==='regrow'&&cr.hp<cr.maxHp){cr.hp=Math.min(cr.maxHp,cr.hp+2);clLog(g,cr.name+' regrows 2')}
+    if(cr.trait==='metamorph'){cr.moth++;}});
+  clSweepKO(g);}
+function clDraw(g,pi){const p=g.players[pi];
+  if(!p.deck.length){p.crystals=Math.max(0,p.crystals-1);clLog(g,p.name+' has no cards left and loses a crystal');clWinCheck(g);return}
+  const id=p.deck.shift();p.hand.push(id);
+  if(p.hand.length>7)p.hand.shift();}       // simple over-7 trim
+function clLog(g,t){g.log.push(t);if(g.log.length>6)g.log.shift()}
+function clStackBonus(cr){return cr.stack.length}
+function clPride(g,side,ln){const cr=g.players[side].lanes[ln];if(cr.trait!=='pride')return 0;
+  return g.players[side].lanes.filter((x,i)=>x&&i!==ln).length}
+function clEffAtk(g,side,ln){const cr=g.players[side].lanes[ln];if(!cr)return 0;
+  let a=cr.atk+clStackBonus(cr)+clPride(g,side,ln);
+  if(cr.trait==='ascend'&&cr.stack.length>=2)a+=3;
+  a-=cr.chillAtk||0;return Math.max(0,a)}
+/* deal `amt` to the creature in (side,ln); handles refract/phase/shell */
+function clHurt(g,side,ln,amt,opt){opt=opt||{};const cr=g.players[side].lanes[ln];if(!cr)return;
+  if(cr.trait==='refract'&&!cr.refractUsed){cr.refractUsed=true;amt=0}
+  if(cr.trait==='phase'&&!cr.phaseUsed){cr.phaseUsed=true;if(Math.random()<.5){clLog(g,cr.name+' phases \u2014 the hit misses');amt=0}}
+  if(cr.trait==='shell')amt=Math.max(0,amt-1);
+  cr.hp-=amt;}
+function clSweepKO(g){for(let side=0;side<2;side++)for(let ln=0;ln<3;ln++){const cr=g.players[side].lanes[ln];if(cr&&cr.hp<=0)clKO(g,side,ln)}}
+function clKO(g,side,ln){const cr=g.players[side].lanes[ln];if(!cr)return;const p=g.players[side];
+  let replace=null;
+  if(cr.trait==='split'&&!cr.blob){replace=clBlob();clLog(g,cr.name+' splits into a Blob')}
+  else if(cr.trait==='rebirth'&&cr.id!=null&&Math.random()<.5){p.hand.push(cr.id);clLog(g,cr.name+' is reborn \u2014 back to hand')}
+  const loss=cr.blob?0:cr.cry;p.crystals=Math.max(0,p.crystals-loss);
+  if(loss)clLog(g,p.name+' loses '+loss+' crystal'+(loss>1?'s':''));
+  p.lanes[ln]=replace;clWinCheck(g)}
+function clWinCheck(g){if(g.winner!=null)return;
+  if(g.players[0].crystals<=0&&g.players[1].crystals<=0)g.winner=g.turn;
+  else if(g.players[1].crystals<=0)g.winner=0;else if(g.players[0].crystals<=0)g.winner=1}
+/* ---- actions ---- */
+function clCanPlay(g,side,hi,ln){const p=g.players[side],id=p.hand[hi];if(id==null)return false;const c=CARD(id),line=ID2LINE[id],dest=p.lanes[ln];
+  let cost=clInfo(id).cost;if(p.bonds[line])cost=Math.max(1,cost-1);
+  if(cost>p.energy)return false;
+  if(c.stage===0)return !dest;                                  // baby into empty lane
+  if(!dest||dest.blob)return false;                             // teen/final need the prev stage
+  return dest.line===line&&dest.stage===c.stage-1}
+function clPlay(g,side,hi,ln){if(!clCanPlay(g,side,hi,ln))return false;const p=g.players[side],id=p.hand[hi],c=CARD(id),line=ID2LINE[id];
+  let cost=clInfo(id).cost;if(p.bonds[line])cost=Math.max(1,cost-1);
+  p.energy-=cost;p.hand.splice(hi,1);
+  if(c.stage===0){const cr=clCreature(id);if(cr.trait==='pounce')cr.canAttack=true;p.lanes[ln]=cr;clLog(g,p.name+' plays '+cr.name);
+    if(cr.trait==='guide'){const bi=p.deck.findIndex(x=>CARD(x).stage===0);if(bi>=0){p.hand.push(p.deck.splice(bi,1)[0]);clLog(g,cr.name+' guides a baby to hand')}}
+    if(cr.trait==='foresight'&&p.deck.length){if(p.isAI){if(clInfo(p.deck[0]).cost>p.maxEnergy)p.deck.push(p.deck.shift())}else{clFore(g)}}
+    if(cr.trait==='lure'){const es=g.players[1-side].lanes;if(!es[ln]){const j=[0,1,2].filter(i=>es[i]);if(j.length){const k=j[Math.floor(Math.random()*j.length)];es[ln]=es[k];es[k]=null;clLog(g,cr.name+' lures a foe across')}}}
+  }else{const old=p.lanes[ln],keep=old.canAttack;const cr=clCreature(id);cr.stack=old.stack.concat([old.id]);cr.canAttack=keep;
+    p.lanes[ln]=cr;clLog(g,p.name+' evolves into '+cr.name);
+    if(cr.trait==='avalanche'){const e=g.players[1-side].lanes[ln];if(e){clHurt(g,1-side,ln,2);clLog(g,cr.name+' avalanche hits for 2')}}}
+  clSweepKO(g);return true}
+function clMetaTick(g,side){const p=g.players[side];p.lanes.forEach((cr,ln)=>{if(cr&&cr.trait==='metamorph'&&cr.moth>=2&&cr.stage<2){
+  const need=lineOf(cr.line).find(c=>c.stage===cr.stage+1),hi=p.hand.findIndex(id=>ID2LINE[id]===cr.line&&CARD(id).stage===cr.stage+1);
+  if(hi>=0){const keep=cr.canAttack,id=p.hand.splice(hi,1)[0],nc=clCreature(id);nc.stack=cr.stack.concat([cr.id]);nc.canAttack=keep;nc.moth=0;p.lanes[ln]=nc;clLog(g,cr.name+' metamorphoses free into '+nc.name)}}})}
+function clAttack(g,side,ln){const atk=g.players[side].lanes[ln];if(!atk||!atk.canAttack)return null;
+  const dmg=clEffAtk(g,side,ln);if(dmg<=0){atk.canAttack=false;return null}
+  const def=g.players[1-side].lanes[ln];atk.canAttack=false;let killed=false;
+  if(def){let d=dmg;if(CL_STRONG[atk.type]&&CL_STRONG[atk.type].indexOf(def.type)>=0)d+=2;
+    if(atk.trait==='ferocity'&&def.hp<def.maxHp)d+=2;
+    clHurt(g,1-side,ln,d);
+    if(def&&g.players[1-side].lanes[ln]===def){                 // still alive: reflect + debuffs
+      if(def.trait==='spines'){atk.hp-=2;clLog(g,'Spines hit back for 2')}
+      if(def.trait==='thorns'){atk.hp-=1;clLog(g,'Thorns hit back for 1')}
+      if(atk.trait==='chill')def.chillAtk=1;
+      if(atk.trait==='sting'&&Math.random()<.5){def.skip=true;clLog(g,def.name+' is stung and will skip its attack')}}
+    if(atk.trait==='scorch'){[ln-1,ln+1].forEach(l=>{if(l>=0&&l<3&&g.players[1-side].lanes[l]){clHurt(g,1-side,l,1)}});clLog(g,atk.name+' scorches the neighbours')}
+    clLog(g,atk.name+' hits '+def.name+' for '+d);
+    clSweepKO(g);killed=g.players[1-side].lanes[ln]!==def;
+    return {target:'creature',lane:ln,dmg:d,killed,atkU:atk.u}}
+  // empty lane -> crystals, unless blocked by a Bulwark on the defender's board
+  const bulwark=g.players[1-side].lanes.some(c=>c&&c.trait==='bulwark');
+  if(bulwark){clLog(g,atk.name+' is walled off by Bulwark')}
+  else{g.players[1-side].crystals=Math.max(0,g.players[1-side].crystals-1);clLog(g,atk.name+' shatters a crystal');clWinCheck(g)}
+  clSweepKO(g);return {target:'crystal',lane:ln,atkU:atk.u}}
+function clDice(g,side,ln,targetU){const atk=g.players[side].lanes[ln];const def=g.players[1-side].lanes[ln];
+  const roll=1+Math.floor(Math.random()*6);let txt='',dbl=roll===6||(roll===5&&atk&&atk.trait==='surge');
+  if(roll===1){if(atk){atk.hp-=1;clLog(g,'Dice 1 \u2014 backfire! '+atk.name+' takes 1')}txt='Backfire!'}
+  else if(def&&def.u===targetU){let bonus=dbl?clEffAtk(g,side,ln):roll;clHurt(g,1-side,ln,bonus);txt=dbl?'DOUBLE! +'+bonus:'+'+bonus;clLog(g,'Dice '+roll+' \u2014 '+txt)}
+  else{txt='Dice '+roll;clLog(g,'Dice '+roll+' \u2014 target gone')}
+  clSweepKO(g);return {roll,txt,dbl}}
+function clEndTurn(g){const p=g.players[g.turn];
+  p.lanes.forEach(cr=>{if(cr){cr.chillAtk=0;cr.skip=false}});   // clear this side's temp debuffs at end of its turn
+  g.turn=1-g.turn;g.seq++;clBeginTurn(g);
+  // metamorph free evolve happens at the very start of a turn, after draws
+  clMetaTick(g,g.turn);}
+
+/* ================= screens ================= */
+function clRoute(){if(!root)return;if(CL.screen==='builder')return clBuilder();if(CL.screen==='lobby')return clLobby();
+  if(CL.screen==='board'&&CL.game)return clBoard();return clMenu()}
+function clMenu(){CL.screen='menu';CL.game=null;const st=stage();deactivate();root.onkeydown=null;
+  const party=B.party&&B.party(),on=party&&party.on,d=clActive();
+  st.innerHTML=`<div class="clash clmenu">
+   <div class="cl-hero"><div class="cl-logo"><b>STACK</b><span>CLASH</span></div><p>Lane battles with the creatures you collect. Stack evolutions, exploit types, gamble the dice.</p></div>
+   <div class="cl-deckpick"><small>ACTIVE DECK</small><b>${hx(d.name)}</b><span>${d.cards.length} cards \u00b7 ${clBabies(d.cards)} babies</span><button class="lnk" id="clEdit">Deck builder</button></div>
+   <div class="cl-modes">
+    <button class="cl-mode" id="clAI"><div class="cl-mi">\uD83E\uDD16</div><b>Vs AI</b><small>Battle the computer</small></button>
+    <button class="cl-mode" id="clPass"><div class="cl-mi">\uD83D\uDD01</div><b>Pass &amp; play</b><small>Two players, one screen</small></button>
+    <button class="cl-mode${on?'':' off'}" id="clParty"><div class="cl-mi">\u2694\uFE0F</div><b>Battle your mate</b><small>${on?'Organise decks, then play '+hx(party.name):'Join a party first'}</small></button>
+   </div>
+   <div class="cl-diff"><span>AI difficulty</span>${['easy','normal','hard'].map(x=>`<button class="clpill${CL.diff===x?' on':''}" data-diff="${x}">${x[0].toUpperCase()+x.slice(1)}</button>`).join('')}</div>
+  </div>`;
+  $('#clEdit').onclick=()=>{SFX.tick();CL.screen='builder';clBuilder()};
+  st.querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{CL.diff=b.dataset.diff;SFX.tick();clMenu()});
+  $('#clAI').onclick=()=>clBegin('solo');
+  $('#clPass').onclick=()=>clBegin('pass');
+  const pb=$('#clParty');if(on)pb.onclick=()=>{SFX.tick();CL.screen='lobby';clLobbyInit()};else pb.onclick=()=>{SFX.no();note('Join a party with your mate first (Party in the casino)')}}
+function clBegin(mode){SFX.init();SFX.tick();CL.mode=mode;const deck=clActive().cards.slice();
+  if(deck.length<8){SFX.no();note('Your deck needs at least 8 cards');return}
+  const me=B.me?B.me():'You';
+  CL.side=0;
+  CL.game=clStart(deck,deck,{n0:mode==='pass'?'Player 1':me,n1:mode==='pass'?'Player 2':(mode==='solo'?'CPU':'Mate'),ai1:mode==='solo'});
+  CL.screen='board';CL.sel=null;CL.swap=null;
+  if(CL.game.turn===1&&mode==='solo'){clBoard();clAISoon()}
+  else if(mode==='pass'){clPassScreen()}else clBoard()}
+
+/* ---- deck builder ---- */
+function clBuilder(){CL.screen='builder';const st=stage();deactivate();root.onkeydown=null;
+  const d=clData();let cur=d._edit;if(!cur){cur=d._edit={idx:d.active,name:clActive().name,cards:clActive().cards.slice()}}
+  const cnt=clCounts(cur.cards),owned=SET.filter(c=>owns(c)),bab=clBabies(cur.cards);
+  const curve=[0,0,0];cur.cards.forEach(id=>curve[CARD(id).stage]++);
+  const grpHtml=owned.map(c=>{const info=clInfo(c.id),have=cnt[c.id]||0;
+    return `<button class="clown${have?' in':''}" data-add="${c.id}" title="${hx(c.name)}"><div class="clownart">${cardFrontBase(c,false)}</div>
+      <span class="clminichip a">${info.atk}</span><span class="clminichip h">${info.hp}</span>
+      <em style="background:${CL_TC[info.type]}"></em>${have?`<span class="clhave">${have}</span>`:''}</button>`}).join('');
+  const list=cur.cards.map((id,i)=>{const info=clInfo(id),c=CARD(id);
+    return `<div class="cllrow" data-rm="${i}"><span class="clcost">${info.cost}</span><b>${hx(c.name)}</b><small>${CL_TN[info.type]} \u00b7 ${info.atk}/${info.hp}</small><i>\u00d7</i></div>`}).join('');
+  st.innerHTML=`<div class="clash clbuild">
+   <div class="cl-btop"><button class="btn ghost sm" id="clBack">\u2190 Battle</button><b>Deck builder</b>
+     <input id="clName" value="${hx(cur.name)}" maxlength="20" spellcheck="false"><button class="btn sm" id="clSave">Save deck</button></div>
+   <div class="cl-bcols">
+    <div class="cl-pool"><div class="cl-pooltop"><b>Your cards</b><small>${owned.length} owned \u00b7 tap to add (max 2)</small></div>
+      <div class="clgrid">${grpHtml||'<p class="gempty">Open packs to collect cards \u2014 for now use the starter deck.</p>'}</div></div>
+    <div class="cl-deck">
+      <div class="cl-dhead"><b>${cur.cards.length}/20</b><span class="${bab<6?'warn':''}">${bab} babies${bab<6?' \u2014 aim for 6+':''}</span></div>
+      <div class="cl-curve">${[0,1,2].map(s=>`<div class="clcv"><i style="height:${Math.min(100,curve[s]*12)}%"></i><small>${['Baby','Teen','Final'][s]}</small><b>${curve[s]}</b></div>`).join('')}</div>
+      <div class="cl-dlist">${list||'<p class="gempty">Empty deck. Add cards, or load the starter.</p>'}</div>
+      <div class="cl-dfoot"><button class="lnk" id="clStarter">Load starter deck</button><button class="lnk" id="clClear">Clear</button></div>
+      <div class="cl-decks">${d.decks.map((dk,i)=>`<button class="cldeckchip${i===cur.idx?' on':''}" data-deck="${i}">${hx(dk.name)}</button>`).join('')}${d.decks.length<5?'<button class="cldeckchip add" id="clNew">+ New</button>':''}</div>
+    </div></div></div>`;
+  $('#clBack').onclick=()=>{delete d._edit;SFX.tick();CL.screen='menu';clMenu()};
+  $('#clName').oninput=e=>cur.name=e.target.value;
+  st.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const id=+b.dataset.add;if((cnt[id]||0)>=2){SFX.no();return}if(cur.cards.length>=20){SFX.no();note('20 cards max');return}cur.cards.push(id);SFX.tick();clBuilder()});
+  st.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{cur.cards.splice(+b.dataset.rm,1);SFX.tick();clBuilder()});
+  $('#clStarter').onclick=()=>{cur.cards=clStarter();SFX.tick();clBuilder()};
+  $('#clClear').onclick=()=>{cur.cards=[];SFX.tick();clBuilder()};
+  st.querySelectorAll('[data-deck]').forEach(b=>b.onclick=()=>{const i=+b.dataset.deck;cur.idx=i;cur.name=d.decks[i].name;cur.cards=d.decks[i].cards.slice();SFX.tick();clBuilder()});
+  const nw=$('#clNew');if(nw)nw.onclick=()=>{cur.idx=d.decks.length;cur.name='New deck';cur.cards=clStarter();SFX.tick();clBuilder()};
+  $('#clSave').onclick=()=>{if(cur.cards.length<8){SFX.no();note('A deck needs at least 8 cards');return}
+    const cover=(cur.cards.find(id=>CARD(id).stage===2)||cur.cards[0]);
+    const dk={name:cur.name||'Deck',cards:cur.cards.slice(),cover};
+    if(cur.idx>=d.decks.length)d.decks.push(dk);else d.decks[cur.idx]=dk;
+    d.active=cur.idx;delete d._edit;save();SFX.buy();note('Deck saved');CL.screen='menu';clMenu()}}
+
+/* ---- board ---- */
+function clRel(){return CL.mode==='pass'?CL.game.turn:CL.side}       // which side "I" am for this render
+function clMyTurn(){const g=CL.game;return g.winner==null&&(CL.mode==='pass'?true:g.turn===CL.side)}
+function clToken(cr,side,ln,mine){const drop=mine&&CL.sel!=null&&clMyTurn()&&clCanPlay(CL.game,side,CL.sel,ln)?' drop':'';
+  if(!cr)return `<div class="cllane empty${drop}" data-side="${side}" data-ln="${ln}"><span class="cllane-x"></span></div>`;
+  const c=cr.id!=null?CARD(cr.id):null,eff=clEffAtk(CL.game,side,ln),tr=CL_TR[cr.trait];
+  const hurt=cr.hp<cr.maxHp;
+  return `<div class="cllane${mine?' mine':''}${drop}${cr.canAttack&&mine&&clMyTurn()&&CL.sel==null?' ready':''}" data-side="${side}" data-ln="${ln}" data-u="${cr.u}">
+    <div class="cltok t-${cr.type}${hurt?' hurt':''}">
+     ${cr.stack.map((sid,i)=>`<div class="clunder" style="transform:translate(${-(i+1)*3}px,${(i+1)*4}px)"></div>`).join('')}
+     <div class="clart">${c?cardFrontBase(c,false):'<div class="clblob"></div>'}</div>
+     <div class="cltype" style="background:${CL_TC[cr.type]}">${CL_TN[cr.type][0]}</div>
+     ${tr?`<div class="cltrait" title="${tr[0]}: ${tr[1]}">${tr[2]}</div>`:''}
+     ${cr.stack.length?`<div class="clstk">+${cr.stack.length}</div>`:''}
+     <div class="clhpbar"><i style="width:${Math.max(0,cr.hp/cr.maxHp*100)}%"></i></div>
+     <div class="clstats"><span class="clatk${eff>cr.atk+cr.stack.length?' up':''}">${eff}</span><span class="clhp">${cr.hp}</span></div>
+     ${mine&&cr.trait==='undertow'&&!CL.game.players[side].swapped&&clMyTurn()?'<button class="clact swap" data-swap="'+ln+'">\u21C4</button>':''}
+    </div></div>`}
+const CL_GEM_ON='<svg viewBox="0 0 24 24" class="clgem"><path d="M5 3h14l4 6-11 13L1 9z" fill="#1f6fd6"/><path d="M5 3h14l4 6H1z" fill="#59b6f5"/><path d="M8 3l4 6 4-6z" fill="#bfe9ff"/><path d="M1 9l11 13L23 9" fill="none" stroke="#8fd3ff" stroke-width="1.1" opacity=".55"/><path d="M12 9v13M5 3l7 6 7-6" fill="none" stroke="#cdeeff" stroke-width="1" opacity=".7"/><path d="M1 9h22" stroke="#0d3f78" stroke-width="1" opacity=".5"/></svg>';
+const CL_GEM_OFF='<svg viewBox="0 0 24 24" class="clgem off"><path d="M5 3h14l4 6-11 13L1 9z" fill="#1b2a33"/><path d="M5 3h14l4 6H1z" fill="#26404e"/><path d="M1 9h22M12 9v13M5 3l7 6 7-6" fill="none" stroke="#324c5b" stroke-width="1"/><path d="M9 4l3 8-2 7" fill="none" stroke="#101a20" stroke-width="1.3"/></svg>';
+const CL_BOLT_ON='<svg viewBox="0 0 24 24" class="clbolt"><path d="M13.5 1.5 4 13.5h6.2L8.5 22.5 20 9.5h-6.6z" fill="#37e23f" stroke="#0a3d12" stroke-width="1.1" stroke-linejoin="round"/><path d="M12.6 4 7 12h4.4" fill="none" stroke="#d6ffd6" stroke-width="1.1" opacity=".8"/></svg>';
+const CL_BOLT_OFF='<svg viewBox="0 0 24 24" class="clbolt off"><path d="M13.5 1.5 4 13.5h6.2L8.5 22.5 20 9.5h-6.6z" fill="#1b2a33" stroke="#324c5b" stroke-width="1.1" stroke-linejoin="round"/></svg>';
+function clCrys(n){let h='';for(let i=0;i<6;i++)h+=i<n?CL_GEM_ON:CL_GEM_OFF;return `<div class="clcrys">${h}</div>`}
+function clEnergy(p){let h='';for(let i=0;i<p.maxEnergy;i++)h+=i<p.energy?CL_BOLT_ON:CL_BOLT_OFF;return `<div class="clnrg">${h}</div>`}
+function clBoard(){CL.screen='board';const g=CL.game,st=stage();root.onkeydown=null;
+  const meSide=clRel(),opp=1-meSide,me=g.players[meSide],them=g.players[opp],my=clMyTurn();
+  st.innerHTML=`<div class="clash clplay${my?' myturn':''}${CL.sel!=null?' cl-selmode':''}">
+   <div class="cl-oppbar"><button class="btn ghost xs" id="clQuit">\u2190</button><b>${hx(them.name)}</b>${clCrys(them.crystals)}<span class="clhand">\uD83C\uDCA0 ${them.hand.length}</span>${clEnergy(them)}</div>
+   <div class="cl-rows">
+    <div class="cl-row opp">${[0,1,2].map(ln=>clToken(them.lanes[ln],opp,ln,false)).join('')}</div>
+    <div class="cl-mid"><div class="cl-log">${g.log.slice(-3).map(t=>`<div>${hx(t)}</div>`).join('')}</div><div class="cl-turn">${g.winner!=null?'':(my?'Your turn':hx(them.name)+'\u2019s turn')}</div></div>
+    <div class="cl-row you">${[0,1,2].map(ln=>clToken(me.lanes[ln],meSide,ln,true)).join('')}</div>
+   </div>
+   <div class="cl-youbar"><span class="cl-deckcount">\uD83C\uDCCF ${me.deck.length}</span>${clCrys(me.crystals)}${clEnergy(me)}<button class="btn cl-end" id="clEnd" ${my?'':'disabled'}>End turn</button></div>
+   <div class="cl-hand" id="clHand">${me.hand.map((id,i)=>clHandCard(g,meSide,id,i)).join('')||'<span class="cl-nohand">No cards in hand</span>'}</div>
+  </div>`;
+  clWire();
+  if(g.winner!=null)clResult();}
+function clHandCard(g,side,id,i){const info=clInfo(id),c=CARD(id),p=g.players[side];let cost=info.cost;if(p.bonds[info.line])cost=Math.max(1,cost-1);
+  const playable=clMyTurn()&&[0,1,2].some(ln=>clCanPlay(g,side,i,ln)),sel=CL.sel===i;
+  return `<div class="clhc t-${info.type}${sel?' sel':''}${playable?' can':' cant'}" data-hi="${i}">
+    <div class="clhc-cost${cost<info.cost?' bond':''}">${cost}</div>
+    <div class="clart">${cardFrontBase(c,false)}</div>
+    <div class="clhc-b"><b>${hx(c.name)}</b><span><em class="a">${info.atk}</em><em class="h">${info.hp}</em></span></div></div>`}
+function clWire(){const g=CL.game,side=clRel(),my=clMyTurn();
+  $('#clQuit').onclick=()=>{clLeave()};
+  const end=$('#clEnd');if(end&&my)end.onclick=()=>clDoEnd();
+  root.querySelectorAll('.clhc').forEach(el=>el.onclick=()=>{if(!my)return zoomId(+el.dataset.hi,side);const i=+el.dataset.hi;
+    if(!el.classList.contains('can')){zoomHand(g,side,i);return}CL.sel=CL.sel===i?null:i;CL.swap=null;clBoard()});
+  root.querySelectorAll('.cl-row.you .cllane').forEach(el=>{el.onclick=e=>{if(!my)return;const ln=+el.dataset.ln;
+    if(CL.swap!=null){if(CL.swap!==ln&&g.players[side].lanes[ln]!==undefined){clSwap(side,CL.swap,ln)}CL.swap=null;return clBoard()}
+    if(CL.sel!=null){if(clCanPlay(g,side,CL.sel,ln)){clDoPlay(CL.sel,ln)}else SFX.no();return}
+    const cr=g.players[side].lanes[ln];if(cr){if(cr.canAttack){clDoAttack(ln)}else zoomCreature(cr)}}});
+  root.querySelectorAll('.cl-row.opp .cllane').forEach(el=>{el.onclick=()=>{const cr=g.players[1-side].lanes[+el.dataset.ln];if(cr)zoomCreature(cr)}});
+  root.querySelectorAll('[data-swap]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!my)return;CL.swap=+b.dataset.swap;CL.sel=null;SFX.tick();clBoard()});}
+function clSwap(side,a,b){const p=CL.game.players[side];if(p.swapped)return;[p.lanes[a],p.lanes[b]]=[p.lanes[b],p.lanes[a]];p.swapped=true;
+  clLog(CL.game,'Undertow swaps lanes '+(a+1)+' and '+(b+1));SFX.swoosh();clAfter()}
+function clDoPlay(hi,ln){const side=clRel();if(clPlay(CL.game,side,hi,ln)){CL.sel=null;SFX.tick();clAfter()}}
+function clDoAttack(ln){const side=clRel();const res=clAttack(CL.game,side,ln);SFX.swoosh();
+  if(res&&res.target==='creature'&&!res.killed&&CL.game.winner==null){clAfter();clOfferDice(ln,res.atkU)}
+  else{if(res&&res.killed)SFX.boom();clAfter()}}
+function clDoEnd(){CL.sel=null;CL.swap=null;const g=CL.game;const wasPass=CL.mode==='pass';
+  clEndTurn(g);SFX.tick();
+  if(g.winner!=null){clBoard();return}
+  if(CL.mode==='solo'&&g.turn===1){clBoard();clBroadcast();clAISoon();return}
+  if(wasPass){clPassScreen();return}
+  clBoard();clBroadcast()}
+function clAfter(){clWinCheck(CL.game);clBoard();clBroadcast();if(CL.game.winner!=null){clBroadcast()}}
+/* dice overlay */
+function clOfferDice(ln,targetU){const side=clRel();const ov=document.createElement('div');ov.className='cldice';
+  ov.innerHTML=`<div class="cldice-box"><b>Gamble a dice roll?</b><small>2\u20135 adds damage \u00b7 6 doubles \u00b7 1 backfires</small>
+    <div class="clfaces" id="clFace">\u2680</div>
+    <div class="cldice-btns"><button class="btn ghost" id="clNoRoll">Skip</button><button class="btn" id="clRoll">Roll</button></div></div>`;
+  root.appendChild(ov);
+  const fin=()=>{ov.remove()};
+  ov.querySelector('#clNoRoll').onclick=()=>{fin();clAfter()};
+  ov.querySelector('#clRoll').onclick=()=>{const btns=ov.querySelector('.cldice-btns');btns.style.visibility='hidden';const face=ov.querySelector('#clFace');
+    SFX.tick();let t=0;const iv=setInterval(()=>{face.textContent='\u2680\u2681\u2682\u2683\u2684\u2685'[Math.floor(Math.random()*6)];if(++t>10){clearInterval(iv);
+      const res=clDice(CL.game,side,ln,targetU);face.textContent='\u2680\u2681\u2682\u2683\u2684\u2685'[res.roll-1];
+      face.className='clfaces done '+(res.roll===1?'bad':res.dbl?'crit':'good');
+      const tag=document.createElement('div');tag.className='cldice-res';tag.textContent=res.txt;ov.querySelector('.cldice-box').appendChild(tag);
+      res.dbl?SFX.boom():res.roll===1?SFX.no():SFX.ding(660);
+      setTimeout(()=>{fin();clAfter()},1100)}},60)}}
+/* pass-and-play cover */
+function clPassScreen(){const g=CL.game,st=stage();st.innerHTML=`<div class="clash clpass"><div class="cl-passbox">
+  <div class="cl-mi">\uD83D\uDD01</div><b>Pass the device to<br>${hx(g.players[g.turn].name)}</b><small>Their hand is hidden until they\u2019re ready.</small>
+  <button class="btn" id="clReady">I\u2019m ready</button></div></div>`;
+  $('#clReady').onclick=()=>{SFX.tick();clBoard()}}
+/* results */
+function clResult(){const g=CL.game,meSide=CL.mode==='pass'?g.winner:CL.side,win=g.winner===meSide;
+  const ov=document.createElement('div');ov.className='clover';
+  ov.innerHTML=`<div class="clover-box ${win?'win':'lose'}"><small>${CL.mode==='pass'?hx(g.players[g.winner].name)+' wins':(win?'Victory':'Defeat')}</small>
+    <b>${win?'You win!':(CL.mode==='pass'?g.players[g.winner].name+' takes it':'You lost')}</b>
+    <div class="clover-btns"><button class="btn ghost" id="clAgain">Rematch</button><button class="btn" id="clMenuBtn">Menu</button></div></div>`;
+  root.appendChild(ov);
+  if(win&&CL.mode==='solo'){try{SFX.reveal('u',true);SFX.boom()}catch(e){}}
+  ov.querySelector('#clAgain').onclick=()=>{ov.remove();if(CL.mode==='party'){clLeave()}else clBegin(CL.mode)};
+  ov.querySelector('#clMenuBtn').onclick=()=>{ov.remove();clLeave()}}
+function clLeave(){if(CL.mode==='party'){try{B.send({t:'clashLeave'})}catch(e){}}CL.game=null;CL.mode='solo';CL.screen='menu';clMenu()}
+function zoomCreature(cr){if(cr.id!=null)zoom({c:CARD(cr.id),foil:false,ins:null})}
+function zoomId(hi,side){const id=CL.game.players[side].hand[hi];if(id!=null)zoom({c:CARD(id),foil:false,ins:null})}
+function zoomHand(g,side,i){const id=g.players[side].hand[i];if(id!=null)zoom({c:CARD(id),foil:false,ins:null})}
+function clFore(g){/* human owl: simple auto-keep for now */const p=g.players[g.turn];if(p.deck.length&&clInfo(p.deck[0]).cost>p.maxEnergy+1){p.deck.push(p.deck.shift());clLog(g,'Foresight sends the top card to the bottom')}}
+
+/* ---- AI ---- */
+function clAISoon(){CL.busy=true;setTimeout(()=>clAIStep(),720)}
+function clAIStep(){const g=CL.game;if(!g||g.winner!=null||g.turn!==1){CL.busy=false;return}
+  if(clAIPlay(g)){clBoard();return setTimeout(clAIStep,620)}
+  if(clAIAttack(g)){clBoard();return setTimeout(clAIStep,640)}
+  CL.busy=false;clEndTurn(g);
+  if(g.winner!=null){clBoard();return}
+  clBoard();}
+function clAIPlay(g){const p=g.players[1],rnd=CL.diff==='easy';
+  // evolve first (prefer finals), then play babies
+  const evo=[];p.lanes.forEach((cr,ln)=>{if(!cr||cr.blob||cr.stage>=2)return;
+    const hi=p.hand.findIndex(id=>ID2LINE[id]===cr.line&&CARD(id).stage===cr.stage+1);if(hi>=0&&clCanPlay(g,1,hi,ln))evo.push([hi,ln,CARD(p.hand[hi]).stage])});
+  if(evo.length){evo.sort((a,b)=>b[2]-a[2]);const[hi,ln]=rnd?evo[Math.floor(Math.random()*evo.length)]:evo[0];return clPlay(g,1,hi,ln)}
+  const babies=[];p.hand.forEach((id,hi)=>{if(CARD(id).stage===0){const empt=[0,1,2].filter(ln=>clCanPlay(g,1,hi,ln));if(empt.length)babies.push([hi,empt])}});
+  if(babies.length){const[hi,lns]=babies[Math.floor(Math.random()*babies.length)];
+    // prefer a lane facing an enemy (to trade) unless easy
+    let ln=lns[0];if(!rnd){const face=lns.find(l=>g.players[0].lanes[l]);ln=face!=null?face:lns[Math.floor(Math.random()*lns.length)]}else ln=lns[Math.floor(Math.random()*lns.length)];
+    return clPlay(g,1,hi,ln)}
+  return false}
+function clAIAttack(g){const p=g.players[1];for(let ln=0;ln<3;ln++){const cr=p.lanes[ln];if(!cr||!cr.canAttack||clEffAtk(g,1,ln)<=0)continue;
+    const def=g.players[0].lanes[ln];const res=clAttack(g,1,ln);
+    if(res&&res.target==='creature'&&!res.killed&&CL.diff!=='easy'&&def&&def.hp<=5){const roll=clDice(g,1,ln,res.atkU);/* hard/normal gamble to finish */}
+    return true}
+  return false}
+
+/* ---- party lobby ---- */
+function clLobbyInit(){CL.mode='party';CL.lobby={mine:clActive().name,mineCards:clActive().cards.slice(),ready:false,theirs:null,theirName:(B.party&&B.party().name)||'Mate',theirReady:false};
+  try{B.send({t:'clashHello',name:B.me?B.me():'Mate'})}catch(e){}clLobby()}
+function clLobby(){CL.screen='lobby';const st=stage();deactivate();root.onkeydown=null;const L=CL.lobby;if(!L)return clMenu();
+  const d=clData(),me=B.me?B.me():'You',iHost=me>=L.theirName;
+  st.innerHTML=`<div class="clash cllobby">
+   <div class="cl-btop"><button class="btn ghost sm" id="clLBack">\u2190 Menu</button><b>Battle lobby</b><span></span></div>
+   <div class="cl-lobcols">
+    <div class="cl-lobme"><small>YOU</small><b>${hx(me)}</b>
+      <div class="cl-lobdeck"><span>Deck</span><select id="clLDeck">${d.decks.map((dk,i)=>`<option value="${i}"${dk.name===L.mine?' selected':''}>${hx(dk.name)} (${dk.cards.length})</option>`).join('')}</select></div>
+      <div class="cl-lstat ${L.ready?'ready':''}">${L.ready?'\u2713 Ready':'Choosing\u2026'}</div>
+      <button class="btn" id="clLReady">${L.ready?'Cancel':'Ready up'}</button></div>
+    <div class="cl-lobvs">VS</div>
+    <div class="cl-lobthem"><small>YOUR MATE</small><b>${hx(L.theirName)}</b>
+      <div class="cl-lobdeck"><span>Deck</span><i>${L.theirs?hx(L.theirs.name):'\u2026'}</i></div>
+      <div class="cl-lstat ${L.theirReady?'ready':''}">${L.theirReady?'\u2713 Ready':'Waiting\u2026'}</div></div>
+   </div>
+   <div class="cl-lobfoot">${L.ready&&L.theirReady?(iHost?'<button class="btn big" id="clLStart">Start battle</button>':'<div class="cl-waiting">Both ready \u2014 waiting for '+hx(L.theirName)+' to start\u2026</div>'):'<div class="cl-waiting">Both players pick a deck and ready up.</div>'}</div>
+  </div>`;
+  $('#clLBack').onclick=()=>{try{B.send({t:'clashLeave'})}catch(e){}CL.lobby=null;CL.mode='solo';CL.screen='menu';clMenu()};
+  const sel=$('#clLDeck');if(sel)sel.onchange=()=>{const dk=d.decks[+sel.value];L.mine=dk.name;L.mineCards=dk.cards.slice();if(L.ready){L.ready=false;clSendReady()}clLobby()};
+  $('#clLReady').onclick=()=>{L.ready=!L.ready;SFX.tick();clSendReady();clLobby()};
+  const sb=$('#clLStart');if(sb)sb.onclick=()=>clHostStart()}
+function clSendReady(){const L=CL.lobby;try{B.send(L.ready?{t:'clashReady',name:B.me?B.me():'Mate',deckName:L.mine,cards:L.mineCards}:{t:'clashUnready'})}catch(e){}}
+function clHostStart(){const L=CL.lobby;if(!L||!L.ready||!L.theirReady||!L.theirs)return;
+  const me=B.me?B.me():'You';CL.side=0;CL.mode='party';
+  CL.game=clStart(L.mineCards,L.theirs.cards,{n0:me,n1:L.theirName});
+  CL.screen='board';CL.sel=null;
+  try{B.send({t:'clashStart',game:CL.game,hostName:me,joinName:L.theirName})}catch(e){}
+  clBoard();clBroadcast()}
+function clBroadcast(){if(CL.mode==='party'&&CL.game){try{B.send({t:'clashState',game:CL.game})}catch(e){}}}
+function clNet(m){
+  if(m.t==='clashHello'){if(CL.lobby){CL.lobby.theirName=m.name||CL.lobby.theirName;if(CL.lobby.ready)clSendReady();clLobby()}
+    else{try{B.send({t:'clashHello',name:B.me?B.me():'Mate'})}catch(e){}}return}
+  if(m.t==='clashReady'){if(!CL.lobby)return;CL.lobby.theirReady=true;CL.lobby.theirName=m.name||CL.lobby.theirName;CL.lobby.theirs={name:m.deckName,cards:m.cards};if(CL.screen==='lobby')clLobby();return}
+  if(m.t==='clashUnready'){if(CL.lobby){CL.lobby.theirReady=false;if(CL.screen==='lobby')clLobby()}return}
+  if(m.t==='clashStart'){CL.mode='party';CL.side=1;CL.game=m.game;CL.screen='board';CL.sel=null;CL.swap=null;
+    curView='clash';tabOn('clash');note('Battle started vs '+(m.hostName||'your mate'));clBoard();return}
+  if(m.t==='clashState'){if(CL.mode==='party'&&CL.game){CL.game=m.game;if(CL.screen==='board'){clBoard();if(CL.game.winner!=null)clWinCheck(CL.game)}}return}
+  if(m.t==='clashLeave'){if(CL.mode==='party'){note('Your mate left the battle');CL.game=null;CL.mode='solo';if(curView==='clash'){CL.screen='menu';clMenu()}}return}}
 
 /* ---------------- STORE + BOOSTER BOX ----------------
    The store front: a featured sealed booster box turning on a lit plinth, a
@@ -2849,12 +3393,14 @@ function showOffer(m){closeOffer();const el=document.createElement('div');el.cla
 const closeOffer=()=>{const o=root&&root.querySelector('.tofr');o&&o.remove()};
 
 function onNet(m){if(!m||!m.t)return;
+  if(m.t.indexOf('clash')===0)return clNet(m);
   if(m.t==='tcgReq'){B.send({t:'tcgCol',col:snapshot(),name:B.me?B.me():'Your mate'});return}
   if(m.t==='tcgCol'){TR.mate={col:m.col,name:m.name||'Your mate'};if(root&&curView==='trade')trade();return}
   if(m.t==='tcgOffer'){TR.incoming=m;if(root)showOffer(m);note(`${m.from||'Your mate'} sent you a card trade offer`);return}
   if(m.t==='tcgResp'){settleOffer(m);return}
   if(m.t==='tcgCancel'){if(TR.incoming&&TR.incoming.oid===m.oid){TR.incoming=null;closeOffer();note('They withdrew the trade offer')}return}
-  if(m.t==='tcgLost'){if(col.escrow){Object.keys(col.escrow).forEach(k=>giveItems(col.escrow[k]));delete col.escrow;save()}
+  if(m.t==='tcgLost'){if(CL.mode==='party'){CL.game=null;CL.mode='solo';if(curView==='clash'){CL.screen='menu';if(root)clMenu()}}
+    if(col.escrow){Object.keys(col.escrow).forEach(k=>giveItems(col.escrow[k]));delete col.escrow;save()}
     TR.mate=null;TR.waiting=null;TR.incoming=null;closeOffer();if(root&&curView==='trade')go('binder')}}
 
 window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){return col},
@@ -2868,6 +3414,7 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
      OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
      VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
      get DESK(){return DESK},get BOXCTX(){return BOXCTX},addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
+     CL,clStarter,clStart,clPlay,clCanPlay,clAttack,clEndTurn,clEffAtk,clAIStep,clInfo,clStat,ID2LINE,clData,clBonds,clStStart:clStart,clBegin,clDoEnd,CL_TYPE,CL_TRAIT,clRoute,clMenu,clBuilder,clBoard,clLobbyInit,clLobby,clHostStart,clNet,clActive,
      get col(){return col},set col(v){col=v}}};
 if(document.getElementById('tcg')&&!window.StackBridge)mount(document.getElementById('tcg'));
 })();

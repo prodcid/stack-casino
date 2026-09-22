@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.22.10",
-  "notes": "Stack Cards: redesigned Diamond binder slot",
-  "bytes": 865244,
-  "at": "2026-09-21T20:29:45.946Z"
+  "version": "2026.09.22.12",
+  "notes": "Stack Clash: lane battle game as a new Clash tab (deck builder, AI, pass-and-play, party battles), detailed gem/energy icons",
+  "bytes": 918860,
+  "at": "2026-09-22T01:56:17.973Z"
 }
