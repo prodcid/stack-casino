@@ -1,5 +1,5 @@
-#!/usr/bin/env node
-/* test.js — browser regression for the single-file build.
+﻿#!/usr/bin/env node
+/* test.js â€” browser regression for the single-file build.
    node test.js            everything
    node test.js solo       single-player games + tickets + cosmetics
    node test.js admin      admin portal: stats, user table, suspend, audit
@@ -587,7 +587,7 @@ async function cards(ctx, errs) {
 
   // STORE + BOOSTER BOX: buy -> desk -> cut the wrap -> push the tab -> 36 packs -> open one
   await pg.evaluate("StackCards.go('store')"); await pg.waitForTimeout(400);
-  const sf = await pg.evaluate("(()=>{const R=StackCards.root;return [!!R.querySelector('.st-feature .bx3 .wr'),!!R.querySelector('#stBuy'),R.querySelectorAll('.st-ghost').length]})()");
+  const sf = await pg.evaluate("(()=>{const R=StackCards.root;return [!!R.querySelector('.st-feature .bx3 .wr'),!!R.querySelector('#stBuy'),R.querySelectorAll('.st-fe .front.fe').length]})()");
   (sf[0] && sf[1] && sf[2] === 3) ? pass('store front shows a sealed box and the shelves') : fail('store front shows a sealed box and the shelves', JSON.stringify(sf));
   await pg.evaluate("StackCards.root.querySelector('#stBuy').click()"); await pg.waitForTimeout(1500);
   const cr = await pg.evaluate("(()=>{const r=StackCards.root.querySelector('#wrCut').getBoundingClientRect();return [r.left,r.top,r.width,r.height]})()");
@@ -804,7 +804,7 @@ async function sports(ctx, errs) {
     });
   })()`);
   const up = cashUI.find(c => c[0] === 'up'), dn = cashUI.find(c => c[0] === 'down');
-  (up && up[1] === '+' && dn && dn[1] === '−')
+  (up && up[1] === '+' && dn && dn[1] === 'âˆ’')
     ? pass('cash out shows coloured +/- against stake', 'up and down both rendered')
     : fail('cash out shows coloured +/- against stake', JSON.stringify(cashUI));
   await pg.evaluate("FB.open=[];FB.card[0].phase='pre';FB.card[0].min=0;FB.card[0].ch=0;FB.card[0].ca=0;FB.live=-1;fbRender()");
@@ -1154,13 +1154,13 @@ async function mp(browser, errs) {
     (errs.length === n0 && synced) ? pass('table ' + g) : fail('table ' + g, synced ? errs.slice(n0).join(' | ') : 'not synced');
   }
 
-  // hidden-information leak checks — the guest must never receive secrets
+  // hidden-information leak checks â€” the guest must never receive secrets
   await A.evaluate("act({a:'pick',g:'vt'})"); await A.waitForTimeout(400);
   await tap(A, '#vtGo', 200); await tap(B, '#vtGo', 1300);
   const vtLeak = await B.evaluate("JSON.stringify((PS.d.lockers||[]).filter(l=>!l.open)[0]||{})");
   vtLeak === '{"open":false}' ? pass('vault: closed lockers hidden') : fail('vault: closed lockers hidden', vtLeak);
 
-  // the vault round above is still live and (correctly) blocks a table switch — clear it first
+  // the vault round above is still live and (correctly) blocks a table switch â€” clear it first
   await A.evaluate("if(PG&&PG.vt){clearTimeout(PG.vt.to);PG.vt=vtNew();push()}"); await A.waitForTimeout(400);
   await A.evaluate("act({a:'pick',g:'pk'})"); await A.waitForTimeout(600);
   await tap(A, '#mpPkDeal', 2500);
@@ -1192,7 +1192,7 @@ async function strip(browser, errs) {
 
   // The Strip is documented and audited here but is not currently in the build:
   // no 'st' entry in PT, no hostInit state, no renderer. Skip loudly rather than
-  // fail — this suite is worth keeping for when the table is actually built.
+  // fail â€” this suite is worth keeping for when the table is actually built.
   const probe = await browser.newContext();
   const pp = await probe.newPage();
   await pp.goto(URL);

@@ -802,6 +802,45 @@ html,body{margin:0;height:100%;background:#0f212e;overflow:hidden}
  animation:tufly 1.1s var(--d) cubic-bezier(.5,0,.8,.4) forwards}
 @keyframes tufly{0%{opacity:0;transform:rotate(var(--a)) translateY(-280px) rotate(calc(-1*var(--a)))}
  15%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(0) rotate(calc(-1*var(--a))) scale(.3)}}
+/* ===== 1st Edition: classic 1999 layout, matte ===== */
+#tcg .front.fe{background:linear-gradient(135deg,#f9dc4a,#f1c52b 45%,#f8d948);padding:0;border-radius:4.6%/3.3%;color:#1b1b1b;font-family:Arial,Helvetica,sans-serif}
+#tcg .fe-in{position:absolute;inset:3.4% 4.4%;border-radius:1.2cqi;padding:2.2cqi 3cqi 1.6cqi;display:flex;flex-direction:column;overflow:hidden;
+ box-shadow:inset 0 0 0 .35cqi rgba(120,90,0,.35)}
+#tcg .fe-flame .fe-in{background:repeating-radial-gradient(circle at 30% 20%,rgba(255,255,255,.08) 0 1.5cqi,transparent 1.5cqi 3cqi),linear-gradient(170deg,#f6b98f,#ec8f62 55%,#f2a97c)}
+#tcg .fe-tide .fe-in{background:repeating-radial-gradient(circle at 70% 30%,rgba(255,255,255,.1) 0 1.5cqi,transparent 1.5cqi 3cqi),linear-gradient(170deg,#b9dcf3,#7fb8e2 55%,#a7d0ee)}
+#tcg .fe-verdant .fe-in{background:repeating-radial-gradient(circle at 40% 70%,rgba(255,255,255,.1) 0 1.5cqi,transparent 1.5cqi 3cqi),linear-gradient(170deg,#c9e6a4,#97c76a 55%,#b8dc8e)}
+#tcg .fe-top{position:relative;display:flex;align-items:center;gap:1.2cqi;padding-top:2.6cqi;margin-bottom:1cqi}
+#tcg .fe-top small{position:absolute;left:0;top:0;font-size:2.3cqi;font-weight:700;letter-spacing:.02em}
+#tcg .fe-top b{font-size:6.4cqi;font-weight:900;letter-spacing:-.01em;margin-right:auto;line-height:1}
+#tcg .fe-hp{font-size:4.6cqi;font-weight:900;color:#c8191b}
+#tcg .fesym{width:4.8cqi;height:4.8cqi;flex:none;display:inline-block;vertical-align:middle}
+#tcg .fe-frame{padding:1.3cqi;background:linear-gradient(135deg,#f3dc8a,#b8902a 35%,#f6e29a 55%,#a37d1f);box-shadow:0 .4cqi .8cqi rgba(0,0,0,.35);height:40%;flex:none}
+#tcg .fe-art{position:relative;width:100%;height:100%;overflow:hidden;background:#fff8e6}
+#tcg .fe-art img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.8) contrast(.9) brightness(1.06) blur(.25px)}
+#tcg .fe-art::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;
+ background:radial-gradient(ellipse at 50% 45%,transparent 50%,rgba(255,245,220,.55)),repeating-linear-gradient(35deg,rgba(255,255,255,.07) 0 .4cqi,rgba(0,0,0,.04) .4cqi .8cqi)}
+#tcg .festamp{position:absolute;left:1.2cqi;top:47.5%;width:7.6cqi;height:7.6cqi;z-index:3}
+#tcg .fe-strip{margin:1.2cqi 4% 1.4cqi;padding:.6cqi 1cqi;text-align:center;font-size:2.35cqi;font-style:italic;font-weight:700;
+ background:linear-gradient(180deg,#f7e39a,#dcbc55);clip-path:polygon(2% 0,98% 0,100% 50%,98% 100%,2% 100%,0 50%)}
+#tcg .fe-atks{flex:1;display:flex;flex-direction:column;justify-content:center;gap:1cqi}
+#tcg .fe-atk{display:flex;align-items:center;gap:1.4cqi}
+#tcg .fe-cost{display:flex;gap:.4cqi;width:12cqi;flex:none}
+#tcg .fe-at{flex:1;font-size:2.7cqi;line-height:1.25}
+#tcg .fe-at b{font-size:4.1cqi;font-weight:900}
+#tcg .fe-dmg{font-size:6.2cqi;font-weight:900;width:9cqi;text-align:right}
+#tcg .fe-rule{display:block;height:.25cqi;background:rgba(0,0,0,.35)}
+#tcg .fe-wrr{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;border-top:.3cqi solid rgba(0,0,0,.35);padding-top:.8cqi;margin-top:1cqi}
+#tcg .fe-wrr div{display:flex;flex-direction:column;align-items:center;gap:.3cqi;min-height:7.5cqi}
+#tcg .fe-wrr small{font-size:2.2cqi;font-weight:700}
+#tcg .fe-wrr div>span,#tcg .fe-wrr em{font-style:normal;font-size:2.6cqi;font-weight:900}
+#tcg .fe-wrr div:nth-child(2){flex-direction:column}
+#tcg .fe-flav{margin-top:.8cqi;padding:.8cqi 1.4cqi;font-size:2.25cqi;font-style:italic;font-weight:600;line-height:1.3;border:.35cqi solid #b8902a;background:rgba(255,248,215,.55)}
+#tcg .fe-flav b{font-style:normal;font-weight:900;white-space:nowrap}
+#tcg .fe-foot{display:flex;justify-content:space-between;margin-top:.8cqi;font-size:1.9cqi;font-weight:700}
+#tcg .fe-foot i{font-style:normal}
+#tcg .st-fe{position:relative;width:104px;aspect-ratio:63/88;background:none;transition:transform .15s}
+#tcg .st-fe:hover{transform:translateY(-6px) rotate(-1deg)}
+#tcg .st-fec{position:absolute;inset:0;border-radius:5px;box-shadow:0 10px 18px rgba(0,0,0,.45)}
 /* ================= STORE ================= */
 #tcg .store{position:absolute;inset:0;overflow-y:auto;touch-action:pan-y;padding:66px 14px 60px;
  background:radial-gradient(90% 40% at 50% 0%,rgba(0,231,1,.07),transparent 60%),linear-gradient(180deg,#10202c,#0b1720)}
@@ -2155,7 +2194,7 @@ function cardFront(c,foil,ins,lod){let h=cardFrontBase(c,foil);
    plus any further sky plates. */
 function stripSky(svg){let n=0;
   return svg.replace(/<rect width="200" height="280"([^>]*)\/>/g,(m,attrs)=>{n++;return(n===1||/url\(#sky?\)/.test(attrs))?'':m})}
-function cardFrontBase(c,foil){const h=c.h??CATS[c.cat].h;
+function cardFrontBase(c,foil){if(c.t==='fe')return feFront(c);const h=c.h??CATS[c.cat].h;
   const EVO=c.prev?`<div class="evo">${artImg(c.prev,Art[c.prev])}</div>`:'';
   const IA=c.art?artImg(c.art,Art[c.art]):null;
   const shade='<div class="sheen"></div><div class="glare"></div>';
@@ -2242,7 +2281,7 @@ function activate(el,kind){if(!el||E.el===el)return;
   const dpr=Math.min(MOB?1.25:2,window.devicePixelRatio||1);cv.width=host.offsetWidth*dpr;cv.height=host.offsetHeight*dpr;
   E.cv=cv;E.ctx=cv.getContext('2d');E.dpr=dpr;
   if(kind==='pack'){GS_H=125;E.sp=genSparks('pack',0,99);E.gain=.55}
-  else{const t=el.dataset.t,rev=el.dataset.rev==='1';GS_H=+el.dataset.h||0;E.sp=genSparks(t,rev,+el.dataset.id*7+(rev?3:0));E.gain={c:rev?1:.45,h:1,fa:1.1,sir:1.25,bwr:1.45,obs:1.5}[t]}}
+  else{const t=el.dataset.t,rev=el.dataset.rev==='1';GS_H=+el.dataset.h||0;E.sp=genSparks(t,rev,+el.dataset.id*7+(rev?3:0));E.gain={c:rev?1:.45,h:1,fa:1.1,sir:1.25,bwr:1.45,obs:1.5,fe:0}[t]}}
 function star(ctx,x,y,L,col,a){ctx.globalAlpha=a;
   const g=ctx.createRadialGradient(x,y,0,x,y,L*.45);g.addColorStop(0,'#fff');g.addColorStop(.3,col);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,L*.45,0,6.283);ctx.fill();
   const ln=(dx,dy,w,len)=>{const lg=ctx.createLinearGradient(x-dx*len,y-dy*len,x+dx*len,y+dy*len);lg.addColorStop(0,'rgba(0,0,0,0)');lg.addColorStop(.5,'#fff');lg.addColorStop(1,'rgba(0,0,0,0)');
@@ -3004,6 +3043,43 @@ function clNet(m){
   if(m.t==='clashState'){if(CL.mode==='party'&&CL.game){CL.game=m.game;if(CL.screen==='board'){clBoard();if(CL.game.winner!=null)clWinCheck(CL.game)}}return}
   if(m.t==='clashLeave'){if(CL.mode==='party'){note('Your mate left the battle');CL.game=null;CL.mode='solo';if(curView==='clash'){CL.screen='menu';clMenu()}}return}}
 
+/* ---------------- 1ST EDITION (classic layout preview) ----------------
+   Three baby starters redrawn in the 1999 base-set card layout: yellow border,
+   name + HP, gold-framed art window, length/weight strip, attacks with energy
+   costs, weakness/resistance/retreat, flavour box, 1st Edition stamp. Matte -
+   no holo, no sparkle. Not in SET yet; shown on the store's limited shelf. */
+const FE_SYM={flame:['#e2452c','<path d="M12 4c1 3 4 4 4 8a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-2-1-4 0-7z" fill="#fff"/>'],
+  tide:['#2f7fd8','<path d="M12 4c2.5 3.5 5 6.4 5 9.2A5 5 0 0 1 7 13.2C7 10.4 9.5 7.5 12 4z" fill="#fff"/>'],
+  verdant:['#3c9a3a','<path d="M6 16c0-6 5-10 12-10-1 7-5 12-11 11l-2 2-1-1 2-2z" fill="#fff"/>'],
+  storm:['#e6b800','<path d="M13 3 7 13h4l-2 8 7-11h-4z" fill="#fff"/>'],
+  any:['#e9e6dc','<path d="M12 5l2 4.5 5 .5-3.8 3.3 1.1 4.9L12 15.7 7.7 18.2l1.1-4.9L5 10l5-.5z" fill="#8a8578"/>']};
+const feSym=t=>`<svg class="fesym" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="${FE_SYM[t][0]}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>${FE_SYM[t][1]}</svg>`;
+const FE_CARDS=[
+ {key:'fox',type:'flame',hp:40,kind:'Kit',len:"1' 2\"",wt:'9 lbs.',lv:10,
+  atk:[[['flame'],'Scratch',10,''],[['flame','any'],'Tail Spark',30,'Flip a coin. If tails, Emberkit does 10 damage to itself.']],
+  weak:'tide',res:null,ret:1,flav:'The tip of its tail glows brighter when it is happy. Embers drift from its fur on cold nights.'},
+ {key:'wyrm',type:'tide',hp:40,kind:'Hatchling',len:"1' 8\"",wt:'7 lbs.',lv:8,
+  atk:[[['tide'],'Splash',10,''],[['tide','any'],'Ripple Coil',20,'Flip a coin. If heads, the Defending Creature can\u2019t attack during your opponent\u2019s next turn.']],
+  weak:'storm',res:null,ret:1,flav:'It rides the shallows at dawn, curling into a ring to sleep between the waves.'},
+ {key:'gdr',type:'verdant',hp:40,kind:'Seedling',len:"2' 0\"",wt:'14 lbs.',lv:12,
+  atk:[[['verdant'],'Leaf Nip',10,''],[['verdant','verdant'],'Budding Bloom',20,'Remove 1 damage counter from Sproutling.']],
+  weak:'flame',res:'tide',ret:1,flav:'The bud on its back drinks in sunlight. On rainy days it naps with the bud closed tight.'}
+].map((f,i)=>{const b=lineOf(f.key)[0];return Object.assign({},f,{cat:'Mythic',name:b.name,t:'fe',h:b.h,art:b.art,stage:0,id:2000+i,no:String(i+1)})});
+const FE_STAMP='<svg class="festamp" viewBox="0 0 40 40"><defs><path id="feArc" d="M8 22a12 12 0 0 0 24 0"/></defs><circle cx="20" cy="20" r="18" fill="#fff" stroke="#111" stroke-width="2.4"/><text x="20" y="22" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="17" fill="#111">1</text><text x="26.5" y="15" font-family="Arial" font-weight="900" font-size="5.5" fill="#111">ST</text><text font-family="Arial" font-weight="900" font-size="5.2" letter-spacing=".6" fill="#111"><textPath href="#feArc" startOffset="50%" text-anchor="middle">EDITION</textPath></text></svg>';
+function feFront(c){
+  const atks=c.atk.map(([cost,nm,dmg,txt])=>`<div class="fe-atk"><div class="fe-cost">${cost.map(feSym).join('')}</div>
+    <div class="fe-at"><b>${nm}</b>${txt?` <span>${txt}</span>`:''}</div><div class="fe-dmg">${dmg||''}</div></div>`).join('<i class="fe-rule"></i>');
+  return `<div class="front fe fe-${c.type}" style="--h:${c.h}"><div class="fe-in">
+    <div class="fe-top"><small>Basic Creature</small><b>${hx(c.name)}</b><span class="fe-hp">${c.hp} HP</span>${feSym(c.type)}</div>
+    <div class="fe-frame"><div class="fe-art">${artImg(c.art,Art[c.art])}</div></div>
+    ${FE_STAMP}
+    <div class="fe-strip">${c.kind} Creature. Length: ${c.len}, Weight: ${c.wt}</div>
+    <div class="fe-atks">${atks}</div>
+    <div class="fe-wrr"><div><small>weakness</small>${feSym(c.weak)}</div><div><small>resistance</small>${c.res?feSym(c.res)+'<em>-30</em>':''}</div><div><small>retreat cost</small>${Array(c.ret).fill(feSym('any')).join('')}</div></div>
+    <div class="fe-flav">${hx(c.flav)} <b>LV. ${c.lv}</b></div>
+    <div class="fe-foot"><span>Illus. Stack Studio</span><span>\u00a92026 Stack Cards</span><span>${c.no}/3 <i>\u25cf</i></span></div>
+  </div></div>`}
+
 /* ---------------- STORE + BOOSTER BOX ----------------
    The store front: a featured sealed booster box turning on a lit plinth, a
    limited-edition shelf (coming soon), single packs on a peg, your boxes, and a
@@ -3071,13 +3147,14 @@ function store(){const st=stage();deactivate();root.onkeydown=null;DESK=null;
      <p>36 sealed booster packs, 8 cards each. Slice the wrap, pop the lid and pull packs straight from the display.</p>
      <div class="st-tag">${BOX_COST?'$'+fmt(BOX_COST):''}</div><button class="btn" id="stBuy">Buy booster box</button></div></section>
    <div class="st-grid">
-    <section class="st-panel st-lim"><h5>Limited editions</h5><div class="st-shelf">${[0,1,2].map(()=>'<div class="st-ghost"><i></i><span>COMING SOON</span></div>').join('')}</div><div class="st-plank"></div></section>
+    <section class="st-panel st-lim"><h5>Limited editions <small>1st Edition preview · tap to inspect</small></h5><div class="st-shelf">${FE_CARDS.map((c,i)=>`<button class="st-fe" data-fe="${i}"><div class="st-fec">${cardFrontBase(c,false)}</div></button>`).join('')}</div><div class="st-plank"></div></section>
     <section class="st-panel st-single"><h5>Single packs</h5><div class="st-peg"><div class="st-hook"></div><div class="st-pack">${artImg('packArt',Art.packArt)}<b>STACK</b></div></div><button class="btn ghost" id="stPack">Open a pack</button></section>
    </div>
    <section class="st-panel st-mine"><h5>Your boxes <small>${mine.length}</small></h5>${mine.length?`<div class="st-boxes">${mine.map(b=>`<button class="st-box" data-box="${b.u}"><div class="st-boxic${b.st==='sealed'?' sealed':''}"></div><b>${b.st==='sealed'?'Sealed box':b.st==='boxed'?'Unwrapped box':'Open box'}</b><small>${boxLeft(b)} of ${BOX_N} packs left</small></button>`).join('')}</div>`:'<p class="gempty">No boxes yet \u2014 grab one above.</p>'}</section>
    <section class="st-panel st-cab"><h5>Display cabinet <small>your best slabs</small></h5><div class="st-glass">${slabs.length?slabs.map(i=>`<div class="st-slab"><div class="tslab">${slabHTML(i,1)}</div></div>`).join(''):'<p class="gempty">Grade a card and your best slabs go on show here.</p>'}</div></section>
   </div>`;
-  $('#stBuy').onclick=buyBox;$('#stPack').onclick=()=>{SFX.tick();go('shop')};
+  $('#stBuy').onclick=buyBox;
+  st.querySelectorAll('[data-fe]').forEach(b=>b.onclick=()=>{SFX.tick();zoom({c:FE_CARDS[+b.dataset.fe],foil:false,ins:null})});$('#stPack').onclick=()=>{SFX.tick();go('shop')};
   st.querySelectorAll('[data-box]').forEach(b=>b.onclick=()=>{SFX.tick();desk(b.dataset.box)})}
 function buyBox(){SFX.init();if(!B.spend(BOX_COST)){SFX.no();return null}updBal();SFX.buy();
   col.boxes=col.boxes||[];const b={u:'bx'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),st:'sealed',packs:Array(BOX_N).fill(1),at:Date.now()};
@@ -3412,7 +3489,7 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
   /* exposed for tests */
   _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,artSrc:k=>Art[k](),
      OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
-     VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
+     FE_CARDS,feFront,VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
      get DESK(){return DESK},get BOXCTX(){return BOXCTX},addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
      CL,clStarter,clStart,clPlay,clCanPlay,clAttack,clEndTurn,clEffAtk,clAIStep,clInfo,clStat,ID2LINE,clData,clBonds,clStStart:clStart,clBegin,clDoEnd,CL_TYPE,CL_TRAIT,clRoute,clMenu,clBuilder,clBoard,clLobbyInit,clLobby,clHostStart,clNet,clActive,
      get col(){return col},set col(v){col=v}}};
