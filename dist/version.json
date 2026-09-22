@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.22.17",
-  "notes": "Stack Cards: performance pass, visual trade offers, keep scroll when picking cards",
-  "bytes": 937759,
-  "at": "2026-09-22T10:00:25.897Z"
+  "version": "2026.09.22.18",
+  "notes": "Stack Cards: performance tracker (FPS button + binder diagnosis report)",
+  "bytes": 947380,
+  "at": "2026-09-22T10:05:37.465Z"
 }

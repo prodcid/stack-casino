@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.22.17">
+<meta name="stack-version" content="2026.09.22.18">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -2775,6 +2775,27 @@ window.StackBridge={
 #tcg .vsec-err .vsec-ic{background:linear-gradient(135deg,#ff3b6b,#3bd4ff);color:#fff}
 #tcg .grow.vrow{margin-bottom:26px}
 #tcg .grow.vsec-col{margin-bottom:12px}
+/* performance tracker */
+#tcg .barr{display:flex;align-items:center;gap:8px}
+#tcg .perfbtn{background:var(--panel);border:1px solid var(--line)!important;border-radius:8px;padding:8px 10px;font-weight:900;font-size:11px;letter-spacing:.08em;color:var(--mute)}
+#tcg .perfbtn:hover{color:#fff}
+#tcg .perfp{position:absolute;right:14px;top:62px;z-index:120;width:290px;background:rgba(12,24,33,.96);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 16px 40px rgba(0,0,0,.5);font-size:12px}
+#tcg .pf-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#tcg .pf-h b{font-size:13px;font-weight:900}
+#tcg .pf-x{background:none;color:var(--mute);font-size:18px;line-height:1}
+#tcg .pf-live>b{font-size:34px;font-weight:900;line-height:1}#tcg .pf-live>b.ok{color:#00e701}#tcg .pf-live>b.meh{color:#ffc800}#tcg .pf-live>b.bad{color:#ff5a5a}
+#tcg .pf-live>small{color:var(--mute);font-weight:800;margin-left:4px}
+#tcg .pf-g{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin-top:8px}
+#tcg .pf-g span{color:var(--mute);font-weight:600}#tcg .pf-g i{font-style:normal;font-weight:800;text-align:right}
+#tcg .pf-gpu{margin-top:9px;padding:6px 8px;border-radius:7px;background:var(--bg);color:var(--mute);font-size:10.5px;font-weight:700;word-break:break-word}
+#tcg .pf-gpu.bad{color:#ffb03a;box-shadow:inset 0 0 0 1px rgba(255,176,58,.5)}
+#tcg .pf-btns{display:flex;gap:6px;margin-top:10px}
+#tcg .pf-msg{margin-top:8px;color:var(--mute);font-weight:700;min-height:14px}
+#tcg .pf-ta{width:100%;height:120px;margin-top:8px;background:var(--bg);color:#fff;border:1px solid var(--line);border-radius:6px;font-size:10px}
+#tcg.pf-noanim *,#tcg.pf-noanim *::before,#tcg.pf-noanim *::after{animation-play-state:paused!important}
+#tcg.pf-lite .revfoil,#tcg.pf-lite .etchfoil,#tcg.pf-lite .rainfoil,#tcg.pf-lite .bwrfoil,#tcg.pf-lite .bwrline,#tcg.pf-lite .emboss,#tcg.pf-lite .pastel,#tcg.pf-lite .glit,
+#tcg.pf-lite .cosmos,#tcg.pf-lite .sheen,#tcg.pf-lite .glare,#tcg.pf-lite .wear,#tcg.pf-lite .dstones,#tcg.pf-lite .obs-bg,#tcg.pf-lite .obsfoil,#tcg.pf-lite .vsig{display:none!important}
+#tcg.pf-noart .tilt img{visibility:hidden}
 /* ================= STORE ================= */
 #tcg .store{position:absolute;inset:0;overflow-y:auto;touch-action:pan-y;padding:66px 14px 60px;
  background:radial-gradient(90% 40% at 50% 0%,rgba(0,231,1,.07),transparent 60%),linear-gradient(180deg,#10202c,#0b1720)}
@@ -4261,8 +4282,9 @@ const $=(s,r=root)=>r.querySelector(s);const fmt=n=>n.toLocaleString();
 function mount(el){root=el;root.id='tcg';
   root.innerHTML=`<div class="bar"><div class="title">Stack Cards<small>Mythic collection</small></div>
    <div class="tabs"><button class="tab on" data-v="store">Store</button><button class="tab" data-v="shop">Packs</button><button class="tab" data-v="binder">Binder</button><button class="tab" data-v="graded">Graded<i class="tdot" id="tcgDot"></i></button><button class="tab" data-v="tradeup">Trade Up</button><button class="tab" data-v="clash">Clash</button><button class="tab" data-v="trade" id="tcgTradeTab" hidden>Trade</button></div>
-   <div class="bal">$<b id="tcgBal"></b></div></div><div class="stage" id="tcgStage"></div>`;
+   <div class="barr"><button class="perfbtn" id="perfBtn" title="Performance tracker">FPS</button><div class="bal">$<b id="tcgBal"></b></div></div></div><div class="stage" id="tcgStage"></div>`;
   root.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{SFX.tick();go(b.dataset.v)});
+  root.querySelector('#perfBtn').onclick=()=>perfToggle();
   root.addEventListener('pointermove',e=>{if(!E.el||dragging||E.free||E.swipe||gyro)return;const r=E.el.getBoundingClientRect(),k=E.kind==='pack'?.6:1;
     E.hx=clamp(((r.top+r.height/2)-e.clientY)/r.height,-1,1)*14*k;E.hy=clamp((e.clientX-(r.left+r.width/2))/r.width,-1,1)*18*k;E.last=performance.now()});
   root.addEventListener('pointerleave',()=>{E.hx=E.hy=0});
@@ -5060,6 +5082,67 @@ function feFront(c){
     <div class="fe-foot"><span>Illus. Stack Studio</span><span>\u00a92026 Stack Cards</span><span>${c.no}/6 <i>${c.holo?'\u2605':'\u25cf'}</i></span></div>
   </div></div>`}
 
+/* ---------------- PERFORMANCE TRACKER ----------------
+   The FPS button in the bar opens a live meter. "Diagnose binder" runs a scripted
+   20s test on the player's own machine (idle / animations paused / scrolling /
+   scrolling with the heavy effect layers hidden) and "Copy report" hands the
+   whole thing, plus GPU + hardware-acceleration info, back to paste into chat. */
+const PERF={on:false,raf:0,frames:[],long:[],ev:[],obs:null,log:[]};
+function perfGPU(){try{const c=document.createElement('canvas'),g=c.getContext('webgl')||c.getContext('experimental-webgl');
+  if(!g)return {gpu:'no WebGL',soft:true};const d=g.getExtension('WEBGL_debug_renderer_info');
+  const ren=d?g.getParameter(d.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER),ven=d?g.getParameter(d.UNMASKED_VENDOR_WEBGL):g.getParameter(g.VENDOR);
+  return {gpu:ven+' / '+ren,soft:/swiftshader|llvmpipe|software|basic render|microsoft basic/i.test(ren)}}catch(e){return {gpu:'unknown ('+e.message+')',soft:false}}}
+function perfObs(){if(PERF.obs||!window.PerformanceObserver)return;PERF.obs=[];
+  try{const o=new PerformanceObserver(l=>l.getEntries().forEach(e=>{PERF.long.push({t:e.startTime,d:e.duration});if(PERF.long.length>400)PERF.long.shift()}));o.observe({type:'longtask',buffered:false});PERF.obs.push(o)}catch(e){}
+  try{const o=new PerformanceObserver(l=>l.getEntries().forEach(e=>{if(e.duration<40)return;const tg=e.target;
+      PERF.ev.push({t:e.startTime,d:Math.round(e.duration),n:e.name,on:tg?((tg.className&&tg.className.baseVal!=null?tg.className.baseVal:tg.className)||tg.tagName||'').toString().slice(0,40):'?'});if(PERF.ev.length>100)PERF.ev.shift()}));
+    o.observe({type:'event',durationThreshold:40,buffered:false});PERF.obs.push(o)}catch(e){}}
+function perfStats(ms){const now=performance.now(),f=PERF.frames.filter(x=>now-x.t<ms);if(f.length<2)return {fps:0,worst:0,slow:0,p99:0};
+  const ds=f.map(x=>x.d).sort((a,b)=>a-b),span=(f[f.length-1].t-f[0].t)/1000||1;
+  return {fps:Math.round(f.length/span),worst:Math.round(ds[ds.length-1]),slow:Math.round(f.filter(x=>x.d>34).length/f.length*100),p99:Math.round(ds[Math.floor(ds.length*.99)]||0)}}
+function perfLoop(t){PERF.raf=requestAnimationFrame(perfLoop);const last=PERF.lt||t;PERF.lt=t;PERF.frames.push({t,d:t-last});if(PERF.frames.length>1200)PERF.frames.shift();
+  if(!PERF.paint||t-PERF.paint>500){PERF.paint=t;perfPaint()}}
+function perfEnv(){const g=perfGPU();return {view:curView,dpr:devicePixelRatio,screen:screen.width+'x'+screen.height,win:innerWidth+'x'+innerHeight,cores:navigator.hardwareConcurrency,mem:navigator.deviceMemory||'?',
+  ua:navigator.userAgent.replace(/^Mozilla\/5.0 /,''),gpu:g.gpu,soft:g.soft}}
+function perfCounts(){const R=root;return {anims:R?R.getRootNode().getAnimations().filter(a=>a.playState==='running').length:0,nodes:R?R.querySelectorAll('*').length:0,
+  cards:R?R.querySelectorAll('.tilt').length:0,imgs:R?R.querySelectorAll('img').length:0}}
+function perfPaint(){const el=root&&root.querySelector('.perfp');if(!el)return;const a=perfStats(1000),b=perfStats(5000),c=perfCounts(),now=performance.now();
+  const lt=PERF.long.filter(x=>now-x.t<5000),ev=PERF.ev.filter(x=>now-x.t<10000);
+  el.querySelector('.pf-live').innerHTML=`<b class="${a.fps<40?'bad':a.fps<55?'meh':'ok'}">${a.fps}</b><small>fps</small>
+   <div class="pf-g"><span>worst frame (5s)</span><i>${b.worst} ms</i><span>frames over 34ms</span><i>${b.slow}%</i><span>freezes over 50ms (5s)</span><i>${lt.length} \u00b7 ${Math.round(lt.reduce((x,y)=>x+y.d,0))} ms</i>
+   <span>slow taps/clicks (10s)</span><i>${ev.length?Math.max(...ev.map(x=>x.d))+' ms':'none'}</i><span>animations running</span><i>${c.anims}</i><span>cards on page</span><i>${c.cards}</i><span>elements</span><i>${c.nodes}</i></div>`}
+function perfToggle(){PERF.on=!PERF.on;const old=root.querySelector('.perfp');old&&old.remove();cancelAnimationFrame(PERF.raf);if(!PERF.on)return;
+  perfObs();const g=perfGPU(),el=document.createElement('div');el.className='perfp';
+  el.innerHTML=`<div class="pf-h"><b>Performance</b><button class="pf-x" id="pfX">\u00d7</button></div><div class="pf-live"></div>
+   <div class="pf-gpu${g.soft?' bad':''}">${g.soft?'\u26a0 Hardware acceleration looks OFF \u2014 ':''}GPU: ${hx(g.gpu)}</div>
+   <div class="pf-btns"><button class="btn sm" id="pfDiag">Diagnose binder</button><button class="btn ghost sm" id="pfCopy">Copy report</button></div><div class="pf-msg" id="pfMsg"></div>`;
+  root.appendChild(el);PERF.lt=0;PERF.frames=[];PERF.raf=requestAnimationFrame(perfLoop);
+  el.querySelector('#pfX').onclick=()=>perfToggle();el.querySelector('#pfDiag').onclick=()=>perfDiagnose();
+  el.querySelector('#pfCopy').onclick=()=>perfCopy()}
+const perfWait=ms=>new Promise(r=>setTimeout(r,ms));
+async function perfPhase(name,ms,setup,each){if(setup)setup();await perfWait(400);const t0=performance.now();PERF.frames=[];PERF.lt=0;
+  const l0=PERF.long.length;let run=true;const step=()=>{if(!run)return;each&&each();requestAnimationFrame(step)};if(each)requestAnimationFrame(step);
+  await perfWait(ms);run=false;const st=perfStats(ms+100),lt=PERF.long.slice(l0);
+  const res={phase:name,fps:st.fps,worstMs:st.worst,p99Ms:st.p99,slowPct:st.slow,freezes:lt.length,freezeMs:Math.round(lt.reduce((x,y)=>x+y.d,0))};PERF.log.push(res);
+  const m=root.querySelector('#pfMsg');if(m)m.textContent=name+': '+st.fps+' fps';return res}
+async function perfDiagnose(){if(PERF.busy)return;PERF.busy=true;PERF.log=[];const m=root.querySelector('#pfMsg');m.textContent='Running \u2014 don\u2019t touch anything for ~20s\u2026';
+  go('binder');await perfWait(700);const sc=root.querySelector('.binder'),top=()=>{sc.scrollTop=0},
+    scroll=()=>{sc.scrollTop+=9;if(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-2)sc.scrollTop=0};
+  const build=performance.now();go('binder');const buildMs=Math.round(performance.now()-build);
+  await perfPhase('idle',3000,top);
+  await perfPhase('idle, animations paused',3000,()=>root.classList.add('pf-noanim'));
+  root.classList.remove('pf-noanim');
+  await perfPhase('scrolling',4000,top,scroll);
+  await perfPhase('scrolling, effects hidden',4000,()=>{top();root.classList.add('pf-lite')},scroll);
+  await perfPhase('scrolling, effects + art hidden',4000,()=>{top();root.classList.add('pf-noart')},scroll);
+  root.classList.remove('pf-lite','pf-noart');top();
+  PERF.report={when:new Date().toISOString(),env:perfEnv(),counts:perfCounts(),binderBuildMs:buildMs,phases:PERF.log,slowEvents:PERF.ev.slice(-8)};
+  m.textContent='Done \u2014 hit Copy report and paste it to Claude.';PERF.busy=false}
+function perfCopy(){const rep=PERF.report||{when:new Date().toISOString(),env:perfEnv(),counts:perfCounts(),live5s:perfStats(5000),slowEvents:PERF.ev.slice(-8),note:'no diagnosis run'};
+  const txt='STACK CARDS PERF REPORT\n'+JSON.stringify(rep,null,1);const m=root.querySelector('#pfMsg');
+  const fallback=()=>{const ta=document.createElement('textarea');ta.className='pf-ta';ta.value=txt;root.querySelector('.perfp').appendChild(ta);ta.select();m.textContent='Copy blocked \u2014 select all in the box and copy it'};
+  try{navigator.clipboard.writeText(txt).then(()=>{m.textContent='Copied \u2014 paste it to Claude'},fallback)}catch(e){fallback()}}
+
 /* ---------------- STORE + BOOSTER BOX ----------------
    The store front: a featured sealed booster box turning on a lit plinth, a
    limited-edition shelf (coming soon), single packs on a peg, your boxes, and a
@@ -5474,7 +5557,7 @@ window.StackCards={mount,SET,forceGod:()=>{FORCE_GOD=true},get collection(){retu
   /* exposed for tests */
   _:{HI,rollCond,condScore,stkGrade,newInst,sendGrade,takeItems,giveItems,snapshot,wearHTML,slabHTML,cardFront,GW,GRADE_MS,rng,artSrc:k=>Art[k](),
      OBS,CARD,lineOf,canCraft,craft,checkCraftable,stripSky,numOf,GF,
-     FE_CARDS,feFront,VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
+     FE_CARDS,feFront,perfToggle,perfDiagnose,perfGPU,get PERF(){return PERF},VAR,isVar,rollVar,diaHTML,DIA_ID,buyBox,boxBy,boxLeft,BOX_N,desk,cutDone,openLid,boxPackOpen,
      get DESK(){return DESK},get BOXCTX(){return BOXCTX},addCard,spareStacks,TU,tuAuto,tuSign,TU_NEXT,
      CL,clStarter,clStart,clPlay,clCanPlay,clAttack,clEndTurn,clEffAtk,clAIStep,clInfo,clStat,ID2LINE,clData,clBonds,clStStart:clStart,clBegin,clDoEnd,CL_TYPE,CL_TRAIT,clRoute,clMenu,clBuilder,clBoard,clLobbyInit,clLobby,clHostStart,clNet,clActive,
      get col(){return col},set col(v){col=v}}};
