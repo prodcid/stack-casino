@@ -2137,6 +2137,8 @@ window.StackBridge={
 #tcg .prog{height:6px;background:var(--line);border-radius:6px;max-width:980px;margin:0 auto 18px;overflow:hidden}#tcg .prog i{display:block;height:100%;background:var(--green)}
 #tcg .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px;max-width:980px;margin:0 auto}
 #tcg .grid .mini{--cw:100%;width:100%}
+#tcg .off,#tcg .off *{animation-play-state:paused!important}
+#tcg .off .dstones.dtw{visibility:hidden}
 #tcg .grid .mini.miss .front{filter:grayscale(1) brightness(.22)}
 #tcg .grid .mini.miss::after{content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;font-weight:800;color:var(--dim);font-size:20px}
 #tcg .qty{position:absolute;bottom:-8px;right:-4px;z-index:20;background:var(--panel2);border:1px solid var(--line);border-radius:6px;font-size:11px;font-weight:800;padding:1px 6px}
@@ -2379,10 +2381,20 @@ window.StackBridge={
 #tcg .twait{max-width:1100px;margin:0 auto 12px;background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.35);color:#ffd35a;border-radius:10px;padding:10px 14px;font-weight:800;font-size:13px}
 #tcg .lnk{background:none;color:#fff;text-decoration:underline;font-weight:800;margin-left:8px}
 #tcg .tofr{position:absolute;inset:0;z-index:95;background:rgba(5,12,18,.82);display:grid;place-items:center;padding:16px}
-#tcg .tofr-box{width:min(94vw,520px);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;animation:cpin2 .35s cubic-bezier(.2,1.4,.4,1)}
+#tcg .tofr-box{width:min(94vw,820px);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;animation:cpin2 .35s cubic-bezier(.2,1.4,.4,1)}
 @keyframes cpin2{from{opacity:0;transform:scale(.92)}}
 #tcg .tofr-box h3{font-size:18px}
-#tcg .tofr-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#tcg .tofr-cols{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start}
+#tcg .tofr-cols>div:not(.tofr-swap){background:var(--bg);border-radius:12px;padding:10px 12px}
+#tcg .tofr-get{box-shadow:inset 0 0 0 1px rgba(0,231,1,.45)}
+#tcg .tofr-give{box-shadow:inset 0 0 0 1px rgba(255,120,120,.4)}
+#tcg .tofr-get h5{color:var(--green)!important}
+#tcg .tofr-cols h5 small{background:var(--panel2);border-radius:99px;padding:1px 7px;margin-left:4px;color:var(--mute)}
+#tcg .tofr-swap{align-self:center;font-size:22px;font-weight:900;color:var(--mute)}
+#tcg .tofr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px 10px;max-height:48vh;overflow-y:auto;padding:8px 4px 4px}
+#tcg .tofr-card small{display:block;margin-top:8px;text-align:center;font-size:11px;font-weight:700;color:var(--mute);line-height:1.25}
+#tcg .tofr-card .ttile{cursor:default}
+#tcg .tofr-none{color:var(--dim);font-weight:700;padding:14px 4px}
 #tcg .tofr-cols h5{font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--mute);margin-bottom:6px}
 #tcg .tofr-cols ul{list-style:none;display:grid;gap:5px}
 #tcg .tofr-cols li{background:var(--bg);border-radius:8px;padding:8px 10px;font-weight:700;font-size:13px}
@@ -2399,15 +2411,17 @@ window.StackBridge={
  box-shadow:inset 0 0 0 .45cqi rgba(255,255,255,.32),inset 0 0 0 .85cqi rgba(0,0,0,.55)}
 #tcg .obs-bg{position:absolute;inset:3.2% 4.2%;border-radius:1.8%/1.3%;overflow:hidden;background:#05040c;z-index:1;transform:translateX(var(--ctrx,0))}
 #tcg .obs-bg i{position:absolute;display:block}
-#tcg .obs-bg .ob1{inset:-60%;opacity:.9;filter:blur(8cqi) saturate(1.5);animation:obspin 16s linear infinite;
+#tcg .obs-bg .ob1{inset:-60%;opacity:.9;filter:blur(8cqi) saturate(1.5);animation:obspin 16s linear infinite;will-change:transform;
  background:conic-gradient(from 0deg,hsl(var(--h) 95% 55%),hsl(calc(var(--h) + 70) 95% 62%),hsl(calc(var(--h) - 50) 90% 38%),hsl(calc(var(--h) + 150) 90% 60%),hsl(var(--h) 95% 55%))}
-#tcg .obs-bg .ob2{inset:0;opacity:.85;animation:obstars 10s linear infinite;
- background-image:radial-gradient(circle,#fff 0 .35cqi,transparent .5cqi),radial-gradient(circle,rgba(255,255,255,.75) 0 .22cqi,transparent .35cqi);
- background-size:13cqi 13cqi,7cqi 9cqi;background-position:0 0,3cqi 5cqi}
-#tcg .obs-bg .ob3{inset:-20%;mix-blend-mode:screen;animation:obwave 6s linear infinite;
+#tcg .obs-bg .ob2{inset:-26cqi 0 0 -13cqi;opacity:.85;animation:obstars 10s linear infinite;will-change:transform;
+ background-image:radial-gradient(circle,#fff 0 .35cqi,transparent .5cqi);background-size:13cqi 13cqi}
+#tcg .obs-bg .ob2::before{content:"";position:absolute;inset:-27cqi -7cqi 0 0;animation:obstars2 10s linear infinite;will-change:transform;
+ background-image:radial-gradient(circle,rgba(255,255,255,.75) 0 .22cqi,transparent .35cqi);background-size:7cqi 9cqi;background-position:3cqi 5cqi}
+#tcg .obs-bg .ob3{inset:-20%;mix-blend-mode:screen;animation:obwave 6s linear infinite;will-change:transform;
  background:repeating-linear-gradient(115deg,transparent 0 6cqi,hsla(var(--h),100%,78%,.2) 6cqi 7cqi,transparent 7cqi 14cqi)}
 @keyframes obspin{to{transform:rotate(360deg)}}
-@keyframes obstars{to{background-position:13cqi 26cqi,-4cqi 23cqi}}
+@keyframes obstars{to{transform:translate(13cqi,26cqi)}}
+@keyframes obstars2{to{transform:translate(-7cqi,27cqi)}}
 @keyframes obwave{to{transform:translateX(14cqi)}}
 #tcg .obsfoil{position:absolute;inset:0;z-index:3;pointer-events:none;mix-blend-mode:screen;
  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.18) var(--pos,50%),transparent 70%)}
@@ -2417,9 +2431,10 @@ window.StackBridge={
  background:linear-gradient(150deg,#141418 0%,#030304 38%,#0b0b0e 62%,#000 100%);
  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),0 8px 18px rgba(0,0,0,.5)}
 #tcg .grid .obslock::after{content:none}
-#tcg .grid .obslock.ready{cursor:pointer;animation:obready 1.6s ease-in-out infinite alternate;
+#tcg .grid .obslock.ready::before{content:"";position:absolute;inset:0;border-radius:5px;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(0,231,1,.9),0 0 34px rgba(0,231,1,.6);opacity:0;animation:obready 1.6s ease-in-out infinite alternate;will-change:opacity}
+#tcg .grid .obslock.ready{cursor:pointer;
  box-shadow:inset 0 0 0 1px rgba(0,231,1,.6),0 0 22px rgba(0,231,1,.35)}
-@keyframes obready{to{box-shadow:inset 0 0 0 1px rgba(0,231,1,.9),0 0 34px rgba(0,231,1,.6)}}
+@keyframes obready{to{opacity:1}}
 #tcg .oblk em{display:block;font-style:normal;font-size:20px;font-weight:900;color:#fff;margin:4px 0 0;font-variant-numeric:tabular-nums}
 #tcg .obcraft{display:inline-block;margin:6px 0 2px;background:#00e701;color:#05250a;border-radius:7px;padding:5px 12px;font-weight:900;font-size:12px}
 #tcg .slot.forge .tilt{filter:brightness(1.6) saturate(1.4);animation:forge .5s ease-in-out infinite alternate}
@@ -2615,11 +2630,12 @@ window.StackBridge={
 #tcg .vauth{position:absolute;right:0;bottom:-16%;transform:rotate(9deg);font-style:normal;font-size:max(5px,3.2cqi);font-weight:900;letter-spacing:.08em;color:#2a1c00;
  background:linear-gradient(135deg,#fff3b0,#e9b93a 45%,#fff3b0 60%,#c9921a);border-radius:99px;padding:.3em .7em;box-shadow:0 1px 3px rgba(0,0,0,.5)}
 /* diamond: the edge chips re-cut as blue stones that catch the light */
-#tcg .dstones{position:absolute;inset:0;z-index:8;pointer-events:none;filter:drop-shadow(0 0 1.2px rgba(120,200,255,.9));animation:diashine 2.4s ease-in-out infinite alternate}
+#tcg .dstones{position:absolute;inset:0;z-index:8;pointer-events:none;filter:drop-shadow(0 0 2px rgba(140,212,255,.95)) brightness(1.15);animation:diashine 2.4s ease-in-out infinite alternate;will-change:opacity}
 #tcg .dstones svg{display:block;width:100%;height:100%}
-#tcg .dstones.dtw{z-index:9;filter:drop-shadow(0 0 3px #bfe9ff);animation:none;mix-blend-mode:screen}
-#tcg .dstones .dg{transform-box:fill-box;transform-origin:center;animation:diatw 2.6s ease-in-out infinite;opacity:0}
-@keyframes diashine{from{filter:drop-shadow(0 0 1px rgba(120,200,255,.7)) brightness(1)}to{filter:drop-shadow(0 0 3px rgba(160,225,255,1)) brightness(1.35)}}
+#tcg .dstones.dtw{z-index:9;filter:drop-shadow(0 0 3px #bfe9ff);animation:dtwk 2.8s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes dtwk{0%,55%,100%{opacity:0}72%{opacity:1}}
+#tcg .dstones .dg{opacity:1}
+@keyframes diashine{from{opacity:.82}to{opacity:1}}
 @keyframes diatw{0%,70%,100%{opacity:0;transform:scale(.2) rotate(0)}82%{opacity:1;transform:scale(1) rotate(45deg)}}
 #tcg .front.v-dia .full>*,#tcg .front.v-dia .evo>*{filter:hue-rotate(208deg) saturate(.5) brightness(1.95) contrast(.85)}
 #tcg .front.v-dia{box-shadow:0 0 0 1px rgba(160,225,255,.5),0 0 18px rgba(80,170,255,.35),0 18px 32px rgba(0,0,0,.55)}
@@ -2746,9 +2762,9 @@ window.StackBridge={
 #tcg .fe-glit.b{background-size:38% auto;background-position:17px 23px;animation:feglB 3.1s ease-in-out infinite alternate}
 @keyframes feglA{from{opacity:1}to{opacity:.35}}
 @keyframes feglB{from{opacity:.3}to{opacity:1}}
-#tcg .fe-rain{position:absolute;inset:0;z-index:2;mix-blend-mode:color-dodge;opacity:.5;
- background:linear-gradient(115deg,#ff5fd1,#ffd35f,#5fffa9,#5fd1ff,#b35fff,#ff5fd1);background-size:300% 300%;animation:ferain 6s linear infinite}
-@keyframes ferain{from{background-position:0% 50%}to{background-position:300% 50%}}
+#tcg .fe-rain{position:absolute;inset:-60%;z-index:2;mix-blend-mode:color-dodge;opacity:.5;pointer-events:none;will-change:transform;
+ background:linear-gradient(90deg,#ff5fd1,#ffd35f,#5fffa9,#5fd1ff,#b35fff,#ff5fd1);background-size:33.3334% 100%;animation:ferain 6s linear infinite}
+@keyframes ferain{from{transform:rotate(25deg) translateX(0)}to{transform:rotate(25deg) translateX(-33.3334%)}}
 #tcg .fe-pow{font-size:2.6cqi;line-height:1.3}
 #tcg .fe-pow b{color:#c8191b;font-size:3.2cqi;font-weight:900}
 #tcg .st-shelf2{margin-top:14px}
@@ -3113,10 +3129,10 @@ function diaHTML(ins){const r=rng((ins.s^0x6d2b79f5)>>>0),W=630,H=880,R=(a,b)=>a
     for(let i=0;i<38;i++){const a=r()*Math.PI/2,dist=Math.pow(r(),1.6)*rad,x=cx+sx*Math.cos(a)*dist*(.7+r()*.5),y=cy+sy*Math.sin(a)*dist*(.7+r()*.5);
       g+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(R(.6,4.2))}" fill="${pick()}" opacity="${R(.7,1).toFixed(2)}"/>`;if(r()<.15)spots.push([x,y])}});
   // glints: four-point stars on some of the stones, each on its own clock
-  spots.sort(()=>r()-.5).slice(0,90).forEach(([x,y])=>{const L=R(7,16);
-    tw+=`<path class="dg" style="animation-delay:-${R(0,3.2).toFixed(2)}s;animation-duration:${R(1.8,3.4).toFixed(2)}s" d="M${f1(x)} ${f1(y-L)} Q${f1(x+1.2)} ${f1(y-1.2)} ${f1(x+L)} ${f1(y)} Q${f1(x+1.2)} ${f1(y+1.2)} ${f1(x)} ${f1(y+L)} Q${f1(x-1.2)} ${f1(y+1.2)} ${f1(x-L)} ${f1(y)} Q${f1(x-1.2)} ${f1(y-1.2)} ${f1(x)} ${f1(y-L)}Z" fill="#fff"/>`});
+  const TW=['','','','',''];spots.sort(()=>r()-.5).slice(0,90).forEach(([x,y],k)=>{const L=R(7,16);
+    TW[k%5]+=`<path class="dg" d="M${f1(x)} ${f1(y-L)} Q${f1(x+1.2)} ${f1(y-1.2)} ${f1(x+L)} ${f1(y)} Q${f1(x+1.2)} ${f1(y+1.2)} ${f1(x)} ${f1(y+L)} Q${f1(x-1.2)} ${f1(y+1.2)} ${f1(x-L)} ${f1(y)} Q${f1(x-1.2)} ${f1(y-1.2)} ${f1(x)} ${f1(y-L)}Z" fill="#fff"/>`});
   const sv=i=>`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${i}</svg>`;
-  return `<div class="dstones">${sv(g)}</div><div class="dstones dtw">${sv(tw)}</div>`}
+  return `<div class="dstones">${sv(g)}</div>`+TW.map((t,k)=>`<div class="dstones dtw" style="animation-delay:-${(k*.56).toFixed(2)}s">${sv(t)}</div>`).join('')}
 function varFront(h,ins){h=h.replace('<div class="front ','<div class="front v-'+ins.v+' ');
   if(ins.v==='sig')h=h.replace('<div class="sheen">',sigHTML(ins.s)+'<div class="sheen">');
   if(ins.v==='dia'){h=h.replace(/--h:[-\d.]+/,'--h:208');h=h.replace('<div class="sheen">',diaHTML(ins)+'<div class="sheen">')}
@@ -4207,6 +4223,12 @@ function star(ctx,x,y,L,col,a){ctx.globalAlpha=a;
   const ln=(dx,dy,w,len)=>{const lg=ctx.createLinearGradient(x-dx*len,y-dy*len,x+dx*len,y+dy*len);lg.addColorStop(0,'rgba(0,0,0,0)');lg.addColorStop(.5,'#fff');lg.addColorStop(1,'rgba(0,0,0,0)');
     ctx.strokeStyle=lg;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x-dx*len,y-dy*len);ctx.lineTo(x+dx*len,y+dy*len);ctx.stroke()};
   ln(1,0,L*.07+.6,L);ln(0,1,L*.07+.6,L);if(L>9){ln(.707,.707,L*.04+.4,L*.45);ln(.707,-.707,L*.04+.4,L*.45)}}
+/* star() builds 3-5 gradients per call; at ~200 sparks x 60fps that's the busiest thing on screen.
+   Render each (colour, whole-pixel size) once into a small canvas and drawImage it after. */
+const SPR=new Map();
+function starSpr(L,col){const Li=Math.max(2,Math.round(L)),k=col+'|'+Li;let c=SPR.get(k);if(c)return c;
+  const S=Li*2+4;c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');x.globalCompositeOperation='lighter';star(x,S/2,S/2,Li,col,1);
+  if(SPR.size>900)SPR.delete(SPR.keys().next().value);SPR.set(k,c);return c}
 function frame(t){requestAnimationFrame(frame);if(!E.el)return;if(!E.el.isConnected){deactivate();return}
   const now=performance.now();
   // idle breathing so it never sits dead
@@ -4217,6 +4239,8 @@ function frame(t){requestAnimationFrame(frame);if(!E.el)return;if(!E.el.isConnec
   const sx=Math.sin(E.ry*R),sy=Math.sin(E.rx*R);
   const px=clamp(.5-sx*.9,0,1),py=clamp(.42+sy*.9,0,1);
   E.el.style.transform=`rotateX(${E.rx.toFixed(2)}deg) rotateY(${E.ry.toFixed(2)}deg)`;
+  // idle sway: movement stays 60fps, but the light/sparkle repaint only needs every other frame
+  const idleSway=!E.free&&!E.swipe&&now-E.last>1600&&spd<.35;if(idleSway&&(E.skip=!E.skip))return;
   light(E.el,px,py,0);
   const kick=Math.min(.5,spd*.05);E.el.style.setProperty('--ho',(.35+Math.hypot(px-.5,py-.5)*1.1+kick).toFixed(2));E.el.style.setProperty('--go',(.5+Math.hypot(px-.5,py-.5)*.8+kick).toFixed(2));
   // twinkle (every other frame on phones)
@@ -4226,8 +4250,8 @@ function frame(t){requestAnimationFrame(frame);if(!E.el)return;if(!E.el.isConnec
   for(const p of E.sp){const dx=lx-p.nx,dy=ly-p.ny;let b=Math.exp(-(dx*dx+dy*dy)/.14);
     const prox=Math.max(0,1-Math.hypot(p.x-px,p.y-py)*1.25);b*=.25+.75*prox;
     b*=.7+.3*Math.sin(t/1000*p.sp+p.ph)**2;b=Math.min(1,b*(1+spd*.08))*E.gain;if(b<.04)continue;
-    const L=(4+b*22)*p.s*unit;const col=p.white?'rgba(255,255,255,.9)':`hsla(${p.hue},${p.sat}%,72%,.9)`;
-    star(c,p.x*W,p.y*H,L,col,Math.min(1,b))}
+    const L=(4+b*22)*p.s*unit;const col=p.white?'rgba(255,255,255,.9)':`hsla(${Math.round(p.hue)},${p.sat}%,72%,.9)`;
+    const sp=starSpr(L,col),hs=sp.width/2;c.globalAlpha=Math.min(1,b);c.drawImage(sp,p.x*W-hs,p.y*H-hs)}
   c.globalAlpha=1}
 requestAnimationFrame(frame);
 
@@ -4389,7 +4413,12 @@ function summary(){const st=stage();root.onkeydown=null;
     else{$('#again').textContent=`Next pack (${boxLeft(bx)} left)`;$('#again').onclick=()=>{SFX.tick();BOXCTX={u,i:nx};shop({box:1})}}}}
 /* tiles without a card in them (the black Obsidian slots) are skipped - one
    null here used to abort the loop and leave every later card unclickable */
-function minis(scope){scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
+/* cards scrolled out of view stop animating (Obsidian skies, diamond glints, foils) */
+let OFFIO=null;
+function watchOff(scope){if(!window.IntersectionObserver)return;const sc=scope.closest('.binder,.store,.clash')||null;
+  if(OFFIO)OFFIO.disconnect();OFFIO=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('off',!e.isIntersecting)),{root:sc,rootMargin:'250px 0px'});
+  scope.querySelectorAll('.mini,.ttile,.smini').forEach(el=>OFFIO.observe(el))}
+function minis(scope){requestAnimationFrame(()=>watchOff(scope));scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
   m.onpointerenter=()=>{if(!root.querySelector('.zoom'))activate(t,'card')};
   m.onclick=()=>{if(m.classList.contains('miss'))return;const p=m.dataset.id!=null?{c:CARD(+m.dataset.id),foil:m.dataset.f==='1',ins:m.dataset.u?instBy(m.dataset.u):null}:pull[+m.dataset.i];zoom(p)}})}
 const fmtLeft=due=>{const t=Math.max(0,Math.ceil((due-Date.now())/1000));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
@@ -4540,7 +4569,10 @@ function tuAuto(pool){const left=p=>p.max-TU.sel.filter(x=>itemKey(x)===itemKey(
   const order=pool.slice().sort((a,b)=>a.ins&&b.ins?condScore(a.ins.cd)-condScore(b.ins.cd):b.max-a.max||(a.foil-b.foil));
   // spread across the biggest stacks first, plain before reverse holo, worst condition first
   while(TU.sel.length<TU_N){const p=order.filter(x=>left(x)>0).sort((a,b)=>a.ins?0:left(b)-left(a))[0];if(!p)break;TU.sel.push(Object.assign({},p.it))}}
-function tradeup(){const st=stage();deactivate();root.onkeydown=null;
+/* re-rendering the same screen (picking a card) keeps every scroller where it was */
+function keepScroll(st,key,sels){const same=st.dataset.v===key,y=sels.map(q=>{const e=st.querySelector(q);return e?e.scrollTop:0});st.dataset.v=key;
+  return()=>{if(same)sels.forEach((q,i)=>{const e=st.querySelector(q);if(e)e.scrollTop=y[i]})}}
+function tradeup(){const st=stage();deactivate();root.onkeydown=null;const back=keepScroll(st,'tradeup',['.tuv']);
   const pool=spareStacks(TU.t);tuFit(pool);
   const nt=TU_NEXT[TU.t],full=TU.sel.length===TU_N,spare=pool.reduce((a,t)=>a+t.max,0);
   st.innerHTML=`<div class="binder tuv">
@@ -4552,7 +4584,7 @@ function tradeup(){const st=stage();deactivate();root.onkeydown=null;
    <div class="tubar"><span class="tucount"><b>${TU.sel.length}</b> / ${TU_N}</span><button class="btn ghost" id="tuAuto" ${spare&&!full?'':'disabled'}>Auto-fill</button><button class="btn ghost" id="tuClr" ${TU.sel.length?'':'disabled'}>Clear</button><button class="btn" id="tuGo" ${full?'':'disabled'}>Sign contract</button></div>
    <div class="grow"><h5>Your spare ${TSH[TU.t]}s <small>${spare}</small></h5>
     <div class="tgrid">${pool.map(t=>tileHTML(t,'tu',TU.sel)).join('')||`<p class="gempty">No spare ${TSH[TU.t]}s yet \u2014 you need doubles.</p>`}</div></div></div>`;
-  st.querySelectorAll('[data-tu]').forEach(b=>b.onclick=()=>{SFX.tick();TU.t=b.dataset.tu;TU.sel=[];tradeup()});
+  back();st.querySelectorAll('[data-tu]').forEach(b=>b.onclick=()=>{SFX.tick();TU.t=b.dataset.tu;TU.sel=[];tradeup()});
   st.querySelectorAll('.ttile').forEach(el=>el.onclick=()=>{const k=el.dataset.k,t=pool.find(x=>itemKey(x.it)===k);if(!t)return;
     const have=TU.sel.filter(x=>itemKey(x)===k).length;
     if(have>=t.max||TU.sel.length>=TU_N){if(!have)return;for(let i=TU.sel.length-1;i>=0;i--)if(itemKey(TU.sel[i])===k){TU.sel.splice(i,1);break}}
@@ -4761,7 +4793,7 @@ function clBegin(mode){SFX.init();SFX.tick();CL.mode=mode;const deck=clActive().
   else if(mode==='pass'){clPassScreen()}else clBoard()}
 
 /* ---- deck builder ---- */
-function clBuilder(){CL.screen='builder';const st=stage();deactivate();root.onkeydown=null;
+function clBuilder(){CL.screen='builder';const st=stage();deactivate();root.onkeydown=null;const back=keepScroll(st,'clbuild',['.clash','.clgrid','.cl-dlist']);
   const d=clData();let cur=d._edit;if(!cur){cur=d._edit={idx:d.active,name:clActive().name,cards:clActive().cards.slice()}}
   const cnt=clCounts(cur.cards),owned=SET.filter(c=>owns(c)),bab=clBabies(cur.cards);
   const curve=[0,0,0];cur.cards.forEach(id=>curve[CARD(id).stage]++);
@@ -4784,7 +4816,7 @@ function clBuilder(){CL.screen='builder';const st=stage();deactivate();root.onke
       <div class="cl-dfoot"><button class="lnk" id="clStarter">Load starter deck</button><button class="lnk" id="clClear">Clear</button></div>
       <div class="cl-decks">${d.decks.map((dk,i)=>`<button class="cldeckchip${i===cur.idx?' on':''}" data-deck="${i}">${hx(dk.name)}</button>`).join('')}${d.decks.length<5?'<button class="cldeckchip add" id="clNew">+ New</button>':''}</div>
     </div></div></div>`;
-  $('#clBack').onclick=()=>{delete d._edit;SFX.tick();CL.screen='menu';clMenu()};
+  back();$('#clBack').onclick=()=>{delete d._edit;SFX.tick();CL.screen='menu';clMenu()};
   $('#clName').oninput=e=>cur.name=e.target.value;
   st.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const id=+b.dataset.add;if((cnt[id]||0)>=2){SFX.no();return}if(cur.cards.length>=20){SFX.no();note('20 cards max');return}cur.cards.push(id);SFX.tick();clBuilder()});
   st.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{cur.cards.splice(+b.dataset.rm,1);SFX.tick();clBuilder()});
@@ -5363,7 +5395,7 @@ const itemLabel=(it,snapInst)=>{if(it.k==='i'){const i=it.ins||(snapInst||[]).fi
   return c.name+(i.st==='slab'?` (STK ${i.grade}${vv})`:HI(c.t)?` (${condScore(i.cd).toFixed(1)}${vv})`:vv?` (${vv.slice(3)})`:'')}
   return CARD(it.id).name+(it.f?' (Reverse)':'')};
 
-function trade(){const st=stage();deactivate();root.onkeydown=null;
+function trade(){const st=stage();deactivate();root.onkeydown=null;const back=keepScroll(st,'trade',['.binder','.tcol:nth-child(1) .tgrid','.tcol:nth-child(2) .tgrid']);
   const party=B.party&&B.party();
   if(!party||!party.on){st.innerHTML='<div class="binder"><p class="gempty">Join a party with your mate to trade cards.</p></div>';return}
   if(!TR.mate){B.send({t:'tcgReq'});st.innerHTML=`<div class="binder"><p class="gempty">Opening ${hx(party.name)}'s binder\u2026</p></div>`;return}
@@ -5379,7 +5411,7 @@ function trade(){const st=stage();deactivate();root.onkeydown=null;
    </div></div>
    <div class="dock tdock"><div class="tsum"><span>You give <b>${TR.sel.give.length}</b></span><span>You get <b>${TR.sel.want.length}</b></span></div>
     <button class="btn ghost" id="tClr">Clear</button><button class="btn" id="tSend" ${(TR.sel.give.length||TR.sel.want.length)&&!TR.waiting?'':'disabled'}>Send offer</button></div>`;
-  const pick=(side,key)=>{const arr=side==='give'?TR.sel.give:TR.sel.want,pool=side==='give'?mine:theirs;
+  back();const pick=(side,key)=>{const arr=side==='give'?TR.sel.give:TR.sel.want,pool=side==='give'?mine:theirs;
     const t=pool.find(x=>itemKey(x.it)===key);if(!t)return;
     const have=arr.filter(x=>itemKey(x)===key).length;
     if(have>=t.max){for(let i=arr.length-1;i>=0;i--)if(itemKey(arr[i])===key)arr.splice(i,1)}else arr.push(Object.assign({},t.it));
@@ -5405,9 +5437,13 @@ function settleOffer(m,silent){const esc=col.escrow&&col.escrow[m.oid];if(TR.wai
 
 function showOffer(m){closeOffer();const el=document.createElement('div');el.className='tofr';
   const ok=canGive(m.want);
-  const row=items=>items.length?items.map(it=>`<li>${hx(itemLabel(it))}</li>`).join(''):'<li class="none">Nothing</li>';
+  /* show the real cards: slabs as slabs, raw copies with their own condition, wear and signed/error look */
+  const tile=it=>{const i=it.k==='i'?(it.ins||instBy(it.u)):null,c=CARD(i?i.id:it.id);if(!c)return'';
+    const inner=i&&i.st==='slab'?`<div class="tslab">${slabHTML(i,1)}</div>`:cardEl(c,i?!!i.f:!!it.f,false,i,1);
+    return `<div class="tofr-card"><div class="ttile">${inner}${vtag(i)}</div><small>${hx(itemLabel(it))}</small></div>`};
+  const row=items=>items.length?`<div class="tofr-grid">${items.map(tile).join('')}</div>`:'<p class="tofr-none">Nothing</p>';
   el.innerHTML=`<div class="tofr-box"><h3>${hx(m.from||'Your mate')} wants to trade</h3>
-   <div class="tofr-cols"><div><h5>You get</h5><ul>${row(m.give)}</ul></div><div><h5>You give</h5><ul>${row(m.want)}</ul></div></div>
+   <div class="tofr-cols"><div class="tofr-get"><h5>You get <small>${m.give.length}</small></h5>${row(m.give)}</div><div class="tofr-swap">⇄</div><div class="tofr-give"><h5>You give <small>${m.want.length}</small></h5>${row(m.want)}</div></div>
    ${ok?'':'<p class="twarn">You no longer have everything they asked for.</p>'}
    <div class="tofr-act"><button class="btn ghost" id="tDec">Decline</button><button class="btn" id="tAcc" ${ok?'':'disabled'}>Accept trade</button></div></div>`;
   root.appendChild(el);try{SFX.ding(990)}catch(x){}
