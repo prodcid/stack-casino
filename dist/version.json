@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.22.18",
-  "notes": "Stack Cards: performance tracker (FPS button + binder diagnosis report)",
-  "bytes": 947380,
-  "at": "2026-09-22T10:05:37.465Z"
+  "version": "2026.09.22.19",
+  "notes": "Stack Cards: fix binder hover lag, hover tests in Diagnose",
+  "bytes": 948285,
+  "at": "2026-09-22T10:11:06.285Z"
 }

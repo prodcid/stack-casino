@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.22.18">
+<meta name="stack-version" content="2026.09.22.19">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -4231,11 +4231,13 @@ function deactivate(){if(E.cv)E.cv.remove();if(E.el){E.el.classList.remove('live
 function activate(el,kind){if(!el||E.el===el)return;
   // while a card is zoomed nothing behind it may take the engine (a binder tile used to steal it and spin instead)
   const zm=root&&root.querySelector('.zoom');if(zm&&!zm.contains(el))return;
+  // read the size while layout is still clean - measuring after the DOM writes below forced a full binder layout on every hover
+  const host=kind==='pack'?el:el.querySelector('.front'),hw=host?host.offsetWidth:0,hh=host?host.offsetHeight:0;
   deactivate();
   Object.assign(E,{el,kind,rx:0,ry:0,vx:0,vy:0,bx:0,by:0,hx:0,hy:0,free:false,swipe:false,last:performance.now()});el.classList.add('live');
-  const host=kind==='pack'?el:el.querySelector('.front');if(!host)return;
+  if(!host)return;
   const cv=document.createElement('canvas');cv.className='twk';host.appendChild(cv);
-  const dpr=Math.min(MOB?1.25:2,window.devicePixelRatio||1);cv.width=host.offsetWidth*dpr;cv.height=host.offsetHeight*dpr;
+  const dpr=Math.min(MOB?1.25:2,window.devicePixelRatio||1);cv.width=hw*dpr;cv.height=hh*dpr;
   E.cv=cv;E.ctx=cv.getContext('2d');E.dpr=dpr;
   if(kind==='pack'){GS_H=125;E.sp=genSparks('pack',0,99);E.gain=.55}
   else{const t=el.dataset.t,rev=el.dataset.rev==='1';GS_H=+el.dataset.h||0;E.sp=genSparks(t,rev,+el.dataset.id*7+(rev?3:0));E.gain={c:rev?1:.45,h:1,fa:1.1,sir:1.25,bwr:1.45,obs:1.5,fe:0}[t]}}
@@ -4440,8 +4442,13 @@ let OFFIO=null;
 function watchOff(scope){if(!window.IntersectionObserver)return;const sc=scope.closest('.binder,.store,.clash')||null;
   if(OFFIO)OFFIO.disconnect();OFFIO=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('off',!e.isIntersecting)),{root:sc,rootMargin:'250px 0px'});
   scope.querySelectorAll('.mini,.ttile,.smini').forEach(el=>OFFIO.observe(el))}
+/* hover intent: only bring a card to life once the mouse settles on it - sweeping across the
+   binder used to promote and re-rasterise every card you passed over */
+let HOVT=0;
+function hoverOn(t){clearTimeout(HOVT);HOVT=setTimeout(()=>{if(t.isConnected&&!root.querySelector('.zoom'))activate(t,'card')},90)}
+function hoverOff(){clearTimeout(HOVT)}
 function minis(scope){requestAnimationFrame(()=>watchOff(scope));scope.querySelectorAll('.mini').forEach(m=>{const t=m.querySelector('.tilt');if(!t)return;light(t,.5,.35,.6);
-  m.onpointerenter=()=>{if(!root.querySelector('.zoom'))activate(t,'card')};
+  m.onpointerenter=()=>hoverOn(t);m.onpointerleave=hoverOff;
   m.onclick=()=>{if(m.classList.contains('miss'))return;const p=m.dataset.id!=null?{c:CARD(+m.dataset.id),foil:m.dataset.f==='1',ins:m.dataset.u?instBy(m.dataset.u):null}:pull[+m.dataset.i];zoom(p)}})}
 const fmtLeft=due=>{const t=Math.max(0,Math.ceil((due-Date.now())/1000));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
 const condGrid=cd=>[['Centering',cd.ctr+'/'+(100-cd.ctr)],['Corners',cd.co.toFixed(1)],['Edges',cd.ed.toFixed(1)],['Surface',cd.su.toFixed(1)]]
@@ -5125,7 +5132,7 @@ async function perfPhase(name,ms,setup,each){if(setup)setup();await perfWait(400
   await perfWait(ms);run=false;const st=perfStats(ms+100),lt=PERF.long.slice(l0);
   const res={phase:name,fps:st.fps,worstMs:st.worst,p99Ms:st.p99,slowPct:st.slow,freezes:lt.length,freezeMs:Math.round(lt.reduce((x,y)=>x+y.d,0))};PERF.log.push(res);
   const m=root.querySelector('#pfMsg');if(m)m.textContent=name+': '+st.fps+' fps';return res}
-async function perfDiagnose(){if(PERF.busy)return;PERF.busy=true;PERF.log=[];const m=root.querySelector('#pfMsg');m.textContent='Running \u2014 don\u2019t touch anything for ~20s\u2026';
+async function perfDiagnose(){if(PERF.busy)return;PERF.busy=true;PERF.log=[];const m=root.querySelector('#pfMsg');m.textContent='Running \u2014 don\u2019t touch anything for ~30s\u2026';
   go('binder');await perfWait(700);const sc=root.querySelector('.binder'),top=()=>{sc.scrollTop=0},
     scroll=()=>{sc.scrollTop+=9;if(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-2)sc.scrollTop=0};
   const build=performance.now();go('binder');const buildMs=Math.round(performance.now()-build);
@@ -5136,6 +5143,10 @@ async function perfDiagnose(){if(PERF.busy)return;PERF.busy=true;PERF.log=[];con
   await perfPhase('scrolling, effects hidden',4000,()=>{top();root.classList.add('pf-lite')},scroll);
   await perfPhase('scrolling, effects + art hidden',4000,()=>{top();root.classList.add('pf-noart')},scroll);
   root.classList.remove('pf-lite','pf-noart');top();
+  {const ms=[...root.querySelectorAll('.grid .mini:not(.miss)')];let k=0,f=0;
+   await perfPhase('hover sweep (new card every 150ms)',4500,top,()=>{if(++f%9)return;const m=ms[k++%ms.length];if(m&&m.onpointerenter)m.onpointerenter()});
+   k=0;f=0;await perfPhase('hover rest (card every 600ms)',4500,top,()=>{if(++f%36)return;const m=ms[k++%ms.length];const t=m&&m.querySelector('.tilt');t&&activate(t,'card')})}
+  deactivate();
   PERF.report={when:new Date().toISOString(),env:perfEnv(),counts:perfCounts(),binderBuildMs:buildMs,phases:PERF.log,slowEvents:PERF.ev.slice(-8)};
   m.textContent='Done \u2014 hit Copy report and paste it to Claude.';PERF.busy=false}
 function perfCopy(){const rep=PERF.report||{when:new Date().toISOString(),env:perfEnv(),counts:perfCounts(),live5s:perfStats(5000),slowEvents:PERF.ev.slice(-8),note:'no diagnosis run'};
@@ -5384,7 +5395,7 @@ function graded(){const st=stage();deactivate();root.onkeydown=null;
   st.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{SFX.tick();openGraded(instBy(b.dataset.open))});
   st.querySelectorAll('[data-gf]').forEach(b=>b.onclick=()=>{const [k,v]=b.dataset.gf.split(':');GF[k]=v;SFX.tick();graded()});
   st.querySelectorAll('.smini').forEach(m=>{const t=m.querySelector('.tilt');light(t,.5,.35,.6);
-    m.onpointerenter=()=>{if(!root.querySelector('.zoom'))activate(t,'card')};m.onclick=()=>zoom(null,{slab:instBy(m.dataset.u)})})}
+    m.onpointerenter=()=>hoverOn(t);m.onpointerleave=hoverOff;m.onclick=()=>zoom(null,{slab:instBy(m.dataset.u)})})}
 
 /* Opening the mailer: drag across the seal, the lid lifts away, light spills
    out and the slab rises - then the grade is unveiled. */
