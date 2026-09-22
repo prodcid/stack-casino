@@ -529,10 +529,10 @@ async function cards(ctx, errs) {
     const n0=(c[com.id]||{n:0}).n,f0=(c[fa.id]||{n:0}).n;
     X.addCard({c:com,foil:false,v:'sig',ins:X.newInst(com.id)});X.addCard({c:fa,foil:false,v:'miscut',ins:X.newInst(fa.id)});
     const sig=c.inst.find(i=>i.id===com.id&&i.v==='sig'),err=c.inst.find(i=>i.id===fa.id&&i.v==='miscut');
-    StackCards.go('binder');const R=StackCards.root,row=R.querySelector('.vrow');
-    const shown=row?[...row.querySelectorAll('.mini')].map(m=>m.dataset.u):[];
-    const sigFront=!!(row&&row.querySelector('.mini[data-u="'+sig.u+'"] .front.v-sig .vsig svg path'));
-    const errFront=!!(row&&row.querySelector('.mini[data-u="'+err.u+'"] .front.v-miscut .mcut'));
+    StackCards.go('binder');const R=StackCards.root,row=R;
+    const shown=[...R.querySelectorAll('.vrow .mini')].map(m=>m.dataset.u);
+    const sigFront=!!R.querySelector('.vsec-sig .mini[data-u="'+sig.u+'"] .front.v-sig .vsig svg path');
+    const errFront=!!R.querySelector('.vsec-err .mini[data-u="'+err.u+'"] .front.v-miscut .mcut');
     const odds=Object.keys(X.VAR).length;
     return {comCount:(c[com.id]||{n:0}).n-n0,faCount:c[fa.id].n-f0,shown:shown.includes(sig.u)&&shown.includes(err.u),sigFront,errFront,odds,
       owns:StackCards.root&&true,sigU:sig.u,errU:err.u}})()`);
@@ -588,7 +588,7 @@ async function cards(ctx, errs) {
   // STORE + BOOSTER BOX: buy -> desk -> cut the wrap -> push the tab -> 36 packs -> open one
   await pg.evaluate("StackCards.go('store')"); await pg.waitForTimeout(400);
   const sf = await pg.evaluate("(()=>{const R=StackCards.root;return [!!R.querySelector('.st-feature .bx3 .wr'),!!R.querySelector('#stBuy'),R.querySelectorAll('.st-fe .front.fe').length]})()");
-  (sf[0] && sf[1] && sf[2] === 3) ? pass('store front shows a sealed box and the shelves') : fail('store front shows a sealed box and the shelves', JSON.stringify(sf));
+  (sf[0] && sf[1] && sf[2] === 6) ? pass('store front shows a sealed box and the shelves') : fail('store front shows a sealed box and the shelves', JSON.stringify(sf));
   await pg.evaluate("StackCards.root.querySelector('#stBuy').click()"); await pg.waitForTimeout(600);
   // wait for the box to finish dropping onto the desk before measuring the cut line
   await pg.waitForFunction("(()=>{const b=StackCards.root&&StackCards.root.querySelector('#bx');return !!b&&b.getAnimations().every(a=>a.playState==='finished')})()", null, { timeout: 5000 });
