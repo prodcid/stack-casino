@@ -475,6 +475,7 @@ Two patterns, don't mix them up:
 - **2026-09-24** — Frame-game audio bled across tabs (Racing + Markets kept playing hidden). Fixed from the host by wrapping AudioContext inside each frame with a master gain the host mutes, instead of patching each game's own sound code - works for any future frame game. Also dark thin scrollbars site-wide.
 - **2026-09-24** — Stack GP (F1 betting) built from stack-gp-spec.md as a frame game under Stack Sports. One segment-level event sim is both the race on screen and the Monte Carlo (instead of the spec's full sim + separate lap model), so pricing can never drift from what you watch. Suspend selections seen <5 times or with fair price over the 501 cap - otherwise capped long shots return ~50%.
 - **2026-09-25** — Stack League (NRL) built as a watchable frame game: tackle-by-tackle sim is both the match on screen and the Monte Carlo; each play is choreographed (scripted key actors + steering for the rest). Hidden day form was swapped for per-set luck because the MC knowing the form made favourites win 78%.
+- **2026-09-25** — Stack League players teleported: KO/conversion snaps and scripted actors sent further than they could run. Fixed with a 10.5 m/s cap on scripted paths, nearest-player dummy half/kicker, and a jog-back lead-in before kick-offs (snaps only at half starts). Verified: 0 frames over 12 m/s across a full match.
 
 ---
 

@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.25.1",
-  "notes": "Stack League: watch live rugby league under Stack Sports. Stack GP: Leader camera, readable upright signs, centred overlays.",
-  "bytes": 2039554,
-  "at": "2026-09-24T20:28:01.566Z"
+  "version": "2026.09.25.2",
+  "notes": "Stack League: no more teleporting players - real sprint speeds, nearest dummy half, jog back for kick-offs.",
+  "bytes": 2040594,
+  "at": "2026-09-24T21:39:34.373Z"
 }
