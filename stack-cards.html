@@ -2499,6 +2499,8 @@ const lineDone=()=>LINES.filter(L=>SET.filter(c=>c.art.startsWith(L.key)).every(
 let justDone=[];
 function openPack(){if(opened)return;opened=true;const pk=$('#pk');const before=lineDone();
   pull.forEach(addCard);
+  try{B.log&&B.log('pack',{kind:VINT?'vintage':BOXCTX?'box':'single',god:!!GOD,hits:pull.filter(p=>['fa','sir','bwr'].includes(p.c.t)||p.v||(p.c.t==='fe'&&p.c.rar!=='common'))
+    .map(p=>p.c.name+' '+(p.c.t==='fe'?'1st Ed '+p.c.rar:(TNAME[p.c.t]||p.c.t))+(p.v?' ['+p.v+']':''))})}catch(e){}
   if(BOXCTX){const bx=boxBy(BOXCTX.u);if(bx&&bx.packs[BOXCTX.i]){bx.packs[BOXCTX.i]=0;if(!boxLeft(bx))bx.st='done'}}
   justDone=lineDone().filter(k=>!before.includes(k));col.opened=(col.opened||0)+1;
   const hit=feT(pull[pull.length-1]);if(!VINT)col.pity=(hit==='h')?(col.pity||0)+1:0;checkCraftable();save();
@@ -3745,7 +3747,7 @@ function sendOffer(){const give=TR.sel.give.slice(),want=TR.sel.want.slice();if(
   TR.waiting=oid;TR.sel={give:[],want:[]};SFX.slide&&SFX.slide();note('Offer sent');trade()}
 
 function settleOffer(m,silent){const esc=col.escrow&&col.escrow[m.oid];if(TR.waiting===m.oid)TR.waiting=null;
-  if(m.ok){giveItems(m.items);if(col.escrow)delete col.escrow[m.oid];save();note('Trade complete!');checkCraftable();
+  if(m.ok){giveItems(m.items);if(col.escrow)delete col.escrow[m.oid];save();note('Trade complete!');try{B.log&&B.log('cardtrade')}catch(e){}checkCraftable();
     try{SFX.reveal('u',true);SFX.boom()}catch(x){}}
   else{if(esc)giveItems(esc);if(col.escrow)delete col.escrow[m.oid];save();if(!silent)note(m.why==='missing'?'Trade failed \u2014 they no longer had those cards':'Trade declined')}
   TR.mate=null;if(root&&root.isConnected&&(curView==='trade'||curView==='binder'))go(curView)}
@@ -3766,7 +3768,7 @@ function showOffer(m){closeOffer();const el=document.createElement('div');el.cla
   $('#tAcc').onclick=()=>{const out=takeItems(m.want);
     if(!out){B.send({t:'tcgResp',oid:m.oid,ok:false,why:'missing'});closeOffer();return}
     giveItems(m.give);save();B.send({t:'tcgResp',oid:m.oid,ok:true,items:out});TR.incoming=null;closeOffer();checkCraftable();
-    note('Trade complete!');try{SFX.reveal('u',true);SFX.boom()}catch(x){}TR.mate=null;if(curView==='trade'||curView==='binder')go(curView)}}
+    note('Trade complete!');try{B.log&&B.log('cardtrade')}catch(e){}try{SFX.reveal('u',true);SFX.boom()}catch(x){}TR.mate=null;if(curView==='trade'||curView==='binder')go(curView)}}
 const closeOffer=()=>{const o=root&&root.querySelector('.tofr');o&&o.remove()};
 
 function onNet(m){if(!m||!m.t)return;

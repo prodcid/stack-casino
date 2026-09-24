@@ -1,0 +1,551 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Stack Racing</title>
+<style>
+:root{--bg:#0f1923;--p1:#16222e;--p2:#1c2a38;--p3:#243444;--line:#2a3a4a;--txt:#e8eef4;--mute:#8a9aac;--green:#00e701;--red:#ff4f4f;--gold:#ffc800}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--txt);font:14px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}button:disabled{opacity:.45;cursor:default}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:10px 14px;background:#0b131b;border-bottom:1px solid var(--line)}
+.brand{font-weight:900;font-size:18px;display:flex;align-items:center;gap:7px;margin-right:auto}.brand i{font-style:normal;color:var(--green)}
+.hb{width:36px;height:36px;border-radius:10px;background:var(--p2);font-size:16px}
+.balw{display:flex;border-radius:10px;overflow:hidden;background:var(--p2)}#bal{padding:8px 10px;font-weight:800;min-width:92px;text-align:right}#bal.fu{color:var(--green)}#bal.fd{color:var(--red)}
+#topup{background:#1a6ae8;padding:8px 12px;font-weight:800;color:#fff}
+.wrap{max-width:1180px;margin:0 auto;padding:12px}
+#rhead{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;flex-wrap:wrap;margin-bottom:10px}#rhead b{font-size:18px}
+.tag{background:var(--green);color:#021;font-weight:900;border-radius:6px;padding:2px 7px;font-size:12px;vertical-align:2px}
+.sub{color:var(--mute);font-size:12.5px}.cond{font-weight:800}.cond.c0{color:#7adf6a}.cond.c1{color:#e8c040}.cond.c2{color:#e87a3a}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+.viewer{position:relative;border-radius:14px;overflow:hidden;background:#123;border:1px solid var(--line)}#cv{display:block;width:100%}
+#cv.sepia{filter:sepia(.85) contrast(1.15)}
+#togo{position:absolute;right:8px;top:8px;background:rgba(8,14,20,.78);border-radius:8px;padding:4px 9px;font-weight:900;font-size:15px;font-variant-numeric:tabular-nums}
+#photo{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none}#photo.on{display:flex}
+#photo span{background:rgba(0,0,0,.72);border:2px solid #fff;padding:8px 18px;border-radius:10px;font-weight:900;letter-spacing:4px;font-size:22px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.4}}
+.callbox{background:var(--p1);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+#call{font-size:16px;min-height:22px}#call b{color:#fff}#call em{color:var(--green);font-style:normal;font-weight:800}#call.pop{animation:pop .35s}
+@keyframes pop{from{opacity:.3;transform:translateY(4px)}}
+#calllog{margin-top:6px;color:var(--mute);font-size:12.5px;max-height:84px;overflow:hidden}#calllog div{padding:1px 0}#calllog b{color:#c8d4e0;font-weight:600}#calllog em{font-style:normal}
+h3{margin:4px 0 8px;font-size:15px}
+.cardhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card{display:flex;flex-direction:column;gap:6px}
+.rn{background:var(--p1);border:1px solid var(--line);border-radius:12px}.rn.open{border-color:#3a5a7a}
+.rtop{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer}
+.silk{width:38px;height:38px;flex:none}.silk.sm{width:24px;height:24px}
+.rmain{flex:1;min-width:0}.form{font-weight:800;color:#c8d4e0;letter-spacing:1.5px;font-variant-numeric:tabular-nums}
+.rname{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rname .bar{color:var(--mute);font-weight:600}
+.num{display:inline-block;min-width:20px;text-align:center;background:#e8eef4;color:#0b131b;border-radius:5px;font-weight:900;font-size:12px;margin-right:6px;padding:0 3px}
+.trs{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}.tr{font-size:10.5px;padding:1px 6px;border-radius:5px;background:var(--p3);color:#c8d4e0;font-weight:700}
+.tr.wet{background:#15384a;color:#8ad8ff}.tr.dry{background:#4a3215;color:#ffc88a}.tr.lead{background:#3a1a3a;color:#ffaaf0}.tr.grit{background:#3a2a10;color:#ffd06a}
+.odds{display:flex;gap:5px;flex:none}
+.ob{min-width:62px;padding:5px 6px;border-radius:9px;background:var(--p3);font-weight:900;font-size:14px;display:flex;flex-direction:column;align-items:center;border:2px solid transparent}
+.ob small{font-size:9.5px;color:var(--mute);font-weight:700;text-transform:uppercase}.ob.on{border-color:var(--green);background:#12361c}.ob.had{box-shadow:inset 0 -3px 0 var(--gold)}
+.fg{padding:0 12px 12px;border-top:1px solid var(--line)}.fg>.sub{margin-top:8px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:10px 0}.stats div{display:flex;align-items:center;gap:6px;font-size:12px}.stats span{width:78px;color:var(--mute)}
+.stats i{flex:1;height:7px;border-radius:4px;background:var(--p3);overflow:hidden}.stats i b{display:block;height:100%;background:linear-gradient(90deg,#1a6ae8,#00e701)}.stats em{font-style:normal;width:22px;text-align:right;font-weight:800}
+.last{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;font-size:12px;color:#c8d4e0;margin-bottom:8px}.last b{display:inline-block;min-width:34px}.last b.w{color:var(--gold)}.last b.p{color:var(--green)}
+.side{position:sticky;top:70px;background:var(--p1);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.sl{display:flex;align-items:center;gap:8px;background:var(--p2);border-radius:9px;padding:7px 9px}.sl span:first-child{flex:1;font-weight:700}.sl button{font-size:18px;color:var(--mute);padding:0 4px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}.chips button{padding:6px 10px;border-radius:8px;background:var(--p3);font-weight:800}.chips button.on{background:var(--green);color:#021}
+.btn{padding:11px 14px;border-radius:11px;background:var(--p3);font-weight:900;width:100%}.btn.go,.btn.big{background:var(--green);color:#021}.btn.big{padding:14px;font-size:16px}.btn.ghost{background:var(--p2);border:1px solid var(--line)}
+.row2{display:flex;gap:8px}
+.mb{display:flex;align-items:center;gap:8px;background:var(--p2);border-radius:9px;padding:7px 9px;margin-bottom:5px;border-left:3px solid var(--line)}.mb span{flex:1;font-weight:700}.mb small{display:block;color:var(--mute);font-weight:500;font-size:11.5px}
+.mb.up{border-left-color:var(--green)}.mb.up b{color:var(--green)}.mb.dn{border-left-color:#4a5a6a}.mb.dn b{color:var(--mute)}
+.lrows{position:relative}.lrows .ld{position:absolute;left:0;right:0;top:0;height:40px;transition:transform .45s cubic-bezier(.3,.8,.3,1)}
+.sl span:first-child small{display:block;color:var(--mute);font-weight:500;font-size:11.5px}.slr{color:var(--green);font-size:13px}
+.stakebox{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700}.sin{display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0 10px;font-weight:900;font-size:17px}
+.sin input{width:110px;background:none;border:0;color:var(--txt);font:inherit;padding:9px 0;outline:none;text-align:right}.sin:focus-within{border-color:var(--green)}
+.slipsum{font-size:13.5px;color:var(--mute)}.slipsum b{color:var(--green);font-size:15px}
+.lh{display:flex;justify-content:space-between;color:var(--mute);font-size:12px;padding:0 4px 6px;font-weight:700}.sus{color:var(--gold);font-style:normal}
+.ld,.rr{display:flex;align-items:center;gap:8px;background:var(--p1);border:1px solid var(--line);border-radius:10px;padding:6px 8px;margin-bottom:4px}
+.ld.me,.rr.me{border-color:var(--green);background:#11261a}.pos{width:30px;font-weight:900;color:var(--mute);font-size:13px}
+.nm{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.blk{color:var(--red);font-style:normal;font-size:11px}
+.gap{width:46px;text-align:right;color:var(--mute);font-size:12.5px;font-variant-numeric:tabular-nums}
+.bk{min-width:64px;padding:6px 6px;border-radius:8px;background:#1a3a6a;font-weight:900;color:#cfe4ff}.bk:disabled{background:var(--p3);color:var(--mute)}
+.rr.p0{border-color:var(--gold)}.rr.p0 .pos{color:var(--gold)}.rr.p1 .pos{color:#d8dee8}.rr.p2 .pos{color:#e0a060}.sp{width:74px;text-align:right;color:var(--mute);font-size:12px}
+.net{text-align:center;font-weight:900;font-size:18px;padding:6px}.net.up,.up{color:var(--green)}.net.dn,.dn{color:var(--red)}
+#irm{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px}#irm.on{display:flex}
+.irbox{background:var(--p1);border:1px solid var(--line);border-radius:16px;padding:16px;width:min(360px,100%);display:flex;flex-direction:column;gap:10px}
+.irh{display:flex;gap:10px;align-items:center}.irh img{width:44px}.irh span{display:block}.irp{font-size:36px;font-weight:900;color:var(--green);text-align:center}
+.hl{max-height:50vh;overflow:auto}.hl div{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)}
+#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:60;display:flex;flex-direction:column;gap:6px;align-items:center}
+.toast{background:#223344;border:1px solid var(--line);border-radius:10px;padding:9px 14px;display:flex;gap:12px;font-weight:700;animation:pop .3s}.toast.good b{color:var(--green)}.toast.bad b{color:var(--red)}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1}.left{display:contents}.viewer{order:-3}.callbox{order:-2;margin:0}#panel{order:0}.grid{gap:10px}}
+@media (max-width:420px){.wrap{padding:10px}.ob{min-width:56px;font-size:13px}.brand span{display:none}}
+</style></head><body>
+<header><div class="brand">🏇 <span>Stack <i>Racing</i></span></div><button class="hb" id="hist" title="History">📋</button><button class="hb" id="mute" title="Sound">🔊</button><div class="balw"><span id="bal">$0.00</span><button id="topup">Top up</button></div></header>
+<div class="wrap"><div id="rhead"></div>
+<div class="grid"><div class="left"><div class="viewer"><canvas id="cv"></canvas><div id="togo"></div><div id="photo"><span>PHOTO</span></div></div>
+<div class="callbox"><div id="call"></div><div id="calllog"></div></div><div id="panel"></div></div>
+<aside class="side" id="side"></aside></div></div>
+<div id="irm"></div><div id="toasts"></div>
+<script>
+/* ================= STACK RACING ENGINE =================
+   A small physics-style race: every horse has early speed, cruising speed, a finishing kick and
+   stamina. Speed above cruise burns energy, sitting behind another horse (cover) saves it, running
+   wide on the bends costs ground, and horses can get blocked. All the drama comes out of this.
+   Odds are Monte Carlo runs of this exact same step function, priced to return 97%. */
+const DT=0.25,LEN=2.4,RB=175,LANES=9,HOUSE=0.97;
+const COND=[{n:'Good 4',k:1,wet:0},{n:'Soft 6',k:.985,wet:1},{n:'Heavy 8',k:.965,wet:2}];
+let _sp=null;function randn(){if(_sp!==null){const v=_sp;_sp=null;return v}let u=0;while(u===0)u=Math.random();const v=Math.random(),r=Math.sqrt(-2*Math.log(u)),a=6.283185307*v;_sp=r*Math.sin(a);return r*Math.cos(a)}
+/* track: 2000m loop, anticlockwise. loop coord u: [0,550) bend 1, [550,1000) back straight, [1000,1550) bend 2, [1550,2000) home straight, post at 2000 */
+const onBend=(R,s)=>{const u=(R.u0+s)%2000;return u<550||(u>=1000&&u<1550)};
+/* per-race horse numbers derived from the horse's ratings (all 0..1) */
+function runnerParams(h,R,barrier){const c=COND[R.cond];
+  let k=c.k;if(h.traits.includes('wet'))k+=c.wet*.0035;if(h.traits.includes('dry'))k-=c.wet*.0035;
+  const vb=(16.55+.16*h.cr)*k-(h.wt-54)*.025;
+  return{vb,es:h.es,ki:h.ki,st:h.st,lead:h.traits.includes('lead'),slow:h.traits.includes('slow'),grit:h.traits.includes('grit'),
+    lane0:(barrier-1)*.55,sprint:340+120*h.st+(h.traits.includes('late')?-70:0),den:.9+.2*h.st,kick:.5+.95*h.ki}}
+function newState(R){return R.P.map(p=>({s:0,v:0,lane:p.lane0,E:1,fin:0,delay:0,form:0,mo:0,kf:NaN,push:0,blk:0,hd:0}))}
+/* roll the random bits that are fixed for the whole race: day form and the start */
+function rollDay(R,st){st.forEach((h,i)=>{h.form=randn()*.0055;const p=R.P[i].slow?.22:.05;h.delay=Math.random()<p?.35+Math.random()*.9:0})}
+function cloneState(st){return st.map(h=>({...h}))}
+/* one DT step. t = race clock before the step. returns nothing; fin holds the finish time */
+function step(R,st,t){const n=st.length,D=R.D,K=0.0082*Math.sqrt(1600/D)*R.dk;
+  const nv=new Float64Array(n),nl=new Float64Array(n);
+  let leadS=-1;for(const h of st)if(!h.fin&&h.s>leadS)leadS=h.s;
+  for(let i=0;i<n;i++){const h=st[i],p=R.P[i];nl[i]=h.lane;
+    if(h.fin){nv[i]=Math.max(5,h.v-.3);nl[i]=h.lane;continue}
+    if(t<h.delay){nv[i]=0;continue}
+    const rem=D-h.s;let tgt;
+    if(h.s<Math.min(380,D*.26))tgt=p.vb-.15+.55*p.es+(p.lead?.25:0);
+    else if(rem>p.sprint){const g=leadS-h.s;tgt=g<.5?p.vb-(p.lead?0:.25):p.vb+Math.min(.45,.03*g)}
+    else{// empty the tank by the post: the fastest pace the remaining energy can hold, capped by the horse's turn of foot
+      const allow=h.E/(rem/Math.max(h.v,14)+.5),rv=1+(allow*p.den/K-1)/11;// how much a horse has left on the day is only found out when the jockey asks for it
+      if(h.kf!==h.kf)h.kf=randn()*.42;tgt=Math.min(p.vb*Math.max(.9,rv),p.vb+p.kick)+h.kf+(h.push>0?.3:0)}
+    h.mo+=-h.mo*DT/4+randn()*(rem<p.sprint?.0042:.0022);tgt*=1+h.form+h.mo;
+    // fatigue caps speed
+    const cap=h.E>.25?1:.95+.05*h.E/.25;tgt*=cap;
+    let v=h.v+(tgt-h.v)*Math.min(1,DT*(h.v<8?.9:1.3))+randn()*.1;
+    // who is directly in front
+    let ahead=-1,gap=1e9,cover=false;
+    for(let j=0;j<n;j++){if(j===i)continue;const o=st[j],d=o.s-h.s;if(d>0&&d<4.2&&Math.abs(o.lane-h.lane)<.85){cover=true;if(d<gap){gap=d;ahead=j}}}
+    h.blk=0;
+    if(ahead>=0&&gap<LEN+.35&&v>st[ahead].v){v=Math.max(st[ahead].v-.05,v-1.2);h.blk=1;
+      // look for a way out: out first, inside in the straight if there's room
+      const tryL=l=>{if(l<0||l>LANES-1)return false;for(let j=0;j<n;j++){if(j===i)continue;const o=st[j];if(Math.abs(o.lane-l)<.85&&Math.abs(o.s-h.s)<LEN+.6)return false}return true};
+      const inS=rem<450;if(tryL(h.lane+1))nl[i]=h.lane+Math.min(1,.9*DT*2);else if(inS&&tryL(h.lane-1))nl[i]=h.lane-Math.min(1,.9*DT*2)}
+    else if(rem>450&&h.lane>.01){ // drift in towards the rail when there's room
+      let ok=true;const l=Math.max(0,h.lane-.6);for(let j=0;j<n;j++){if(j===i)continue;const o=st[j];if(Math.abs(o.lane-l)<.8&&Math.abs(o.s-h.s)<LEN+1){ok=false;break}}
+      if(ok)nl[i]=Math.max(0,h.lane-.35*DT)}
+    // energy
+    const rv=Math.max(v,0)/p.vb;let drain=K*(rv<1?rv*rv:1+11*(rv-1))/p.den;
+    if(cover)drain*=.8;else if(onBend(R,h.s)&&h.lane>1.4)drain*=1.08;
+    if(p.lead&&h.s<leadS-1.5&&rem>p.sprint)drain*=1.1;
+    h.E=Math.max(0,h.E-drain*DT);
+    // gritty horses fight back when something ranges up
+    if(p.grit&&rem<p.sprint){let beside=false;for(let j=0;j<n;j++){if(j===i)continue;const d=st[j].s-h.s;if(d>-1&&d<1.5)beside=true}h.push=beside?1:Math.max(0,h.push-DT)}
+    nv[i]=Math.max(0,v)}
+  for(let i=0;i<n;i++){const h=st[i];h.v=nv[i];h.lane=nl[i];
+    const f=onBend(R,h.s)?RB/(RB+h.lane):1,ds=h.v*f*DT;
+    if(!h.fin&&h.s+ds>=R.D)h.fin=t+DT*((R.D-h.s)/Math.max(ds,1e-6));
+    h.s+=ds}}
+/* finishing order from state (finished by time, rest by distance) */
+function order(st){return st.map((h,i)=>i).sort((a,b)=>{const A=st[a],B=st[b];if(A.fin&&B.fin)return A.fin-B.fin;if(A.fin)return-1;if(B.fin)return 1;return B.s-A.s})}
+/* one full run from a state; returns the finishing order (only the first 3 are guaranteed settled) */
+function simOnce(R,st0,t0,withDay){const st=cloneState(st0);if(withDay)rollDay(R,st);let t=t0,done=0;const need=Math.min(3,st.length);
+  while(t<400){step(R,st,t);t+=DT;done=0;for(const h of st)if(h.fin)done++;if(done>=need)break}
+  return order(st)}
+/* Monte Carlo from a state. counts wins and top-3. withDay: reroll day form (pre-race) */
+function mc(R,st0,t0,n,withDay){const N=st0.length,win=new Float64Array(N),plc=new Float64Array(N),need=Math.min(3,N);
+  for(let k=0;k<n;k++){const o=simOnce(R,st0,t0,withDay);win[o[0]]++;for(let j=0;j<need;j++)plc[o[j]]++}
+  return{win:[...win].map(x=>x/n),plc:[...plc].map(x=>x/n)}}
+/* fair prob -> fixed price with the 3% edge. null = suspended (price would round below fair) */
+function priceOf(p,n){const q=(p*n+.5)/(n+1);const pr=Math.floor(HOUSE/q*100)/100;return pr<1.02?null:Math.min(pr,501)}
+if(typeof module!=='undefined')module.exports={simOnce,DT,LEN,COND,randn,runnerParams,newState,rollDay,cloneState,step,order,mc,priceOf,onBend,HOUSE};
+
+/* ================= RACE VIEW =================
+   Side-on camera from the grandstand. Rail at the back, outside lanes nearest the camera.
+   Everything is drawn live on one canvas: sky, hills, stands, turf, rail, markers, horses. */
+const COATS={bay:{b:'#7a4122',h:'#9a5a30',d:'#3a1a0c',p:'#140a06'},chestnut:{b:'#9a4e1e',h:'#c26a2c',d:'#5a2a0c',p:'#6a3010'},
+  brown:{b:'#4a2614',h:'#64361e',d:'#24120a',p:'#120806'},black:{b:'#1e1916',h:'#3a322c',d:'#0a0808',p:'#050404'},grey:{b:'#a8a8a4',h:'#d0d0cc',d:'#6a6a68',p:'#4a4a48'}};
+const V={cam:{x:0,w:30},stands:null,t:0};
+function hsh(i,k){let h=Math.imul(i^0x9e3779b9,0x85ebca6b)^Math.imul(k+7,0xc2b2ae35);h^=h>>>13;h=Math.imul(h,0x27d4eb2f);h^=h>>>15;return(h>>>0)/4294967296}
+function laneY(l,T,Bt){return T+(Bt-T)*.3+(Math.min(l,7.5)/7.5)*(Bt-T)*.62}
+function laneK(l){return .9+.2*Math.min(l,7.5)/7.5}
+/* grandstand strip, baked once */
+function bakeStands(h){const W=900,c=document.createElement('canvas');c.width=W;c.height=h;const x=c.getContext('2d');
+  // roofline + tiers
+  x.fillStyle='#2a3440';x.fillRect(0,h*.18,W,h*.82);
+  for(let b=0;b<3;b++){const bx=b*300;x.fillStyle='#e8ecf0';x.beginPath();x.moveTo(bx+8,h*.2);x.lineTo(bx+292,h*.2);x.lineTo(bx+280,h*.06);x.lineTo(bx+20,h*.06);x.closePath();x.fill();
+    x.fillStyle='#b8c2cc';x.fillRect(bx+8,h*.2,284,h*.04);for(let p=0;p<6;p++){x.fillStyle='#8a96a2';x.fillRect(bx+14+p*55,h*.2,4,h*.3)}}
+  // crowd
+  for(let i=0;i<2600;i++){const cx=hsh(i,1)*W,cy=h*.26+hsh(i,2)*h*.62,r=hsh(i,3);
+    x.fillStyle=r<.18?'#e84a4a':r<.3?'#f0c040':r<.45?'#4a8ae8':r<.55?'#f0f0f0':r<.62?'#3ad07a':`hsl(${20+hsh(i,4)*30},35%,${30+hsh(i,5)*30}%)`;
+    x.fillRect(cx,cy,2.2,2.6);x.fillStyle='rgba(240,200,170,.8)';x.fillRect(cx+.3,cy-1.4,1.6,1.5)}
+  x.fillStyle='rgba(0,0,0,.18)';x.fillRect(0,h*.24,W,h*.06);
+  // front fence + sponsor boards
+  const cols=['#00b84a','#0a2a4a','#e8e8e8','#c81a1a'];for(let b=0;b<9;b++){x.fillStyle=cols[b%4];x.fillRect(b*100,h*.88,98,h*.12);x.fillStyle=b%4===2?'#0a2a4a':'#fff';x.font=`900 ${Math.round(h*.08)}px Arial`;x.textAlign='center';x.textBaseline='middle';x.fillText(b%2?'STACK PARK':'STACK',b*100+49,h*.94)}
+  return c}
+/* ---------- silks ---------- */
+function silksFill(x,sk,path,bx,by,bw,bh,ang){x.save();x.clip(path);x.fillStyle=sk.a;x.fillRect(bx-bw,by-bh,bw*3,bh*3);x.fillStyle=sk.b;
+  if(sk.pat==='hoops'){x.translate(bx+bw/2,by+bh/2);x.rotate(ang||0);for(let i=-4;i<5;i+=2)x.fillRect(-bw*2,i*bh/4.4,bw*4,bh/4.4)}
+  else if(sk.pat==='stripes'){x.translate(bx+bw/2,by+bh/2);x.rotate(ang||0);for(let i=-6;i<7;i+=2)x.fillRect(i*bw/9,-bh*2,bw/9,bh*4)}
+  else if(sk.pat==='sash'){x.translate(bx+bw/2,by+bh/2);x.rotate(.8);x.fillRect(-bw*2,-bh*.14,bw*4,bh*.28)}
+  else if(sk.pat==='quarters'){x.fillRect(bx,by,bw/2,bh/2);x.fillRect(bx+bw/2,by+bh/2,bw/2,bh/2)}
+  else if(sk.pat==='cross'){x.translate(bx+bw/2,by+bh/2);x.fillRect(-bw*2,-bh*.1,bw*4,bh*.2);x.fillRect(-bw*.1,-bh*2,bw*.2,bh*4)}
+  else if(sk.pat==='spots'){for(let i=0;i<9;i++){x.beginPath();x.arc(bx+(i%3+.5)*bw/3,by+(Math.floor(i/3)+.5)*bh/3,Math.min(bw,bh)*.1,0,6.3);x.fill()}}
+  x.restore()}
+const SILK_IMG={};
+function silksIcon(sk,key){if(SILK_IMG[key])return SILK_IMG[key];const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');
+  const p=new Path2D('M20 8 L27 5 C29 9 35 9 37 5 L44 8 L58 18 L52 30 L46 26 L46 58 L18 58 L18 26 L12 30 L6 18 Z');
+  silksFill(x,sk,p,6,5,52,53,0);x.lineWidth=2;x.strokeStyle='rgba(0,0,0,.55)';x.stroke(p);
+  x.fillStyle=sk.cap;x.beginPath();x.arc(32,5,6,Math.PI,0);x.fill();
+  return SILK_IMG[key]=c.toDataURL()}
+/* ---------- horse ---------- */
+function leg(x,ax,ay,a1,a2,l1,l2,w,col,hoof){const kx=ax+Math.sin(a1)*l1,ky=ay+Math.cos(a1)*l1,fx=kx+Math.sin(a2)*l2,fy=ky+Math.cos(a2)*l2;
+  x.strokeStyle=col;x.lineCap='round';x.lineWidth=w;x.beginPath();x.moveTo(ax,ay);x.lineTo(kx,ky);x.stroke();x.lineWidth=w*.62;x.beginPath();x.moveTo(kx,ky);x.lineTo(fx,fy);x.stroke();
+  x.fillStyle=hoof;x.beginPath();x.ellipse(fx+1.2,fy+1,3.2,2,0,0,6.3);x.fill()}
+function drawHorse(x,px,py,sc,ph,co,sk,num,opt){const C=COATS[co];x.save();x.translate(px,py);x.scale(sc,sc);
+  const b=Math.sin(ph*12.566)*2.2,tau=ph*6.2832,run=opt.moving;
+  // ground shadow
+  x.fillStyle='rgba(0,0,0,.28)';x.beginPath();x.ellipse(0,1,52,6,0,0,6.3);x.fill();
+  if(opt.glow){x.fillStyle=opt.glow;x.beginPath();x.ellipse(0,1,60,9,0,0,6.3);x.fill()}
+  x.translate(0,b);
+  const L=(o,fore)=>{const s=run?Math.sin(tau+o*6.2832):0,c=run?Math.cos(tau+o*6.2832):1;
+    if(fore){const a1=.12+.62*s;return[a1,a1-Math.max(0,-c)*1.5]}const a1=-.18+.55*s;return[a1,a1+.25+Math.max(0,-c)*.9]};
+  // far legs
+  let q=L(0,false);leg(x,-30,-46,q[0],q[1],24,26,8,C.d,C.p);q=L(.52,true);leg(x,27,-44,q[0],q[1],24,27,7,C.d,C.p);
+  // tail
+  const tw=run?Math.sin(tau*2)*4:0;x.strokeStyle=C.p;x.lineCap='round';x.lineWidth=7;x.beginPath();x.moveTo(-44,-62);x.quadraticCurveTo(-62,-60+tw,-74,-46-tw);x.stroke();
+  x.lineWidth=3;x.beginPath();x.moveTo(-46,-60);x.quadraticCurveTo(-64,-54-tw,-76,-40+tw);x.stroke();
+  // body
+  const g=x.createLinearGradient(0,-72,0,-36);g.addColorStop(0,C.h);g.addColorStop(.55,C.b);g.addColorStop(1,C.d);x.fillStyle=g;
+  x.beginPath();x.ellipse(-28,-55,19,16,0,0,6.3);x.fill();x.beginPath();x.ellipse(0,-53,38,14,0,0,6.3);x.fill();x.beginPath();x.ellipse(26,-55,16,15,0,0,6.3);x.fill();
+  // neck + head (bobs with the stride)
+  const nb=run?Math.sin(tau+1)*.07:0;x.save();x.translate(28,-60);x.rotate(nb);{const ng=x.createLinearGradient(-6,-40,24,8);ng.addColorStop(0,C.h);ng.addColorStop(.6,C.b);ng.addColorStop(1,C.d);x.fillStyle=ng}
+  x.beginPath();x.moveTo(-8,-6);x.quadraticCurveTo(6,-28,22,-40);x.lineTo(31,-34);x.quadraticCurveTo(22,-16,12,12);x.closePath();x.fill();
+  x.beginPath();x.moveTo(20,-40);x.lineTo(32,-44);x.lineTo(52,-28);x.quadraticCurveTo(56,-23,51,-20);x.lineTo(43,-21);x.lineTo(28,-30);x.closePath();x.fill();
+  x.fillStyle=C.d;x.beginPath();x.moveTo(23,-42);x.lineTo(22,-51);x.lineTo(28,-44);x.fill();
+  x.strokeStyle=C.p;x.lineWidth=4;x.beginPath();x.moveTo(-6,-10);x.quadraticCurveTo(6,-30,22,-42);x.stroke();
+  x.fillStyle='#050505';x.beginPath();x.arc(35,-36,1.6,0,6.3);x.fill();
+  if(co!=='grey'&&co!=='black'&&num%3===0){x.fillStyle='#f4f0e8';x.beginPath();x.moveTo(36,-40);x.lineTo(48,-27);x.lineTo(45,-25);x.lineTo(34,-37);x.fill()}
+  // bridle + reins
+  x.strokeStyle='#1a1a1a';x.lineWidth=1.4;x.beginPath();x.moveTo(26,-40);x.lineTo(40,-26);x.moveTo(44,-24);x.lineTo(10,-26);x.stroke();
+  x.restore();
+  // near legs
+  q=L(.14,false);leg(x,-26,-44,q[0],q[1],24,26,8.5,C.b,C.p);q=L(.66,true);leg(x,31,-42,q[0],q[1],24,27,7.5,C.b,C.p);
+  // saddle cloth + number
+  x.fillStyle='#f6f6f2';x.fillRect(-12,-66,24,17);x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=1;x.strokeRect(-12,-66,24,17);
+  x.fillStyle='#111';x.font='900 13px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(num,0,-57);
+  // jockey
+  const push=opt.drive?Math.sin(tau*2)*3:0;
+  x.strokeStyle='#f0f0ea';x.lineWidth=7;x.lineCap='round';x.lineJoin='round';x.beginPath();x.moveTo(2,-76);x.lineTo(18,-72);x.lineTo(10,-62);x.stroke();
+  x.fillStyle='#1a1a1a';x.beginPath();x.ellipse(11,-61,4,2.4,.4,0,6.3);x.fill();
+  const torso=new Path2D();torso.moveTo(-2,-80);torso.lineTo(24+push,-94);torso.lineTo(30+push,-86);torso.lineTo(6,-70);torso.closePath();
+  silksFill(x,sk,torso,-2,-96,34,28,-.5);x.strokeStyle='rgba(0,0,0,.45)';x.lineWidth=1;x.stroke(torso);
+  x.strokeStyle=sk.a;x.lineWidth=5;x.beginPath();x.moveTo(24+push,-90);x.lineTo(40+push*.5,-84);x.stroke();
+  if(opt.drive&&opt.whip){x.strokeStyle='#2a1a0a';x.lineWidth=1.5;x.beginPath();x.moveTo(26,-90);x.lineTo(8,-112+Math.sin(tau*2)*8);x.stroke()}
+  x.fillStyle=sk.cap;x.beginPath();x.arc(31+push,-97,6.5,0,6.3);x.fill();x.fillStyle='rgba(0,0,0,.4)';x.fillRect(33+push,-97,7,2.2);
+  x.restore()}
+/* ---------- scene ---------- */
+function drawScene(x,W,H,R,S,alpha,prev,cur,mine,t,phase){V.t=t;
+  const cam=V.cam,ppm=W/cam.w,X=s=>(s-cam.x)*ppm+W/2;
+  const T=H*.36,Bt=H;
+  // sky + hills
+  let g=x.createLinearGradient(0,0,0,T);g.addColorStop(0,'#5a9ad8');g.addColorStop(1,'#bfe0f4');x.fillStyle=g;x.fillRect(0,0,W,T);
+  x.fillStyle='#6e9a78';x.beginPath();x.moveTo(0,T*.5);for(let px=0;px<=W;px+=8){const wx=px/ppm*.08+cam.x*.08;x.lineTo(px,T*.42-Math.sin(wx*.05)*T*.08-Math.sin(wx*.013+1)*T*.1)}x.lineTo(W,T);x.lineTo(0,T);x.fill();
+  // stands (parallax)
+  const sh=Math.round(T*.66);if(!V.stands||V.stands.height!==sh)V.stands=bakeStands(sh);
+  const off=((cam.x*ppm*.45)%900+900)%900;for(let k=-1;k<=Math.ceil(W/900)+1;k++)x.drawImage(V.stands,k*900-off,T-sh+2);
+  // turf with mowing stripes
+  x.fillStyle='#2e8a3a';x.fillRect(0,T,W,Bt-T);
+  const s0=Math.floor((cam.x-cam.w)/12)*12;for(let s=s0;s<cam.x+cam.w;s+=12)if((s/12)%2===0){x.fillStyle='rgba(255,255,255,.05)';x.fillRect(X(s),T,12*ppm,Bt-T)}
+  g=x.createLinearGradient(0,T,0,Bt);g.addColorStop(0,'rgba(0,0,0,.18)');g.addColorStop(.3,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.1)');x.fillStyle=g;x.fillRect(0,T,W,Bt-T);
+  // rail + posts
+  x.fillStyle='#f4f4f4';x.fillRect(0,T+2,W,Math.max(2,H*.012));
+  for(let s=Math.floor((cam.x-cam.w)/4)*4;s<cam.x+cam.w;s+=4){x.fillStyle='#e0e0e0';x.fillRect(X(s),T+2,Math.max(1,ppm*.12),H*.035)}
+  // distance markers
+  for(let d=200;d<R.D;d+=200){const s=R.D-d,px=X(s);if(px<-40||px>W+40)continue;x.fillStyle=d%400?'#f4f4f4':'#e8b020';x.fillRect(px-1.5,T-H*.1,3,H*.12);
+    x.fillStyle='#10202e';x.fillRect(px-15,T-H*.14,30,H*.06);x.fillStyle='#fff';x.font=`800 ${Math.round(H*.04)}px Arial`;x.textAlign='center';x.textBaseline='middle';x.fillText(d,px,T-H*.11)}
+  // winning post
+  {const px=X(R.D);if(px>-60&&px<W+60){x.fillStyle='rgba(255,255,255,.75)';x.fillRect(px-1,T,2,Bt-T);
+    for(let k=0;k<6;k++){x.fillStyle=k%2?'#fff':'#d0141e';x.fillRect(px-3,T-H*.2+k*H*.036,6,H*.036)}
+    x.fillStyle='#d0141e';x.beginPath();x.arc(px,T-H*.22,H*.035,0,6.3);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(px,T-H*.22,H*.018,0,6.3);x.fill()}}
+  // starting stalls (before the jump and just after)
+  if(t<8){const px=X(-1.2);if(px>-200&&px<W+100){for(let i=0;i<R.P.length;i++){const y=laneY(R.P[i].lane0,T,Bt),k=laneK(R.P[i].lane0)*ppm;
+    x.fillStyle='#1a7a3a';x.fillRect(px-2.6*k,y-3.2*k,.25*k,3.2*k);x.fillStyle='#e8e8e8';x.fillRect(px-2.6*k,y-3.3*k,3.2*k,.28*k);
+    x.fillStyle=phase==='card'?'#2a9a4a':'rgba(42,154,74,.35)';x.fillRect(px+.3*k,y-3.2*k,.3*k,3.2*k)}}}
+  // horses, back lanes first
+  const H_=R.P.map((p,i)=>{const a=prev[i],b=cur[i];return{i,s:a.s+(b.s-a.s)*alpha,l:a.lane+(b.lane-a.lane)*alpha,v:b.v}}).sort((a,b)=>(a.l-b.l)||(a.i-b.i));
+  for(const h of H_){const px=X(h.s),k=laneK(h.l);if(px<-80||px>W+80)continue;const y=laneY(h.l,T,Bt),sc=ppm*3.1/112*k;
+    const rr=R.run[h.i],isMine=mine.has(h.i),drive=R.D-h.s<420&&h.s<R.D;
+    // turf kick-up
+    if(h.v>12){x.fillStyle=R.cond?'rgba(70,45,20,.55)':'rgba(60,110,40,.5)';for(let j=0;j<3;j++){const q=hsh(Math.floor(t*8)+j,h.i);x.fillRect(px-(40+q*30)*sc,y-(q*14)*sc,2.2*sc*6,2.2*sc*6)}}
+    drawHorse(x,px,y,sc,h.s/6.2+rr.num*.13,rr.coat,rr.silks,rr.num,{moving:h.v>2,glow:isMine?'rgba(0,231,1,.28)':null,drive,whip:drive&&(rr.num%2===0)});
+    // number pill above
+    const py=y-118*sc-10;x.fillStyle=isMine?'#00e701':'rgba(10,16,24,.8)';const tw=isMine?30:22;x.beginPath();x.roundRect(px-tw/2+6*sc,py-8,tw,15,7);x.fill();
+    x.fillStyle=isMine?'#021':'#fff';x.font='800 10px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(isMine?'★'+rr.num:rr.num,px+6*sc,py)}
+  // minimap
+  drawMini(x,W,H,R,H_,mine)}
+function uPos(u){u=((u%2000)+2000)%2000;if(u<550){const a=Math.PI/2-Math.PI*u/550;return[225+175*Math.cos(a),175*Math.sin(a)]}
+  if(u<1000)return[225-(u-550),-175];if(u<1550){const a=-Math.PI/2-Math.PI*(u-1000)/550;return[-225+175*Math.cos(a),175*Math.sin(a)]}return[-225+(u-1550),175]}
+function drawMini(x,W,H,R,hs,mine){const w=Math.min(132,W*.3),h=w*.46,ox=8,oy=8,k=(w-12)/800;
+  x.fillStyle='rgba(8,14,20,.72)';x.beginPath();x.roundRect(ox,oy,w,h,8);x.fill();
+  const cx=ox+w/2,cy=oy+h/2;x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=Math.max(3,h*.09);x.beginPath();
+  for(let u=0;u<=2000;u+=20){const[a,b]=uPos(u);u?x.lineTo(cx+a*k,cy+b*k*.92):x.moveTo(cx+a*k,cy+b*k*.92)}x.closePath();x.stroke();
+  const[fa,fb]=uPos(2000);x.fillStyle='#d0141e';x.fillRect(cx+fa*k-1,cy+fb*k*.92-5,2,10);
+  for(const q of hs){const[a,b]=uPos(R.u0+Math.min(q.s,R.D+60));const m=mine.has(q.i);x.fillStyle=m?'#00e701':R.run[q.i].silks.a;x.strokeStyle='#000';x.lineWidth=1;
+    x.beginPath();x.arc(cx+a*k,cy+b*k*.92,m?3.6:2.4,0,6.3);x.fill();x.stroke()}}
+
+/* ================= STACK RACING APP ================= */
+const $=id=>document.getElementById(id);
+const money=n=>(n<0?'-$':'$')+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rint=n=>Math.floor(Math.random()*n),pick=a=>a[rint(a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rint(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+/* ---------- names & data ---------- */
+const NA=['Thunder','Storm','Red','Midnight','Golden','Silver','Iron','Wild','Lucky','Southern','Desert','Northern','Rapid','Brave','Royal','Blazing','Shadow','Copper','Velvet','Neon','Diamond','Ocean','Rebel','Crimson','Black','Sonic','Outback','Paddock','Harbour','Capital','Molonglo','Limestone','Brindabella','Ginninderra','Tuggeranong','Summit','Frosty','Dusty','Rusty','Cosmic'];
+const NB=['Road','Menace','Coast','Express','Jack','Ruler','Lass','Charm','Bandit','Dancer','Knight','Legend','Runner','Echo','Spirit','Arrow','Rocket','Flyer','Rain','Empire','Tide','Chief','Comet','Jet','Nova','Ridge','Tempest','Fortune','Maverick','Bolt','Queen','Larrikin','Drifter','Rover','Magpie','Galah','Swagman','Brumby','Duchess','Outlaw'];
+const JOCK=['T. Rourke','M. Kavanagh','S. Delaney','J. Whitlock','R. Batista','L. Moreau','C. Nguyen','A. Petrakis','D. Hollis','B. Sato','E. Fairweather','N. Okafor','K. Lindqvist','P. Mahony'];
+const TRAIN=['P. Ashdown','H. Clancy','M. Riordan','S. Varga','R. Tennant','D. Kerslake','L. Brennan','F. Moss','G. Hartigan','W. Lomax'];
+const SCOL=['#d0141e','#0a3a8a','#f0c800','#111111','#ffffff','#00a84a','#ff7a1a','#8a1a8a','#1ab0e8','#ff5aa8','#7a4a1a','#c0c0c0','#0a6a5a','#e8e0b0'];
+const PATS=['solid','hoops','stripes','sash','quarters','cross','spots'];
+const COATL=['bay','bay','bay','chestnut','chestnut','brown','brown','black','grey'];
+const TRAITS={wet:['Wet tracker','Goes better on Soft and Heavy tracks'],dry:['Hates the wet','Goes worse on rain-affected tracks'],lead:['Wants the lead','Runs harder early and gets fired up if it can\'t lead'],
+  slow:['Slow out of the gates','Misses the start about 1 in 5 races'],grit:['Fights back','Finds more when something draws alongside late'],late:['Saves it late','Its jockey waits longer before asking for the run']};
+const RNAMES=['Stack Park Handicap','Ridgeway Plate','Limestone Stakes','Capital Cup','Molonglo Sprint','Black Mountain Mile','Brindabella Classic','Lake Burley Quality','Ainslie Stakes','Tuggeranong Cup','Parliament Plate','Red Hill Handicap','Kambah Class 3','Ginninderra Guineas'];
+function mkHorse(i,used){let n;do n=pick(NA)+' '+pick(NB);while(used.has(n));used.add(n);const r=Math.random,T=[];
+  const tp=r();if(tp<.18)T.push('wet');else if(tp<.3)T.push('dry');if(r()<.14)T.push('lead');if(r()<.1)T.push('slow');if(r()<.14)T.push('grit');if(r()<.13)T.push('late');
+  let a=pick(SCOL),b;do b=pick(SCOL);while(b===a);
+  return{id:i,name:n,age:3+rint(5),sex:pick(['g','g','m','h']),coat:pick(COATL),es:r(),cr:r(),ki:r(),st:r(),traits:T,
+    silks:{a,b,pat:pick(PATS),cap:pick([a,b,pick(SCOL)])},jockey:pick(JOCK),trainer:pick(TRAIN),form:[],starts:0,wins:0,places:0,prize:0}}
+/* ---------- save ---------- */
+const KEY='stackRacing.v1';
+let S={bal:1000,pool:null,raceNo:1,hist:[],mute:false};
+const SB=window.StackBridge;   // set by the casino: wallet + per-account save
+try{const s=SB&&SB.load?SB.load():JSON.parse(localStorage.getItem(KEY));if(s&&typeof s.bal==='number')S=Object.assign(S,s)}catch(e){}
+const save=()=>{try{SB&&SB.save?SB.save(S):localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const BR=window.StackBridge;
+const bal=()=>BR?BR.getBalance():S.bal;
+function spend(n){n=Math.round(n*100)/100;if(BR){const ok=BR.spend(n);ok&&drawBal(-1);return ok}if(S.bal+1e-9<n)return false;S.bal=Math.round((S.bal-n)*100)/100;save();drawBal(-1);return true}
+function credit(n){n=Math.round(n*100)/100;if(BR&&BR.credit)BR.credit(n);else{S.bal=Math.round((S.bal+n)*100)/100;save()}drawBal(1)}
+function drawBal(d){const e=$('bal');e.textContent=money(bal());if(d){e.classList.remove('fu','fd');void e.offsetWidth;e.classList.add(d>0?'fu':'fd')}}
+function toast(t,a,cls){const e=document.createElement('div');e.className='toast '+(cls||'');e.innerHTML=`<span>${t}</span><b>${a||''}</b>`;$('toasts').appendChild(e);setTimeout(()=>e.remove(),2600)}
+/* ---------- race building ---------- */
+function rating(h,D){const L=D/1600;return .3*h.cr+.24*h.ki+.22*h.es*(1/L)+.24*h.st*L}
+function buildRace(no){const D=pick([1200,1200,1400,1600,1600,2000,2400]),cr=Math.random(),cond=cr<.58?0:cr<.88?1:2;
+  const n=8+rint(5),field=shuffle(S.pool).slice(0,n),bars=shuffle([...Array(n).keys()].map(i=>i+1));
+  const rs=field.map(h=>rating(h,D)),lo=Math.min(...rs),hi=Math.max(...rs);
+  const R={no,name:RNAMES[(no-1)%RNAMES.length],D,cond,u0:(2000-D%2000)%2000,dk:1+.08*COND[cond].wet,
+    run:field.map((h,i)=>({hid:h.id,num:i+1,bar:bars[i],wt:54+Math.round(6*(rs[i]-lo)/Math.max(1e-6,hi-lo)*2)/2,name:h.name,coat:h.coat,silks:h.silks}))};
+  R.P=R.run.map((r,i)=>runnerParams({...field[i],wt:r.wt},R,r.bar));return R}
+/* seed genuine form: every horse runs a few background races through the real sim */
+function seedPool(){const used=new Set();S.pool=Array.from({length:44},(_,i)=>mkHorse(i,used));
+  for(let k=0;k<30;k++){const R=buildRace(0);const st=newState(R);rollDay(R,st);let t=0;while(st.some(h=>!h.fin)&&t<300){step(R,st,t);t+=DT}recordForm(R,order(st),true)}}
+function recordForm(R,o,seed){o.forEach((i,pos)=>{const h=S.pool[R.run[i].hid];h.form.push({p:pos+1,of:o.length,d:R.D,c:R.cond,r:seed?0:R.no});if(h.form.length>6)h.form.shift();
+  h.starts++;if(pos===0)h.wins++;if(pos<3)h.places++})}
+const formStr=h=>h.form.slice(-5).map(f=>f.p>9?'0':f.p).join('')||'-';
+if(!S.pool)seedPool();
+/* ---------- audio ---------- */
+const A=(()=>{let C=null,crowd=null,cg=null,noise=null,hoofT=0;
+  function init(){if(C)return;try{C=new(window.AudioContext||window.webkitAudioContext)();const n=C.sampleRate*2;noise=C.createBuffer(1,n,C.sampleRate);const d=noise.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+    crowd=C.createBufferSource();crowd.buffer=noise;crowd.loop=true;const bp=C.createBiquadFilter();bp.type='bandpass';bp.frequency.value=700;bp.Q.value=.45;cg=C.createGain();cg.gain.value=0;crowd.connect(bp).connect(cg).connect(C.destination);crowd.start()}catch(e){C=null}}
+  const on=()=>C&&!S.mute;
+  function tone(f,d,v,type,when){if(!on())return;const t=C.currentTime+(when||0),o=C.createOscillator(),g=C.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(C.destination);o.start(t);o.stop(t+d+.05)}
+  function thump(v){if(!on())return;const t=C.currentTime,s=C.createBufferSource();s.buffer=noise;const f=C.createBiquadFilter();f.type='lowpass';f.frequency.value=220;const g=C.createGain();g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+.09);s.connect(f).connect(g).connect(C.destination);s.start(t,Math.random());s.stop(t+.12);tone(70+Math.random()*20,.08,v*.6)}
+  return{init,
+    crowd(v){if(cg&&C)cg.gain.setTargetAtTime(on()?v:0,C.currentTime,.4)},
+    hooves(dt,intensity){if(!on()||intensity<=0)return;hoofT-=dt;if(hoofT<=0){hoofT=.07+Math.random()*.09;thump(.05+.22*intensity)}},
+    bell(){for(let k=0;k<7;k++){tone(1250,.35,.07,'triangle',k*.11);tone(2480,.25,.03,'sine',k*.11)}},
+    click(){tone(900,.05,.05,'square')},
+    bet(){tone(660,.08,.06,'triangle');tone(990,.1,.05,'triangle',.07)},
+    photo(){for(let k=0;k<3;k++)tone(420,.12,.06,'square',k*.35)},
+    win(){[523,659,784,1047].forEach((f,i)=>tone(f,.4,.09,'triangle',i*.09))}}})();
+/* ---------- state ---------- */
+let R=null,phase='card',cur=null,prev=null,simT=0,rt=0,clock=0,paused=false,speed=1,bets=[],mcJob=null,pre={n:0,w:null,p:null},live={w:null,n:0,t:0},photoT=0,lastFrame=performance.now(),follow=-1,callLog=[];
+const PLAY=2; // sim seconds per real second at 1x
+function newRace(){R=buildRace(S.raceNo);phase='card';cur=newState(R);prev=cloneState(cur);simT=0;rt=0;clock=0;bets=[];pre={n:0,w:new Float64Array(R.P.length),p:new Float64Array(R.P.length)};live={w:null,n:0,t:0};
+  V.cam.x=0;V.cam.w=34;V.cam.off=null;follow=-1;callLog=[];setCall(`${R.name} · ${R.D}m · ${COND[R.cond].n}. Horses are going into the gates.`);
+  mcJob={st:newState(R),t:0,withDay:true,target:1600,n:0,w:new Float64Array(R.P.length),p:new Float64Array(R.P.length),pre:true};
+  drawHead();drawPanel()}
+/* ---------- odds ---------- */
+const need=()=>Math.min(3,R.P.length);
+function runJob(ms){if(!mcJob)return;const end=performance.now()+ms,J=mcJob;
+  while(performance.now()<end&&J.n<J.target){const o=simOnce(R,J.st,J.t,J.withDay);J.w[o[0]]++;for(let j=0;j<need();j++)J.p[o[j]]++;J.n++;
+    if(J.pre&&(J.n%100===0||J.n===J.target)){pre={n:J.n,w:J.w.slice(),p:J.p.slice()};if(phase==='card'){if(J.n===J.target)drawPanel();else drawOddsCells()}}}
+  if(J.n>=J.target){if(J.pre){pre={n:J.n,w:J.w.slice(),p:J.p.slice()};mcJob=null;drawPanel()}else{live={w:J.w.map(v=>v/J.n),n:J.n,t:J.t};mcJob=null}}}
+const preReady=()=>pre.n>=1600;
+const winPrice=i=>preReady()?priceOf(pre.w[i]/pre.n,pre.n):null;
+const plcPrice=i=>preReady()?priceOf(pre.p[i]/pre.n,pre.n):null;
+function livePrice(i){if(!live.w)return null;return priceOf(live.w[i],live.n)}
+const suspended=()=>phase!=='run'||R.D-Math.max(...cur.map(h=>h.s))<260||cur.some(h=>h.fin);
+/* ---------- betting ---------- */
+let slip=[],stake=10;
+function toggleSlip(i,type){const k=slip.findIndex(s=>s.i===i&&s.type===type);if(k>=0)slip.splice(k,1);else slip.push({i,type});A.click();drawSlip();drawOddsCells()}
+function placeSlip(){if(!slip.length||!preReady()||!stake)return;const tot=stake*slip.length;if(bal()+1e-9<tot){toast('Not enough balance',money(tot),'bad');return}
+  const lines=slip.map(s=>({...s,price:s.type==='W'?winPrice(s.i):plcPrice(s.i)}));if(lines.some(l=>!l.price)){toast('Price unavailable','');return}
+  if(!spend(tot))return;lines.forEach(l=>bets.push({i:l.i,type:l.type,stake,price:l.price,inrun:false}));slip=[];A.bet();toast(`${lines.length} bet${lines.length>1?'s':''} placed`,money(tot));drawSlip();drawOddsCells();drawMyBets()}
+async function backInRun(i){if(suspended()){toast('Betting suspended','');return}
+  paused=true;$('irm').classList.add('on');$('irm').innerHTML='<div class="irbox"><b>Pricing…</b></div>';await sleep(40);
+  const st=cloneState(cur),res=mc(R,st,simT,320,false),p=priceOf(res.win[i],320),rr=R.run[i];
+  if(!p){$('irm').innerHTML=`<div class="irbox"><b>#${rr.num} ${rr.name}</b><p class="sub">Suspended, the price is too short to offer.</p><button class="btn" data-a="irno">Back to race</button></div>`;return}
+  let st2=Math.max(0,Math.min(stake||10,Math.floor(bal())));
+  $('irm').innerHTML=`<div class="irbox"><div class="irh"><img src="${silksIcon(rr.silks,'h'+rr.hid)}"><div><b>#${rr.num} ${rr.name}</b><span class="sub">Race paused · win bet in running</span></div></div>
+    <div class="irp">$${p.toFixed(2)}</div>
+    <div class="stakebox"><span>Stake</span><label class="sin">$<input id="irin" type="text" inputmode="decimal" autocomplete="off" value="${st2}"></label></div>
+    <div class="chips">${[5,10,25,50,100,250].map(v=>`<button data-a="irs" data-v="${v}">$${v}</button>`).join('')}</div>
+    <div class="slipsum" id="irret"></div><div class="row2"><button class="btn ghost" data-a="irno">Cancel</button><button class="btn go" data-a="iryes" id="iryes"></button></div></div>`;
+  const upd=()=>{$('irret').innerHTML=st2?`<b>Returns ${money(st2*p)}</b> if it wins`:'Enter a stake';$('iryes').textContent=`Back it · ${money(st2)}`;$('iryes').disabled=!st2;
+    document.querySelectorAll('[data-a="irs"]').forEach(b=>b.classList.toggle('on',+b.dataset.v===st2))};
+  $('irin').addEventListener('input',ev=>{const v=parseFloat(ev.target.value.replace(/[^0-9.]/g,''));st2=isFinite(v)&&v>0?Math.round(v*100)/100:0;upd()});
+  upd();const M=$('irm');M._p=p;M._i=i;M._draw=v=>{st2=v;$('irin').value=v;upd()};M._st=()=>st2}
+function closeIR(){$('irm').classList.remove('on');paused=false;lastFrame=performance.now()}
+$('irm').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a,M=$('irm');
+  if(a==='irno')closeIR();if(a==='irs')M._draw(+b.dataset.v);
+  if(a==='iryes'){const s=M._st();if(s<=0||!spend(s)){toast('Not enough balance','','bad');return}bets.push({i:M._i,type:'W',stake:s,price:M._p,inrun:true});A.bet();toast('Backed in running','$'+M._p.toFixed(2));closeIR();drawMyBets()}});
+/* ---------- race flow ---------- */
+function startRace(){if(phase!=='card')return;A.init();if(!preReady())return;
+  // lock starting prices, any open slip is dropped
+  R.sp=R.P.map((_,i)=>winPrice(i));slip=[];drawSlip();
+  mcJob=null;cur=newState(R);rollDay(R,cur);prev=cloneState(cur);simT=0;rt=0;clock=0;phase='run';paused=false;lastFrame=performance.now();A.bell();
+  CM.reset();setCall('And they\'re racing!');drawPanel()}
+function skipRace(){if(phase!=='run')return;while(cur.some(h=>!h.fin)&&simT<400){step(R,cur,simT);simT+=DT}prev=cloneState(cur);rt=simT;finish(true)}
+function finish(skipped){phase='done';R.coolT=skipped?0:simT+9;const o=order(cur);R.result=o;
+  let ret=0;const lines=bets.map(b=>{const pos=o.indexOf(b.i),won=b.type==='W'?pos===0:pos<need(),pay=won?Math.round(b.stake*b.price*100)/100:0;ret+=pay;return{...b,won,pay}});
+  if(ret>0){credit(ret);A.win()}
+  recordForm(R,o,false);const h=S.pool[R.run[o[0]].hid];h.prize+=R.D*20;
+  const staked=bets.reduce((a,b)=>a+b.stake,0);if(bets.length){S.hist.unshift({no:R.no,name:R.name,staked,ret});S.hist=S.hist.slice(0,30)}
+  S.raceNo++;save();R.lines=lines;R.ret=ret;R.staked=staked;
+  const w=R.run[o[0]];if(!skipped&&!callLog.some(c=>c.includes('wins')))setCall(`${w.name} wins the ${R.name}!`);
+  if(bets.length)toast(ret>0?'Winner!':'No luck this time',ret>0?'+'+money(ret):'-'+money(staked),ret>0?'good':'bad');
+  drawPanel()}
+/* ---------- commentary ---------- */
+const CM={reset(){this.lead=-1;this.did=new Set();this.next=0;this.hist=[];this.blk={};this.cleared={}},
+  tick(){const o=order(cur),L=o[0],ls=cur[L].s,rem=R.D-ls,nm=i=>`<b>${R.run[i].name}</b>`,mineTxt=i=>mine().has(i)?' <em>(yours)</em>':'';
+    this.hist.push({t:simT,o});while(this.hist.length&&this.hist[0].t<simT-10)this.hist.shift();
+    const say=(k,txt,force)=>{if(this.did.has(k))return false;if(!force&&clock<this.next)return false;this.did.add(k);this.next=clock+2.4;setCall(txt);return true};
+    const marg=(a,b)=>{const m=(cur[a].s-cur[b].s)/LEN;return m<.3?'a head':m<.7?'half a length':m<1.3?'a length':m.toFixed(1).replace('.0','')+' lengths'};
+    if(simT>1.2&&simT<3){const sl=cur.map((h,i)=>i).filter(i=>cur[i].delay>.3);if(sl.length&&say('slow',`${nm(sl[0])} has missed the start!${mineTxt(sl[0])}`,true))return}
+    if(ls>R.D*.12&&ls>150&&say('early',`${nm(L)} goes forward to lead, ${nm(o[1])} sits outside, ${nm(o[2])} handy.`))return;
+    if(ls>Math.min(R.D*.3,520)&&rem>650&&say('settle',`They've settled. ${nm(L)} leads by ${marg(L,o[1])}. ${nm(o[o.length-1])} is back last.`))return;
+    for(const d of[1200,1000,800,600]){if(rem<d&&rem>d-120&&R.D>d+300&&say('m'+d,`${d} to go. ${nm(L)} still leads, ${nm(o[1])} second, ${nm(o[2])} third.`))return}
+    if(rem<430&&rem>300&&say('straight',`Into the straight! ${nm(L)} kicks away, ${nm(o[1])} chasing, and here comes ${nm(o[3])} out wide!`))return;
+    if(L!==this.lead&&this.lead>=0&&ls>200){const nl=L;this.lead=L;if(say('lead'+nl+Math.floor(rem/100),`${nm(nl)} hits the front!${mineTxt(nl)}`,rem<350))return}
+    this.lead=L;
+    // movers in the run home
+    if(rem<420&&this.hist.length>8){const old=this.hist[0].o;for(const i of o.slice(0,5)){const g=old.indexOf(i)-o.indexOf(i);if(g>=3&&say('mv'+i,`${nm(i)} is flying${cur[i].lane>3?' down the outside':cur[i].lane<1?' along the rail':' between runners'}!${mineTxt(i)}`))return}}
+    // blocked contenders
+    for(const i of o.slice(0,6)){if(rem<380&&cur[i].blk){this.blk[i]=(this.blk[i]||0)+.4;if(this.blk[i]>1.2&&say('bk'+i,`${nm(i)} has nowhere to go!${mineTxt(i)}`))return}
+      else if(this.blk[i]>1.2&&!this.cleared[i]){this.cleared[i]=1;if(say('cl'+i,`${nm(i)} finds a gap!`,true))return}}
+    if(rem<250&&cur[L].E<.04&&say('tire',`${nm(L)} is starting to feel it!`))return;
+    if(rem<200&&rem>120&&say('200',`200 to go! ${nm(L)} from ${nm(o[1])}${mine().has(o[2])||mine().has(o[1])||mine().has(L)?' and your runner is right there':''}!`,true))return;
+    if(rem<70&&rem>0&&Math.abs(cur[L].s-cur[o[1]].s)<1.4&&say('lock',`${nm(L)} and ${nm(o[1])}, locked together!`,true))return}};
+function setCall(t){callLog.unshift(t);callLog=callLog.slice(0,30);const e=$('call');e.innerHTML=t;e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop');
+  $('calllog').innerHTML=callLog.slice(1,6).map(c=>`<div>${c}</div>`).join('')}
+const mine=()=>new Set(bets.map(b=>b.i));
+/* ---------- main loop ---------- */
+const cv=$('cv'),cx=cv.getContext('2d');let dpr=1,cw=0,ch=0;
+function fit(){dpr=Math.min(2,window.devicePixelRatio||1);const r=cv.parentNode.getBoundingClientRect();cw=r.width;ch=Math.round(Math.min(Math.max(r.width*.6,236),460));cv.style.height=ch+'px';cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr)}
+window.addEventListener('resize',fit);
+let uiT=0,cmT=0,photo=null;
+function camera(dt,ip){const o=ip.map((_,i)=>i).sort((a,b)=>ip[b]-ip[a]),lead=ip[o[0]];let lo,hi;
+  if(photo){lo=R.D-7;hi=R.D+3}
+  else if(phase==='card'){lo=-13;hi=11}else if(simT<3){lo=-4;hi=6}
+  else{const inc=o.slice(0,4);const M=mine();if(follow>=0)inc.length=0,inc.push(follow);else M.forEach(i=>{if(lead-ip[i]<45)inc.push(i)});
+    const ss=inc.map(i=>ip[i]);lo=Math.min(...ss);hi=Math.max(...ss)+2}
+  const tw=photo?16:Math.max(22,Math.min(60,hi-lo+14)),tx=(lo+hi)/2+tw*.06,k=photo?Math.min(1,dt*6):Math.min(1,dt*2.2);V.cam.w+=(tw-V.cam.w)*k;
+  // smooth the camera relative to the leader so it never lags behind a field doing 60km/h
+  if(V.cam.off==null)V.cam.off=V.cam.x-lead;V.cam.off+=((tx-lead)-V.cam.off)*k;V.cam.x=lead+V.cam.off}
+function frame(now){const dt=Math.min(.1,(now-lastFrame)/1000);lastFrame=now;
+  if(phase==='run'&&!paused&&!photo){clock+=dt;rt+=dt*PLAY*speed;
+    // live odds keep being worked out from fresh snapshots
+    if(!mcJob&&!suspended())mcJob={st:cloneState(cur),t:simT,withDay:false,target:140,n:0,w:new Float64Array(R.P.length),p:new Float64Array(R.P.length),pre:false};
+    while(simT<rt){prev=cloneState(cur);const f1=cur.filter(h=>h.fin).length;step(R,cur,simT);simT+=DT;
+      const fins=cur.map((h,i)=>[h.fin,i]).filter(a=>a[0]).sort((a,b)=>a[0]-b[0]);
+      if(f1<2&&fins.length>=2){const gap=fins[1][0]-fins[0][0],w=fins[0][1];
+        if(gap<.028){photo={t:0,a:w,b:fins[1][1],m:gap*16.5/LEN};A.photo();setCall(`Photo! ${R.run[w].name} and ${R.run[fins[1][1]].name}, too close to call!`);break}
+        setCall(`<b>${R.run[w].name}</b> wins it!${mine().has(w)?' <em>That\'s yours!</em>':''}`)}
+      if(cur.every(h=>h.fin)&&simT>Math.max(...cur.map(h=>h.fin))+1.5){finish(false);break}}
+    if(dt<.03)runJob(3);cmT+=dt;if(cmT>.4&&phase==='run'&&!photo){cmT=0;CM.tick()}}
+  else if(phase==='card')runJob(9);
+  else if(phase==='done'&&simT<R.coolT){rt+=dt*PLAY*speed;while(simT<rt){prev=cloneState(cur);step(R,cur,simT);simT+=DT}}
+  if(photo){rt=simT;photo.t+=dt;if(photo.t>2.6){const w=photo.a;setCall(`Photo result: <b>${R.run[w].name}</b> by ${({nose:'a nose','sht hd':'a short head',head:'a head'})[marginTxt(photo.m)]||'a neck'}!${mine().has(w)?' <em>That\'s yours!</em>':''}`);photo=null}}
+  const alpha=phase!=='card'&&!photo?Math.min(1,Math.max(0,1-(simT-rt)/DT)):1;
+  camera(dt,cur.map((h,i)=>prev[i].s+(h.s-prev[i].s)*alpha));
+  // audio bed
+  const rem=R.D-Math.max(...cur.map(h=>h.s));
+  A.crowd(phase==='run'?(rem<450?.05+.3*(1-Math.max(0,rem)/450):.04):phase==='done'?.03:.015);
+  if(phase==='run'&&!paused)A.hooves(dt,Math.min(1,34/V.cam.w)*(simT>.5?1:0)*(cur.some(h=>!h.fin)?1:.2));
+  cx.setTransform(dpr,0,0,dpr,0,0);drawScene(cx,cw,ch,R,S,alpha,prev,cur,mine(),simT,phase);
+  cv.classList.toggle('sepia',!!photo);$('photo').classList.toggle('on',!!photo);
+  $('togo').textContent=phase==='run'?(rem>0?Math.ceil(rem/10)*10+'m':'Finish'):phase==='card'?R.D+'m':'Result';
+  uiT+=dt;if(uiT>.4&&phase==='run'){uiT=0;drawLadder()}
+  requestAnimationFrame(frame)}
+/* ---------- panels ---------- */
+function drawHead(){$('rhead').innerHTML=`<div><span class="tag">Race ${R.no}</span> <b>${R.name}</b></div><div class="sub">${R.D}m · <span class="cond c${R.cond}">${COND[R.cond].n}</span> · ${R.P.length} runners · Stack Park</div>`}
+function oddsBtn(i,type){const p=type==='W'?winPrice(i):plcPrice(i),on=slip.some(s=>s.i===i&&s.type===type),had=bets.some(b=>b.i===i&&b.type===type);
+  return `<button class="ob ${on?'on':''} ${had?'had':''}" data-a="odd" data-i="${i}" data-t="${type}" ${p?'':'disabled'}><small>${type==='W'?'Win':'Place'}</small>${p?'$'+p.toFixed(2):'…'}</button>`}
+function drawOddsCells(){document.querySelectorAll('[data-oc]').forEach(e=>{const i=+e.dataset.oc;e.innerHTML=oddsBtn(i,'W')+oddsBtn(i,'P')});
+  const m=$('mform');if(m)m.textContent=preReady()?`Prices from ${pre.n.toLocaleString()} simulated races · 97% return`:`Pricing the field… ${Math.round(pre.n/16)}%`}
+let open=-1;
+function runnerRow(i){const r=R.run[i],h=S.pool[r.hid],p=R.P[i],bars=[['Early speed',h.es],['Cruise',h.cr],['Finish',h.ki],['Stamina',h.st]];
+  return `<div class="rn ${open===i?'open':''}"><div class="rtop" data-a="exp" data-i="${i}"><img class="silk" src="${silksIcon(r.silks,'h'+r.hid)}"><div class="rmain"><div class="rname"><span class="num">${r.num}</span>${r.name} <span class="bar">(${r.bar})</span></div>
+     <div class="sub"><span class="form">${formStr(h)}</span> · ${r.wt}kg · J: ${h.jockey}</div>${h.traits.length?`<div class="trs">${h.traits.map(t=>`<span class="tr ${t}">${TRAITS[t][0]}</span>`).join('')}</div>`:''}</div>
+     <div class="odds" data-oc="${i}">${oddsBtn(i,'W')+oddsBtn(i,'P')}</div></div>
+   ${open===i?`<div class="fg"><div class="sub">${h.age}yo ${({g:'gelding',m:'mare',h:'horse'})[h.sex]} · ${h.coat} · Trainer ${h.trainer} · Career ${h.starts}: ${h.wins}-${h.places-h.wins}</div>
+     <div class="stats">${bars.map(([n,v])=>`<div><span>${n}</span><i><b style="width:${Math.round(v*100)}%"></b></i><em>${Math.round(v*100)}</em></div>`).join('')}</div>
+     <div class="last">${h.form.slice().reverse().map(f=>`<div><b class="${f.p===1?'w':f.p<=3?'p':''}">${f.p}/${f.of}</b> ${f.d}m ${COND[f.c].n}${f.r?` · Race ${f.r}`:' · Trial'}</div>`).join('')||'<div class="sub">No starts yet</div>'}</div>
+     ${h.traits.map(t=>`<div class="sub">• <b>${TRAITS[t][0]}:</b> ${TRAITS[t][1]}</div>`).join('')}</div>`:''}</div>`}
+const pr=(s)=>s.type==='W'?winPrice(s.i):plcPrice(s.i);
+function drawSlip(){const e=$('slip');if(!e)return;if(!slip.length){e.innerHTML='<div class="sub">Tap a Win or Place price to add it here.</div>';return}
+  e.innerHTML=`${slip.map(s=>{const r=R.run[s.i],p=pr(s);return `<div class="sl"><span>#${r.num} ${r.name}<small>${s.type==='W'?'Win':'Place'} @ $${p?p.toFixed(2):'…'}</small></span><b class="slr" data-k="${s.i}${s.type}"></b><button data-a="rm" data-i="${s.i}" data-t="${s.type}">×</button></div>`}).join('')}
+   <div class="stakebox"><span>Stake${slip.length>1?' per bet':''}</span><label class="sin">$<input id="stakein" type="text" inputmode="decimal" autocomplete="off" value="${stake}"></label></div>
+   <div class="chips">${[5,10,25,50,100,250].map(v=>`<button data-a="stk" data-v="${v}">$${v}</button>`).join('')}</div>
+   <div class="slipsum" id="slipsum"></div>
+   <button class="btn go" data-a="place" id="placebtn"></button>`;
+  $('stakein').addEventListener('input',ev=>{const v=parseFloat(ev.target.value.replace(/[^0-9.]/g,''));stake=isFinite(v)&&v>0?Math.round(v*100)/100:0;slipSum()});
+  slipSum()}
+function slipSum(){const tot=stake*slip.length,ret=slip.reduce((a,s)=>a+stake*(pr(s)||0),0);
+  document.querySelectorAll('.slr').forEach(el=>{const s=slip.find(q=>q.i+q.type===el.dataset.k);el.textContent=s&&stake?money(stake*(pr(s)||0)):''});
+  document.querySelectorAll('[data-a="stk"]').forEach(b=>b.classList.toggle('on',+b.dataset.v===stake));
+  $('slipsum').innerHTML=stake?`Total ${money(tot)} · <b>${slip.length>1?'returns up to':'returns'} ${money(ret)}</b>`:'Enter a stake';
+  const b=$('placebtn');b.disabled=!stake||!preReady();b.textContent=stake?`Place ${slip.length} bet${slip.length>1?'s':''} · ${money(tot)}`:'Place bet'}
+function drawMyBets(){const e=$('mybets');if(!e)return;if(!bets.length){e.innerHTML='';lastMB='';return}
+  const o=phase==='card'?null:order(cur);
+  const html=`<h3>Your bets</h3>`+bets.map(b=>{const r=R.run[b.i],pos=o?o.indexOf(b.i)+1:0,win=o&&(b.type==='W'?pos===1:pos<=need());
+    return `<div class="mb ${o?(win?'up':'dn'):''}"><img class="silk sm" src="${silksIcon(r.silks,'h'+r.hid)}"><span>#${r.num} ${r.name}<small>${b.type==='W'?'Win':'Place'}${b.inrun?' · in running':''} · ${money(b.stake)} @ $${b.price.toFixed(2)}</small></span><b>${o?(pos?ordinal(pos)+' · ':'')+(win?money(b.stake*b.price):'$0'):money(b.stake*b.price)}</b></div>`}).join('');if(html!==lastMB||e.innerHTML===''){lastMB=html;e.innerHTML=html}}
+let ladKey=null,lastMB='';
+function drawLadder(){const e=$('ladder');if(!e)return;const o=order(cur),L=cur[o[0]].s,M=mine(),sus=suspended(),RH=44;
+  if(ladKey!==R){ladKey=R;e.innerHTML=`<div class="lh"><span>Running order</span><span id="lhs"></span></div><div class="lrows" style="height:${o.length*RH}px">${R.run.map((r,i)=>`<div class="ld" id="ld${i}"><span class="pos"></span><img class="silk sm" src="${silksIcon(r.silks,'h'+r.hid)}"><span class="nm"><span class="num">${r.num}</span>${r.name}<em class="blk"></em></span><span class="gap"></span><button class="bk" data-a="back" data-i="${i}"></button></div>`).join('')}</div>`}
+  $('lhs').innerHTML=sus?'<em class="sus">Suspended</em>':'Live win price';
+  o.forEach((i,k)=>{const row=$('ld'+i),gap=(L-cur[i].s)/LEN,p=livePrice(i);row.style.transform=`translateY(${k*RH}px)`;row.classList.toggle('me',M.has(i));
+    row.children[0].textContent=k+1;row.querySelector('.blk').textContent=cur[i].blk&&R.D-cur[i].s<450?' blocked':'';
+    row.children[3].textContent=k?(gap<.15?'nk':gap.toFixed(1)+'L'):'';const b=row.children[4];b.disabled=sus||!p;b.textContent=p&&!sus?'$'+p.toFixed(2):'—'});
+  drawMyBets()}
+const ordinal=n=>n+(n%10===1&&n!==11?'st':n%10===2&&n!==12?'nd':n%10===3&&n!==13?'rd':'th');
+function drawPanel(){const e=$('panel');
+  if(phase==='card'){e.innerHTML=`<div class="cardhead"><h3>Race card</h3><span class="sub" id="mform"></span></div><div class="card">${R.run.map((_,i)=>runnerRow(i)).join('')}</div>`;
+    $('side').innerHTML=`<h3>Bet slip</h3><div id="slip"></div><div id="mybets"></div><button class="btn big" data-a="start" ${preReady()?'':'disabled'}>${preReady()?'Start race':'Pricing the field…'}</button>
+      <p class="sub">Once the gates open you can still back horses to win at live prices, until 250m to go.</p>`;
+    drawSlip();drawMyBets();drawOddsCells()}
+  else if(phase==='run'){ladKey=null;lastMB='';e.innerHTML=`<div id="ladder"></div>`;$('side').innerHTML=`<div id="mybets"></div><div class="row2"><button class="btn ghost" data-a="speed">Speed ${speed}x</button><button class="btn ghost" data-a="skip">Skip to result</button></div>
+      <button class="btn ghost" data-a="follow">${follow>=0?'Following #'+R.run[follow].num:'Camera: leaders'}</button>`;drawLadder()}
+  else{const o=R.result;e.innerHTML=`<h3>Result</h3><div class="res">${o.map((i,k)=>{const r=R.run[i],gap=k?(cur[i].fin-cur[o[k-1]].fin)*16.5/LEN:0;
+      return `<div class="rr ${k<3?'p'+k:''} ${mine().has(i)?'me':''}"><span class="pos">${ordinal(k+1)}</span><img class="silk sm" src="${silksIcon(r.silks,'h'+r.hid)}"><span class="nm"><span class="num">${r.num}</span>${r.name}</span><span class="gap">${k?marginTxt(gap):''}</span><span class="sp">SP $${(R.sp[i]||0).toFixed(2)}</span></div>`}).join('')}</div>`;
+    $('side').innerHTML=`${R.lines.length?`<h3>Your bets</h3>${R.lines.map(l=>{const r=R.run[l.i];return `<div class="mb ${l.won?'up':'dn'}"><span>#${r.num} ${r.name}<small>${l.type==='W'?'Win':'Place'}${l.inrun?' · in running':''} · ${money(l.stake)} @ $${l.price.toFixed(2)}</small></span><b>${l.won?'+'+money(l.pay):'Lost'}</b></div>`}).join('')}
+      <div class="net ${R.ret-R.staked>=0?'up':'dn'}">${R.ret-R.staked>=0?'Profit':'Loss'} ${money(Math.abs(R.ret-R.staked))}</div>`:'<p class="sub">No bets on this one.</p>'}
+      <button class="btn big" data-a="next">Next race</button>`}}
+function marginTxt(l){return l<.08?'nose':l<.15?'sht hd':l<.25?'head':l<.4?'neck':l<.6?'½L':l<.85?'¾L':l.toFixed(1).replace('.0','')+'L'}
+/* ---------- input: pointerdown so re-rendered rows never eat a tap ---------- */
+function handle(e){const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,i=+b.dataset.i;A.init();
+  if(a==='odd'){e.preventDefault();toggleSlip(i,b.dataset.t)}
+  else if(a==='exp'){if(e.target.closest('.odds'))return;open=open===i?-1:i;drawPanel()}
+  else if(a==='rm'){slip=slip.filter(s=>!(s.i===i&&s.type===b.dataset.t));drawSlip();drawOddsCells()}
+  else if(a==='stk'){e.preventDefault();stake=+b.dataset.v;const inp=$('stakein');if(inp)inp.value=stake;slipSum()}
+  else if(a==='place')placeSlip();
+  else if(a==='start')startRace();
+  else if(a==='back'){e.preventDefault();backInRun(i)}
+  else if(a==='skip')skipRace();
+  else if(a==='speed'){speed=speed===1?2:speed===2?4:1;b.textContent='Speed '+speed+'x'}
+  else if(a==='follow'){const M=[...mine()];const opts=[-1,...M];follow=opts[(opts.indexOf(follow)+1)%opts.length];if(follow<-1)follow=-1;b.textContent=follow>=0?'Following #'+R.run[follow].num:'Camera: leaders'}
+  else if(a==='next'){newRace()}}
+['panel','side'].forEach(id=>$(id).addEventListener('pointerdown',handle));
+$('topup').onclick=()=>{A.init();credit(1000);toast('Topped up','+$1,000.00','good')};
+if(BR)$('topup').style.display='none';
+window.StackFrame={refresh:()=>drawBal()};
+$('mute').onclick=()=>{S.mute=!S.mute;save();$('mute').textContent=S.mute?'🔇':'🔊';A.init()};$('mute').textContent=S.mute?'🔇':'🔊';
+$('hist').onclick=()=>{const t=S.hist.reduce((a,h)=>a+h.ret-h.staked,0);$('irm').classList.add('on');
+  $('irm').innerHTML=`<div class="irbox"><b>Your last ${S.hist.length} races</b><div class="hl">${S.hist.map(h=>`<div><span>R${h.no} ${h.name}</span><b class="${h.ret-h.staked>=0?'up':'dn'}">${h.ret-h.staked>=0?'+':'-'}${money(Math.abs(h.ret-h.staked))}</b></div>`).join('')||'<p class="sub">No bets yet.</p>'}</div>
+  <p class="sub">Net ${t>=0?'+':'-'}${money(Math.abs(t))}</p><button class="btn" data-a="irno">Close</button></div>`};
+drawBal();fit();newRace();requestAnimationFrame(frame);
+window.StackRacing={get phase(){return phase},get R(){return R},start:startRace,skip:skipRace,pre:()=>pre};
+
+</script></body></html>

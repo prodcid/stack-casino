@@ -44,6 +44,8 @@ node test.js coop       # two-window presence, join invites, side bets
 node test.js fight      # Fight Night engine, outcome mix, RTP, joint accas
 node test.js cards      # Stack Cards: isolation, numbering, saving, grading, slab, wear + trading
 node test.js clash      # Stack Clash: two-window party battle (lobby, ready sync, start, move sync)
+node test.js frames     # new home + Racing/Markets on the casino wallet
+node test.js garage     # Stack Garage: wallet bridge, crate + Spin, two-window part trade (accept + decline)
 npm run test:launcher   # the auto-update path end to end
 ```
 First run needs `npm i -D playwright && npx playwright install chromium`.
@@ -77,7 +79,8 @@ storage/account layer.
 
 ## 2. Current scope
 
-18 single-player games + sportsbook + fight night + Stack Cards (with the Stack Clash battle game), 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+**Stack is an ecosystem** (2026-09-24): the Big Three are **Stack Sports** (hub `ssports` → Racing, Fight Night, Football), **Stack Markets** and **Stack Cards**; then **Stack Casino** (solo originals) and **Stack Tables** (card/table games + party).
+18 single-player games + Football sportsbook + fight night + Stack Racing + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -165,6 +168,35 @@ guide (`#fnGuide`) — do not point Fight Night at the football one.
 Watch for: `fnScoreRound` (cards) is separate from `fnEndRound` (cards + advance) because
 `fnDecision` must score the round still in progress — missing that scored only rounds 1-2
 and drew 45% of fights. Ring uses **red/blue corner colours**, not fighter brand colours.
+
+**Brand system** — every platform = the Stack hexagon mark (`bMark(k)`) + wordmark `STACK <NAME>` in
+Barlow Condensed heavy italic (`bLock(k,size)`); only colour + glyph change (`BRANDS`: stack green,
+sports blue/yellow, markets violet/teal, cards gold, casino pink, tables teal, garage grey). Home =
+`buildEco()` (hero, `BIG3` panels, `#tilesCasino`/`#tilesTables`, More, scoreboard). Sidebar = `NAVG`
+groups in `buildNav()`; keep `data-g` on every entry (tests + `go()` highlight rely on it).
+Don't name a CSS custom property `--a` — it's registered as an `<angle>` (`@property`).
+
+**Frame games** — Stack Garage, **Stack Racing** (`stack-racing.html`) and **Stack Markets**
+(`stack-markets.html`) all use the same host: `FRAME_IDS` / `FG[id]` / `fgMount` / `fgView` /
+`fgReload`, bridge = `FrameBridges[id]` (saves on `P()[id]`). Racing/Markets patches: bridge load/save,
+Top up hidden, `drawBal(-1)` after a bridged spend, `window.StackFrame.refresh`. `GAR`, `garNet`,
+`garView`, `garReload` remain as garage aliases. Add a frame game: source file + `FRAMES` in
+sync-cards.js + marker block + `FRAME_IDS` + a `<id>View` section with `<id>Host`/`<id>Load`.
+
+**Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
+truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
+as `x-script`) and `garMount()` runs it in a same-origin **srcdoc iframe** — its page-wide CSS and
+`document.getElementById` code can't share the casino document. `window.GarageBridge` (in the
+`stack-bridge` script): casino wallet (`take`/`pay`), saves on `P().garage`, party send/name, toast,
+go-to-party. Our patches to the original: bridge load/save, Top up hidden, reveal's green button is
+**Spin · $price** (re-opens the crate), widebody wheels pushed out (`WIDE_OUT=.12`), `__gPaused` stops
+rendering when you leave, and a **Trade tab** (`GT`): open your mate's spare parts (`garageReq/Inv`),
+offer parts + cash, escrow in `bt.escrow`, incoming parts rebuilt from the `Na` catalogue with value
+capped per tier, `garageLost` refunds. Messages route via the casino net switch → `garNet`.
+**Status 2026-09-24: in the build but HIDDEN — `GARAGE_LIVE=false` removes its sidebar/home entries. Alex said hold it until he says the word; to release, set `GARAGE_LIVE=true` and ship.**
+Telemetry: with `TELE_URL=''` it queues locally only and the first-login notice + account-modal note stay hidden; setting the Worker URL turns both on.
+Header wallet coin = `.scoin` SVG (ridged rim, engraved S).
+If Alex sends a newer stack-garage.html, re-apply the patches (anchors are minified names).
 
 **Stack Cards** (`cards` view) — the trading card game. **`stack-cards.html` is the source
 of truth**; it still opens on its own (demo mode). Never edit the inlined copy in
@@ -409,6 +441,9 @@ Two patterns, don't mix them up:
 - **2026-09-22** — Binder scroll lag (Alex saw fps tank on real wheel scrolling; diagnose glides 9px/frame so never showed it): 127 unique vector arts, 9.5MB SVG, ~6.5ms (max 22ms) to rasterise each as tiles enter view - a wheel flick brings a row in at once. Grid tiles (binder/trade/deck builder/trade up) now swap to pre-rendered 360px WebP bitmaps built in requestIdleCallback (BMP cache, ~4s idle for all 127, in-memory per session); zoom/pack/slabs keep vector. Hover activation is suppressed while scrolling. Perf panel gained 'Record my scroll' (8s real use, long-animation-frame script/style/render breakdown).
 - **2026-09-22** — Alex's recorded scroll: 36fps, 18 long frames (worst 303ms) with ~0 script/layout/render attributed and only 101/127 bitmaps ready - bitmap building (sync drawImage + main-thread WebP base64 encode) was running while he scrolled. Now: all art keys queued at mount (bmpPrime, 1.5s after load, ~9s to finish in idle), one per idle slot, paused while SCROLLING, encoded via async canvas.toBlob -> object URL (PC only, blob: OK). Report now includes bitmap work during the recording and unattributed main-thread ms.
 - **2026-09-22** — 1st Edition vintage set: 6 more lines (wolf, owl, lion, hare, turt, rdr) + the original 3, each as common/rare/holo = 27 cards. Chose base-set structure (rare AND holo rare per final) as 'their rare versions'. Vintage booster is a separate pack (not mixed into the main set) with its own retro yellow/blue wrapper and Titan One logo; 6 cards, 1/3 rares holo, pity untouched. Also fixed a pre-existing pack bug: leaving the pack screen <0.5s after tearing threw in the delayed reveal/hint timeouts.
+- **2026-09-24** — Stack Garage integrated (NOT shipped - Alex said hold until he says so). stack-garage.html is the source of truth (from Downloads, patched: bridge save to P().garage, no top-up, Spin button, widebody wheels out to WIDE_OUT=.12, render pause, Trade tab). Runs in a same-origin srcdoc iframe from an inert text/plain block that sync-cards.js fills (script tags escaped as x-script), because its page-wide CSS/JS can't share the casino document. Trade: escrow + catalogue-validated parts (Na lookup, value capped per tier), garage* msgs via the casino net switch, garageLost refunds. Build grows to ~1.6MB.
+- **2026-09-24** — The new Stack: ecosystem home (Big Three: Stack Sports hub, Stack Markets, Stack Cards; then Casino + Tables rows), one brand system (hex mark + Barlow Condensed italic wordmark, colour per platform) and a sidebar grouped by platform. Racing + Markets added as frame games by generalising the garage iframe host (FG registry + FrameBridges) rather than inlining - both are whole pages with page-wide CSS/ids.
+- **2026-09-24** — Shipped the new Stack with the garage hidden (GARAGE_LIVE=false) and the telemetry notice gated on TELE_URL - Alex chose to hold both. Header coin now an engraved S with a ridged rim.
 
 ---
 

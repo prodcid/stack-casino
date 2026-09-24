@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* test.js â€” browser regression for the single-file build.
+/* test.js — browser regression for the single-file build.
    node test.js            everything
    node test.js solo       single-player games + tickets + cosmetics
    node test.js admin      admin portal: stats, user table, suspend, audit
@@ -43,6 +43,8 @@ async function signIn(pg, user) {
   await pg.click('#auGo');
   await pg.waitForFunction('loggedIn()', null, { timeout: 8000 });
   await pg.waitForTimeout(150);
+  // a new account sees the play-stats notice once - accept it like a player would
+  await pg.evaluate("(()=>{const b=document.querySelector('#teleOk');b&&b.click()})()");
 }
 
 async function newPage(ctx, errs, tag, withMock) {
@@ -818,7 +820,7 @@ async function sports(ctx, errs) {
     });
   })()`);
   const up = cashUI.find(c => c[0] === 'up'), dn = cashUI.find(c => c[0] === 'down');
-  (up && up[1] === '+' && dn && dn[1] === 'âˆ’')
+  (up && up[1] === '+' && dn && dn[1] === '−')
     ? pass('cash out shows coloured +/- against stake', 'up and down both rendered')
     : fail('cash out shows coloured +/- against stake', JSON.stringify(cashUI));
   await pg.evaluate("FB.open=[];FB.card[0].phase='pre';FB.card[0].min=0;FB.card[0].ch=0;FB.card[0].ca=0;FB.live=-1;fbRender()");
@@ -1168,13 +1170,13 @@ async function mp(browser, errs) {
     (errs.length === n0 && synced) ? pass('table ' + g) : fail('table ' + g, synced ? errs.slice(n0).join(' | ') : 'not synced');
   }
 
-  // hidden-information leak checks â€” the guest must never receive secrets
+  // hidden-information leak checks — the guest must never receive secrets
   await A.evaluate("act({a:'pick',g:'vt'})"); await A.waitForTimeout(400);
   await tap(A, '#vtGo', 200); await tap(B, '#vtGo', 1300);
   const vtLeak = await B.evaluate("JSON.stringify((PS.d.lockers||[]).filter(l=>!l.open)[0]||{})");
   vtLeak === '{"open":false}' ? pass('vault: closed lockers hidden') : fail('vault: closed lockers hidden', vtLeak);
 
-  // the vault round above is still live and (correctly) blocks a table switch â€” clear it first
+  // the vault round above is still live and (correctly) blocks a table switch — clear it first
   await A.evaluate("if(PG&&PG.vt){clearTimeout(PG.vt.to);PG.vt=vtNew();push()}"); await A.waitForTimeout(400);
   await A.evaluate("act({a:'pick',g:'pk'})"); await A.waitForTimeout(600);
   await tap(A, '#mpPkDeal', 2500);
@@ -1206,7 +1208,7 @@ async function strip(browser, errs) {
 
   // The Strip is documented and audited here but is not currently in the build:
   // no 'st' entry in PT, no hostInit state, no renderer. Skip loudly rather than
-  // fail â€” this suite is worth keeping for when the table is actually built.
+  // fail — this suite is worth keeping for when the table is actually built.
   const probe = await browser.newContext();
   const pp = await probe.newPage();
   await pp.goto(URL);
@@ -1395,6 +1397,89 @@ async function clashbattle(browser, errs) {
   await A.close(); await B.close();
 }
 
+/* The new Stack home + Racing / Markets frame games: the home shows the Big Three,
+   the sidebar groups by platform, and both frames run on the casino wallet. */
+async function frames(ctx, errs) {
+  console.log('\n-- Stack home + Racing + Markets --');
+  const pg = await newPage(ctx, errs, 'fr');
+  const home = await pg.evaluate(`({b3:document.querySelectorAll('#big3 .b3').length,cas:document.querySelectorAll('#tilesCasino .tile').length,tab:document.querySelectorAll('#tilesTables .tile').length,
+    nav:['ssports','racing','fight','sports','markets','cards','bj'].every(g=>document.querySelector('#side [data-g="'+g+'"]'))})`);
+  (home.b3 === 3 && home.cas >= 15 && home.tab === 5 && home.nav ? pass : fail)('home: Big Three, casino + tables rows, grouped sidebar', JSON.stringify(home));
+  await pg.click('#big3 .b3-sports .b3go'); await pg.waitForTimeout(300);
+  ((await pg.evaluate("$('ssportsView').classList.contains('on')&&document.querySelector('#side [data-g=ssports]').classList.contains('on')")) ? pass : fail)('Big Three opens the Stack Sports hub');
+  for (const id of ['racing', 'markets']) {
+    await pg.evaluate(`P().bal=500;renderBal();go('${id}')`);
+    await pg.waitForFunction(`FG.${id}.ready`, null, { timeout: 25000 }); await pg.waitForTimeout(600);
+    const r = await pg.evaluate(`(()=>{const w=FG.${id}.frame.contentWindow,d=w.document;const before=P().bal;const ok=w.StackBridge.spend(25);w.StackFrame.refresh();
+      return {bridged:w.StackBridge===FrameBridges.${id},topup:getComputedStyle(d.getElementById('topup')).display,ok,drop:+(before-P().bal).toFixed(2),shown:d.getElementById('bal').textContent}})()`);
+    (r.bridged && r.topup === 'none' && r.ok && r.drop === 25 && /475/.test(r.shown) ? pass : fail)(`${id}: casino wallet, no free top-up`, JSON.stringify(r));
+  }
+  await pg.close();
+}
+
+async function garage(browser, errs) {
+  console.log('\nSTACK GARAGE');
+  const [A, B] = await connectPair(browser, errs);
+  if (await A.evaluate("NET.status") !== 'connected') { fail('garage: no connection'); await A.close(); await B.close(); return; }
+  const frame = pg => pg.frames().find(f => f.parentFrame() === pg.mainFrame());
+  for (const pg of [A, B]) { await pg.evaluate("P().bal=1000;renderBal();go('garage')"); await pg.waitForFunction('GAR.ready', null, { timeout: 25000 }); }
+  await A.waitForTimeout(1500);
+  const fa = frame(A), fb = frame(B);
+  const env = await fa.evaluate(() => ({ bridge: !!window.StackBridge, topup: getComputedStyle(document.getElementById('topup')).display, bal: document.getElementById('bal').textContent }));
+  (env.bridge && env.topup === 'none' && env.bal === '$1,000.00') ? pass('garage runs on the casino wallet, no free top-up', env.bal) : fail('garage runs on the casino wallet, no free top-up', JSON.stringify(env));
+
+  // a crate spends from the casino wallet, saves to the account, and offers Spin at the crate price
+  await fa.evaluate(() => { StackGarage.tab('crates'); document.querySelector('[data-a="open"][data-i="0"]').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })) });
+  await A.waitForTimeout(6300);
+  const cr = await fa.evaluate(() => ({ btn: (document.querySelector('#reelres .btn.go') || {}).textContent || '', hdr: document.getElementById('bal').textContent }));
+  const acct = await A.evaluate("[P().bal, (P().garage||{inv:[]}).inv.length]");
+  (acct[0] === 985 && acct[1] === 1 && /^Spin/.test(cr.btn) && cr.btn.includes('15.00') && cr.hdr === '$985.00')
+    ? pass('crate spends the wallet, saves to your account, button says Spin', cr.btn) : fail('crate spends the wallet, saves to your account', JSON.stringify([acct, cr]));
+  await fa.evaluate(() => document.getElementById('reelwrap').classList.remove('on'));
+
+  // TRADE: A offers an engine + $25 for B's rims
+  const aPart = await fa.evaluate(() => StackGarage.give('engine', 'any', 1).id);
+  const bPart = await fb.evaluate(() => StackGarage.give('rims', 'road', 2).id);
+  await fa.evaluate(() => { StackGarage.tab('trade'); document.querySelector('[data-gt="open"]').click() });
+  const sees = await fa.waitForFunction(id => !!document.querySelector(`[data-gt="pick"][data-side="want"][data-id="${id}"]`), bPart, { timeout: 8000 }).then(() => true, () => false);
+  sees ? pass("trade tab opens your mate's garage") : fail("trade tab opens your mate's garage");
+  await fa.evaluate(([mine, theirs]) => {
+    document.querySelector(`[data-gt="pick"][data-side="give"][data-id="${mine}"]`).click();
+    document.querySelector(`[data-gt="pick"][data-side="want"][data-id="${theirs}"]`).click();
+    const c = document.getElementById('gtCash'); c.value = '25'; c.dispatchEvent(new Event('input'));
+    document.querySelector('[data-gt="send"]').click() }, [aPart, bPart]);
+  await A.waitForTimeout(700);
+  const esc = await A.evaluate(`[P().bal, (P().garage.inv||[]).length, Object.keys(P().garage.escrow||{}).length]`);
+  const aHas = await fa.evaluate(id => StackGarage.S.inv.some(q => q.id === id), aPart);
+  (esc[0] === 960 && esc[2] === 1 && !aHas) ? pass('offered part and cash go into escrow') : fail('offered part and cash go into escrow', JSON.stringify([esc, aHas]));
+  const inc = await fb.evaluate(() => !!StackGarage.GT.T.incoming);
+  inc ? pass('your mate gets the offer') : fail('your mate gets the offer');
+  await fb.evaluate(() => { StackGarage.tab('trade'); document.querySelector('[data-gt="view"]').click() });
+  await B.waitForTimeout(300);
+  const shown = await fb.evaluate(() => document.querySelectorAll('#sheet .gt-offer .tile').length);
+  await fb.evaluate(() => document.querySelector('[data-gt="acc"]').click());
+  await A.waitForTimeout(900);
+  const aInv = await fa.evaluate(() => StackGarage.S.inv.map(q => q.cat + ':' + q.tier));
+  const bInv = await fb.evaluate(() => StackGarage.S.inv.map(q => q.cat + ':' + q.tier));
+  const bals = [await A.evaluate('P().bal'), await B.evaluate('P().bal')];
+  const escLeft = await A.evaluate("Object.keys(P().garage.escrow||{}).length");
+  (shown >= 2 && aInv.includes('rims:2') && !aInv.includes('engine:1') && bInv.includes('engine:1') && !bInv.includes('rims:2') && bals[0] === 960 && bals[1] === 1025 && escLeft === 0)
+    ? pass('accepted trade swaps the parts and pays the cash', `A ${bals[0]} / B ${bals[1]}`) : fail('accepted trade swaps the parts and pays the cash', JSON.stringify({ shown, aInv, bInv, bals, escLeft }));
+
+  // a declined offer hands everything back
+  const again = await fa.evaluate(() => StackGarage.give('paint', 'any', 1).id);
+  await fa.evaluate(() => document.querySelector('[data-gt="open"]').click()); await A.waitForTimeout(700);
+  await fa.evaluate(id => { document.querySelector(`[data-gt="pick"][data-side="give"][data-id="${id}"]`).click();
+    const c = document.getElementById('gtCash'); c.value = '10'; c.dispatchEvent(new Event('input')); document.querySelector('[data-gt="send"]').click() }, again);
+  await A.waitForTimeout(700);
+  await fb.evaluate(() => { const v = document.querySelector('[data-gt="view"]'); v && v.click(); document.querySelector('[data-gt="dec"]').click() });
+  await A.waitForTimeout(900);
+  const back = await fa.evaluate(id => StackGarage.S.inv.some(q => q.id === id), again);
+  const aBal = await A.evaluate('P().bal');
+  (back && aBal === 960) ? pass('declined offer returns your part and cash') : fail('declined offer returns your part and cash', JSON.stringify([back, aBal]));
+  await A.close(); await B.close();
+}
+
 /* ---------------- run ---------------- */
 (async () => {
   const which = (process.argv[2] || 'all').toLowerCase();
@@ -1412,6 +1497,8 @@ async function clashbattle(browser, errs) {
     if (which === 'all' || which === 'cards' || which === 'trade') await cardtrade(browser, errs);
     if (which === 'all' || which === 'mp') await mp(browser, errs);
     if (which === 'all' || which === 'clash') await clashbattle(browser, errs);
+    if (which === 'all' || which === 'frames') await frames(ctx, errs);
+    if (which === 'all' || which === 'garage') await garage(browser, errs);
     if (which === 'all' || which === 'coop') await coop(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);
