@@ -451,16 +451,16 @@ const ICON={
 /* sponsor table: icon, board colours, the two lines of text */
 const SPONSORS=[
  {n:'STACK',ic:'stack',bg:'#0b1a12',fg:'#00e701',t:'STACK'},
- {n:'Stack Cases',ic:'crate',bg:'#10244d',fg:'#ff8a1f',t:'STACK',t2:'CASES'},
+ {n:'Stack Cases',ic:'crate',bg:'#10244d',fg:'#ffa04a',t:'STACK',t2:'CASES'},
  {n:'Stack Markets',ic:'chart',bg:'#07110d',fg:'#35f0c8',t:'STACK',t2:'MARKETS',tick:'STKM ▲ 2.4%'},
- {n:'Stack Racing',ic:'horse',bg:'#0b3a1f',fg:'#e0b64a',t:'STACK',t2:'RACING'},
- {n:'Stack Garage',ic:'spanner',bg:'#252a31',fg:'#e8242c',t:'STACK',t2:'GARAGE'},
+ {n:'Stack Racing',ic:'horse',bg:'#0b3a1f',fg:'#f2cc62',t:'STACK',t2:'RACING'},
+ {n:'Stack Garage',ic:'spanner',bg:'#252a31',fg:'#ff5a5f',t:'STACK',t2:'GARAGE'},
  {n:'Stack Cards',ic:'cards',bg:'#2a1460',fg:'#ffc23a',t:'STACK',t2:'CARDS'},
- {n:'Stack Casino',ic:'chip',bg:'#3a0610',fg:'#ff4d8d',t:'STACK',t2:'CASINO'},
- {n:'Stack Parts Co.',ic:'gear',bg:'#18222e',fg:'#9eb0c2',t:'STACK',t2:'PARTS CO.'},
+ {n:'Stack Casino',ic:'chip',bg:'#3a0610',fg:'#ff79a8',t:'STACK',t2:'CASINO'},
+ {n:'Stack Parts Co.',ic:'gear',bg:'#18222e',fg:'#d0dbe6',t:'STACK',t2:'PARTS CO.'},
  {n:'Stack GP',ic:'flag',bg:'#0b131b',fg:'#00e701',t:'STACK',t2:'GP'},
  {n:'Capital Energy',ic:'bolt',bg:'#141414',fg:'#ffd400',t:'CAPITAL',t2:'ENERGY'},
- {n:'Molonglo Mining',ic:'pick',bg:'#2b2b2e',fg:'#d98a48',t:'MOLONGLO',t2:'MINING'},
+ {n:'Molonglo Mining',ic:'pick',bg:'#2b2b2e',fg:'#f2a25e',t:'MOLONGLO',t2:'MINING'},
  {n:'Ridgeway Freight',ic:'arrow',bg:'#1b2c5a',fg:'#ffffff',t:'RIDGEWAY',t2:'FREIGHT'},
  {n:'Brindabella Water',ic:'drop',bg:'#e9f6ff',fg:'#0b5aa8',t:'BRINDABELLA',t2:'WATER'},
  {n:'Velocity Tyres',ic:'vee',bg:'#111111',fg:'#ffd400',t:'VELOCITY',t2:'TYRES'},
@@ -470,12 +470,12 @@ function fitText(x,s,maxW,px,font){x.font=`italic ${px}px ${font||FONT}`;const w
 function mkBoard(s,w,h,lit){const c=mkC(w,h),x=c.getContext('2d');
   x.fillStyle=s.bg;x.fillRect(0,0,w,h);if(lit){const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(255,255,255,.18)');g.addColorStop(.5,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,w,h)}
   const ir=h*.34;x.save();x.translate(h*.52,h/2);x.scale(ir,ir);ICON[s.ic](x,s.fg);x.restore();
-  x.textBaseline='middle';x.textAlign='left';const tx=h*1.02,room=w-tx-h*.25;
-  if(s.tick){fitText(x,s.t+' '+s.t2,room*.62,h*.42);x.fillStyle='#fff';x.fillText(s.t,tx,h/2);const w1=x.measureText(s.t+' ').width;x.fillStyle=s.fg;x.fillText(s.t2,tx+w1,h/2);
-    const tw=x.measureText(s.t+' '+s.t2).width;x.font=`700 ${Math.round(h*.3)}px ${FONTB}`;x.fillStyle='#35f0c8';x.fillText(s.tick,tx+tw+h*.3,h/2)}
-  else if(s.t2){const px=fitText(x,s.t+' '+s.t2,room,h*.46);x.fillStyle=s.bg==='#e9f6ff'?'#0b2a4a':'#fff';x.fillText(s.t,tx,h/2);const w1=x.measureText(s.t+' ').width;x.fillStyle=s.fg;x.fillText(s.t2,tx+w1,h/2)}
-  else{fitText(x,s.t,room,h*.6);x.fillStyle=s.fg;x.fillText(s.t,tx,h/2)}
-  x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=2;x.strokeRect(1,1,w-2,h-2);return c}
+  x.textBaseline='middle';x.textAlign='left';x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=3;const tx=h*1.02,room=w-tx-h*.25;
+  if(s.tick){fitText(x,s.t+' '+s.t2,room*.66,h*.54);x.fillStyle='#fff';x.fillText(s.t,tx,h/2);const w1=x.measureText(s.t+' ').width;x.fillStyle=s.fg;x.fillText(s.t2,tx+w1,h/2);
+    const tw=x.measureText(s.t+' '+s.t2).width;x.font=`800 ${Math.round(h*.36)}px ${FONTB}`;x.fillStyle='#35f0c8';x.fillText(s.tick,tx+tw+h*.3,h/2)}
+  else if(s.t2){const px=fitText(x,s.t+' '+s.t2,room,h*.58);x.fillStyle=s.bg==='#e9f6ff'?'#0b2a4a':'#fff';x.fillText(s.t,tx,h/2);const w1=x.measureText(s.t+' ').width;x.fillStyle=s.fg;x.fillText(s.t2,tx+w1,h/2)}
+  else{fitText(x,s.t,room,h*.7);x.fillStyle=s.fg;x.fillText(s.t,tx,h/2)}
+  x.shadowBlur=0;x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=2;x.strokeRect(1,1,w-2,h-2);return c}
 /* wordmark only (transparent), for car decals + kerbs */
 function mkWord(s,h,col){const x0=mkC(10,10).getContext('2d');const txt=s.t2?s.t+' '+s.t2:s.t;x0.font=`italic ${h*.8}px ${FONT}`;const w=Math.ceil(x0.measureText(txt).width+h*1.3);
   const c=mkC(w,h),x=c.getContext('2d');x.save();x.translate(h*.5,h/2);x.scale(h*.4,h*.4);ICON[s.ic](x,s.fg);x.restore();
@@ -484,7 +484,7 @@ function mkWord(s,h,col){const x0=mkC(10,10).getContext('2d');const txt=s.t2?s.t
 function mkRunoffLogo(){const c=mkC(420,150),x=c.getContext('2d');x.globalAlpha=.9;x.save();x.translate(75,75);x.scale(62,62);ICON.stack(x,'#00e701');x.restore();
   x.font=`italic 104px ${FONT}`;x.textBaseline='middle';x.fillStyle='#fff';x.fillText('STACK',150,80);return c}
 const ART={boards:null,lit:null,words:null,wordW:null,runoff:null,cars:[],shadow:null,sc:null,flap:[],kerbWord:null};
-function buildArt(){ART.boards=SPONSORS.map(s=>mkBoard(s,480,64));ART.lit=SPONSORS.map(s=>mkBoard(s,480,64,1));ART.words=SPONSORS.map(s=>mkWord(s,40));ART.wordW=SPONSORS.map(s=>mkWord(s,40,'#fff'));ART.runoff=mkRunoffLogo();
+function buildArt(){ART.boards=SPONSORS.map(s=>mkBoard(s,480,64));ART.lit=SPONSORS.map(s=>mkBoard(s,480,64,1));ART.words=SPONSORS.map(s=>mkWord(s,40));ART.wordW=SPONSORS.map(s=>mkWord(s,40,'#fff'));ART.wordD=SPONSORS.map(s=>mkWord(s,40,'#10151b'));ART.runoff=mkRunoffLogo();
   ART.kerbWord=(()=>{const c=mkC(120,30),x=c.getContext('2d');x.font=`italic 26px ${FONT}`;x.textBaseline='middle';x.textAlign='center';x.fillStyle='#fff';x.fillText('STACK',60,16);return c})();
   ART.cars=DRIVERS.map(d=>mkCar(d));ART.shadow=mkShadow();ART.sc=mkSC();ART.flap=TEAMS.map(tm=>mkFlap(tm))}
 /* ---------- cars ----------
@@ -622,14 +622,14 @@ function buildWorld(T){const{n,x,y,ang,kap,v,segs,pit}=T,C=T.C,th=THEMES[C.theme
   W.posts=[];for(let i=40;i<n;i+=130){const s=(i/130|0)%2,sg=s?1:-1,o=off[s][i]+2.2;if(free[s][i]<o+4)continue;const[px,py]=at(i,sg*o);W.posts.push({x:px,y:py,a:ang[i]})}
   // grandstands: along the main straight opposite the pits, plus the slowest corners with room
   W.stands=[];const standAt=(i,s,len)=>{const sg=s?1:-1,o=off[s][i]+2.5;if(free[s][i]<o+14)return;const[px,py]=at(i,sg*(o+6));
-    for(const g of W.stands)if(Math.hypot(g.x-px,g.y-py)<60)return;W.stands.push({x:px,y:py,a:ang[i]+(s?0:Math.PI),len,img:mkStand(len,12,W.stands.length)})};
+    for(const g of W.stands)if(Math.hypot(g.x-px,g.y-py)<60)return;W.stands.push({x:px,y:py,a:ang[i]+(s?0:Math.PI),len,img:mkStand(len,12,W.stands.length),sp:[0,2,1,5,3,6,8].map((q,k,a)=>a[(k+W.stands.length)%7])})};
   standAt(Wr(-40),pit.side>0?0:1,70);corners.slice().sort((a,b)=>a.vap-b.vap).slice(0,4).forEach(c=>standAt(Wr(c.ap+6),c.out>0?1:0,52));
   // pit lane, pit wall and garages
   const lane=u=>{const d=pit.dIn+u,i0=Math.floor(d),f=d-i0,a=Wr(i0),b=Wr(i0+1),o=pit.offAt(u)*pit.side,px=x[a]+(x[b]-x[a])*f,py=y[a]+(y[b]-y[a])*f,
     ax=nx[a]+(nx[b]-nx[a])*f,ay=ny[a]+(ny[b]-ny[a])*f;return[px+ax*o,py+ay*o,ang[a]+wrapA(ang[b]-ang[a])*f]};W.lane=lane;
   W.pLane=new Path2D();for(let u=0;u<=pit.laneLen;u+=2){const[px,py]=lane(u);u?W.pLane.lineTo(px,py):W.pLane.moveTo(px,py)}
   W.pWall=new Path2D();for(let u=pit.RAMP+4;u<=pit.laneLen-pit.RAMP-4;u+=2){const i=Wr(Math.round(pit.dIn+u)),o=(HW+pit.OFF)/2*pit.side+(pit.side*1.2);const[px,py]=[x[i]+nx[i]*o,y[i]+ny[i]*o];u>pit.RAMP+4?W.pWall.lineTo(px,py):W.pWall.moveTo(px,py)}
-  W.garages=pit.box.map((u,j)=>{const i=Wr(Math.round(pit.dIn+u)),o=(pit.OFF+10)*pit.side;return{x:x[i]+nx[i]*o,y:y[i]+ny[i]*o,a:ang[i]+(pit.side>0?0:Math.PI),img:mkGarage(j)}});
+  W.garages=pit.box.map((u,j)=>{const i=Wr(Math.round(pit.dIn+u)),o=(pit.OFF+10)*pit.side;return{x:x[i]+nx[i]*o,y:y[i]+ny[i]*o,a:ang[i]+(pit.side>0?0:Math.PI),img:mkGarage(j),j}});
   W.boxes=pit.box.map((u,j)=>{const i=Wr(Math.round(pit.dIn+u)),o=(pit.OFF+3.2)*pit.side;return{x:x[i]+nx[i]*o,y:y[i]+ny[i]*o,a:ang[i],j}});
   W.wallBoards=[];for(let u=pit.RAMP+10;u<pit.laneLen-pit.RAMP-10;u+=16){const i=Wr(Math.round(pit.dIn+u)),o=((HW+pit.OFF)/2+1.2)*pit.side;W.wallBoards.push({x:x[i]+nx[i]*o,y:y[i]+ny[i]*o,a:ang[i]+(pit.side>0?Math.PI:0),sp:[0,8,2,1][(u/16|0)%4]})}
   // scenery on the open ground
@@ -659,15 +659,18 @@ function mkStand(len,dep,seed){const S=6,c=mkC(len*S,dep*S),x=c.getContext('2d')
   for(let i=0;i<len*dep*4.2;i++){const cx=r()*w,cy=h*.16+r()*h*.66,q=r();x.fillStyle=q<.16?'#e84a4a':q<.28?'#f0c040':q<.42?'#4a8ae8':q<.52?'#f0f0f0':q<.62?'#00e701':`hsl(${20+r()*30},35%,${30+r()*30}%)`;x.beginPath();x.arc(cx,cy,1.9,0,7);x.fill()}
   for(let i=0;i<len/9;i++){const fx=r()*w,fy=h*.2+r()*h*.55;x.fillStyle=['#00e701','#ffd400','#1f5fd6','#ff8a1f'][i%4];x.fillRect(fx,fy,9,6)}
   x.fillStyle='#e8ecf0';x.fillRect(0,0,w,h*.15);x.fillStyle='#b8c2cc';for(let p=0;p<w;p+=36)x.fillRect(p,h*.02,3,h*.12);
-  const nb=Math.max(1,Math.floor(len/14));for(let b=0;b<nb;b++)x.drawImage(ART.boards[[0,2,1,5,3,6,8][(b+seed)%7]],b*w/nb+2,h*.84,w/nb-4,h*.15);
+  x.fillStyle='#0b131b';x.fillRect(0,h*.84,w,h*.16);
   return c}
 /* a team garage: team colour roof with the sponsor wordmark, the open garage front */
 function mkGarage(j){const tm=TEAMS[j],S=8,w=13*S,h=10*S,c=mkC(w,h),x=c.getContext('2d');
   x.fillStyle=tm.c[2];x.fillRect(0,0,w,h);x.fillStyle=tm.c[0];x.fillRect(3,3,w-6,h*.55);x.fillStyle=tm.c[1];x.fillRect(3,h*.55,w-6,5);
-  const im=ART.wordW[tm.sp],iw=w*.82,ih=iw*im.height/im.width;x.drawImage(im,(w-iw)/2,h*.28-ih/2,iw,ih);
   x.fillStyle='#0d1014';x.fillRect(6,h*.66,w-12,h*.34);x.fillStyle='rgba(255,255,255,.08)';for(let k=0;k<5;k++)x.fillRect(10+k*(w-20)/5,h*.7,(w-20)/5-4,h*.26);
-  x.fillStyle='#fff';x.font=`900 ${h*.13}px ${FONT}`;x.textAlign='center';x.fillText(tm.short.toUpperCase(),w/2,h*.62);return c}
+  return c}
 /* ---------- drawing the static world for a view rect (world coords) ---------- */
+/* signs always read the right way up on screen (VROT = how far the camera is rotated) */
+let VROT=0;const up=a=>Math.cos(a-VROT)<0?a+Math.PI:a;
+/* draw an image centred at local (lx,ly) inside a frame rotated by a, turned upright */
+function uprightAt(x,px,py,a,lx,ly,im,w,h){x.save();x.translate(px,py);x.rotate(a);x.translate(lx,ly);x.rotate(up(a)-a);x.drawImage(im,-w/2,-h/2,w,h);x.restore()}
 function drawWorld(x,W,Z,view,t){const T=W.T,th=W.th,HW=TW/2,[vx0,vy0,vx1,vy1]=view,vis=(a,b,A,B)=>A>=vx0&&a<=vx1&&B>=vy0&&b<=vy1,visP=(px,py,r)=>px+r>=vx0&&px-r<=vx1&&py+r>=vy0&&py-r<=vy1;
   x.fillStyle=W.grass;x.fillRect(vx0,vy0,vx1-vx0,vy1-vy0);
   if(th.water){x.fillStyle=th.water;x.fill(W.pCentre);x.strokeStyle=W.grass;x.lineWidth=74;x.lineJoin='round';x.stroke(W.pCentre);
@@ -676,7 +679,7 @@ function drawWorld(x,W,Z,view,t){const T=W.T,th=W.th,HW=TW/2,[vx0,vy0,vx1,vy1]=v
   // verge + run-off
   x.lineJoin='round';x.lineCap='butt';x.strokeStyle=th.verge;x.lineWidth=TW+5;x.stroke(W.pCentre);
   for(const r of W.runoffs){if(!vis(...r.bb))continue;x.fillStyle=r.tar?W.roTarP:W.sandP;x.fill(r.p);
-    if(r.logo&&Z>2.5){const L=r.logo,im=ART.runoff,h=L.w*im.height/im.width;x.save();x.translate(L.x,L.y);x.rotate(L.a);x.globalAlpha=.85;x.drawImage(im,-L.w/2,-h/2,L.w,h);x.restore()}}
+    if(r.logo&&Z>2.5){const L=r.logo,im=ART.runoff,h=L.w*im.height/im.width;x.save();x.translate(L.x,L.y);x.rotate(up(L.a));x.globalAlpha=.85;x.drawImage(im,-L.w/2,-h/2,L.w,h);x.restore()}}
   // pit lane
   x.strokeStyle='#fff';x.lineWidth=9;x.stroke(W.pLane);x.strokeStyle=W.tarP;x.lineWidth=8.2;x.stroke(W.pLane);
   // track
@@ -685,21 +688,23 @@ function drawWorld(x,W,Z,view,t){const T=W.T,th=W.th,HW=TW/2,[vx0,vy0,vx1,vy1]=v
   if(Z>2.5){x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=.32;x.lineCap='round';x.stroke(W.pSkid);x.lineCap='butt'}
   // kerbs
   if(Z>1.6)for(const k of W.kerbs){if(!vis(...k.bb))continue;x.strokeStyle='#f4f4f4';x.lineWidth=1.3;x.stroke(k.p);x.strokeStyle='#00c853';x.setLineDash([1.5,1.5]);x.stroke(k.p);x.setLineDash([]);
-    if(Z>5)for(const wd of k.words){x.save();x.translate(wd.x,wd.y);x.rotate(wd.a);x.globalAlpha=.9;x.drawImage(ART.kerbWord,-2.4,-.6,4.8,1.2);x.restore()}}
+    if(Z>5)for(const wd of k.words){x.save();x.translate(wd.x,wd.y);x.rotate(up(wd.a));x.globalAlpha=.9;x.drawImage(ART.kerbWord,-2.4,-.6,4.8,1.2);x.restore()}}
   drawMarkings(x,W,Z,visP);
   // barriers
   x.strokeStyle=th.wall?'#c9ccd2':'#9aa4ae';x.lineWidth=th.wall?1.1:.6;x.stroke(W.pBarL);x.stroke(W.pBarR);
   if(Z>2.2){for(const b of W.boards){if(!visP(b.x,b.y,8))continue;const sp=b.led?Math.floor(t/3+b.ph)%SPONSORS.length:b.sp,im=(b.led||th.night)?ART.lit[sp]:ART.boards[sp];
-      x.save();x.translate(b.x,b.y);x.rotate(b.a);if(th.night||b.led){x.shadowColor=SPONSORS[sp].fg;x.shadowBlur=8}x.drawImage(im,-6.5,-.95,13,1.9);x.restore()}
+      x.save();x.translate(b.x,b.y);x.rotate(up(b.a));if(th.night||b.led){x.shadowColor=SPONSORS[sp].fg;x.shadowBlur=8}x.drawImage(im,-6.5,-1.1,13,2.2);x.restore()}
     const TC=['#e8242c','#f2f2f2','#1f5fd6'];for(const ty of W.tyres){if(!visP(ty.x,ty.y,1))continue;x.fillStyle='#15171a';x.beginPath();x.arc(ty.x,ty.y,.38,0,7);x.fill();x.strokeStyle=TC[ty.b];x.lineWidth=.14;x.beginPath();x.arc(ty.x,ty.y,.27,0,7);x.stroke()}
     for(const p of W.posts){if(!visP(p.x,p.y,3))continue;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle='#ff7a1a';x.fillRect(-1.2,-1,2.4,2);x.save();x.scale(.55,.55);ICON.stack(x);x.restore();x.restore()}}
   // pit wall boards, garages, box markings
   x.strokeStyle='#d8dde3';x.lineWidth=1;x.stroke(W.pWall);
-  if(Z>2.2)for(const b of W.wallBoards){if(!visP(b.x,b.y,8))continue;x.save();x.translate(b.x,b.y);x.rotate(b.a);x.drawImage(ART.boards[b.sp],-6.5,-.8,13,1.6);x.restore()}
-  for(const g of W.garages){if(!visP(g.x,g.y,10))continue;x.save();x.translate(g.x,g.y);x.rotate(g.a);x.drawImage(g.img,-6.5,-5,13,10);x.restore()}
+  if(Z>2.2)for(const b of W.wallBoards){if(!visP(b.x,b.y,8))continue;x.save();x.translate(b.x,b.y);x.rotate(up(b.a));x.drawImage(ART.boards[b.sp],-6.5,-.95,13,1.9);x.restore()}
+  for(const g of W.garages){if(!visP(g.x,g.y,10))continue;x.save();x.translate(g.x,g.y);x.rotate(g.a);x.drawImage(g.img,-6.5,-5,13,10);x.restore();
+    const tc=TEAMS[g.j].c[0],lum=parseInt(tc.slice(1,3),16)*.3+parseInt(tc.slice(3,5),16)*.59+parseInt(tc.slice(5,7),16)*.11,im=(lum>150?ART.wordD:ART.wordW)[TEAMS[g.j].sp],iw=10.4;uprightAt(x,g.x,g.y,g.a,0,-2.2,im,iw,iw*im.height/im.width)}
   if(Z>2.2)for(const b of W.boxes){if(!visP(b.x,b.y,6))continue;x.save();x.translate(b.x,b.y);x.rotate(b.a);x.strokeStyle=TEAMS[b.j].c[0]==='#0c0f12'?'#00e701':TEAMS[b.j].c[0];x.lineWidth=.35;x.strokeRect(-3.2,-1.4,6.4,2.8);x.restore()}
   // grandstands
-  for(const g of W.stands){if(!visP(g.x,g.y,g.len))continue;x.save();x.translate(g.x,g.y);x.rotate(g.a);x.drawImage(g.img,-g.len/2,-6,g.len,12);x.restore()}
+  for(const g of W.stands){if(!visP(g.x,g.y,g.len))continue;x.save();x.translate(g.x,g.y);x.rotate(g.a);x.drawImage(g.img,-g.len/2,-6,g.len,12);x.restore();
+    const nb=Math.max(1,Math.floor(g.len/14)),bw=g.len/nb;for(let b=0;b<nb;b++)uprightAt(x,g.x,g.y,g.a,-g.len/2+bw*(b+.5),5.05,ART.boards[g.sp[b%g.sp.length]],bw-.4,1.8)}
   // scenery
   for(const d of W.decor){if(!visP(d.x,d.y,14))continue;
     if(d.k==='tree'||d.k==='pine'){x.fillStyle='rgba(0,0,0,.25)';x.beginPath();x.arc(d.x+1,d.y+1.2,d.r,0,7);x.fill();x.fillStyle=d.k==='pine'?'#1f5a32':'#2f6e2a';x.beginPath();x.arc(d.x,d.y,d.r,0,7);x.fill();x.fillStyle=d.k==='pine'?'#2d7442':'#3e8636';x.beginPath();x.arc(d.x-d.r*.25,d.y-d.r*.25,d.r*.55,0,7);x.fill()}
@@ -715,7 +720,7 @@ function drawMarkings(x,W,Z,visP){const T=W.T,{n,segs,pit}=T,HW=TW/2,at=W.at,a0=
       x.beginPath();x.moveTo(1.2,-1.3);x.lineTo(1.6,-1.3);x.lineTo(1.6,1.3);x.lineTo(1.2,1.3);x.stroke();x.restore()}}
   segs.forEach((s,q)=>{if(!s.drs||s.fs<0)return;const act=(q===0?(T.n-segs[segs.length-1].Lf*0+segs[segs.length-1].fs):s.fs)%n,det=(act-70+n)%n;
     for(const[i,col]of[[det,'#ffd400'],[act,'#fff']]){if(!visP(T.x[i],T.y[i],20))continue;x.save();x.translate(T.x[i],T.y[i]);x.rotate(T.ang[i]);x.fillStyle=col;x.fillRect(-.2,-HW,.4,TW);x.restore()}
-    const i=(act+12)%n;if(visP(T.x[i],T.y[i],20)&&Z>2){x.save();x.translate(T.x[i],T.y[i]);x.rotate(T.ang[i]+Math.PI/2);x.fillStyle='rgba(255,255,255,.75)';x.font=`italic 900 4.2px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText('DRS',0,0);x.restore()}});
+    const i=(act+12)%n;if(visP(T.x[i],T.y[i],20)&&Z>2){x.save();x.translate(T.x[i],T.y[i]);x.rotate(up(T.ang[i]+Math.PI/2));x.fillStyle='rgba(255,255,255,.75)';x.font=`italic 900 4.2px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText('DRS',0,0);x.restore()}});
   for(const u of[pit.RAMP+3,pit.laneLen-pit.RAMP-3]){const[px,py,a]=W.lane(u);if(!visP(px,py,10))continue;x.save();x.translate(px,py);x.rotate(a);x.fillStyle='#fff';x.fillRect(-.2,-4,.4,8);x.restore()}
   T.sectB.forEach((k,q)=>{const i=segs[k].d0%n,s=q%2?1:-1;const[px,py]=at(i,s*(HW+3));if(!visP(px,py,6)||Z<2.5)return;x.save();x.translate(px,py);x.fillStyle='#0b131b';x.fillRect(-2.4,-1.3,4.8,2.6);x.fillStyle=['#ffd400','#00e701','#b58cff'][q];x.font=`900 1.7px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText('S'+(q+1),0,.1);x.restore()})}
 
@@ -799,7 +804,7 @@ function drawCar(x,V,i,o,Z,t){const im=ART.cars[i],d=DRIVERS[i],w=im.width/CS,h=
   // rain light
   if((o.sc||V.wet>.3)&&Math.floor(t*4)%2===0){x.fillStyle='#ff2a2a';x.fillRect(-2.9,-.08,.12,.16)}
   // my car ring
-  if(V.mine&&V.mine.has(i)&&!o.cool){x.strokeStyle='#00e701';x.lineWidth=.16;x.globalAlpha=.8;x.beginPath();x.ellipse(0,0,3.3,1.6,0,0,7);x.stroke()}
+  if(V.camMode==='mine'&&V.mine&&V.mine.has(i)&&!o.cool){x.strokeStyle='#00e701';x.lineWidth=.16;x.globalAlpha=.8;x.beginPath();x.ellipse(0,0,3.3,1.6,0,0,7);x.stroke()}
   x.restore();x.globalAlpha=1;
   // name tag when zoomed in
   if(Z>6&&!o.cool&&!o.gone){x.save();x.translate(o.x,o.y);x.rotate(V.camA||0);const tag=d.code,tx=0,ty=-2.4;x.font=`900 1.15px ${FONT}`;const tw=x.measureText(tag).width+1.4;
@@ -815,8 +820,8 @@ function drawCrew(x,o,team,t){const tm=TEAMS[team],u=clamp((t-o.tBox)/Math.max(.
   x.fillStyle=u<1?'#e8242c':'#00e701';x.fillRect(4.1,-.08,.9,.16);x.beginPath();x.arc(5.1,0,.35,0,7);x.fill();x.restore()}
 /* gantry over the start line with the lights */
 function drawGantry(x,V,Z,t){const T=V.T,p=trackPt(V.Wd,4,0),HW=TW/2;x.save();x.translate(p.x,p.y);x.rotate(p.a);
-  x.fillStyle='rgba(0,0,0,.3)';x.fillRect(-.9,-HW-6,2.8,TW+12);x.fillStyle='#1b232c';x.fillRect(-1.3,-HW-6,2.6,TW+12);x.fillStyle='#0f1923';x.fillRect(-1.3,-HW-6,.4,TW+12);
-  x.save();x.rotate(Math.PI/2);x.fillStyle='#fff';x.font=`italic 900 1.5px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillText('STACK',-3.4,.1);x.fillStyle='#00e701';x.fillText('GP',1.6,.1);x.restore();
+  x.fillStyle='rgba(0,0,0,.3)';x.fillRect(-.9,-HW-14,2.8,TW+18);x.fillStyle='#1b232c';x.fillRect(-1.4,-HW-14,2.8,TW+18);x.fillStyle='#0f1923';x.fillRect(-1.4,-HW-14,.4,TW+18);
+  const ga=p.a+Math.PI/2;x.save();x.translate(0,-HW-7.2);x.rotate(up(ga)-p.a);x.font=`italic 900 1.9px ${FONT}`;x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';x.fillText('STACK',-1.3,.1);x.fillStyle='#00e701';x.fillText('GP',2.9,.1);x.restore();
   const L=V.lights||0;for(let k=0;k<5;k++){const on=L>k&&!V.lightsOut;x.fillStyle=on?'#ff2020':'#2a0c0c';x.beginPath();x.arc(.2,-HW+2.2+k*2.1,.6,0,7);x.fill();if(on){x.globalCompositeOperation='lighter';x.fillStyle='rgba(255,40,30,.35)';x.beginPath();x.arc(.2,-HW+2.2+k*2.1,1.4,0,7);x.fill();x.globalCompositeOperation='source-over'}}
   if(V.chequer){for(let r=0;r<3;r++)for(let c=0;c<4;c++){const wv=Math.sin(t*9+c*.9)*.25;x.fillStyle=(r+c)%2?'#111':'#fff';x.fillRect(-2.6+r*.5+wv,HW+1+c*.5,.5,.5)}}
   x.restore()}
@@ -974,7 +979,7 @@ function startQuali(){const W=WK.W,T=W.T,K=T.K;slip=slip.filter(s=>s.mk!=='pole'
   run.forEach((i,k)=>{const t0=k*1.7+3,L=T.segs[K-1],tl=[{ty:0,k:K-1,t0:t0-L.refT*1.04,t1:t0,lap:0,tyre:0}];let t=t0;res[i].sp=[];
     res[i].seg.forEach((s,kk)=>{tl.push({ty:0,k:kk,t0:t,t1:t+s,lap:1,tyre:0});t+=s;res[i].sp.push(t)});tl.push({ty:4,t0:t,fade:4,lap:2,tyre:0});res[i].t0=t0;res[i].tEnd=t;V.tl[i]=tl});
   const grid=res.slice().sort((a,b)=>a.tot-b.tot).map(r=>r.i);
-  WK.quali={res,run,end:Math.max(...res.map(r=>r.tEnd))};WK.grid=grid;phase='quali';V.t=0;V.camMode=S.cam==='full'?'full':'auto';
+  WK.quali={res,run,end:Math.max(...res.map(r=>r.tEnd))};WK.grid=grid;phase='quali';V.t=0;V.camMode=S.cam||'auto';
   $('hub').classList.add('hidden');$('race').classList.remove('hidden');resize();prepRace();
   say(`Qualifying at the ${esc(CIRCUITS[WK.ci].gp)}. One flying lap each, slowest cars first.`);drawVbar();drawPanel(true);drawSide()}
 function qualiNow(){const Q=WK.quali,t=V.t,rows=[];const secT=(r,q)=>{const k=[WK.W.T.sectB[1],WK.W.T.sectB[2],WK.W.T.K][q]-1;return r.sp[k]};
@@ -1080,10 +1085,15 @@ function frame(now){const rdt=Math.min(.05,(now-last)/1000);last=now;requestAnim
     liveBg()}
   if(phase==='result'){V.podT+=rdt;drawPodium(rdt);callTick();return}
   if(phase==='grid'||phase==='start'){V.t+=0}
-  framePoses(V,V.t,dt);stepParts(dt);computeOrder();if(phase==='race')direct(V,V.t);
+  framePoses(V,V.t,dt);stepParts(dt);computeOrder();if(phase==='race')camFocus();
   if(phase==='quali')qualiFocus();
   camUpdate(V,rdt,VPW,VPH);render(rdt);callTick();A.engine(V,rdt,paused);
   if(now-lastPanel>350){lastPanel=now;drawPanel(false)}}
+/* who the camera follows: the TV director picks battles / pits / incidents, Leader sticks to P1,
+   Follow my car + Onboard stick to your first running bet car (else the leader) */
+function camFocus(){const m=V.camMode;if(m==='auto'){direct(V,V.t);return}if(m==='full')return;
+  let f=V.lead;if(m==='mine'||m==='onboard'){const P=V.P,c=[...V.mine].find(i=>P[i]&&!P[i].stop&&!(P[i].cool>=1)&&!P[i].gone);if(c!=null)f=c}
+  if(!V.focus||V.focus.length!==1||V.focus[0]!==f){V.focus=[f];V.focusSC=false;V.cutFrom=1}}
 function qualiFocus(){const Q=WK.quali,t=V.t;let pick=-1,bt=-1;for(const r of Q.res)if(t>=r.t0-2&&t<r.tEnd+.8&&r.t0>bt){bt=r.t0;pick=r.i}
   if(pick>=0&&(!V.focus||V.focus[0]!==pick)){const cur=V.focus&&Q.res.find(r=>r.i===V.focus[0]);const late=Q.run.indexOf(pick)>=15;if(!cur||t>cur.tEnd||late&&t>cur.tEnd-6||!late&&t>cur.t0+6){V.focus=[pick];V.focusSC=false;V.cutFrom=1}}}
 /* running order + gaps from the timelines */
@@ -1102,7 +1112,7 @@ function computeOrder(){const P=V.P,st=WK.st,T=V.T;const live=[],fin=[],out=[];
 function viewRect(C,w,h){const hw=w/2/C.z,hh=h/2/C.z,ca=Math.abs(Math.cos(C.a)),sa=Math.abs(Math.sin(C.a)),rw=hw*ca+hh*sa,rh=hw*sa+hh*ca;return[C.x-rw,C.y-rh,C.x+rw,C.y+rh]}
 function render(dt){const x=cx,C=V.cam,w=VPW,h=VPH;x.setTransform(DPR,0,0,DPR,0,0);x.fillStyle='#0b131b';x.fillRect(0,0,w,h);
   x.save();x.translate(w/2,h/2);if(V.camMode==='onboard')x.rotate(-C.a-Math.PI/2);x.scale(C.z,C.z);x.translate(-C.x,-C.y);V.camA=V.camMode==='onboard'?C.a+Math.PI/2:0;
-  const vr=viewRect(C,w,h);drawWorld(x,V.Wd,C.z,vr,performance.now()/1000);drawGantry(x,V,C.z,V.t);
+  VROT=V.camMode==='onboard'?C.a+Math.PI/2:0;const vr=viewRect(C,w,h);drawWorld(x,V.Wd,C.z,vr,performance.now()/1000);drawGantry(x,V,C.z,V.t);
   const P=V.P,t=V.t,vis=o=>o&&o.x>vr[0]-10&&o.x<vr[2]+10&&o.y>vr[1]-10&&o.y<vr[3]+10;
   // effects emitted from the live field
   if(!paused)for(let i=0;i<20;i++){const o=P[i];if(!o||o.cool>=1||!vis(o))continue;
@@ -1121,9 +1131,10 @@ function render(dt){const x=cx,C=V.cam,w=VPW,h=VPH;x.setTransform(DPR,0,0,DPR,0,
 function overlay(x,w,h){const P=V.P,W=WK.W,sm=w<620;x.textBaseline='middle';
   // lap counter + tower
   const lap=phase==='race'?Math.min(W.N,(P[V.lead]?P[V.lead].lap:0)+1):0;
-  x.fillStyle='rgba(8,14,20,.88)';rr(x,10,10,sm?120:176,30,6);x.fill();x.fillStyle='#00e701';x.fillRect(10,10,4,30);x.font=`italic 900 13px ${FONT}`;x.fillStyle='#fff';
-  x.fillText(phase==='quali'?'QUALIFYING':phase==='race'?(WK.done?'FINISHED':`LAP ${lap}/${W.N}`):phase==='start'?'FORMATION':'THE GRID',22,26);
-  if(!sm){x.font=`700 10.5px ${FONTB}`;x.fillStyle='#8a9aac';x.fillText(CIRCUITS[WK.ci].name.toUpperCase(),110,26)}
+  const lt=phase==='quali'?'QUALIFYING':phase==='race'?(WK.done?'FINISHED':`LAP ${lap}/${W.N}`):phase==='start'?'FORMATION':'THE GRID',cn=CIRCUITS[WK.ci].name.toUpperCase();
+  x.font=`italic 900 13px ${FONT}`;const lw=x.measureText(lt).width;x.font=`700 10.5px ${FONTB}`;const cnw=sm?0:x.measureText(cn).width+14;
+  x.fillStyle='rgba(8,14,20,.88)';rr(x,10,10,lw+cnw+26,30,6);x.fill();x.fillStyle='#00e701';x.fillRect(10,10,4,30);
+  x.font=`italic 900 13px ${FONT}`;x.fillStyle='#fff';x.fillText(lt,22,25.5);if(!sm){x.font=`700 10.5px ${FONTB}`;x.fillStyle='#8a9aac';x.fillText(cn,22+lw+14,25.5)}
   if(phase==='quali')qualiTower(x,w,h);else if(phase==='race'&&h>380)raceTower(x,w,h);
   // flag banner
   let flag='GREEN',fc='#00c853',ft='#021';const st=WK.st;
@@ -1131,8 +1142,8 @@ function overlay(x,w,h){const P=V.P,W=WK.W,sm=w<620;x.textBaseline='middle';
   else if(phase!=='quali'){flag=phase==='start'?'FORMATION':'PRE-RACE';fc='#263849';ft='#fff'}
   V.flag=flag==='SAFETY CAR'?'SC':flag==='VIRTUAL SC'?'VSC':flag;
   x.font=`italic 900 13px ${FONT}`;const fw=x.measureText(flag).width+34;x.fillStyle=fc;rr(x,w-fw-10,10,fw,30,6);x.fill();if(flag==='CHEQUERED'){for(let r=0;r<3;r++)for(let c=0;c<3;c++){x.fillStyle=(r+c)%2?'#111':'#fff';x.fillRect(w-fw-4+c*6,16+r*6,6,6)}}
-  x.fillStyle=ft;x.textAlign='right';x.fillText(flag,w-18,26);x.textAlign='left';
-  if(V.wet>.08){x.font=`800 11px ${FONTB}`;x.fillStyle='#9fd0ff';x.textAlign='right';x.fillText(`🌧 TRACK ${Math.round(V.wet*100)}% WET`,w-14,52);x.textAlign='left'}
+  const fx=w-10-fw/2+(flag==='CHEQUERED'?10:0);x.fillStyle=ft;x.textAlign='center';x.fillText(flag,fx,25.5);
+  if(V.wet>.08){x.font=`800 11px ${FONTB}`;x.fillStyle='#9fd0ff';x.fillText(`🌧 TRACK ${Math.round(V.wet*100)}% WET`,w-10-fw/2,54)}x.textAlign='left';
   // start lights
   if(phase==='start'){const cw=5*44+20,sx=w/2-cw/2;x.fillStyle='rgba(8,14,20,.9)';rr(x,sx,54,cw,56,10);x.fill();for(let k=0;k<5;k++){const on=V.lights>k;x.fillStyle=on?'#ff2020':'#2a0c0c';x.beginPath();x.arc(sx+32+k*44,82,15,0,7);x.fill();if(on){x.fillStyle='rgba(255,60,40,.35)';x.beginPath();x.arc(sx+32+k*44,82,22,0,7);x.fill()}}}
   // mini map
@@ -1175,10 +1186,10 @@ function drawPodium(dt){const x=cx,w=VPW,h=VPH;x.setTransform(DPR,0,0,DPR,0,0);c
   stepParts(dt);x.save();for(const p of PART){if(!p.on||p.ty!=='champ')continue;x.globalAlpha=1-p.l/p.L;x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,p.s,0,7);x.fill()}x.restore();x.globalAlpha=1;
   x.font=`italic 900 22px ${FONT}`;x.textAlign='center';x.fillStyle='#fff';x.fillText(CIRCUITS[WK.ci].gp.toUpperCase(),w/2,h*.93);x.fillStyle='#00e701';x.font=`italic 900 12px ${FONT}`;x.fillText('STACK GP · PODIUM',w/2,h*.965);x.textAlign='left'}
 /* ---------- panels ---------- */
-function drawVbar(){const b=$('vbar');const cams=[['auto','Leader battle'],['mine','Follow my car'],['onboard','Onboard'],['full','Full track']];
+function drawVbar(){const b=$('vbar');const cams=[['auto','TV director'],['lead','Leader'],['mine','Follow my car'],['onboard','Onboard'],['full','Full track']];
   b.innerHTML=cams.map(([k,n])=>`<button data-cam="${k}" class="${V.camMode===k?'on':''}">${n}</button>`).join('')+`<span class="sp"></span>`+
     (phase==='race'&&!WK.done?[1,2,4].map(s=>`<button data-sp="${s}" class="${speed===s?'on':''}">${s}x</button>`).join('')+`<button id="skip">Skip to result</button>`:'')+(phase==='quali'?`<button id="qskip">Skip qualifying</button>`:'');
-  b.querySelectorAll('[data-cam]').forEach(q=>q.onclick=()=>{V.camMode=q.dataset.cam;S.cam=V.camMode;save();if(V.camMode==='mine'){const m=[...V.mine].filter(i=>V.P[i]&&!V.P[i].stop);V.focus=m.length?[m[0]]:V.focus;V.nextCut=V.t+1e9}else V.nextCut=0;V.cutFrom=1;drawVbar()});
+  b.querySelectorAll('[data-cam]').forEach(q=>q.onclick=()=>{V.camMode=q.dataset.cam;S.cam=V.camMode;save();V.focus=null;V.shot=null;V.shotScore=0;V.nextCut=0;V.cutFrom=1;drawVbar()});
   b.querySelectorAll('[data-sp]').forEach(q=>q.onclick=()=>{speed=+q.dataset.sp;drawVbar()});
   const sk=$('skip');if(sk)sk.onclick=()=>{const st=WK.st;advance(st,Infinity);V.t=Math.max(V.t,(st.fin||V.t)-.01);speed=1;drawVbar()};
   const qs=$('qskip');if(qs)qs.onclick=()=>{V.t=WK.quali.end+2}}

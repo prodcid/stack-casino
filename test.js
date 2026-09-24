@@ -1403,11 +1403,11 @@ async function frames(ctx, errs) {
   console.log('\n-- Stack home + Racing + Markets --');
   const pg = await newPage(ctx, errs, 'fr');
   const home = await pg.evaluate(`({b3:document.querySelectorAll('#big3 .b3').length,cas:document.querySelectorAll('#tilesCasino .tile').length,tab:document.querySelectorAll('#tilesTables .tile').length,
-    nav:['ssports','racing','gp','fight','sports','markets','cards','bj'].every(g=>document.querySelector('#side [data-g="'+g+'"]'))})`);
+    nav:['ssports','racing','gp','nrl','fight','sports','markets','cards','bj'].every(g=>document.querySelector('#side [data-g="'+g+'"]'))})`);
   (home.b3 === 3 && home.cas >= 15 && home.tab === 5 && home.nav ? pass : fail)('home: Big Three, casino + tables rows, grouped sidebar', JSON.stringify(home));
   await pg.click('#big3 .b3-sports .b3go'); await pg.waitForTimeout(300);
   ((await pg.evaluate("$('ssportsView').classList.contains('on')&&document.querySelector('#side [data-g=ssports]').classList.contains('on')")) ? pass : fail)('Big Three opens the Stack Sports hub');
-  for (const id of ['racing', 'markets', 'gp']) {
+  for (const id of ['racing', 'markets', 'gp', 'nrl']) {
     await pg.evaluate(`P().bal=500;renderBal();go('${id}')`);
     await pg.waitForFunction(`FG.${id}.ready`, null, { timeout: 25000 }); await pg.waitForTimeout(600);
     const r = await pg.evaluate(`(()=>{const w=FG.${id}.frame.contentWindow,d=w.document;const before=P().bal;const ok=w.StackBridge.spend(25);w.StackFrame.refresh();
