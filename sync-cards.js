@@ -25,22 +25,22 @@ const JS_A = '<script id="stack-cards">', JS_B = '</script><!--/stack-cards-->';
    text/plain script blocks and mounted in same-origin iframes by the casino.
    Their own script tags are rewritten to x-script so they can't end the block
    early; the casino swaps them back at mount time. */
-const FRAMES = ['garage', 'racing', 'markets'];
+const FRAMES = ['garage', 'racing', 'markets', 'gp'];
 const frameFile = id => path.join(ROOT, `stack-${id}.html`);
 const frameMarks = id => [`<script type="text/plain" id="stack-${id}">`, `</script><!--/stack-${id}-->`];
 function frameText(id) {
-  const src = fs.readFileSync(frameFile(id), 'utf8');
+  const src = fs.readFileSync(frameFile(id), 'utf8').replace(/\r\n/g, '\n');
   if (/x-script/i.test(src)) throw new Error(`stack-${id}.html already contains "x-script" - the escape would be ambiguous`);
   if (/<!--/.test(src)) throw new Error(`stack-${id}.html contains an HTML comment opener, which could break the inert block`);
   return src.replace(/<(\/?)script/gi, '<$1x-script');
 }
 function frameScript(id) {
-  const src = fs.readFileSync(frameFile(id), 'utf8');
+  const src = fs.readFileSync(frameFile(id), 'utf8').replace(/\r\n/g, '\n');
   return src.slice(src.indexOf('<script>') + 8, src.lastIndexOf('</script>'));
 }
 
 function extract() {
-  const src = fs.readFileSync(CARDS, 'utf8');
+  const src = fs.readFileSync(CARDS, 'utf8').replace(/\r\n/g, '\n');  // git on Windows may check sources out as CRLF
   const cs = src.indexOf('<style>'), ce = src.indexOf('</style>');
   const js = src.indexOf('<script>'), je = src.lastIndexOf('</script>');
   if (cs < 0 || ce < 0 || js < 0 || je < 0) throw new Error('stack-cards.html: missing <style> or <script>');

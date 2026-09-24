@@ -1403,17 +1403,22 @@ async function frames(ctx, errs) {
   console.log('\n-- Stack home + Racing + Markets --');
   const pg = await newPage(ctx, errs, 'fr');
   const home = await pg.evaluate(`({b3:document.querySelectorAll('#big3 .b3').length,cas:document.querySelectorAll('#tilesCasino .tile').length,tab:document.querySelectorAll('#tilesTables .tile').length,
-    nav:['ssports','racing','fight','sports','markets','cards','bj'].every(g=>document.querySelector('#side [data-g="'+g+'"]'))})`);
+    nav:['ssports','racing','gp','fight','sports','markets','cards','bj'].every(g=>document.querySelector('#side [data-g="'+g+'"]'))})`);
   (home.b3 === 3 && home.cas >= 15 && home.tab === 5 && home.nav ? pass : fail)('home: Big Three, casino + tables rows, grouped sidebar', JSON.stringify(home));
   await pg.click('#big3 .b3-sports .b3go'); await pg.waitForTimeout(300);
   ((await pg.evaluate("$('ssportsView').classList.contains('on')&&document.querySelector('#side [data-g=ssports]').classList.contains('on')")) ? pass : fail)('Big Three opens the Stack Sports hub');
-  for (const id of ['racing', 'markets']) {
+  for (const id of ['racing', 'markets', 'gp']) {
     await pg.evaluate(`P().bal=500;renderBal();go('${id}')`);
     await pg.waitForFunction(`FG.${id}.ready`, null, { timeout: 25000 }); await pg.waitForTimeout(600);
     const r = await pg.evaluate(`(()=>{const w=FG.${id}.frame.contentWindow,d=w.document;const before=P().bal;const ok=w.StackBridge.spend(25);w.StackFrame.refresh();
       return {bridged:w.StackBridge===FrameBridges.${id},topup:getComputedStyle(d.getElementById('topup')).display,ok,drop:+(before-P().bal).toFixed(2),shown:d.getElementById('bal').textContent}})()`);
     (r.bridged && r.topup === 'none' && r.ok && r.drop === 25 && /475/.test(r.shown) ? pass : fail)(`${id}: casino wallet, no free top-up`, JSON.stringify(r));
   }
+  // a game that isn't on screen must be silent: its sound goes through a host-controlled gain
+  const au = await pg.evaluate(`(async()=>{const ctx={};for(const id of ['racing','markets']){const w=FG[id].frame.contentWindow;ctx[id]=new w.AudioContext()}
+    const g=()=>['racing','markets'].map(id=>ctx[id].destination.gain.value).join(',');const out={};
+    go('racing');out.onRacing=g();go('lobby');out.onLobby=g();go('markets');out.onMarkets=g();return out})()`);
+  (au.onRacing === '1,0' && au.onLobby === '0,0' && au.onMarkets === '0,1' ? pass : fail)('hidden frame games are muted', JSON.stringify(au));
   await pg.close();
 }
 

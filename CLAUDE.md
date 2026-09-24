@@ -44,6 +44,8 @@ node test.js coop       # two-window presence, join invites, side bets
 node test.js fight      # Fight Night engine, outcome mix, RTP, joint accas
 node test.js cards      # Stack Cards: isolation, numbering, saving, grading, slab, wear + trading
 node test.js clash      # Stack Clash: two-window party battle (lobby, ready sync, start, move sync)
+node test-gp.js sim      # Stack GP: calibration, recorded race == priced race, 97% per market (Node, ~5 min)
+node test-gp.js ui       # Stack GP: screens 1280x860 + 393x852, live bet, settlement, memory over 10 races
 node test.js frames     # new home + Racing/Markets on the casino wallet
 node test.js garage     # Stack Garage: wallet bridge, crate + Spin, two-window part trade (accept + decline)
 npm run test:launcher   # the auto-update path end to end
@@ -80,7 +82,7 @@ storage/account layer.
 ## 2. Current scope
 
 **Stack is an ecosystem** (2026-09-24): the Big Three are **Stack Sports** (hub `ssports` → Racing, Fight Night, Football), **Stack Markets** and **Stack Cards**; then **Stack Casino** (solo originals) and **Stack Tables** (card/table games + party).
-18 single-player games + Football sportsbook + fight night + Stack Racing + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+18 single-player games + Football sportsbook + fight night + Stack Racing + Stack GP + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -176,12 +178,25 @@ sports blue/yellow, markets violet/teal, cards gold, casino pink, tables teal, g
 groups in `buildNav()`; keep `data-g` on every entry (tests + `go()` highlight rely on it).
 Don't name a CSS custom property `--a` — it's registered as an `<angle>` (`@property`).
 
-**Frame games** — Stack Garage, **Stack Racing** (`stack-racing.html`) and **Stack Markets**
+**Frame games** — Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
 (`stack-markets.html`) all use the same host: `FRAME_IDS` / `FG[id]` / `fgMount` / `fgView` /
 `fgReload`, bridge = `FrameBridges[id]` (saves on `P()[id]`). Racing/Markets patches: bridge load/save,
 Top up hidden, `drawBal(-1)` after a bridged spend, `window.StackFrame.refresh`. `GAR`, `garNet`,
-`garView`, `garReload` remain as garage aliases. Add a frame game: source file + `FRAMES` in
+`garView`, `garReload` remain as garage aliases. **Audio:** `frameAudio()` is injected before each frame's code and splices a host-controlled gain into every AudioContext (`ctx.destination` becomes that gain); `fgPause` mutes it via `__frameMute`, so hidden games stay silent while they keep running. Gain, not `suspend()`: a suspended context queues sounds and bursts them on resume. Frames also get the dark scrollbar CSS (`FRAME_SB`). sync-cards.js strips CRLF from the sources (git autocrlf checks them out as CRLF). Add a frame game: source file + `FRAMES` in
 sync-cards.js + marker block + `FRAME_IDS` + a `<id>View` section with `<id>Host`/`<id>Load`.
+
+**Stack GP** (`gp` view, under Stack Sports) — F1-style betting game built from `stack-gp-spec.md`. **Edit
+`stack-gp.html` directly, then `node sync-cards.js`.** The engine sits between `/*==CORE==*/` and
+`/*==END CORE==*/` (test-gp.js evals that slice in Node, so keep it DOM-free). Design choice vs the spec: there
+is ONE simulation, event-driven per track segment (apex to apex); overtakes, DRS, dirty air, pits, SC/VSC,
+mistakes, failures and rain resolve when a car enters a segment. The viewer places cars along the circuit's speed
+profile between recorded segment times (`rawPose`/`framePoses`), so the race you watch IS the priced sim and
+there's no separate lap-level model to keep in step. ~0.5ms per race: 2,000 pre-race runs, 300 live, 20,000
+for pole. The live sim runs 2.5s ahead of the display so a defender's pushed-back exit never jumps on screen.
+`priceOf` suspends anything seen <5 times or whose fair price is over the $501 cap (without that, long shots
+returned ~50%). Tracks: 6 circuits from Catmull-Rom control points in `CIRCUITS`, line auto-placed 62% down the
+longest straight, pit lane on the side with room. Don't name CSS vars `--a`… (casino only) and don't reuse `CW`
+(car width) in the GP UI. Circuits are ~1.2km with real F1 speeds so a race is ~4.5 min at 1x.
 
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
@@ -444,6 +459,8 @@ Two patterns, don't mix them up:
 - **2026-09-24** — Stack Garage integrated (NOT shipped - Alex said hold until he says so). stack-garage.html is the source of truth (from Downloads, patched: bridge save to P().garage, no top-up, Spin button, widebody wheels out to WIDE_OUT=.12, render pause, Trade tab). Runs in a same-origin srcdoc iframe from an inert text/plain block that sync-cards.js fills (script tags escaped as x-script), because its page-wide CSS/JS can't share the casino document. Trade: escrow + catalogue-validated parts (Na lookup, value capped per tier), garage* msgs via the casino net switch, garageLost refunds. Build grows to ~1.6MB.
 - **2026-09-24** — The new Stack: ecosystem home (Big Three: Stack Sports hub, Stack Markets, Stack Cards; then Casino + Tables rows), one brand system (hex mark + Barlow Condensed italic wordmark, colour per platform) and a sidebar grouped by platform. Racing + Markets added as frame games by generalising the garage iframe host (FG registry + FrameBridges) rather than inlining - both are whole pages with page-wide CSS/ids.
 - **2026-09-24** — Shipped the new Stack with the garage hidden (GARAGE_LIVE=false) and the telemetry notice gated on TELE_URL - Alex chose to hold both. Header coin now an engraved S with a ridged rim.
+- **2026-09-24** — Frame-game audio bled across tabs (Racing + Markets kept playing hidden). Fixed from the host by wrapping AudioContext inside each frame with a master gain the host mutes, instead of patching each game's own sound code - works for any future frame game. Also dark thin scrollbars site-wide.
+- **2026-09-24** — Stack GP (F1 betting) built from stack-gp-spec.md as a frame game under Stack Sports. One segment-level event sim is both the race on screen and the Monte Carlo (instead of the spec's full sim + separate lap model), so pricing can never drift from what you watch. Suspend selections seen <5 times or with fair price over the 501 cap - otherwise capped long shots return ~50%.
 
 ---
 
