@@ -49,6 +49,8 @@ node test-gp.js ui       # Stack GP: screens 1280x860 + 393x852, live bet, settl
 node test-nrl.js sim     # Stack League: NRL calibration, recorded == priced, 97% per market (~5 min)
 node test-nrl.js ui      # Stack League: screens, players move, live bet, settlement, ladder, memory
 node test-slots.js sim   # Dragon Stacks: whole-game RTP incl. features, feature odds, fair gamble/wheel/envelopes (~1 min)
+node test-olympus.js sim # Olympus Storm: RTP, bought-bonus RTP, FS odds, cap, honest draws (~2 min)
+node test-olympus.js ui  # Olympus Storm: tumbles, orbs, a bought bonus with the wallet audited, autoplay
 node test-slots.js ui    # Dragon Stacks: every feature forced + played out with the wallet audited, gamble, autoplay
 node test.js frames     # new home + Racing/Markets on the casino wallet
 node test.js garage     # Stack Garage: wallet bridge, crate + Spin, two-window part trade (accept + decline)
@@ -88,7 +90,7 @@ storage/account layer.
 **Stack is an ecosystem** (2026-09-24): the Big Three are **Stack Sports** (hub `ssports` → Racing, Fight Night, Football), **Stack Markets** and **Stack Cards**; then **Stack Casino** (solo originals) and **Stack Tables** (card/table games + party).
 18 single-player games + Football sportsbook + fight night + Stack Racing + Stack GP + Stack League (NRL) + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
-**Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Dragon Stacks (slots, frame game), Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
+**Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Dragon Stacks (slots, frame game), Olympus Storm (tumble slot, frame game), Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
 **Moles** (`MO` state) — Stake Originals clone. 7 holes, player picks 1–6 moles as the volatility dial, max 8 hits, moles reshuffle after every hit so each swing is an independent `M/7`. `mult(k) = 0.98 / p^k`, **kept exact — never round it**; truncating to 2dp cost 0.4% RTP. `moFmt()` displays up to 4dp so the shown multiplier matches the payout. `0.98 × 7⁸ = 5,649,504.98` is the real game's max win and `test.js moles` asserts it.
 Default is **5 moles** (71.4%); 3 averages 0.75 hits a round and reads as broken.
@@ -182,7 +184,7 @@ sports blue/yellow, markets violet/teal, cards gold, casino pink, tables teal, g
 groups in `buildNav()`; keep `data-g` on every entry (tests + `go()` highlight rely on it).
 Don't name a CSS custom property `--a` — it's registered as an `<angle>` (`@property`).
 
-**Frame games** — Dragon Stacks (`stack-slots.html`), Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
+**Frame games** — Dragon Stacks (`stack-slots.html`), Olympus Storm (`stack-olympus.html`), Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
 (`stack-markets.html`) all use the same host: `FRAME_IDS` / `FG[id]` / `fgMount` / `fgView` /
 `fgReload`, bridge = `FrameBridges[id]` (saves on `P()[id]`). Racing/Markets patches: bridge load/save,
 Top up hidden, `drawBal(-1)` after a bridged spend, `window.StackFrame.refresh`. `GAR`, `garNet`,
@@ -229,6 +231,19 @@ under-bet wins read "$x back from your $y bet", no fanfare. Changing that is his
 Canvas stage 1600x800 logical, scaled to fit; all art is canvas paths, all sound synthesised (`SFX`: Karplus-Strong
 guzheng, gong, taiko; generated pentatonic music with base/fs/hs/big moods). `let` globals (S, busy, lastWin) are not
 window props - tests reach them with `frameWindow.eval`.
+
+**Olympus Storm** (`olympus` view, added 2026-09-26) — Gates-of-Olympus-style tumble slot, `stack-olympus.html`
+(edit it, then `node sync-cards.js`; built from scratchpad parts, audio building blocks copied from Dragon Stacks).
+6x5, 8+ of a symbol anywhere pays, winners removed and the rest fall (`tumble` in the CORE, records every step for the
+show; the UI replays by cell `id`). Every cell/refill is an independent draw from `W` (base) / `WF` (free spins) - no
+strips. Orbs (x2-x500) stay through a sequence; if it paid they sum and multiply it. 4+ scatters = 15 free spins where
+orbs on paying tumbles add to a running total multiplier (+5 on 3 scatters), 5000x cap. Buy = `spinBuy` (normal board
+with exactly 4 scatters) at `BUY_X`=115x, priced from the measured bonus EV (~111x) so it returns ~97%.
+Measured 97.35% (3M); shares base 66 / scat 1 / fs 30; free spins ~1 in 355, avg ~109x.
+**Name clash lesson:** the core's weighted picker was first called `drawSym`, same as the art function; the later
+declaration won in the page (not in Node), so every cell was `undefined`. Core helpers must not share names with art/UI.
+Zeus (`drawZeus`, pose throw/charge) hurls a bolt at each orb as it lands (`ZQ` queue); anticipation (`ANTIC` column)
+only while a 4th scatter can still land.
 
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
@@ -496,6 +511,7 @@ Two patterns, don't mix them up:
 - **2026-09-25** — Stack League (NRL) built as a watchable frame game: tackle-by-tackle sim is both the match on screen and the Monte Carlo; each play is choreographed (scripted key actors + steering for the rest). Hidden day form was swapped for per-set luck because the MC knowing the form made favourites win 78%.
 - **2026-09-25** — Stack League players teleported: KO/conversion snaps and scripted actors sent further than they could run. Fixed with a 10.5 m/s cap on scripted paths, nearest-player dummy half/kicker, and a jog-back lead-in before kick-offs (snaps only at half starts). Verified: 0 frames over 12 m/s across a full match.
 - **2026-09-25** — Replaced the old 3-reel Slots with Dragon Stacks, a frame game (stack-slots.html) with Hold & Spin, pick-your-free-games, Dragon Wheel, envelopes, Dragon Breath wilds and a fair gamble. Frame game over inline: ~125KB of canvas/audio code with its own globals. Near misses kept real (dense pearls/lanterns + honest anticipation) rather than faked, per section 4.
+- **2026-09-25** — Added Olympus Storm, a second slot in a different style (tumble/cluster, 6x5 scatter pays, Zeus multiplier orbs, accumulating free-spin multiplier, buy bonus at 115x). Frame game like Dragon Stacks. Independent per-cell draws rather than strips: tumble refills make strips meaningless.
 
 ---
 
