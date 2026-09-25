@@ -512,6 +512,7 @@ Two patterns, don't mix them up:
 - **2026-09-25** — Stack League players teleported: KO/conversion snaps and scripted actors sent further than they could run. Fixed with a 10.5 m/s cap on scripted paths, nearest-player dummy half/kicker, and a jog-back lead-in before kick-offs (snaps only at half starts). Verified: 0 frames over 12 m/s across a full match.
 - **2026-09-25** — Replaced the old 3-reel Slots with Dragon Stacks, a frame game (stack-slots.html) with Hold & Spin, pick-your-free-games, Dragon Wheel, envelopes, Dragon Breath wilds and a fair gamble. Frame game over inline: ~125KB of canvas/audio code with its own globals. Near misses kept real (dense pearls/lanterns + honest anticipation) rather than faked, per section 4.
 - **2026-09-25** — Added Olympus Storm, a second slot in a different style (tumble/cluster, 6x5 scatter pays, Zeus multiplier orbs, accumulating free-spin multiplier, buy bonus at 115x). Frame game like Dragon Stacks. Independent per-cell draws rather than strips: tumble refills make strips meaningless.
+- **2026-09-25** — Olympus Storm visual pass: Zeus rebuilt (anatomy, seeded hair/beard strands, cape, face detail, aura, eye glow, body lightning), layered sky (Olympus temple, islands + waterfalls, drifting cloud sprites, god rays, eagles, branching lightning), ornate temple frame with braziers, lapis grid, squash/dust/shockwave/shake/electric outlines. Cells shrank 112->104 to fit the pediment. Headless software render ~50fps.
 
 ---
 
