@@ -25,7 +25,7 @@ const JS_A = '<script id="stack-cards">', JS_B = '</script><!--/stack-cards-->';
    text/plain script blocks and mounted in same-origin iframes by the casino.
    Their own script tags are rewritten to x-script so they can't end the block
    early; the casino swaps them back at mount time. */
-const FRAMES = ['garage', 'racing', 'markets', 'gp', 'nrl', 'slots', 'olympus'];
+const FRAMES = ['garage', 'racing', 'markets', 'gp', 'nrl', 'slots', 'olympus', 'egypt'];
 const frameFile = id => path.join(ROOT, `stack-${id}.html`);
 const frameMarks = id => [`<script type="text/plain" id="stack-${id}">`, `</script><!--/stack-${id}-->`];
 function frameText(id) {

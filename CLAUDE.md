@@ -49,6 +49,8 @@ node test-gp.js ui       # Stack GP: screens 1280x860 + 393x852, live bet, settl
 node test-nrl.js sim     # Stack League: NRL calibration, recorded == priced, 97% per market (~5 min)
 node test-nrl.js ui      # Stack League: screens, players move, live bet, settlement, ladder, memory
 node test-slots.js sim   # Dragon Stacks: whole-game RTP incl. features, feature odds, fair gamble/wheel/envelopes (~1 min)
+node test-egypt.js sim   # Ra's Fortune: RTP, both buys, feature odds, honest strips/features (~2 min)
+node test-egypt.js ui    # Ra's Fortune: collect, Sun, Rain, Book of Ra, Treasure, buys, gamble - wallet audited
 node test-olympus.js sim # Olympus Storm: RTP, bought-bonus RTP, FS odds, cap, honest draws (~2 min)
 node test-olympus.js ui  # Olympus Storm: tumbles, orbs, a bought bonus with the wallet audited, autoplay
 node test-slots.js ui    # Dragon Stacks: every feature forced + played out with the wallet audited, gamble, autoplay
@@ -90,7 +92,7 @@ storage/account layer.
 **Stack is an ecosystem** (2026-09-24): the Big Three are **Stack Sports** (hub `ssports` → Racing, Fight Night, Football), **Stack Markets** and **Stack Cards**; then **Stack Casino** (solo originals) and **Stack Tables** (card/table games + party).
 18 single-player games + Football sportsbook + fight night + Stack Racing + Stack GP + Stack League (NRL) + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
-**Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Dragon Stacks (slots, frame game), Olympus Storm (tumble slot, frame game), Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
+**Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Dragon Stacks (slots, frame game), Olympus Storm (tumble slot, frame game), Ra's Fortune (Egyptian coin slot, frame game), Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
 **Moles** (`MO` state) — Stake Originals clone. 7 holes, player picks 1–6 moles as the volatility dial, max 8 hits, moles reshuffle after every hit so each swing is an independent `M/7`. `mult(k) = 0.98 / p^k`, **kept exact — never round it**; truncating to 2dp cost 0.4% RTP. `moFmt()` displays up to 4dp so the shown multiplier matches the payout. `0.98 × 7⁸ = 5,649,504.98` is the real game's max win and `test.js moles` asserts it.
 Default is **5 moles** (71.4%); 3 averages 0.75 hits a round and reads as broken.
@@ -184,7 +186,7 @@ sports blue/yellow, markets violet/teal, cards gold, casino pink, tables teal, g
 groups in `buildNav()`; keep `data-g` on every entry (tests + `go()` highlight rely on it).
 Don't name a CSS custom property `--a` — it's registered as an `<angle>` (`@property`).
 
-**Frame games** — Dragon Stacks (`stack-slots.html`), Olympus Storm (`stack-olympus.html`), Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
+**Frame games** — Dragon Stacks (`stack-slots.html`), Olympus Storm (`stack-olympus.html`), Ra's Fortune (`stack-egypt.html`), Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
 (`stack-markets.html`) all use the same host: `FRAME_IDS` / `FG[id]` / `fgMount` / `fgView` /
 `fgReload`, bridge = `FrameBridges[id]` (saves on `P()[id]`). Racing/Markets patches: bridge load/save,
 Top up hidden, `drawBal(-1)` after a bridged spend, `window.StackFrame.refresh`. `GAR`, `garNet`,
@@ -252,6 +254,14 @@ pick 3 of 9 shuffled statues: spins/start mult/cash), Double Chance (`ANTE_X` 1.
 `BUYS` (109x / 162x start x10 / 334x 20 spins from x25, priced from measured EV), Lightning Gamble (50/50 at 2x).
 Measured: normal 97.3%, ante 97.7%, buys 96.7/97.3/97.0%. Second name clash hit here too (`TEMPLE` statue list vs the
 sky's temple position, now `TEMPLE_POS`) - scan for duplicate top-level names after adding a part.
+
+**Ra's Fortune** (`egypt` view, added 2026-09-26) - red + gold Egyptian slot, `stack-egypt.html` (edit it, then
+`node sync-cards.js`; built from scratchpad parts). 5x4, 1,024 ways, real strips. Gold coins carry values; the Pharaoh
+mask `COLL` (reel 5 only) collects every coin. Minis: Sun of Ra (`SUN_P` 1/40, a whole reel wild), Coin Rain (`RAIN_P`
+1/85, 2-4 coins + a guaranteed collector). Bigs: Book of Ra free games (3+ scatters, `pickBook` chooses the expanding
+symbol, `EXPAY` pays by reels covered, collects multiply and step up to x10), Pharaoh's Treasure hold & win (6+ coins,
+`runHold` on a 5 x 4..6 board: sun coins double, pyramid coins add a row, full board = GRAND). Buys: free games 31x,
+treasure 26x. Tuned for frequent wins (any win 1 in 2.1) after Alex said Dragon Stacks felt slow; measured 97.1-98.2%.
 
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
@@ -524,6 +534,7 @@ Two patterns, don't mix them up:
 - **2026-09-25** — Olympus Storm features: Zeus's Wrath, Hera's Blessing, Titan Battle (3 scatters), Temple of Gods (before free spins), Double Chance ante, Super/Epic buy tiers, Lightning Gamble. Retuned: pays x0.8, WF orbs 55->33, temple values kept small; every mode measured at ~97%. Titan attacks are EV-equal by construction so the pick is about swing, not skill.
 - **2026-09-26** — Slot control bars: gamble buttons float above the bar (they used to push the win box off-screen), fixed-size controls never flex-shrink (spin button was squashing), compact bar under 1180px. Checked at 1060/1290/1500 wide.
 - **2026-09-26** — Titan Battle arena now sizes to the stage height (was width-based, so short windows cut the top off and the buttons sat on the control bar). Checked at 1540x880, 1290x760, 1100x700.
+- **2026-09-26** — Added Ra's Fortune (Egyptian, red + gold): coin collect, Sun of Ra, Coin Rain, Book of Ra free games, Pharaoh's Treasure hold & win with growing rows, two buys, coin-flip gamble. Built for hit frequency (1 in 2.1) because Alex finds Dragon Stacks slow and loves Olympus's frequent wins.
 
 ---
 
