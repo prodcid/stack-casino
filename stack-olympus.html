@@ -789,7 +789,7 @@ function drawCloudBtn(x,w,h,t,lit){for(let i=0;i<9;i++){const cx=-w*.35+i*w*.09,
   if(lit){x.save();x.globalCompositeOperation='lighter';x.fillStyle=rg(x,0,0,5,w*.6,[[0,`rgba(200,230,255,${lit*.6})`],[1,'rgba(120,180,255,0)']]);x.fillRect(-w,-h,w*2,h*2);x.restore()}}
 /* ================= STATE + WALLET ================= */
 const $=id=>document.getElementById(id);
-const BETS=[.2,.4,.6,1,2,3,5,10,20,50,100];
+const BETS=[.2,.4,.6,1,2,3,5,10,20,50,100,150,200,250,300];
 const KEY='stackOlympus.v1';
 let S={betI:3,mute:false,music:true,turbo:false,stats:{spins:0,wag:0,won:0,best:0,fs:0,buys:0},bal:1000};
 const SB=window.StackBridge;

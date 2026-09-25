@@ -535,6 +535,8 @@ Two patterns, don't mix them up:
 - **2026-09-26** — Slot control bars: gamble buttons float above the bar (they used to push the win box off-screen), fixed-size controls never flex-shrink (spin button was squashing), compact bar under 1180px. Checked at 1060/1290/1500 wide.
 - **2026-09-26** — Titan Battle arena now sizes to the stage height (was width-based, so short windows cut the top off and the buttons sat on the control bar). Checked at 1540x880, 1290x760, 1100x700.
 - **2026-09-26** — Added Ra's Fortune (Egyptian, red + gold): coin collect, Sun of Ra, Coin Rain, Book of Ra free games, Pharaoh's Treasure hold & win with growing rows, two buys, coin-flip gamble. Built for hit frequency (1 in 2.1) because Alex finds Dragon Stacks slow and loves Olympus's frequent wins.
+- **2026-09-26** — Ra's Fortune gamble: the flip animation ended on the wrong face (9 half-turns flipped it), so a Scarab result could land showing the Pharaoh. Payout was always right. Now 10 half-turns + the result, verified 30/30, and a LANDED line says what came up.
+- **2026-09-26** — All three slots: bet ladder extended to 150/200/250/300 (max 300 a spin, Alex's ask). Ra's Fortune gamble: coin now always lands showing the result (was 9 half-turns, flipping it) + LANDED line; verified 30/30.
 
 ---
 

@@ -560,7 +560,7 @@ function drawKhepri(x,t,P){const pw=P.power||0;x.save();
   x.restore()}
 /* ================= STATE + WALLET ================= */
 const $=id=>document.getElementById(id);
-const BETS=[.2,.4,.6,1,2,3,5,10,20,50,100];
+const BETS=[.2,.4,.6,1,2,3,5,10,20,50,100,150,200,250,300];
 const KEY='stackEgypt.v1';
 let S={betI:3,mute:false,music:true,turbo:false,hist:[],stats:{spins:0,wag:0,won:0,best:0,f:{fs:0,hs:0,coll:0,sun:0,rain:0,buys:0}},bal:1000};
 const SB=window.StackBridge;
@@ -877,8 +877,11 @@ function openBuy(){if(busy)return;auInit();SFX.buyOpen();const bet=BET();
 $('buyBtn').onclick=openBuy;$('buyNo').onclick=()=>{SFX.click();$('buyOv').classList.remove('on')};
 /* ================= GAMBLE: the coin of Ra, exactly 50/50 ================= */
 let GB=null;
+/* face 0 = Pharaoh (cos>0), face 1 = Scarab (cos<0). 10 half-turns + the result's half-turn, so the coin always lands showing the result */
+const flipSpin=e=>(GB.flipT?e*Math.PI*10:0)+(GB.face?Math.PI:0);
+const faceShown=()=>Math.cos(flipSpin(GB.flipT?1:0))>0?0:1;
 function flipScene(){const c=$('flipCv'),x=c.getContext('2d'),W=c.width,H=c.height;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,W,H);x.fillStyle=rg(x,W/2,H/2,10,W*.6,[[0,'#6a0a0c'],[1,'#1a0204']]);x.fillRect(0,0,W,H);
-  const e=GB.flipT?Math.min(1,(T-GB.flipT)/1.1):1,ht=GB.flipT?Math.sin(e*Math.PI)*H*.35:0,spin=GB.flipT?e*Math.PI*9+(GB.face?Math.PI:0):(GB.face?Math.PI:0);
+  const e=GB.flipT?Math.min(1,(T-GB.flipT)/1.1):1,ht=GB.flipT?Math.sin(e*Math.PI)*H*.35:0,spin=flipSpin(e);
   x.save();x.translate(W/2,H*.6-ht);const r=110;coinFace(x,r,spin);if(Math.cos(spin)>0){x.save();x.scale(Math.abs(Math.cos(spin)),1);x.translate(0,-6);mask(x,170,T,0,.6);x.restore()}
   else{x.save();x.scale(Math.abs(Math.cos(spin)),1);x.translate(0,0);drawScarab(x,150,T,0);x.restore()}x.restore();
   x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(W/2,H*.93,120*(1-ht/H),16,0,0,7);x.fill()}
@@ -886,8 +889,9 @@ function gRender(){$('gAmt').textContent=money(GB.amt);$('gC').textContent=money
 function openGamble(){if(!lastWin||busy)return;auInit();if(!spend(lastWin)){toast('Balance changed');return}GB={amt:lastWin,n:0,busy:false,face:0,flipT:0,alive:true};lastWin=0;$('gambleBtn').classList.remove('on');stopCycle();
   $('gambleOv').classList.add('on');gRender();SFX.click();(function loop(){if(!GB||!GB.alive)return;flipScene();requestAnimationFrame(loop)})()}
 async function gGuess(face){if(!GB||GB.busy)return;GB.busy=true;SFX.flipCoin();const res=Math.random()<.5?0:1;GB.face=res;GB.flipT=T;await new Promise(r=>setTimeout(r,1200));
-  if(res===face){GB.amt=r2(GB.amt*2);GB.n++;SFX.gWin();gRender();if(GB.n>=5){await new Promise(r=>setTimeout(r,700));gCollect(true);return}}
-  else{SFX.gLose();GB.amt=0;gRender();await new Promise(r=>setTimeout(r,1300));GB.alive=false;$('gambleOv').classList.remove('on');HUD.win=0;GB=null;return}GB.busy=false}
+  $('gLeft').textContent='LANDED: '+(res?'SCARAB':'PHARAOH')+(res===face?' · you called it!':' · wrong call');
+  if(res===face){GB.amt=r2(GB.amt*2);GB.n++;SFX.gWin();gRender();$('gLeft').textContent='LANDED: '+(res?'SCARAB':'PHARAOH')+' · you called it! · '+(5-GB.n)+' flips left';if(GB.n>=5){await new Promise(r=>setTimeout(r,700));gCollect(true);return}}
+  else{SFX.gLose();GB.amt=0;gRender();$('gLeft').textContent='LANDED: '+(res?'SCARAB':'PHARAOH')+' · wrong call';await new Promise(r=>setTimeout(r,1300));GB.alive=false;$('gambleOv').classList.remove('on');HUD.win=0;GB=null;return}GB.busy=false}
 function gCollect(force){if(!GB||(GB.busy&&!force))return;const a=GB.amt;GB.alive=false;credit(a);HUD.win=a;HUD.lbl='WIN';SFX.countEnd();$('gambleOv').classList.remove('on');GB=null;if(a>0)coinBurst(800,RY+4*CH,24,760)}
 $('gHead').onclick=()=>gGuess(0);$('gTail').onclick=()=>gGuess(1);$('gTake').onclick=()=>gCollect(false);$('gambleBtn').onclick=openGamble;
 /* ================= INFO ================= */
