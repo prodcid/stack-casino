@@ -53,13 +53,38 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 #autoPop{position:absolute;bottom:100px;z-index:24;display:none;background:#0c1030;border:1px solid #c8a040;border-radius:14px;padding:12px;gap:8px;flex-direction:column;box-shadow:0 10px 30px #000}
 #autoPop.on{display:flex}#autoPop .r{display:flex;gap:6px}#autoPop button.n{width:52px;height:40px;border-radius:10px;background:#141c48;border:1px solid #4a4a7a;font-weight:900}#autoPop button.n:hover{border-color:var(--gold)}
 #autoPop label{font-size:13px;color:var(--mute);display:flex;gap:6px;align-items:center}
+#buyOpts{display:flex;gap:16px;margin-top:16px}
+.bcard{width:220px;border-radius:18px;padding:18px 14px;border:2px solid #c8a040;background:linear-gradient(#1a2470,#080c30);cursor:pointer;text-align:center;transition:transform .15s,box-shadow .15s}
+.bcard:hover{transform:translateY(-6px);box-shadow:0 0 30px #6aaaff88}.bcard h3{margin:0 0 6px;font:900 20px "Cinzel",Georgia,serif;color:#ffd766}.bcard .p{font:900 30px "Outfit";color:#fff;margin:8px 0}.bcard small{color:#aab4d8;display:block;line-height:1.4}
+.bcard.super{background:linear-gradient(#3a1a70,#120830)}.bcard.epic{background:linear-gradient(#6a1a30,#200810);border-color:#ffd766}
+#titanWrap{display:flex;flex-direction:column;align-items:center;gap:10px}#titanCv{width:min(1100px,88vw);aspect-ratio:2/1;border-radius:18px;border:3px solid #c8a040;box-shadow:0 0 50px #ff5a1a55}
+#titanBtns{display:flex;gap:14px}#titanBtns button{width:210px;padding:12px;border-radius:14px;background:linear-gradient(#2a3a8a,#0c1440);border:2px solid #8ac8ff;color:#fff;display:flex;flex-direction:column;gap:4px}
+#titanBtns button:nth-child(2){background:linear-gradient(#5a2a8a,#1c0c40);border-color:#c8a0ff}#titanBtns button:nth-child(3){background:linear-gradient(#8a2a1a,#3a0c08);border-color:#ffb080}
+#titanBtns button b{font:900 22px "Cinzel",Georgia,serif}#titanBtns button small{font-size:12px;color:#dde4ff}#titanBtns button:disabled{opacity:.45}#titanBtns button:not(:disabled):hover{filter:brightness(1.2)}
+#titanMsg{color:#dde4ff;font-weight:700;text-align:center}
+#templeGrid{display:grid;grid-template-columns:repeat(3,150px);gap:14px;margin-top:14px}
+.stat{position:relative;height:178px;border-radius:14px;background:radial-gradient(circle at 50% 30%,#2a3a8a,#0a1030);border:2px solid #4a5aa0;cursor:pointer;overflow:hidden;transition:transform .15s}
+.stat:hover:not(.open){transform:translateY(-5px);border-color:#ffd766;box-shadow:0 0 24px #ffd76666}.stat canvas{width:100%;height:100%;transition:transform .5s,opacity .5s,filter .5s}
+.stat .prize{position:absolute;inset:0;display:grid;place-items:center;font:900 22px "Outfit";color:#fff;text-shadow:0 2px 8px #000;opacity:0;transform:scale(.4);transition:.45s cubic-bezier(.3,1.6,.5,1)}
+.stat .prize.spins{color:#8affb0}.stat .prize.mult{color:#e0b0ff}.stat .prize.cash{color:#ffe58a}
+.stat.open canvas{opacity:.18;transform:scale(1.25);filter:blur(2px)}.stat.open .prize{opacity:1;transform:none}.stat.open{border-color:#ffd766;cursor:default;background:radial-gradient(circle,#4a3a10,#100a02)}.stat.dim{opacity:.4}
+#gambleCv{width:min(760px,80vw);aspect-ratio:2/1;border-radius:16px;border:2px solid #4a5aa0;cursor:pointer}
+.gamt{display:flex;gap:26px;justify-content:center;margin:8px 0}.gamt div{text-align:center}.gamt small{color:var(--mute);font-weight:800;letter-spacing:.1em;font-size:11px}.gamt b{display:block;font-size:24px}
+#gambleBtn{height:52px;padding:0 16px;border-radius:12px;font-weight:900;letter-spacing:.1em;background:linear-gradient(#1a2470,#070a24);border:2px solid #8ac8ff;color:#fff;display:none;animation:gp 1s ease-in-out infinite alternate}#gambleBtn.on{display:block}
+@keyframes gp{from{box-shadow:0 0 0 #8ac8ff}to{box-shadow:0 0 18px #8ac8ff}}
 #toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:40;background:#141c48;border:1px solid #c8a040;border-radius:10px;padding:10px 16px;font-weight:800;display:none}#toast.on{display:block;animation:ovIn .2s}
 </style></head><body>
 <div id="app">
  <div id="stage"><canvas id="cv"></canvas><canvas id="fx"></canvas>
   <div id="banner"><div class="ttl" id="banT"></div><div class="sub" id="banS"></div></div>
-  <div class="ov" id="buyOv"><div class="panel" style="width:520px;text-align:center"><div class="ttl" style="font-size:40px">BUY FREE SPINS</div>
-   <p class="sub" id="buyTxt"></p><div style="display:flex;gap:12px;justify-content:center;margin-top:16px"><button class="gbtn ghost" id="buyNo">CANCEL</button><button class="gbtn" id="buyYes">BUY</button></div></div></div>
+  <div class="ov" id="buyOv"><div class="panel" style="text-align:center"><div class="ttl" style="font-size:40px">BUY A BONUS</div>
+   <p class="sub">Each option is priced from its measured value, so every one returns about 97%. You pay for speed and swing, not better odds.</p><div id="buyOpts"></div>
+   <div style="margin-top:16px"><button class="gbtn ghost" id="buyNo">CANCEL</button></div></div></div>
+  <div class="ov" id="titanOv"><div id="titanWrap"><canvas id="titanCv" width="1200" height="600"></canvas><div id="titanMsg"></div><div id="titanBtns"><button></button><button></button><button></button></div></div></div>
+  <div class="ov" id="templeOv"><div class="panel" style="text-align:center"><div class="ttl" style="font-size:40px">TEMPLE OF GODS</div><div class="sub" id="templeSum"></div><div id="templeGrid"></div><button class="gbtn" id="templeGo" style="margin-top:14px">BEGIN FREE SPINS</button></div></div>
+  <div class="ov" id="gambleOv"><div class="panel" style="text-align:center"><div class="ttl" style="font-size:36px">LIGHTNING GAMBLE</div><div class="sub">Pick the cloud Zeus will strike. Exactly 50/50 for double, so it never changes the 97%.</div>
+   <div class="gamt"><div><small>AT STAKE</small><b id="gAmt">$0</b></div><div><small>WIN TO</small><b id="gC">$0</b></div></div><canvas id="gambleCv" width="900" height="450"></canvas><div class="sub" id="gLeft" style="margin:6px 0"></div>
+   <div style="display:flex;gap:12px;justify-content:center"><button class="gbtn ghost" id="gLeftB">LEFT CLOUD</button><button class="gbtn" id="gTake">COLLECT</button><button class="gbtn ghost" id="gRightB">RIGHT CLOUD</button></div></div></div>
   <div class="ov" id="big"><div class="ttl" id="bigT">BIG WIN</div><div id="bigV">$0.00</div><div class="sub" style="margin-top:18px">click to continue</div></div>
   <div class="ov" id="info"><div class="panel"><button class="x" data-close="info">×</button><div class="ttl" style="font-size:40px">OLYMPUS STORM</div><div id="infoBody"></div></div></div>
   <div id="autoPop"><div class="sub" style="text-align:left;font-weight:800">AUTOPLAY</div><div class="r"><button class="n" data-a="10">10</button><button class="n" data-a="25">25</button><button class="n" data-a="50">50</button><button class="n" data-a="100">100</button><button class="n" data-a="1000">∞</button></div><label><input type="checkbox" id="autoFeat" checked> stop when free spins land</label></div>
@@ -70,12 +95,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
   <button class="ib" id="sndBtn" title="Sound"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg></button>
   <button class="ib" id="musBtn" title="Music"><svg viewBox="0 0 24 24"><path d="M12 3v10.6A4 4 0 1 0 14 17V7h4V3z"/></svg></button>
   <div class="bx"><small>BALANCE</small><b id="bal">$0.00</b></div><button id="topup">Top up</button>
-  <button id="buyBtn"><small>BUY FREE SPINS</small><span id="buyV">$115.00</span></button>
+  <button id="buyBtn"><small>BUY A BONUS</small><span id="buyV">from $109</span></button><button class="tog" id="anteBtn" title="Pay 25% more per spin for about twice the free-spin chance">DOUBLE<br>CHANCE</button>
   <div class="sp"></div>
   <div id="betbox"><button class="pm" id="betDn">−</button><div class="bx"><small>BET</small><b id="betV">$1.00</b></div><button class="pm" id="betUp">+</button></div>
   <button class="tog" id="autoBtn">AUTO</button>
   <button id="spinbtn" title="Spin (space)"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg></button>
   <button class="tog" id="turboBtn">TURBO</button>
+  <button id="gambleBtn">GAMBLE ⚡</button>
   <div class="sp"></div>
   <div class="bx" id="winbx"><small>WIN</small><b id="winV">$0.00</b></div>
  </div>
@@ -94,14 +120,14 @@ const COLS=6,ROWS=5,NCELL=COLS*ROWS;
 const BLUE=0,GREEN=1,YELLOW=2,PURPLE=3,RED=4,CHAL=5,RING=6,HOUR=7,CROWN=8,SCAT=9,ORB=10;
 const SYMN=['Sapphire','Emerald','Topaz','Amethyst','Ruby','Chalice','Ring','Hourglass','Crown','Thunder Seal','Multiplier Orb'];
 /* pays x bet for 8-9 / 10-11 / 12+ of a kind */
-const PAY=[[0.4,1.2,3.2],[0.64,1.44,6.4],[0.8,1.6,8.0],[1.28,1.92,12.8],[1.6,2.4,16.0],[2.4,3.2,19.2],[3.2,8.0,24.0],[4.0,16.0,40.0],[16.0,40.0,80.0]];
+const PAY=[[0.32,0.96,2.56],[0.512,1.152,5.12],[0.64,1.28,6.4],[1.024,1.536,10.24],[1.28,1.92,12.8],[1.92,2.56,15.36],[2.56,6.4,19.2],[3.2,12.8,32],[12.8,32,64]];
 const SCAT_PAY={4:3,5:5,6:100};
 /* weights per cell: base game and free spins */
 const W =[260,240,210,190,170,140,120,95,70,27,5.5];
-const WF=[260,240,210,190,170,140,120,95,70,22,55];
+const WF=[260,240,210,190,170,140,120,95,70,22,33];
 const ORBV=[[2,300],[3,220],[4,160],[5,120],[6,80],[8,60],[10,50],[12,30],[15,25],[20,16],[25,10],[50,4],[100,1.3],[250,.35],[500,.12]];
 const ORBW=ORBV.reduce((a,o)=>a+o[1],0);
-const MAXWIN=5000,FS_N=15,FS_RE=5,BUY_X=115;
+const MAXWIN=5000,FS_N=15,FS_RE=5;
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 let UID=1;
 function pickSym(R,w){const tot=w.reduce((a,b)=>a+b,0);let v=R()*tot;for(let s=0;s<w.length;s++){if((v-=w[s])<0)return s}return 0}
@@ -128,25 +154,55 @@ function tumble(R,b,w){const steps=[];let win=0;
     steps.push({wins,pay,board:snap(b),drops})}
   return{steps,win}}
 const orbSum=b=>{let t=0;for(const col of b)for(const x of col)if(x.s===ORB)t+=x.v;return t};
-/* one base-game spin, fully resolved (free spins are played separately) */
-function spinBase(R){R=R||Math.random;const b=fillBoard(R,W),start=snap(b),t=tumble(R,b,W);
-  const orbs=orbSum(b),mult=t.win>0&&orbs>0?orbs:1,sc=countOf(b,SCAT),scat=sc>=4?SCAT_PAY[Math.min(6,sc)]:0;
-  const win=Math.min(MAXWIN,t.win*mult+scat);
-  return{start,steps:t.steps,end:snap(b),tw:t.win,orbs,mult,sc,scat,fs:sc>=4,win}}
+/* ---------- features ----------
+   Zeus's Wrath (random, base game): he picks the commonest paying symbol and blasts enough other
+     cells into it to make it pay, plus 1-3 more. The blast is part of the drawn outcome.
+   Hera's Blessing (random, base game): a dead spin (no win, fewer than 3 scatters) sometimes gets
+     a free re-drop of the whole board with one multiplier orb guaranteed in it.
+   Titan Battle: exactly 3 scatters. Pot starts at TITAN_P0 x bet; 3 rounds; each attack has
+     q*m + (1-q)*TITAN_LOSE = 1, so every choice is worth the same on average, only the swing differs.
+   Temple of Gods: before every free spins round, pick 3 of 9 statues (extra spins, a starting
+     total multiplier, or cash). The statues are shuffled first; your picks just turn them over.
+   Double Chance (ante): 1.25x the bet, scatters weighted WA instead of W.
+   Bonus tiers: buy the free spins plain, Super (starts at x10) or Epic (x25, 20 spins), each priced
+     from its measured value so it returns ~97%. */
+const WRATH_P=1/80,HERA_P=.03,ANTE_X=1.25;
+const WA=W.slice();WA[SCAT]=31.7;
+const TITAN=[{k:'bolt',name:'Bolt',q:.75,m:1.2},{k:'storm',name:'Storm',q:.5,m:1.6},{k:'wrath',name:'Wrath',q:.25,m:2.8}],TITAN_LOSE=.4,TITAN_P0=3;
+const TEMPLE=[{t:'spins',v:2},{t:'spins',v:4},{t:'mult',v:1},{t:'mult',v:2},{t:'mult',v:3},{t:'mult',v:5},{t:'cash',v:3},{t:'cash',v:5},{t:'cash',v:10}];
+const BUYS=[{k:'fs',name:'Free Spins',acc:0,n:15,x:109},{k:'super',name:'Super Free Spins',acc:10,n:15,x:162},{k:'epic',name:'Epic Free Spins',acc:25,n:20,x:334}];
+const shuffle=(R,a)=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function wrathOn(R,b){const cnt=Array(SCAT).fill(0);for(const col of b)for(const x of col)if(x.s<SCAT)cnt[x.s]++;
+  let best=0;for(let s=1;s<SCAT;s++)if(cnt[s]>cnt[best]||(cnt[s]===cnt[best]&&R()<.5))best=s;
+  const need=Math.max(0,8-cnt[best])+1+Math.floor(R()*3),cand=[];for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){const s=b[c][r].s;if(s<SCAT&&s!==best)cand.push(c*ROWS+r)}
+  const hit=shuffle(R,cand).slice(0,need);for(const k of hit){const x=b[Math.floor(k/ROWS)][k%ROWS];x.s=best;delete x.v}return{s:best,cells:hit}}
+function settleSpin(b,t,extra){const orbs=orbSum(b),mult=t.win>0&&orbs>0?orbs:1,sc=countOf(b,SCAT),scat=sc>=4?SCAT_PAY[Math.min(6,sc)]:0;
+  return Object.assign({steps:t.steps,end:snap(b),tw:t.win,orbs,mult,sc,scat,fs:sc>=4,titan:sc===3,win:Math.min(MAXWIN,t.win*mult+scat)},extra)}
+/* one base-game spin, fully resolved (the bonus games are played separately) */
+function spinBase(R,ante){R=R||Math.random;const w=ante?WA:W;let b=fillBoard(R,w);const pre=snap(b);let wrath=null,hera=null;
+  if(R()<WRATH_P)wrath=wrathOn(R,b);
+  let start=snap(b),t=tumble(R,b,w);
+  if(!wrath&&t.win===0&&countOf(b,SCAT)<3&&R()<HERA_P){const b2=fillBoard(R,w),k=Math.floor(R()*NCELL),c=Math.floor(k/ROWS),r=k%ROWS;
+    if(b2[c][r].s!==SCAT)b2[c][r]={id:UID++,s:ORB,v:orbVal(R)};hera={first:start,cell:k};b=b2;start=snap(b);t=tumble(R,b,w)}
+  return settleSpin(b,t,{pre,start,wrath,hera})}
 /* one free spin: `acc` is the running total multiplier before this spin */
 function spinFree(R,acc){R=R||Math.random;const b=fillBoard(R,WF),start=snap(b),t=tumble(R,b,WF);
   const orbs=orbSum(b),add=t.win>0?orbs:0,nacc=acc+add,mult=t.win>0?Math.max(1,nacc):1,sc=countOf(b,SCAT);
   return{start,steps:t.steps,end:snap(b),tw:t.win,orbs,add,acc:nacc,mult,sc,retrig:sc>=3?FS_RE:0,win:t.win*mult}}
 /* the bought spin: a normal board except it holds exactly 4 scatters, so it always starts the free spins */
-function spinBuy(R){R=R||Math.random;const b=fillBoard(R,W,4),start=snap(b),t=tumble(R,b,W);
-  const orbs=orbSum(b),mult=t.win>0&&orbs>0?orbs:1,sc=countOf(b,SCAT),scat=sc>=4?SCAT_PAY[Math.min(6,sc)]:0;
-  return{start,steps:t.steps,end:snap(b),tw:t.win,orbs,mult,sc,scat,fs:sc>=4,win:Math.min(MAXWIN,t.win*mult+scat),buy:1}}
-function playFree(R){let n=FS_N,acc=0,tot=0,i=0;while(n>0&&i<200){n--;i++;const f=spinFree(R,acc);acc=f.acc;tot+=f.win;n+=f.retrig;if(tot>=MAXWIN){tot=MAXWIN;break}}return{tot,spins:i,acc}}
-function playRound(R,buy){R=R||Math.random;const b=buy?spinBuy(R):spinBase(R);let tot=b.win,fs=0;
-  if(b.fs){fs=playFree(R).tot;tot=Math.min(MAXWIN,tot+fs)}
-  return{base:b.tw*b.mult,scat:b.scat,fs,tot,trig:b.fs,tumbles:b.steps.length,orb:b.orbs>0}}
-if(typeof module!=='undefined')module.exports={COLS,ROWS,NCELL,BLUE,GREEN,YELLOW,PURPLE,RED,CHAL,RING,HOUR,CROWN,SCAT,ORB,SYMN,PAY,SCAT_PAY,W,WF,ORBV,MAXWIN,FS_N,FS_RE,BUY_X,
-  mulberry,fillBoard,findWins,tumble,spinBase,spinFree,spinBuy,playFree,playRound,countOf,orbSum};
+function spinBuy(R){R=R||Math.random;const b=fillBoard(R,W,4),start=snap(b),t=tumble(R,b,W);return settleSpin(b,t,{pre:start,start,wrath:null,hera:null,buy:1})}
+function titanRound(R,choice){const o=TITAN[choice],win=R()<o.q;return{win,m:win?o.m:TITAN_LOSE}}
+function templeBoard(R){return shuffle(R,TEMPLE.map(x=>Object.assign({},x)))}
+function templeApply(picks){const o={spins:0,mult:0,cash:0};for(const p of picks)o[p.t]+=p.v;return o}
+function playFree(R,acc0,n0){let n=n0==null?FS_N:n0,acc=acc0||0,tot=0,i=0;while(n>0&&i<250){n--;i++;const f=spinFree(R,acc);acc=f.acc;tot+=f.win;n+=f.retrig;if(tot>=MAXWIN){tot=MAXWIN;break}}return{tot,spins:i,acc}}
+function playBonus(R,tier){const tb=templeBoard(R),g=templeApply(tb.slice(0,3)),f=playFree(R,tier.acc+g.mult,tier.n+g.spins);return{tot:Math.min(MAXWIN,f.tot+g.cash),temple:g}}
+function playTitan(R,pick){let pot=TITAN_P0;for(let i=0;i<3;i++)pot*=titanRound(R,pick==null?Math.floor(R()*3):pick).m;return pot}
+function playRound(R,buy,ante,pick){R=R||Math.random;const b=buy!=null?spinBuy(R):spinBase(R,ante);let tot=b.win,fs=0,ti=0;
+  if(b.titan){ti=playTitan(R,pick);tot+=ti}
+  if(b.fs){fs=playBonus(R,BUYS[buy==null?0:buy]).tot;tot+=fs}
+  return{base:b.tw*b.mult,scat:b.scat,fs,titan:ti,tot:Math.min(MAXWIN,tot),trig:b.fs,ttrig:b.titan,wrath:!!b.wrath,hera:!!b.hera,tumbles:b.steps.length,orb:b.orbs>0}}
+if(typeof module!=='undefined')module.exports={COLS,ROWS,NCELL,BLUE,GREEN,YELLOW,PURPLE,RED,CHAL,RING,HOUR,CROWN,SCAT,ORB,SYMN,PAY,SCAT_PAY,W,WF,WA,ORBV,MAXWIN,FS_N,FS_RE,BUYS,ANTE_X,
+  WRATH_P,HERA_P,TITAN,TITAN_LOSE,TITAN_P0,TEMPLE,mulberry,fillBoard,findWins,tumble,spinBase,spinFree,spinBuy,playFree,playBonus,playTitan,titanRound,templeBoard,templeApply,playRound,countOf,orbSum};
 /*==END CORE==*/
 /* ================= SOUND (building blocks shared with Dragon Stacks) =================
    All synthesised, no files. Master -> compressor -> out, with a generated reverb send.
@@ -273,6 +329,18 @@ const SFX={
   banner(){whoosh(0,.5,.2,300,3000);timp(.1,.4)},
   skyFlash(){rumble(0,.07,3)},
   buyOpen(){bell(sc(14),0,.12,{ratio:2,idx:1.5,d:1});choir([sc(0),sc(7)],0,1.2,.04)},
+  wrath(){thunder(0,.6);rumble(0,.4,3);choir([sc(-7),sc(-4),sc(0)],0,2.4,.12);timp(.3,.7,55);timp(.6,.7,55)},
+  wrathHit(){zap(0,.2,2800);crack(.02,.25);osc({f:120,f2:60,type:'sine',d:.3,v:.25})},
+  hera(){for(let i=0;i<14;i++)harp(7+i,i*.045,.14);choir([sc(7),sc(9),sc(11),sc(14)],.1,3,.1);bell(sc(21),.7,.14,{ratio:2,idx:1.5,d:2})},
+  titanIntro(){rumble(0,.6,3.5);roar(.2,1.8,.4);timp(.1,.8,48);timp(.5,.8,48);timp(.9,.8,48)},
+  titanHit(){thunder(0,.5);roar(.15,.9,.25);timp(0,.6,58)},
+  titanThrow(){roar(0,.8,.3);whoosh(.2,.6,.25,150,900,.8)},
+  boulderHit(){nz({d:.5,v:.5,type:'lowpass',f:400,f2:60,q:.7,rev:.4});crack(0,.3);timp(0,.7,45);zap(.05,.15,2000)},
+  templeIntro(){choir([sc(0),sc(4),sc(7)],0,2.5,.1);for(let i=0;i<8;i++)harp(4+i,i*.08,.14)},
+  templePick(n){nz({d:.25,v:.3,type:'bandpass',f:1800,f2:600,q:1});crack(0,.18);bell(sc(9+n*3),.12,.18,{ratio:2,idx:2,d:1.4});for(let k=0;k<3;k++)coinSnd(.15+k*.05,.06)},
+  templeDone(){for(let i=0;i<6;i++)bell(sc(10+i*2),i*.07,.14,{ratio:2,idx:1.5,d:1});choir([sc(7),sc(11),sc(14)],0,2,.08)},
+  gWin(){for(let i=0;i<5;i++)harp(9+i*2,i*.06,.2);coinSnd(.1,.1);coinSnd(.18,.1)},
+  gLose(){osc({f:330,f2:110,type:'triangle',d:.7,v:.18});rumble(0,.2,1.2)},
   maxWin(){thunder(0,.6);choir([sc(0),sc(4),sc(7),sc(11),sc(14)],0,4,.14);for(let i=0;i<20;i++)coinSnd(i*.08,.08)}};
 /* ---------- generated music ----------
    Harp arpeggios over a string pad and timpani. base: calm heavenly; fs: storm, faster, drums;
@@ -565,7 +633,7 @@ function zeusHand(th){const a=-1.05-th*1.95,sx=70,sy=-255-120,l1=128,a2=a+(-.75+
    range, the temple on the peak, floating islands), in stage coordinates. drawSkyLive() adds
    the moving parts every frame: god rays, three drifting cloud banks, waterfalls, eagles,
    temple fire glow and lightning that lights the clouds from inside. */
-const TEMPLE=[1395,236];
+const TEMPLE_POS=[1395,236];
 function bakeSky(W,H,mode,k,ox,oy,dpr){const c=mkC(W,H),x=c.getContext('2d'),fs=mode==='fs';
   const pal=fs?['#03020a','#140a30','#2a1240','#3a1030']:['#0a1238','#2a2470','#7a4a98','#e0909a'];
   x.fillStyle=lg(x,0,0,0,H,[[0,pal[0]],[.4,pal[1]],[.75,pal[2]],[1,pal[3]]]);x.fillRect(0,0,W,H);
@@ -576,7 +644,7 @@ function bakeSky(W,H,mode,k,ox,oy,dpr){const c=mkC(W,H),x=c.getContext('2d'),fs=
   for(let i=0;i<14;i++){const sx=-100+R()*1800,sy=R()*380;x.fillStyle=rg(x,sx,sy,0,8,[[0,'rgba(255,255,255,.9)'],[1,'rgba(255,255,255,0)']]);x.fillRect(sx-8,sy-8,16,16)}
   x.globalCompositeOperation='source-over';
   // the sun / heavenly glow behind the temple
-  const[tx,ty]=TEMPLE;x.fillStyle=rg(x,tx,ty-30,10,420,[[0,fs?'rgba(160,140,255,.35)':'rgba(255,236,190,.75)'],[.3,fs?'rgba(90,70,200,.15)':'rgba(255,190,150,.3)'],[1,'rgba(255,160,160,0)']]);x.fillRect(tx-500,ty-500,1000,1000);
+  const[tx,ty]=TEMPLE_POS;x.fillStyle=rg(x,tx,ty-30,10,420,[[0,fs?'rgba(160,140,255,.35)':'rgba(255,236,190,.75)'],[.3,fs?'rgba(90,70,200,.15)':'rgba(255,190,150,.3)'],[1,'rgba(255,160,160,0)']]);x.fillRect(tx-500,ty-500,1000,1000);
   // far mountain range
   const range=(y0,amp,c1,c2,seed,snow)=>{const r=srnd(seed);x.fillStyle=lg(x,0,y0-amp,0,y0+220,[[0,c1],[1,c2]]);x.beginPath();x.moveTo(-300,900);const pts=[];for(let X=-300;X<=1900;X+=60){const y=y0-Math.abs(Math.sin(X/260+seed))*amp-r()*amp*.35;pts.push([X,y]);x.lineTo(X,y)}x.lineTo(1900,900);x.fill();
     if(snow){x.fillStyle=fs?'rgba(180,180,230,.35)':'rgba(255,245,250,.55)';for(let i=1;i<pts.length-1;i++){const p=pts[i];if(p[1]<pts[i-1][1]&&p[1]<pts[i+1][1]){x.beginPath();x.moveTo(p[0]-34,p[1]+26);x.lineTo(p[0],p[1]);x.lineTo(p[0]+30,p[1]+22);x.lineTo(p[0]+10,p[1]+18);x.lineTo(p[0]-4,p[1]+28);x.fill()}}}};
@@ -612,7 +680,7 @@ function eagle(x,e,t){x.save();x.translate(e.x,e.y);x.scale(e.dir*e.s,e.s);const
 let LBOLT=null;
 function drawSkyLive(x,t,dt,fs){cloudSprites();
   // god rays from the temple, slowly turning
-  x.save();x.globalCompositeOperation='lighter';const[tx,ty]=TEMPLE;for(let i=0;i<12;i++){const a=Math.PI*.55+i*.16+Math.sin(t*.12+i)*.05,L=1500;
+  x.save();x.globalCompositeOperation='lighter';const[tx,ty]=TEMPLE_POS;for(let i=0;i<12;i++){const a=Math.PI*.55+i*.16+Math.sin(t*.12+i)*.05,L=1500;
     x.fillStyle=`rgba(255,230,180,${(fs?.018:.04)*(.6+.4*Math.sin(t*.5+i*1.7))})`;x.beginPath();x.moveTo(tx,ty-40);x.lineTo(tx+Math.cos(a)*L,ty-40+Math.sin(a)*L);x.lineTo(tx+Math.cos(a+.05)*L,ty-40+Math.sin(a+.05)*L);x.fill()}
   // temple fire flicker
   const fl=.55+.25*Math.sin(t*9)+.15*Math.sin(t*23);x.fillStyle=rg(x,tx,ty-30,4,90,[[0,`rgba(255,170,80,${.35*fl})`],[1,'rgba(255,120,40,0)']]);x.beginPath();x.arc(tx,ty-30,90,0,7);x.fill();x.restore();
@@ -628,6 +696,84 @@ function drawSkyLive(x,t,dt,fs){cloudSprites();
   if(LBOLT){const a=1-(t-LBOLT.t)/.45;if(a<=0)LBOLT=null;else{x.save();x.globalCompositeOperation='lighter';x.fillStyle=rg(x,LBOLT.x,LBOLT.y1*.6,10,380,[[0,`rgba(190,215,255,${.35*a})`],[1,'rgba(120,160,255,0)']]);x.fillRect(LBOLT.x-400,-100,800,900);x.restore();
       lightning(x,LBOLT.x,-20,LBOLT.x2,LBOLT.y1,LBOLT.seed+Math.floor((t-LBOLT.t)*30),2.4,90,3,a)}}}
 function skyStrike(t){const x0=100+Math.random()*1400;LBOLT={x:x0,x2:x0+(Math.random()-.5)*300,y1:300+Math.random()*250,t,seed:1+Math.floor(Math.random()*1e6)}}
+/* ================= THE REST OF THE CAST =================
+   Hera (Blessing), the Titan (battle), the god statues (Temple of Gods) and the gamble clouds.
+   All origin = bottom centre. */
+function feather(x,len,t,k){x.save();x.strokeStyle='rgba(120,160,90,.8)';x.lineWidth=2;x.beginPath();x.moveTo(0,0);x.lineTo(len,0);x.stroke();
+  for(let i=0;i<22;i++){const f=i/22,y=(1-f)*len*.09+2;x.strokeStyle=`rgba(${60+f*60},${150+f*60},${120-f*40},.55)`;x.lineWidth=1;x.beginPath();x.moveTo(len*f,0);x.lineTo(len*f+len*.05,-y);x.moveTo(len*f,0);x.lineTo(len*f+len*.05,y);x.stroke()}
+  const ex=len*.92,sh=Math.sin(t*2+k)*.1;x.translate(ex,0);x.scale(1+sh*.2,1);
+  for(const[r,c]of[[22,'#2a8a4a'],[16,'#e0b030'],[12,'#1a5ac0'],[7,'#0a2060']]){x.fillStyle=c;x.beginPath();x.ellipse(0,0,r,r*.75,0,0,7);x.fill()}
+  x.fillStyle='rgba(255,255,255,.5)';x.beginPath();x.arc(-3,-3,2.5,0,7);x.fill();x.restore()}
+function drawHera(x,t,a,orbV){if(a<=0)return;x.save();x.globalAlpha=a;
+  x.save();x.globalCompositeOperation='lighter';x.fillStyle=rg(x,0,-260,20,320,[[0,'rgba(255,220,150,.45)'],[1,'rgba(255,180,80,0)']]);x.beginPath();x.arc(0,-260,320,0,7);x.fill();x.restore();
+  // peacock fan
+  for(let k=0;k<19;k++){const ang=-Math.PI*.95+k*(Math.PI*.9/18)+Math.sin(t*1.2+k)*.02;x.save();x.translate(0,-250);x.rotate(ang);feather(x,290+Math.sin(k*1.3)*22,t,k);x.restore()}
+  // gown
+  x.fillStyle=lg(x,-90,-230,90,0,[[0,'#fff6e0'],[.5,'#f0e0c0'],[1,'#c8a878']]);x.beginPath();x.moveTo(-40,-210);x.bezierCurveTo(-70,-120,-110,-40,-120+Math.sin(t*1.5)*6,0);x.lineTo(120+Math.sin(t*1.5+1)*6,0);x.bezierCurveTo(110,-40,70,-120,40,-210);x.closePath();x.fill();
+  x.strokeStyle='rgba(150,110,60,.35)';x.lineWidth=2.5;for(let k=-3;k<=3;k++){x.beginPath();x.moveTo(k*9,-200);x.bezierCurveTo(k*14,-120,k*24+Math.sin(t+k)*4,-60,k*30,0);x.stroke()}
+  x.fillStyle=goldG(x,-8,8);x.fillRect(-118,-8,236,8);x.fillStyle=goldG(x,-222,-208);x.fillRect(-42,-222,84,12);
+  // torso + arms raised, offering the orb
+  x.fillStyle=lg(x,-40,-300,40,-210,[[0,'#ffe0c4'],[1,'#d8a07a']]);x.beginPath();x.moveTo(-38,-290);x.quadraticCurveTo(0,-302,38,-290);x.lineTo(42,-214);x.lineTo(-42,-214);x.fill();
+  x.fillStyle=lg(x,-44,-300,44,-220,[[0,'#ffffff'],[1,'#e6d4b4']]);x.beginPath();x.moveTo(-44,-288);x.lineTo(20,-296);x.lineTo(44,-220);x.lineTo(-44,-220);x.fill();
+  for(const d of[-1,1]){x.save();x.translate(d*36,-286);x.rotate(d>0?-1.1:-2.05);x.fillStyle=lg(x,0,-10,0,10,[[0,'#ffe0c4'],[1,'#c89068']]);rr(x,0,-10,86,20,10);x.fill();x.translate(86,0);x.rotate(d>0?-.5:.5);rr(x,0,-8,70,16,8);x.fill();x.fillStyle=goldG(x,-8,8);x.fillRect(46,-9,10,18);x.restore()}
+  // the orb she offers
+  x.save();x.translate(0,-440);drawOrb(x,110,t,1,orbV||5);x.restore();
+  // head: dark hair up, face, polos crown
+  x.save();x.translate(0,-326);x.fillStyle='#2a1a14';x.beginPath();x.ellipse(0,-10,34,40,0,0,7);x.fill();x.beginPath();x.arc(0,-46,20,0,7);x.fill();
+  x.fillStyle=lg(x,-24,-30,24,30,[[0,'#ffe4c8'],[1,'#d8a07a']]);x.beginPath();x.ellipse(0,0,24,31,0,0,7);x.fill();
+  x.fillStyle='#3a2a20';for(const ex of[-9,9]){x.beginPath();x.ellipse(ex,-3,4.5,2.4,0,0,7);x.fill()}x.strokeStyle='#3a2a20';x.lineWidth=1.5;for(const ex of[-9,9]){x.beginPath();x.arc(ex,-8,6,Math.PI*1.15,Math.PI*1.85);x.stroke()}
+  x.fillStyle='#c05060';x.beginPath();x.ellipse(0,14,6,2.6,0,0,7);x.fill();x.fillStyle='rgba(220,120,110,.35)';x.beginPath();x.arc(-13,7,5,0,7);x.arc(13,7,5,0,7);x.fill();
+  x.fillStyle=goldG(x,-56,-30);x.beginPath();x.moveTo(-26,-28);x.lineTo(-22,-58);x.lineTo(22,-58);x.lineTo(26,-28);x.quadraticCurveTo(0,-34,-26,-28);x.fill();x.strokeStyle='#6a4a06';x.lineWidth=1.5;x.stroke();
+  x.fillStyle='#2a8a4a';x.beginPath();x.arc(0,-44,5,0,7);x.fill();x.restore();
+  x.restore()}
+/* the Titan: a stone giant veined with magma. P = {hit 0..1, throw 0..1, rage 0..1} */
+function rock(x,pts,c1,c2){smooth(x,pts,true);x.fillStyle=lg(x,-60,-60,60,60,[[0,c1],[1,c2]]);x.fill();x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=3;x.stroke()}
+function magma(x,pts,t,k,a){x.save();x.globalCompositeOperation='lighter';const g=(.55+.35*Math.sin(t*3+k))*(a||1);x.strokeStyle=`rgba(255,${120+60*g|0},30,${g})`;x.lineWidth=5;x.lineCap='round';x.beginPath();x.moveTo(pts[0][0],pts[0][1]);for(const p of pts)x.lineTo(p[0],p[1]);x.stroke();x.strokeStyle=`rgba(255,240,180,${g*.8})`;x.lineWidth=1.8;x.stroke();x.restore()}
+function drawTitan(x,t,P){const hit=P.hit||0,th=P.throw||0,rage=P.rage||0,sh=hit*Math.sin(t*60)*8,br=Math.sin(t*1.1)*4;x.save();x.translate(sh,br);
+  // aura of heat
+  x.save();x.globalCompositeOperation='lighter';x.fillStyle=rg(x,0,-260,20,300,[[0,`rgba(255,110,30,${.2+rage*.25})`],[1,'rgba(255,60,0,0)']]);x.beginPath();x.arc(0,-260,300,0,7);x.fill();x.restore();
+  const C1='#6a5a52',C2='#2a201c';
+  // throwing arm (back)
+  x.save();x.translate(70,-330);x.rotate(-.6-th*1.6);rock(x,[[0,-30],[120,-38],[150,0],[120,34],[0,30]],C1,C2);magma(x,[[20,0],[70,-10],[120,4]],t,1);
+  x.translate(150,0);x.rotate(.4);rock(x,[[0,-26],[100,-30],[120,0],[100,28],[0,26]],C1,C2);x.translate(128,0);rock(x,[[-20,-30],[20,-34],[40,0],[20,34],[-20,30]],'#7a6a60','#3a2e28');
+  if(th>.05&&th<.8){x.save();x.translate(30,0);x.fillStyle=rg(x,0,0,5,55,[[0,'#8a7a70'],[1,'#3a2e28']]);smooth(x,[[-50,-30],[0,-55],[50,-25],[45,30],[-5,50],[-50,25]],true);x.fill();magma(x,[[-30,0],[0,10],[30,-5]],t,4);x.restore()}x.restore();
+  // legs + torso
+  rock(x,[[-120,0],[-110,-120],[-60,-150],[-20,-110],[-40,0]],C1,C2);rock(x,[[120,0],[110,-120],[60,-150],[20,-110],[40,0]],C1,C2);
+  rock(x,[[-150,-160],[-130,-330],[-70,-400],[70,-400],[140,-330],[150,-160],[80,-120],[-80,-120]],'#7a6a60',C2);
+  magma(x,[[-100,-330],[-60,-260],[-80,-200],[-40,-150]],t,0,1+rage);magma(x,[[90,-350],[40,-280],[70,-210],[30,-160]],t,2,1+rage);magma(x,[[-10,-380],[10,-300],[-5,-220]],t,3,1+rage);
+  x.fillStyle='rgba(0,0,0,.25)';for(let k=0;k<5;k++){x.beginPath();x.ellipse(-80+k*40,-240+Math.sin(k)*40,18,10,.4,0,7);x.fill()}
+  // near arm
+  x.save();x.translate(-110,-340);x.rotate(2.3-rage*.3);rock(x,[[0,-30],[120,-38],[150,0],[120,34],[0,30]],'#7a6a60',C2);magma(x,[[20,0],[80,6],[130,-4]],t,5);x.translate(150,0);x.rotate(-.5);rock(x,[[0,-26],[100,-30],[120,0],[100,28],[0,26]],'#7a6a60',C2);x.translate(128,0);rock(x,[[-20,-30],[20,-34],[40,0],[20,34],[-20,30]],'#8a7a70','#3a2e28');x.restore();
+  // head: craggy boulder, burning eyes, a jaw that opens in rage
+  x.save();x.translate(0,-430);rock(x,[[-64,-10],[-50,-70],[0,-92],[52,-72],[66,-12],[40,40],[-40,40]],'#8a7a70','#3a2e28');
+  rock(x,[[-50,-60],[-20,-80],[20,-80],[50,-60],[30,-50],[-30,-50]],'#9a8a80','#5a4a40');
+  x.save();x.globalCompositeOperation='lighter';for(const ex of[-24,22]){x.fillStyle=rg(x,ex,-18,0,26,[[0,'rgba(255,240,160,1)'],[.3,'rgba(255,140,30,.8)'],[1,'rgba(255,60,0,0)']]);x.beginPath();x.arc(ex,-18,26,0,7);x.fill()}x.restore();
+  x.fillStyle='#1a0a04';x.beginPath();x.moveTo(-30,14);x.lineTo(30,14);x.lineTo(22,24+rage*16);x.lineTo(-22,24+rage*16);x.fill();x.save();x.globalCompositeOperation='lighter';x.fillStyle=`rgba(255,120,20,${.4+rage*.5})`;x.fillRect(-18,18,36,4+rage*14);x.restore();x.restore();
+  if(hit>0){x.save();x.globalCompositeOperation='lighter';x.fillStyle=`rgba(200,230,255,${hit*.5})`;x.beginPath();x.arc(0,-280,240,0,7);x.fill();x.restore()}
+  x.restore()}
+/* god statues for the Temple of Gods */
+const GODS=['Poseidon','Athena','Hades','Apollo','Artemis','Ares','Aphrodite','Hermes','Hephaestus'];
+function emblem(x,i,s){x.save();x.strokeStyle='#c8901a';x.fillStyle='#c8901a';x.lineWidth=s*.04;x.lineCap='round';
+  switch(i){case 0:x.beginPath();x.moveTo(0,s*.4);x.lineTo(0,-s*.4);for(const d of[-1,0,1]){x.moveTo(d*s*.22,-s*.15);x.lineTo(d*s*.22,-s*.4)}x.moveTo(-s*.22,-s*.15);x.quadraticCurveTo(0,0,s*.22,-s*.15);x.stroke();break;
+    case 1:x.beginPath();x.ellipse(0,0,s*.25,s*.32,0,0,7);x.stroke();for(const d of[-1,1]){x.beginPath();x.arc(d*s*.1,-s*.1,s*.07,0,7);x.fill()}break;
+    case 2:x.beginPath();x.moveTo(-s*.3,s*.3);x.lineTo(-s*.3,-s*.1);x.quadraticCurveTo(0,-s*.5,s*.3,-s*.1);x.lineTo(s*.3,s*.3);x.stroke();x.fillRect(-s*.2,-s*.05,s*.4,s*.08);break;
+    case 3:x.beginPath();x.arc(0,0,s*.16,0,7);x.fill();for(let k=0;k<8;k++){const a=k/8*Math.PI*2;x.beginPath();x.moveTo(Math.cos(a)*s*.24,Math.sin(a)*s*.24);x.lineTo(Math.cos(a)*s*.38,Math.sin(a)*s*.38);x.stroke()}break;
+    case 4:x.beginPath();x.arc(0,0,s*.32,Math.PI*.35,Math.PI*1.65);x.arc(s*.12,0,s*.26,Math.PI*1.55,Math.PI*.45,true);x.fill();break;
+    case 5:x.beginPath();x.moveTo(-s*.35,s*.35);x.lineTo(s*.3,-s*.3);x.stroke();x.beginPath();x.moveTo(s*.34,-s*.34);x.lineTo(s*.12,-s*.26);x.lineTo(s*.26,-s*.12);x.fill();break;
+    case 6:x.beginPath();x.moveTo(0,s*.3);for(let k=0;k<=6;k++){const a=Math.PI+k/6*Math.PI;x.lineTo(Math.cos(a)*s*.34,Math.sin(a)*s*.34*1.1)}x.closePath();x.stroke();for(let k=1;k<6;k++){const a=Math.PI+k/6*Math.PI;x.beginPath();x.moveTo(0,s*.3);x.lineTo(Math.cos(a)*s*.34,Math.sin(a)*s*.37);x.stroke()}break;
+    case 7:x.beginPath();x.moveTo(-s*.3,s*.1);x.quadraticCurveTo(0,-s*.1,s*.3,-s*.3);x.quadraticCurveTo(s*.1,0,s*.3,s*.05);x.quadraticCurveTo(0,s*.1,-s*.3,s*.1);x.fill();break;
+    default:x.fillRect(-s*.3,-s*.12,s*.4,s*.2);x.beginPath();x.moveTo(s*.1,-s*.02);x.lineTo(s*.34,s*.38);x.stroke()}x.restore()}
+function drawStatue(x,i,t,s){x.save();
+  x.fillStyle=lg(x,-s*.4,0,s*.4,0,[[0,'#8a90a8'],[.4,'#f4f4fa'],[1,'#7a8098']]);rr(x,-s*.42,-s*.24,s*.84,s*.24,6);x.fill();x.fillStyle=goldG(x,-s*.26,-s*.2);x.fillRect(-s*.46,-s*.28,s*.92,s*.06);
+  x.save();x.translate(0,-s*.12);emblem(x,i,s*.28);x.restore();
+  // draped figure
+  const g=lg(x,-s*.25,0,s*.25,0,[[0,'#9aa0b8'],[.45,'#ffffff'],[1,'#8a90a8']]);x.fillStyle=g;x.beginPath();x.moveTo(-s*.22,-s*.28);x.bezierCurveTo(-s*.2,-s*.6,-s*.16,-s*.8,-s*.1,-s*.86);x.lineTo(s*.1,-s*.86);x.bezierCurveTo(s*.16,-s*.8,s*.2,-s*.6,s*.22,-s*.28);x.closePath();x.fill();
+  x.strokeStyle='rgba(90,96,120,.4)';x.lineWidth=1.5;for(let k=-2;k<=2;k++){x.beginPath();x.moveTo(k*s*.04,-s*.84);x.quadraticCurveTo(k*s*.06,-s*.55,k*s*.08,-s*.3);x.stroke()}
+  x.fillStyle=g;x.beginPath();x.arc(0,-s*.94,s*.09,0,7);x.fill();
+  x.fillStyle=g;x.save();x.translate(s*.1,-s*.8);x.rotate(-.8+Math.sin(t+i)*.03);rr(x,0,-s*.03,s*.2,s*.06,s*.03);x.fill();x.translate(s*.2,0);emblem(x,i,s*.12);x.restore();
+  x.restore()}
+function drawCloudBtn(x,w,h,t,lit){for(let i=0;i<9;i++){const cx=-w*.35+i*w*.09,cy=Math.sin(i*1.7)*h*.08,r=h*(.28+((i*37)%10)/40);puff(x,cx,cy+r*.25,r,true);puff(x,cx,cy,r,false)}
+  if(lit){x.save();x.globalCompositeOperation='lighter';x.fillStyle=rg(x,0,0,5,w*.6,[[0,`rgba(200,230,255,${lit*.6})`],[1,'rgba(120,180,255,0)']]);x.fillRect(-w,-h,w*2,h*2);x.restore()}}
 /* ================= STATE + WALLET ================= */
 const $=id=>document.getElementById(id);
 const BETS=[.2,.4,.6,1,2,3,5,10,20,50,100];
@@ -654,6 +800,7 @@ let SHAKE=0,SHX=0,SHY=0;
 const stageT=x=>x.setTransform(K*DPR,0,0,K*DPR,(OX+SHX)*DPR,(OY+SHY)*DPR);
 const shake=v=>{SHAKE=Math.max(SHAKE,v)};
 const cellXY=(c,r)=>[GX+c*CS+CS/2,GY+r*CS+CS/2];
+const toStage=(cx,cy)=>{const r=cv.getBoundingClientRect();return[(cx-r.left-OX)/K,(cy-r.top-OY)/K]};
 /* ================= THE TEMPLE FRAME (baked) ================= */
 function marble(x,X0,Y0,w,h){x.fillStyle=lg(x,X0,0,X0+w,0,[[0,'#9aa0b4'],[.3,'#f4f4fa'],[.6,'#dfe2ec'],[1,'#8a90a8']]);x.fillRect(X0,Y0,w,h);
   x.strokeStyle='rgba(120,120,150,.35)';x.lineWidth=1.2;let sd=Math.floor(X0*7+Y0);const R=()=>{sd=(sd*16807)%2147483647;return sd/2147483647};
@@ -768,7 +915,7 @@ function frame(ts){requestAnimationFrame(frame);const t=ts/1000,dt=Math.min(.05,
   drawSkyLive(x,T,dt,BGMODE==='fs');drawAmb(x,dt);drawSkyFx(x,dt);
   x.save();x.translate(ZX,ZY);x.scale(ZS,ZS);drawZeus(x,T,ZP);x.restore();
   drawGridBack(x);drawObjs(x);if(!FRM)FRM=bakeFrame();x.save();x.setTransform(1,0,0,1,0,0);x.drawImage(FRM,OX*DPR,OY*DPR);x.restore();stageT(x);
-  drawBraziers(x);drawHud(x);updFx(dt);countUpd(dt);
+  drawBraziers(x);drawHud(x);drawFeatureLayers(x);updFx(dt);countUpd(dt);
   const wv=HUD.count?HUD.count.v:HUD.win;if(wv!==HUD.winShown){HUD.winShown=wv;$('winV').textContent=money(wv||0)}}
 const EMB=[];
 function drawBraziers(x){for(const bx of[GX-33,GX+GW+33]){const by=GY-54;x.save();x.globalCompositeOperation='lighter';const fl=.7+.3*Math.sin(T*11+bx)+.15*Math.sin(T*27);
@@ -800,6 +947,93 @@ function countTo(from,to,dur,lbl){return new Promise(res=>{HUD.count={v:from,fro
 function countUpd(dt){const c=HUD.count;if(!c)return;c.t+=dt;const k=Math.min(1,c.t/c.dur),e=1-Math.pow(1-k,2.2);c.v=c.from+(c.to-c.from)*e;
   if(T-c.last>.06&&k<1){c.last=T;SFX.winTick(Math.floor(c.t*14))}
   if(k>=1||SKIP.on){c.v=c.to;HUD.win=c.to;HUD.count=null;c.res()}}
+/* ================= FEATURES ================= */
+let DARK=0,DARKT=0,HERA=null,TB=null;
+/* drawn by the frame loop: the wrath darkness, Hera, and the Titan arena */
+function drawFeatureLayers(x){
+  if(DARK!==DARKT)DARK+=(DARKT-DARK)*.08;if(DARK>.01){x.fillStyle=`rgba(4,2,16,${DARK*.55})`;x.fillRect(-500,-500,SW+1000,SH+1000)}
+  if(HERA){HERA.a+=((HERA.out?0:1)-HERA.a)*.06;x.save();x.translate(170,SH-30);x.scale(.78,.78);drawHera(x,T,HERA.a,HERA.v);x.restore();if(HERA.out&&HERA.a<.02)HERA=null}}
+/* ---- Zeus's Wrath: the sky goes dark and he blasts cells into one symbol ---- */
+async function zeusWrath(res){DARKT=1;SFX.wrath();banner("ZEUS'S WRATH",'he turns '+res.wrath.cells.length+' symbols into '+SYMN[res.wrath.s],1800);ZP.chT=T;shake(.6);FLASH=.7;await wait(1500);
+  for(const k of res.wrath.cells){const o=objAt(Math.floor(k/ROWS),k%ROWS);if(!o)continue;const[x,y]=cellXY(o.c,o.r);await zeusThrow(x,y);
+    o.s=res.wrath.s;o.v=undefined;o.pop=T;shock(x,y,100);sparks(x,y,'#fff3c0',22,380);shards(x,y,['#8ac8ff','#ffffff'],6);SFX.wrathHit();await wait(S.turbo?90:170)}
+  await wait(400);DARKT=0}
+/* ---- Hera's Blessing: a dead spin gets a free re-drop with an orb in it ---- */
+async function heraBlessing(res){const orb=res.start[Math.floor(res.hera.cell/ROWS)][res.hera.cell%ROWS];HERA={a:0,v:orb.s===ORB?orb.v:5,out:false};SFX.hera();
+  banner("HERA'S BLESSING",'a free re-drop, with a multiplier orb',2000);await wait(2100);await dropBoard(res.start);HERA.out=true}
+/* ---- Titan Battle ---- */
+const TCV=()=>$('titanCv');
+function titanScene(){const c=TCV(),x=c.getContext('2d'),W=c.width,H=c.height;x.setTransform(1,0,0,1,0,0);
+  x.fillStyle=lg(x,0,0,0,H,[[0,'#0a0616'],[.6,'#2a0a18'],[1,'#4a1a10']]);x.fillRect(0,0,W,H);
+  // lava glow on the horizon + rocks
+  x.fillStyle=rg(x,W*.7,H,20,H*.9,[[0,'rgba(255,90,20,.45)'],[1,'rgba(255,60,0,0)']]);x.fillRect(0,0,W,H);
+  x.fillStyle='#120608';x.beginPath();x.moveTo(0,H);for(let X=0;X<=W;X+=60)x.lineTo(X,H*.82-Math.abs(Math.sin(X*.013))*50);x.lineTo(W,H);x.fill();
+  if(Math.random()<.02)TB.flash=.6;if(TB.flash>0){x.fillStyle=`rgba(200,220,255,${TB.flash*.3})`;x.fillRect(0,0,W,H);TB.flash-=.04}
+  // Zeus (left, facing right) and the Titan (right, facing left)
+  const e=T-TB.zt,zth=e<.28?e/.28:e<.9?Math.max(0,1-(e-.28)/.62):0;
+  x.save();x.translate(W*.24,H*1.02);x.scale(-.62,.62);drawZeus(x,T,{throw:zth,charge:TB.charge});x.restore();
+  TB.th.hit=Math.max(0,TB.th.hit-.03);const te=T-TB.tt,tth=te<.4?te/.4:te<1?Math.max(0,1-(te-.4)/.6):0;TB.th.throw=tth;
+  x.save();x.translate(W*.76,H*.98);x.scale(.62,.62);drawTitan(x,T,TB.th);x.restore();
+  // projectiles
+  for(let i=TB.fx.length-1;i>=0;i--){const f=TB.fx[i],k=(T-f.t0)/f.d;if(k>1){TB.fx.splice(i,1);f.done&&f.done();continue}
+    if(f.k==='bolt')lightning(x,f.x0,f.y0,f.x1,f.y1,f.seed+Math.floor(k*20),5,90,3,1-k*.6);
+    else if(f.k==='rock'){const px=f.x0+(f.x1-f.x0)*k,py=f.y0+(f.y1-f.y0)*k-Math.sin(k*Math.PI)*200;x.save();x.translate(px,py);x.rotate(k*9);x.fillStyle=rg(x,0,0,4,46,[[0,'#8a7a70'],[1,'#3a2e28']]);smooth(x,[[-44,-24],[0,-46],[44,-20],[40,26],[-4,44],[-44,22]],true);x.fill();magma(x,[[-26,0],[0,8],[26,-4]],T,4);x.restore()}
+    else if(f.k==='txt'){x.save();x.globalAlpha=1-k;x.font=`900 ${f.sz}px ${FONT_U}`;x.textAlign='center';x.lineJoin='round';x.strokeStyle='#000';x.lineWidth=8;x.strokeText(f.txt,f.x0,f.y0-k*80);x.fillStyle=f.col;x.fillText(f.txt,f.x0,f.y0-k*80);x.restore()}
+    else if(f.k==='shield'){x.save();x.globalCompositeOperation='lighter';x.strokeStyle=`rgba(160,210,255,${1-k})`;x.lineWidth=10*(1-k)+2;x.beginPath();x.arc(f.x0,f.y0,120+k*80,0,7);x.stroke();x.restore()}}
+  // pot + rounds
+  x.font=`900 26px ${FONT_T}`;x.textAlign='center';x.fillStyle='#ffd766';x.fillText('TITAN BATTLE',W/2,44);
+  x.font=`900 54px ${FONT_U}`;x.fillStyle='#fff';x.strokeStyle='#000';x.lineWidth=8;x.strokeText(money(TB.pot),W/2,108);x.fillText(money(TB.pot),W/2,108);
+  for(let i=0;i<3;i++){x.fillStyle=i<TB.round?(TB.res[i]?'#7dff8a':'#ff6a5a'):'#3a2a40';x.beginPath();x.arc(W/2-40+i*40,138,11,0,7);x.fill();x.strokeStyle='#ffd766';x.lineWidth=2;x.stroke()}}
+function tbFx(f){return new Promise(r=>{f.t0=T;f.done=r;TB.fx.push(f)})}
+async function titanBattle(bet){S.stats.titan=(S.stats.titan||0)+1;SFX.titanIntro();shake(.8);banner('TITAN BATTLE','3 scatters woke a Titan',2000);await wait(2100);
+  const ov=$('titanOv');$('banner').classList.remove('on');TB={pot:r2(TITAN_P0*bet),round:0,res:[],fx:[],zt:-9,tt:-9,th:{hit:0,throw:0,rage:.2},charge:.3,flash:0};ov.classList.add('on');
+  const c=TCV();let alive=true;(function loop(){if(!alive)return;titanScene();requestAnimationFrame(loop)})();
+  const btns=[...document.querySelectorAll('#titanBtns button')];
+  btns.forEach((b,i)=>{const o=TITAN[i];b.innerHTML=`<b>${o.name.toUpperCase()}</b><small>${Math.round(o.q*100)}% hit · pot ×${o.m}<br>miss: pot ×${TITAN_LOSE}</small>`});
+  for(let r=0;r<3;r++){$('titanMsg').textContent=`Round ${r+1} of 3 · every attack is worth the same on average, only the risk differs`;btns.forEach(b=>b.disabled=false);
+    const pick=await new Promise(res=>{btns.forEach((b,i)=>b.onclick=()=>{SFX.click();res(i)});if(auto>0)setTimeout(()=>res(Math.floor(Math.random()*3)),900)});
+    btns.forEach(b=>b.disabled=true);const out=titanRound(Math.random,pick),W=c.width,H=c.height;
+    TB.charge=1;TB.zt=T;SFX.zeusThrow();await wait(260);
+    if(out.win){SFX.titanHit();await tbFx({k:'bolt',x0:W*.34,y0:H*.3,x1:W*.74,y1:H*.5,seed:1+r*77,d:.45});TB.th.hit=1;TB.flash=.8;TB.th.rage=Math.min(1,TB.th.rage+.3);
+      TB.pot=r2(TB.pot*out.m);tbFx({k:'txt',txt:'HIT! ×'+TITAN[pick].m,x0:W*.74,y0:H*.35,col:'#7dff8a',sz:52,d:1.3})}
+    else{tbFx({k:'bolt',x0:W*.34,y0:H*.3,x1:W*.6,y1:H*.1,seed:9+r*31,d:.35});tbFx({k:'txt',txt:'MISS',x0:W*.6,y0:H*.2,col:'#ffd766',sz:40,d:1});await wait(400);
+      TB.tt=T;SFX.titanThrow();await wait(380);await tbFx({k:'rock',x0:W*.7,y0:H*.3,x1:W*.28,y1:H*.55,d:.7});SFX.boulderHit();tbFx({k:'shield',x0:W*.26,y0:H*.6,d:.6});
+      TB.pot=r2(TB.pot*TITAN_LOSE);tbFx({k:'txt',txt:'×'+TITAN_LOSE,x0:W*.26,y0:H*.4,col:'#ff6a5a',sz:52,d:1.3})}
+    TB.res.push(out.win);TB.round=r+1;TB.charge=.3;await wait(1300)}
+  const pot=TB.pot;$('titanMsg').textContent=`The Titan retreats. You take ${money(pot)}.`;SFX.countEnd();await wait(1800);alive=false;ov.classList.remove('on');TB=null;
+  if(pot>=15*bet)await bigWin(pot,bet);else{coinBurst(GX+GW/2,GY+GH,20,700);floatT(GX+GW/2,GY+GH/2,'+'+money(pot),'#ffe58a',46)}
+  credit(pot);return pot}
+/* ---- Temple of Gods: pick 3 of 9 statues before the free spins ---- */
+async function templeOfGods(bet){SFX.templeIntro();const ov=$('templeOv'),G=$('templeGrid'),board=templeBoard(Math.random),picks=[];
+  G.innerHTML=board.map((p,i)=>`<div class="stat" data-i="${i}"><canvas width="220" height="260"></canvas><div class="prize"></div></div>`).join('');
+  const lab=p=>p.t==='spins'?`+${p.v} SPINS`:p.t==='mult'?`START ×${p.v}`:money(p.v*bet);
+  G.querySelectorAll('.stat').forEach((e,i)=>{const x=e.querySelector('canvas').getContext('2d');x.translate(110,250);drawStatue(x,i,1,230);e.querySelector('.prize').textContent=lab(board[i]);e.querySelector('.prize').classList.add(board[i].t);e.onmouseenter=()=>SFX.hover()});
+  $('templeSum').textContent='Pick 3 statues. Each hides extra spins, a starting multiplier or cash.';$('templeGo').style.display='none';$('banner').classList.remove('on');ov.classList.add('on');
+  await new Promise(res=>{const pick=i=>{const e=G.children[i];if(e.classList.contains('open')||picks.length>=3)return;e.classList.add('open');picks.push(board[i]);SFX.templePick(picks.length);
+      const r=e.getBoundingClientRect(),[sx,sy]=toStage(r.left+r.width/2,r.top+r.height/2);sparks(sx,sy,'#fff3c0',30,420);
+      $('templeSum').textContent=`${picks.length} of 3: `+picks.map(lab).join(' · ');if(picks.length===3)setTimeout(res,700)};
+    G.querySelectorAll('.stat').forEach((e,i)=>e.onclick=()=>pick(i));
+    if(auto>0){let k=0;const iv=setInterval(()=>{const c=[...G.children].filter(e=>!e.classList.contains('open'));if(!c.length||picks.length>=3){clearInterval(iv);return}pick(+c[Math.floor(Math.random()*c.length)].dataset.i)},700)}});
+  G.querySelectorAll('.stat:not(.open)').forEach(e=>e.classList.add('open','dim'));const g=templeApply(picks);SFX.templeDone();
+  $('templeSum').innerHTML=`<b>Your blessings:</b> ${g.spins?'+'+g.spins+' spins · ':''}${g.mult?'start at ×'+g.mult+' · ':''}${g.cash?money(g.cash*bet)+' cash':''}`.replace(/ · $/,'');
+  $('templeGo').style.display='';await new Promise(res=>{$('templeGo').onclick=()=>{SFX.click();res()};setTimeout(res,auto>0?1500:9000)});ov.classList.remove('on');return g}
+/* ---- Lightning Gamble: pick the cloud Zeus will strike; exactly 50/50 at 2x ---- */
+let GB=null;
+function gambleScene(){const c=$('gambleCv'),x=c.getContext('2d'),W=c.width,H=c.height;x.setTransform(1,0,0,1,0,0);x.fillStyle=lg(x,0,0,0,H,[[0,'#070a24'],[1,'#20145a']]);x.fillRect(0,0,W,H);
+  for(let i=0;i<2;i++){x.save();x.translate(W*(.28+i*.44),H*.62);drawCloudBtn(x,W*.34,H*.3,T+i,GB.lit[i]);x.restore();GB.lit[i]*=.95;
+    x.font=`900 26px ${FONT_T}`;x.textAlign='center';x.fillStyle=GB.sel===i?'#ffd766':'#aab4d8';x.fillText(i?'RIGHT':'LEFT',W*(.28+i*.44),H*.93)}
+  if(GB.bolt&&T-GB.bolt.t<.6){lightning(x,GB.bolt.x,0,GB.bolt.x,H*.55,GB.bolt.seed+Math.floor((T-GB.bolt.t)*30),6,80,3,1-(T-GB.bolt.t)/.6)}}
+function gRender(){$('gAmt').textContent=money(GB.amt);$('gC').textContent=money(GB.amt*2);$('gLeft').textContent=`${5-GB.n} gamble${5-GB.n===1?'':'s'} left on this win`}
+function openGamble(){if(!lastWin||busy)return;auInit();if(!spend(lastWin)){toast('Balance changed');return}GB={amt:lastWin,n:0,busy:false,lit:[0,0],sel:-1,bolt:null,alive:true};lastWin=0;$('gambleBtn').classList.remove('on');
+  $('gambleOv').classList.add('on');gRender();SFX.click();(function loop(){if(!GB||!GB.alive)return;gambleScene();requestAnimationFrame(loop)})()}
+async function gGuess(side){if(!GB||GB.busy)return;GB.busy=true;GB.sel=side;SFX.click();const strike=Math.random()<.5?0:1,c=$('gambleCv');await new Promise(r=>setTimeout(r,500));
+  GB.bolt={x:c.width*(.28+strike*.44),t:T,seed:1+Math.floor(Math.random()*1e5)};GB.lit[strike]=1;SFX.bolt();FLASH=.4;await new Promise(r=>setTimeout(r,650));
+  if(strike===side){GB.amt=r2(GB.amt*2);GB.n++;SFX.gWin();gRender();if(GB.n>=5){await new Promise(r=>setTimeout(r,700));gCollect();return}}
+  else{SFX.gLose();GB.amt=0;gRender();await new Promise(r=>setTimeout(r,1200));GB.alive=false;$('gambleOv').classList.remove('on');HUD.win=0;GB=null;return}
+  GB.busy=false;GB.sel=-1}
+function gCollect(){if(!GB||GB.busy&&GB.n<5)return;const a=GB.amt;GB.alive=false;credit(a);HUD.win=a;HUD.lbl='WIN';SFX.countEnd();$('gambleOv').classList.remove('on');GB=null;if(a>0)coinBurst(GX+GW/2,GY+GH,20,700)}
+$('gambleCv').addEventListener('click',e=>{const r=e.target.getBoundingClientRect();gGuess(e.clientX-r.left<r.width/2?0:1)});
+$('gLeftB').onclick=()=>gGuess(0);$('gRightB').onclick=()=>gGuess(1);$('gTake').onclick=gCollect;$('gambleBtn').onclick=openGamble;
 /* ================= FLOW ================= */
 const SKIP={on:false};
 let busy=false,phase='idle',slam=false,auto=0,lastWin=0,idleT=0,ANTIC=-1,scatSeen=0;
@@ -862,9 +1096,10 @@ function bigWin(amt,bet){return new Promise(res=>{const m=amt/bet,reach=TIERS.fi
   const finish=()=>{if(!ov.classList.contains('on'))return;clearInterval(iv);ov.classList.remove('on');ov.onclick=null;musMode(BGMODE==='fs'?'fs':'base');res()};
   ov.onclick=()=>{if(!done){done=true;t0=-1e9;SFX.countEnd();setTimeout(finish,900)}else finish()}})}
 /* ================= FREE SPINS ================= */
-async function freeSpins(bet){S.stats.fs++;SFX.fsIntro();FLASH=.8;banner('FREE SPINS',FS_N+' spins · every orb adds to one total multiplier',2800);await wait(2900);
-  BGMODE='fs';musMode('fs');HUD.fs={left:FS_N,acc:0,tot:0,bump:-9};HUD.win=0;HUD.lbl='WIN';
-  let n=FS_N,acc=0,tot=0,i=0;
+async function freeSpins(bet,tier){tier=tier||BUYS[0];S.stats.fs++;SFX.fsIntro();FLASH=.8;banner(tier.name.toUpperCase(),'first, the Temple of Gods',2600);await wait(2700);
+  const g=await templeOfGods(bet);
+  BGMODE='fs';musMode('fs');let n=tier.n+g.spins,acc=tier.acc+g.mult,tot=0,i=0;HUD.fs={left:n,acc,tot:0,bump:-9};HUD.win=0;HUD.lbl='WIN';
+  banner(n+' FREE SPINS',acc?'starting at ×'+acc:'every orb adds to one total multiplier',2000);await wait(2000);
   while(n>0&&i<200){n--;i++;HUD.fs.left=n;SKIP.on=false;slam=false;HUD.msg='';HUD.mult=0;HUD.win=0;const f=spinFree(Math.random,acc);
     phase='drop';await dropBoard(f.start);slam=false;phase='show';const tw=await playTumbles(f,bet,0);
     if(tw>0&&f.orbs>0){for(const o of[...OB.values()].filter(o=>o.s===ORB)){const[x,y]=cellXY(o.c,o.r);ZP.chT=T;SFX.orbCharge(3);
@@ -876,17 +1111,20 @@ async function freeSpins(bet){S.stats.fs++;SFX.fsIntro();FLASH=.8;banner('FREE S
     if(f.retrig){n+=f.retrig;HUD.fs.left=n;SFX.retrig();FLASH=.6;banner('+'+f.retrig+' FREE SPINS','',1500);await wait(1600)}
     if(tot>=MAXWIN*bet){SFX.maxWin();banner('MAX WIN',money(tot),2600);await wait(2600);break}
     await wait(tw?650:300)}
+  if(g.cash){const ca=r2(g.cash*bet);tot=r2(Math.min(MAXWIN*bet,tot+ca));banner('TEMPLE CASH','+'+money(ca),1500);SFX.countEnd();await wait(1500)}
   SKIP.on=false;HUD.mult=0;banner('FREE SPINS WIN',money(tot)+' from '+i+' spins',2600);SFX.countEnd();HUD.win=tot;HUD.lbl='FREE SPINS';await wait(2600);
   if(tot>=15*bet)await bigWin(tot,bet);credit(tot);
   BGMODE='base';musMode('base');HUD.fs=null;return tot}
 /* ================= THE ROUND ================= */
 async function round(buy){auInit();
   if(busy){if(phase==='drop')slam=true;else SKIP.on=true;return}
-  const bet=BET(),cost=r2(buy?BUY_X*bet:bet);if(!spend(cost)){toast('Not enough balance for '+money(cost));auto=0;updAuto();return}
-  busy=true;slam=false;SKIP.on=false;lastWin=0;HUD.win=0;HUD.under=false;HUD.msg='';HUD.mult=0;HUD.lbl='WIN';setBusyUI(true);HUD.idle='GOOD LUCK';
-  S.stats.spins++;S.stats.wag=r2(S.stats.wag+cost);if(buy)S.stats.buys++;
-  const res=buy?spinBuy():spinBase();
-  phase='drop';await dropBoard(res.start);slam=false;phase='show';
+  const bet=BET(),cost=r2(buy!=null&&buy!==false?BUYS[buy].x*bet:bet*(S.ante?ANTE_X:1));if(!spend(cost)){toast('Not enough balance for '+money(cost));auto=0;updAuto();return}
+  if(buy===false)buy=null;busy=true;slam=false;SKIP.on=false;lastWin=0;$('gambleBtn').classList.remove('on');HUD.win=0;HUD.under=false;HUD.msg='';HUD.mult=0;HUD.lbl='WIN';setBusyUI(true);HUD.idle='GOOD LUCK';
+  S.stats.spins++;S.stats.wag=r2(S.stats.wag+cost);if(buy!=null)S.stats.buys++;
+  const res=buy!=null?spinBuy():spinBase(undefined,S.ante);
+  phase='drop';await dropBoard(res.pre);slam=false;phase='show';
+  if(res.wrath){S.stats.wrath=(S.stats.wrath||0)+1;await zeusWrath(res)}
+  if(res.hera){S.stats.hera=(S.stats.hera||0)+1;phase='drop';await heraBlessing(res);slam=false;phase='show'}
   const tw=await playTumbles(res,bet,0);let tot=0;
   if(tw>0){let w=r2(Math.min(MAXWIN,tw)*bet);if(res.orbs>0)w=await orbsToMeter(bet,tw);
     if(w<bet&&!res.fs){HUD.under=true;HUD.win=w;HUD.msg=`${money(w)} back from your ${money(bet)} bet`;SFX.under();await wait(500)}
@@ -896,14 +1134,18 @@ async function round(buy){auInit();
     HLS=new Set([...OB.values()].filter(o=>o.s===SCAT).map(o=>o.id));HLT=T;DIM=1;SFX.scatHit(res.sc);FLASH=.7;
     HUD.msg=`${res.sc} scatters pay ${money(sa)}`;await countTo(tot,r2(tot+sa),.8,'WIN');tot=r2(tot+sa);await wait(900)}
   tot=r2(Math.min(tot,MAXWIN*bet));credit(tot);HUD.win=tot;
-  if(res.fs){HLS=null;DIM=0;tot=r2(tot+await freeSpins(bet));HUD.win=tot;HUD.lbl='TOTAL WIN'}
+  if(res.titan){HLS=null;DIM=0;tot=r2(tot+await titanBattle(bet));HUD.win=tot;HUD.lbl='TOTAL WIN'}
+  if(res.fs){HLS=null;DIM=0;tot=r2(tot+await freeSpins(bet,BUYS[buy==null?0:buy]));HUD.win=tot;HUD.lbl='TOTAL WIN'}
   lastWin=tot;S.stats.won=r2(S.stats.won+tot);S.stats.best=Math.max(S.stats.best,tot);save();
   busy=false;phase='idle';SKIP.on=false;setBusyUI(false);HUD.idle='8 OR MORE ANYWHERE WIN · SPACE TO SPIN';idleT=T;
   if(res.fs&&auto&&$('autoFeat').checked){auto=0;toast('Autoplay stopped: free spins landed')}
-  if(auto>0&&!buy){auto--;updAuto();setTimeout(()=>{if(!busy&&auto>=0)round(false)},tot>=bet*15?900:S.turbo?120:400)}else if(auto>0){auto=0;updAuto()}}
+  if(auto>0&&buy==null){auto--;updAuto();setTimeout(()=>{if(!busy&&auto>=0)round(false)},tot>=bet*15?900:S.turbo?120:400)}else if(auto>0){auto=0;updAuto()}
+  else if(tot>0)$('gambleBtn').classList.add('on')}
 /* ================= BUY ================= */
-function openBuy(){if(busy)return;auInit();SFX.buyOpen();const p=r2(BUY_X*BET());$('buyTxt').innerHTML=`Pay <b style="color:#ffd766">${money(p)}</b> (${BUY_X}× your ${money(BET())} bet) for a spin that always lands 4 scatters and starts the ${FS_N} free spins.<br><br>Priced so the bonus returns about 97%, the same as spinning for it.`;$('buyOv').classList.add('on')}
-$('buyBtn').onclick=openBuy;$('buyNo').onclick=()=>{SFX.click();$('buyOv').classList.remove('on')};$('buyYes').onclick=()=>{$('buyOv').classList.remove('on');auto=0;updAuto();round(true)};
+function openBuy(){if(busy)return;auInit();SFX.buyOpen();const bet=BET(),desc=['15 free spins, then the Temple of Gods','Starts at a ×10 total multiplier','20 spins starting at ×25'];
+  $('buyOpts').innerHTML=BUYS.map((b,i)=>`<div class="bcard ${b.k}" data-b="${i}"><h3>${b.name.toUpperCase()}</h3><div class="p">${money(b.x*bet)}</div><small>${b.x}× your bet<br>${desc[i]}</small></div>`).join('');
+  $('buyOpts').querySelectorAll('.bcard').forEach(e=>{e.onmouseenter=()=>SFX.hover();e.onclick=()=>{$('buyOv').classList.remove('on');auto=0;updAuto();round(+e.dataset.b)}});$('buyOv').classList.add('on')}
+$('buyBtn').onclick=openBuy;$('buyNo').onclick=()=>{SFX.click();$('buyOv').classList.remove('on')};
 /* ================= INFO ================= */
 function openInfo(){SFX.click();const bet=BET(),row=(id,txt)=>`<div class="pr"><canvas width="128" height="128" data-s="${id}"></canvas><div><b>${SYMN[id]}</b><br>${txt}</div></div>`;
   const pays=s=>`12+ ${money(PAY[s][2]*bet)}<br>10-11 ${money(PAY[s][1]*bet)}<br>8-9 ${money(PAY[s][0]*bet)}`;
@@ -913,17 +1155,25 @@ function openInfo(){SFX.click();const bet=BET(),row=(id,txt)=>`<div class="pr"><
   ${row(SCAT,`4 / 5 / 6 anywhere pay ${money(3*bet)} / ${money(5*bet)} / ${money(100*bet)} and start ${FS_N} free spins. 3 in free spins add ${FS_RE} more.`)}
   ${row(ORB,'Zeus hurls these onto the board: ×2 up to ×500. If the tumble pays, every orb on the board adds up and multiplies it.')}</div>
   <h2>Free spins</h2><p>Orbs land more often. Each one that lands in a paying tumble adds to a total multiplier for the rest of the bonus, and every later win is multiplied by that total. Max win ${MAXWIN.toLocaleString()}× your bet.</p>
-  <p><b>Buy free spins</b> for ${BUY_X}× your bet: a spin that always holds exactly 4 scatters. Priced so it returns about 97%.</p>
-  <h2>The honest numbers</h2><div class="odds"><span>Return to player (measured, 6M spins)</span><span>97.5%</span><span>Bought bonus return</span><span>about 97%</span><span>Any win</span><span>1 in 3.4</span><span>Free spins</span><span>1 in 355</span><span>Free spins average</span><span>109× bet</span>
+  <p><b>Temple of Gods</b>: before every free spins round, pick 3 of 9 statues. They hide +2/+4 spins, a starting total multiplier (×1, ×2, ×3, ×5) or cash (3×, 5×, 10× bet).</p>
+  <h2>Features</h2>
+  <p><b>Zeus's Wrath</b> (about 1 in 80 spins): the sky goes dark and Zeus blasts symbols into the commonest one on the board until it pays.</p>
+  <p><b>Hera's Blessing</b> (about 1 in 48 spins): a spin with nothing on it gets a free re-drop of the whole board with a multiplier orb in it.</p>
+  <p><b>Titan Battle</b> (exactly 3 scatters, about 1 in 52): the pot starts at ${TITAN_P0}× your bet. Three rounds: Bolt (75% hit, pot ×1.2), Storm (50%, ×1.6) or Wrath (25%, ×2.8); a miss takes the pot ×${TITAN_LOSE}. Every attack is worth the same on average, you only choose the swing.</p>
+  <p><b>Double Chance</b>: pay 25% more per spin and free spins come about twice as often (1 in ~195). Still about 97%.</p>
+  <p><b>Buy a bonus</b>: Free Spins ${BUYS[0].x}×, Super Free Spins (start at ×10) ${BUYS[1].x}×, Epic Free Spins (20 spins from ×25) ${BUYS[2].x}× your bet. Each priced from its measured value, so each returns about 97%.</p>
+  <p><b>Lightning Gamble</b>: after a win, pick the cloud Zeus strikes. Exactly 50/50 for double, up to 5 times.</p>
+  <h2>The honest numbers</h2><div class="odds"><span>Return to player (measured, 3M spins)</span><span>about 97%</span><span>Double Chance and bought bonuses</span><span>about 97% each</span><span>Any win</span><span>1 in 3.4</span><span>Free spins</span><span>1 in 340</span><span>Free spins average (incl. temple)</span><span>about 105× bet</span>
   <span>Chance per cell: Crown / Scatter / Orb</span><span>${pct(CROWN)} / ${pct(SCAT)} / ${pct(ORB)}</span></div>
   <p class="sub" style="text-align:left;margin-top:12px">Every cell, and every symbol that tumbles in, is an independent draw from these weights. Columns only slow down with the drum roll when a 4th scatter can still land.</p>
   <h2>Your play</h2><div class="odds"><span>Spins</span><span>${S.stats.spins.toLocaleString()}</span><span>Bet</span><span>${money(S.stats.wag)}</span><span>Won</span><span>${money(S.stats.won)}</span><span>Biggest round</span><span>${money(S.stats.best)}</span><span>Free spins / bought</span><span>${S.stats.fs} / ${S.stats.buys}</span></div>`;
   $('infoBody').querySelectorAll('canvas').forEach(c=>{const x=c.getContext('2d');x.translate(64,64);drawSym(x,+c.dataset.s,100,.4,0,25)});$('info').classList.add('on')}
 /* ================= CONTROLS ================= */
-function drawBet(){$('betV').textContent=money(BET());$('buyV').textContent=money(BUY_X*BET());$('betDn').disabled=busy||S.betI<=0;$('betUp').disabled=busy||S.betI>=BETS.length-1;$('buyBtn').disabled=busy}
+function drawBet(){$('betV').textContent=money(BET()*(S.ante?ANTE_X:1));$('buyV').textContent='from '+money(BUYS[0].x*BET());$('anteBtn').classList.toggle('on',!!S.ante);$('anteBtn').disabled=busy;$('betDn').disabled=busy||S.betI<=0;$('betUp').disabled=busy||S.betI>=BETS.length-1;$('buyBtn').disabled=busy}
 function setBusyUI(b){$('spinbtn').classList.toggle('busy',b);drawBet()}
 function updAuto(){$('autoBtn').classList.toggle('on',auto>0);$('autoBtn').textContent=auto>0?(auto>=900?'AUTO ∞':'AUTO '+auto):'AUTO'}
 $('spinbtn').onclick=()=>{$('autoPop').classList.remove('on');round(false)};
+$('anteBtn').onclick=()=>{if(busy)return;auInit();S.ante=!S.ante;SFX.click();drawBet();save()};
 $('betUp').onclick=()=>{if(busy||S.betI>=BETS.length-1)return;auInit();S.betI++;SFX.betUp(S.betI);drawBet();save()};
 $('betDn').onclick=()=>{if(busy||S.betI<=0)return;auInit();S.betI--;SFX.betDn(S.betI);drawBet();save()};
 $('autoBtn').onclick=()=>{auInit();SFX.click();if(auto>0){auto=0;updAuto();return}const p=$('autoPop'),r=$('autoBtn').getBoundingClientRect();p.style.left=(r.left-60)+'px';p.classList.toggle('on')};
@@ -937,7 +1187,7 @@ $('topup').onclick=()=>{S.bal=r2(S.bal+1000);save();drawBal(1);SFX.countEnd()};
 document.querySelectorAll('#bar button').forEach(b=>b.addEventListener('mouseenter',()=>SFX.hover()));
 $('cv').addEventListener('pointerdown',()=>{auInit();if(busy){if(phase==='drop')slam=true;else SKIP.on=true}});
 addEventListener('pointerdown',()=>auInit(),{once:true});
-addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if($('big').classList.contains('on')){$('big').click();return}if($('info').classList.contains('on')||$('buyOv').classList.contains('on'))return;round(false)}if(e.code==='Escape'){$('info').classList.remove('on');$('buyOv').classList.remove('on')}});
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if($('big').classList.contains('on')){$('big').click();return}if(['info','buyOv','titanOv','templeOv','gambleOv'].some(k=>$(k).classList.contains('on')))return;round(false)}if(e.code==='Escape'){$('info').classList.remove('on');$('buyOv').classList.remove('on')}});
 window.StackFrame={refresh:()=>drawBal()};
 if(SB)$('topup').style.display='none';
 /* a first board so the grid isn't empty */

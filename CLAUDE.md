@@ -244,6 +244,14 @@ Measured 97.35% (3M); shares base 66 / scat 1 / fs 30; free spins ~1 in 355, avg
 declaration won in the page (not in Node), so every cell was `undefined`. Core helpers must not share names with art/UI.
 Zeus (`drawZeus`, pose throw/charge) hurls a bolt at each orb as it lands (`ZQ` queue); anticipation (`ANTIC` column)
 only while a 4th scatter can still land.
+Features (2026-09-26, all in the CORE and in `playRound`, which the sims use): Zeus's Wrath (`WRATH_P` 1/80, `wrathOn`
+converts cells to the commonest paying symbol so it always pays), Hera's Blessing (`HERA_P` on dead spins with <3
+scatters: whole-board re-drop with a guaranteed orb), Titan Battle (exactly 3 scatters, pot `TITAN_P0`=3x, 3 rounds,
+every attack has q*m+(1-q)*0.4=1 so the choice only changes the swing), Temple of Gods (before every free spins round,
+pick 3 of 9 shuffled statues: spins/start mult/cash), Double Chance (`ANTE_X` 1.25, scatter weight `WA`), buy tiers
+`BUYS` (109x / 162x start x10 / 334x 20 spins from x25, priced from measured EV), Lightning Gamble (50/50 at 2x).
+Measured: normal 97.3%, ante 97.7%, buys 96.7/97.3/97.0%. Second name clash hit here too (`TEMPLE` statue list vs the
+sky's temple position, now `TEMPLE_POS`) - scan for duplicate top-level names after adding a part.
 
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
@@ -513,6 +521,7 @@ Two patterns, don't mix them up:
 - **2026-09-25** — Replaced the old 3-reel Slots with Dragon Stacks, a frame game (stack-slots.html) with Hold & Spin, pick-your-free-games, Dragon Wheel, envelopes, Dragon Breath wilds and a fair gamble. Frame game over inline: ~125KB of canvas/audio code with its own globals. Near misses kept real (dense pearls/lanterns + honest anticipation) rather than faked, per section 4.
 - **2026-09-25** — Added Olympus Storm, a second slot in a different style (tumble/cluster, 6x5 scatter pays, Zeus multiplier orbs, accumulating free-spin multiplier, buy bonus at 115x). Frame game like Dragon Stacks. Independent per-cell draws rather than strips: tumble refills make strips meaningless.
 - **2026-09-25** — Olympus Storm visual pass: Zeus rebuilt (anatomy, seeded hair/beard strands, cape, face detail, aura, eye glow, body lightning), layered sky (Olympus temple, islands + waterfalls, drifting cloud sprites, god rays, eagles, branching lightning), ornate temple frame with braziers, lapis grid, squash/dust/shockwave/shake/electric outlines. Cells shrank 112->104 to fit the pediment. Headless software render ~50fps.
+- **2026-09-25** — Olympus Storm features: Zeus's Wrath, Hera's Blessing, Titan Battle (3 scatters), Temple of Gods (before free spins), Double Chance ante, Super/Epic buy tiers, Lightning Gamble. Retuned: pays x0.8, WF orbs 55->33, temple values kept small; every mode measured at ~97%. Titan attacks are EV-equal by construction so the pick is about swing, not skill.
 
 ---
 
