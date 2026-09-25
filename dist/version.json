@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.26.1",
-  "notes": "Slot bars fixed: spin button no longer squashes, gamble button floats above the bar so the win amount stays visible",
-  "bytes": 2306431,
-  "at": "2026-09-25T21:51:39.193Z"
+  "version": "2026.09.26.2",
+  "notes": "Titan Battle fits the screen: title and pot visible, buttons clear of the control bar",
+  "bytes": 2306535,
+  "at": "2026-09-25T21:57:23.586Z"
 }

@@ -523,6 +523,7 @@ Two patterns, don't mix them up:
 - **2026-09-25** — Olympus Storm visual pass: Zeus rebuilt (anatomy, seeded hair/beard strands, cape, face detail, aura, eye glow, body lightning), layered sky (Olympus temple, islands + waterfalls, drifting cloud sprites, god rays, eagles, branching lightning), ornate temple frame with braziers, lapis grid, squash/dust/shockwave/shake/electric outlines. Cells shrank 112->104 to fit the pediment. Headless software render ~50fps.
 - **2026-09-25** — Olympus Storm features: Zeus's Wrath, Hera's Blessing, Titan Battle (3 scatters), Temple of Gods (before free spins), Double Chance ante, Super/Epic buy tiers, Lightning Gamble. Retuned: pays x0.8, WF orbs 55->33, temple values kept small; every mode measured at ~97%. Titan attacks are EV-equal by construction so the pick is about swing, not skill.
 - **2026-09-26** — Slot control bars: gamble buttons float above the bar (they used to push the win box off-screen), fixed-size controls never flex-shrink (spin button was squashing), compact bar under 1180px. Checked at 1060/1290/1500 wide.
+- **2026-09-26** — Titan Battle arena now sizes to the stage height (was width-based, so short windows cut the top off and the buttons sat on the control bar). Checked at 1540x880, 1290x760, 1100x700.
 
 ---
 
