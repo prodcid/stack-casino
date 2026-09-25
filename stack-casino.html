@@ -13181,6 +13181,18 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 #autoPop label{font-size:13px;color:var(--mute);display:flex;gap:6px;align-items:center}
 #toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:40;background:#2a0a0c;border:1px solid #b07818;border-radius:10px;padding:10px 16px;font-weight:800;display:none}
 #toast.on{display:block;animation:ovIn .2s}
+
+/* bar layout: fixed-size controls never shrink, text boxes do; the gamble button floats above the bar
+   so it never pushes the win box off the edge */
+#bar{gap:10px;padding:0 12px;min-width:0}
+#bar>*{flex:none}#bar>.sp{flex:1 1 0;min-width:0}
+.bx{min-width:0;padding:6px 12px}#bar>.bx{min-width:118px}#winbx{min-width:130px}
+#spinbtn{flex:none;aspect-ratio:1}
+.pm,.ib,.tog{flex:none}
+#betbox{flex:none}#betbox .bx{min-width:108px}
+@media (max-width:1360px){#bar{gap:7px}.bx b{font-size:17px}.tog{padding:0 9px;font-size:11px}#bar>.bx{min-width:108px}}
+#gamble{position:absolute;right:14px;bottom:calc(100% + 12px);z-index:22;height:48px}
+@media (max-width:1180px){#bar{gap:5px;padding:0 8px}.ib{width:38px;height:38px}.ib svg{width:18px;height:18px}#bar>.bx{min-width:96px;padding:6px 8px}.bx b{font-size:15px}.bx small{font-size:10px}#betbox .bx{min-width:92px}.pm{width:34px;height:34px;font-size:20px}.tog{padding:0 7px;font-size:10px;height:40px}#buyBtn{padding:0 8px;height:52px}#buyBtn span{font-size:12px}#buyBtn small{font-size:9px}#spinbtn{width:74px;height:74px}}
 </style></head><body>
 <div id="app">
  <div id="stage"><canvas id="cv"></canvas><canvas id="fx"></canvas>
@@ -14316,6 +14328,19 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 #gambleBtn{height:52px;padding:0 16px;border-radius:12px;font-weight:900;letter-spacing:.1em;background:linear-gradient(#1a2470,#070a24);border:2px solid #8ac8ff;color:#fff;display:none;animation:gp 1s ease-in-out infinite alternate}#gambleBtn.on{display:block}
 @keyframes gp{from{box-shadow:0 0 0 #8ac8ff}to{box-shadow:0 0 18px #8ac8ff}}
 #toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:40;background:#141c48;border:1px solid #c8a040;border-radius:10px;padding:10px 16px;font-weight:800;display:none}#toast.on{display:block;animation:ovIn .2s}
+
+/* bar layout: fixed-size controls never shrink, text boxes do; the gamble button floats above the bar
+   so it never pushes the win box off the edge */
+#bar{gap:10px;padding:0 12px;min-width:0}
+#bar>*{flex:none}#bar>.sp{flex:1 1 0;min-width:0}
+.bx{min-width:0;padding:6px 12px}#bar>.bx{min-width:118px}#winbx{min-width:130px}
+#spinbtn{flex:none;aspect-ratio:1}
+.pm,.ib,.tog{flex:none}
+#betbox{flex:none}#betbox .bx{min-width:108px}
+@media (max-width:1360px){#bar{gap:7px}.bx b{font-size:17px}.tog{padding:0 9px;font-size:11px}#bar>.bx{min-width:108px}}
+#gambleBtn{position:absolute;right:14px;bottom:calc(100% + 12px);z-index:22;height:48px}
+#buyBtn{white-space:nowrap;padding:0 12px}#buyBtn span{font-size:13px}
+@media (max-width:1180px){#bar{gap:5px;padding:0 8px}.ib{width:38px;height:38px}.ib svg{width:18px;height:18px}#bar>.bx{min-width:96px;padding:6px 8px}.bx b{font-size:15px}.bx small{font-size:10px}#betbox .bx{min-width:92px}.pm{width:34px;height:34px;font-size:20px}.tog{padding:0 7px;font-size:10px;height:40px}#buyBtn{padding:0 8px;height:52px}#buyBtn span{font-size:12px}#buyBtn small{font-size:9px}#spinbtn{width:74px;height:74px}}
 </style></head><body>
 <div id="app">
  <div id="stage"><canvas id="cv"></canvas><canvas id="fx"></canvas>
