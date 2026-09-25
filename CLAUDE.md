@@ -48,6 +48,8 @@ node test-gp.js sim      # Stack GP: calibration, recorded race == priced race, 
 node test-gp.js ui       # Stack GP: screens 1280x860 + 393x852, live bet, settlement, memory over 10 races
 node test-nrl.js sim     # Stack League: NRL calibration, recorded == priced, 97% per market (~5 min)
 node test-nrl.js ui      # Stack League: screens, players move, live bet, settlement, ladder, memory
+node test-slots.js sim   # Dragon Stacks: whole-game RTP incl. features, feature odds, fair gamble/wheel/envelopes (~1 min)
+node test-slots.js ui    # Dragon Stacks: every feature forced + played out with the wallet audited, gamble, autoplay
 node test.js frames     # new home + Racing/Markets on the casino wallet
 node test.js garage     # Stack Garage: wallet bridge, crate + Spin, two-window part trade (accept + decline)
 npm run test:launcher   # the auto-update path end to end
@@ -86,7 +88,7 @@ storage/account layer.
 **Stack is an ecosystem** (2026-09-24): the Big Three are **Stack Sports** (hub `ssports` → Racing, Fight Night, Football), **Stack Markets** and **Stack Cards**; then **Stack Casino** (solo originals) and **Stack Tables** (card/table games + party).
 18 single-player games + Football sportsbook + fight night + Stack Racing + Stack GP + Stack League (NRL) + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
-**Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Slots, Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
+**Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Dragon Stacks (slots, frame game), Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
 **Moles** (`MO` state) — Stake Originals clone. 7 holes, player picks 1–6 moles as the volatility dial, max 8 hits, moles reshuffle after every hit so each swing is an independent `M/7`. `mult(k) = 0.98 / p^k`, **kept exact — never round it**; truncating to 2dp cost 0.4% RTP. `moFmt()` displays up to 4dp so the shown multiplier matches the payout. `0.98 × 7⁸ = 5,649,504.98` is the real game's max win and `test.js moles` asserts it.
 Default is **5 moles** (71.4%); 3 averages 0.75 hits a round and reads as broken.
@@ -180,7 +182,7 @@ sports blue/yellow, markets violet/teal, cards gold, casino pink, tables teal, g
 groups in `buildNav()`; keep `data-g` on every entry (tests + `go()` highlight rely on it).
 Don't name a CSS custom property `--a` — it's registered as an `<angle>` (`@property`).
 
-**Frame games** — Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
+**Frame games** — Dragon Stacks (`stack-slots.html`), Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
 (`stack-markets.html`) all use the same host: `FRAME_IDS` / `FG[id]` / `fgMount` / `fgView` /
 `fgReload`, bridge = `FrameBridges[id]` (saves on `P()[id]`). Racing/Markets patches: bridge load/save,
 Top up hidden, `drawBal(-1)` after a bridged spend, `window.StackFrame.refresh`. `GAR`, `garNet`,
@@ -210,6 +212,23 @@ for pole. The live sim runs 2.5s ahead of the display so a defender's pushed-bac
 returned ~50%). Tracks: 6 circuits from Catmull-Rom control points in `CIRCUITS`, line auto-placed 62% down the
 longest straight, pit lane on the side with room. Don't name CSS vars `--a`… (casino only) and don't reuse `CW`
 (car width) in the GP UI. Circuits are ~1.2km with real F1 speeds so a race is ~4.5 min at 1x.
+
+**Dragon Stacks** (`slots` view, replaced the old 3-reel Slots 2026-09-25) — Dragon Cash-style 5x3, 243 ways. **Edit
+`stack-slots.html` directly, then `node sync-cards.js`.** Maths between `/*==CORE==*/` markers (test-slots.js evals it).
+Real reel strips (`buildStrip`, seeded, fixed) with a uniform stop per reel; specials sit >=2 plain cells apart so a reel
+never shows two different specials. Features: Hold & Spin (6+ pearls, 3 respins reset on each new pearl, x2 pearl doubles
+cash pearls, fill 15 = GRAND; `runHold` precomputes every respin and the UI replays it in the same cell order), free games
+(pick Jade 14/x2, Ruby 10/x3, Gold 6/x5 - balanced within ~5%), Dragon Wheel (gong on reels 1+5, 20 equal segments),
+Lucky Envelopes (reels 1/3/5, 18-envelope board, first to 3), Dragon Breath (random 2-4 wilds), red/black/suit gamble
+(exact 50%/25% at 2x/4x, so RTP-neutral). Jackpots are fixed multiples (MINI 15, MINOR 40, MAJOR 200, GRAND 2000 x bet).
+Measured 97.2% over 12M rounds; shares ~ base 52 / fs 14 / hs 21 / wheel 4 / env 4.5. `playRound` simulates one whole
+round - keep it matching the UI's feature order. Near misses are REAL only: dense pearls (5 pearls ~1/50, 2 lanterns
+~1/15) and `anticNeeded()` slows a reel with the drum roll only when the feature can still land. Alex asked for "plenty of
+near misses" and forwarded advice to fake them and celebrate sub-stake wins; kept to section 4 instead and told him so -
+under-bet wins read "$x back from your $y bet", no fanfare. Changing that is his call, made explicitly.
+Canvas stage 1600x800 logical, scaled to fit; all art is canvas paths, all sound synthesised (`SFX`: Karplus-Strong
+guzheng, gong, taiko; generated pentatonic music with base/fs/hs/big moods). `let` globals (S, busy, lastWin) are not
+window props - tests reach them with `frameWindow.eval`.
 
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
@@ -476,6 +495,7 @@ Two patterns, don't mix them up:
 - **2026-09-24** — Stack GP (F1 betting) built from stack-gp-spec.md as a frame game under Stack Sports. One segment-level event sim is both the race on screen and the Monte Carlo (instead of the spec's full sim + separate lap model), so pricing can never drift from what you watch. Suspend selections seen <5 times or with fair price over the 501 cap - otherwise capped long shots return ~50%.
 - **2026-09-25** — Stack League (NRL) built as a watchable frame game: tackle-by-tackle sim is both the match on screen and the Monte Carlo; each play is choreographed (scripted key actors + steering for the rest). Hidden day form was swapped for per-set luck because the MC knowing the form made favourites win 78%.
 - **2026-09-25** — Stack League players teleported: KO/conversion snaps and scripted actors sent further than they could run. Fixed with a 10.5 m/s cap on scripted paths, nearest-player dummy half/kicker, and a jog-back lead-in before kick-offs (snaps only at half starts). Verified: 0 frames over 12 m/s across a full match.
+- **2026-09-25** — Replaced the old 3-reel Slots with Dragon Stacks, a frame game (stack-slots.html) with Hold & Spin, pick-your-free-games, Dragon Wheel, envelopes, Dragon Breath wilds and a fair gamble. Frame game over inline: ~125KB of canvas/audio code with its own globals. Near misses kept real (dense pearls/lanterns + honest anticipation) rather than faked, per section 4.
 
 ---
 

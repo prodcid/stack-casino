@@ -72,7 +72,6 @@ async function solo(ctx, errs) {
     ['plinko', [['#plGo', 1500]]],
     ['bj', [['#bjDeal', 2100], ['#bjStand', 2300]]],
     ['poker', [['#pkGo', 800], ['#pkGo', 2100]]],
-    ['slots', [['#slGo', 4000]]],
     ['chicken', [['#ckGo', 600], ['#ckGo', 1300], ['#ckCash', 800]]],
     ['balloon', [['#bpGo', 2000], ['#bpGo', 1300]]],
     ['wheel', [['#whGo', 5200]]],
@@ -1407,13 +1406,20 @@ async function frames(ctx, errs) {
   (home.b3 === 3 && home.cas >= 15 && home.tab === 5 && home.nav ? pass : fail)('home: Big Three, casino + tables rows, grouped sidebar', JSON.stringify(home));
   await pg.click('#big3 .b3-sports .b3go'); await pg.waitForTimeout(300);
   ((await pg.evaluate("$('ssportsView').classList.contains('on')&&document.querySelector('#side [data-g=ssports]').classList.contains('on')")) ? pass : fail)('Big Three opens the Stack Sports hub');
-  for (const id of ['racing', 'markets', 'gp', 'nrl']) {
+  for (const id of ['racing', 'markets', 'gp', 'nrl', 'slots']) {
     await pg.evaluate(`P().bal=500;renderBal();go('${id}')`);
     await pg.waitForFunction(`FG.${id}.ready`, null, { timeout: 25000 }); await pg.waitForTimeout(600);
     const r = await pg.evaluate(`(()=>{const w=FG.${id}.frame.contentWindow,d=w.document;const before=P().bal;const ok=w.StackBridge.spend(25);w.StackFrame.refresh();
       return {bridged:w.StackBridge===FrameBridges.${id},topup:getComputedStyle(d.getElementById('topup')).display,ok,drop:+(before-P().bal).toFixed(2),shown:d.getElementById('bal').textContent}})()`);
     (r.bridged && r.topup === 'none' && r.ok && r.drop === 25 && /475/.test(r.shown) ? pass : fail)(`${id}: casino wallet, no free top-up`, JSON.stringify(r));
   }
+  // Dragon Stacks: a real spin on the casino wallet settles back into it
+  { await pg.evaluate("P().bal=500;renderBal();go('slots')");
+    const sl = await pg.evaluate(`(async()=>{const w=FG.slots.frame.contentWindow;w.eval('S.betI=3;S.turbo=true');const before=P().bal;w.spin();
+      await new Promise(r=>setTimeout(r,300));
+      for(let i=0;i<600&&w.eval('busy');i++){for(const q of['#fsPick.on .fsc','#wheelOv.on #wheelGo:not([disabled])','#envOv.on #envAuto:not([disabled])']){const e=w.document.querySelector(q);if(e&&e.offsetParent!==null)e.click()}await new Promise(r=>setTimeout(r,200))}
+      return {busy:w.eval('busy'),before,after:P().bal,won:w.eval('lastWin'),shown:w.document.getElementById('bal').textContent}})()`);
+    (!sl.busy && Math.abs(sl.after - (sl.before - 1 + sl.won)) < .005 && sl.shown.includes(sl.after.toFixed(2).split('.')[0]) ? pass : fail)('slots: a Dragon Stacks spin settles on the casino wallet', JSON.stringify(sl)); }
   // a game that isn't on screen must be silent: its sound goes through a host-controlled gain
   const au = await pg.evaluate(`(async()=>{const ctx={};for(const id of ['racing','markets']){const w=FG[id].frame.contentWindow;ctx[id]=new w.AudioContext()}
     const g=()=>['racing','markets'].map(id=>ctx[id].destination.gain.value).join(',');const out={};
