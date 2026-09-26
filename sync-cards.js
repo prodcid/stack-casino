@@ -36,7 +36,9 @@ function frameText(id) {
 }
 function frameScript(id) {
   const src = fs.readFileSync(frameFile(id), 'utf8').replace(/\r\n/g, '\n');
-  return src.slice(src.indexOf('<script>') + 8, src.lastIndexOf('</script>'));
+  /* a frame can carry more than one plain <script> block (the arcade bundles three.js in its own): check them all */
+  const blocks = src.split('<script>').slice(1).map(b => b.slice(0, b.lastIndexOf('</script>')));
+  return blocks.length > 1 ? blocks.join('\n;\n') : src.slice(src.indexOf('<script>') + 8, src.lastIndexOf('</script>'));
 }
 
 function extract() {

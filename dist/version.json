@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.27.1",
-  "notes": "Claw fix: every box now gets its full chance (loose top boxes were stealing the target), chance tag over the box you're aiming at, first-time how-to, and a 3D unboxing with a real box and a solid figure",
-  "bytes": 2605237,
-  "at": "2026-09-26T21:40:13.862Z"
+  "version": "2026.09.27.2",
+  "notes": "Stackheads in real 3D: new finishes Standard/Silver/Gold/Gummy/Confetti, new packaging with character scenes, a 3D unboxing and a 3D shelf inspector (drag to spin)",
+  "bytes": 3304118,
+  "at": "2026-09-26T22:22:48.931Z"
 }

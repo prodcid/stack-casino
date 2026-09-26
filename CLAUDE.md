@@ -277,8 +277,16 @@ treasure 26x. Tuned for frequent wins (any win 1 in 2.1) after Alex said Dragon 
 built from scratchpad parts, maths between `/*==CORE==*/` and `/*==END CORE==*/`). One frame holds the arcade floor (hub),
 the Claw, the Coin Pusher and the Stackheads shelf; state is `P().arcade` (figures, a saved field per pusher cabinet, the
 claw pile). **Stackheads** are vinyl figures (big head, black eyes, window box - Funko-Pop-inspired but our own name and
-look; don't use "Pop"): 12 characters from across Stack x 5 finishes (Standard 2x, Metallic 6x, Glow 20x, Gold 100x,
-Diamond 500x). A figure's value is fixed when won (multiplier x the play price, or x 3 coins off the pusher) and it can
+look; don't use "Pop"): 12 characters from across Stack x 5 finishes (Standard 2x, Silver 6x, Gold 20x, Gummy 100x,
+Confetti 500x - renamed 2026-09-27 from Metallic/Glow/Gold/Diamond, same index = same rarity, so owned figures kept their value).
+**3D (2026-09-27):** figures are real three.js models (`32-fig3d.js`; three r158 UMD bundled inline like the garage, so it
+works offline): rounded-box heads, parts tagged by ROLE and the finish maps roles to materials (vinyl clearcoat; silver/gold
+metal with a studio PMREM env, eyes stay black; gummy = vertex-colour top-to-bottom gradient + emissive/fresnel shader tweak;
+confetti = translucent base + thousands of instanced metallic flakes sampled through the body). They're baked to sprites
+(`g3Pump` queue, 2D art shows until the bake lands) for the 2D scenes; the unboxing (`47-reveal3d.js`: textured 3D box with
+hinged flaps, beam, finish FX, drag to spin) and the shelf inspector render live. No WebGL -> the old 2D art and reveal.
+Packaging (`33-pack.js`): per-finish box stock (brushed silver, gold foil, candy gummy, holographic confetti), a printed
+scene per character behind the figure, moulded insert, rarity ribbon, finish sticker. A figure's value is fixed when won (multiplier x the play price, or x 3 coins off the pusher) and it can
 always be sold back for exactly that - figures are money on a shelf, which is what keeps the house rule honest.
 **Claw:** the chance to win the box under the claw is shown before the drop, `clawP = 0.97/multiplier x lineUp` (line-up
 100% within 35% of the box centre, 0 at the edge; a box with another on top can't be lifted). The pile is ONE layer of standing boxes: a loose top layer of lying boxes overhung its neighbours and stole the claw's target, so 40-55% of boxes showed almost no chance even dead-centred (Alex: "only some at the very back give 50%"). `test-arcade.js ui` now asserts every box gets its full chance when centred. The price tag over the targeted box and the LCD show finish/chance/prize before you pay; a how-to panel opens on the first claw visit (`S.clawHelp`). The win reveal (`46-reveal.js`) is a real 3D box (per-triangle texture mapping, flaps) with the figure extruded into layers so it has thickness as it turns. Rolled once when the claw
@@ -571,6 +579,8 @@ Two patterns, don't mix them up:
 - **2026-09-26** — Stack Arcade added as a new platform (banner under the Big Three, own sidebar brand): one frame game with the arcade floor, a claw machine and a coin pusher, both paying Stackheads - Funko-Pop-style vinyl figures (Alex's ask) of 12 Stack characters x 5 finishes, each worth a fixed multiple of the play and sellable back, which keeps the 97% honest. Claw shows its real chance before the drop; pusher RTP comes from its own physics (house gutters + Lucky Slot), measured ~97-98%, one saved field per coin value so a coin never changes value.
 - **2026-09-26** — Stack Arcade rendering: neon signs and bulb glows are pre-rendered (NEON cache per text/size/scale, glowSpr per colour) and the arcade floor's attractions are baked per spot, because live shadowBlur on ~150 bulbs + every sign each frame was most of the frame. All three scenes hold 60fps even in headless software rendering (Olympus measures 20ms there). The claw LCD redraws only when its content changes.
 - **2026-09-27** — Claw fix: removed the loose lying-box top layer - those boxes overhung their neighbours and became the claw's target, so 40-55% of boxes (worst at the front) showed near-0% even perfectly centred, and the 'buried' check fired on neighbours by centre distance. Now one layer, buried = real footprint overlap, a test covers every box. Added a chance tag over the targeted box, target info before paying, a first-visit how-to, and a 3D unboxing (textured 3D box + extruded figure) at Alex's ask.
+- **2026-09-27** — Stackheads rebuilt in real 3D (three.js bundled inline, same as the garage, so offline still works): 12 modelled characters, finishes renamed to Alex's list Standard/Silver/Gold/Gummy/Confetti (same rarity index, so owned figures keep value), per-finish packaging with character scenes, a 3D unboxing and a 3D shelf inspector. Figures bake to sprites through a queue so the claw/pusher/shelf never stall; 2D art is the WebGL fallback.
+- **2026-09-27** — sync-cards.js syntax-checks every plain <script> block in a frame file, not first-to-last: the arcade now carries three.js in its own block and the old slice fed '</script><script>' to the checker.
 
 ---
 

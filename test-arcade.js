@@ -99,7 +99,7 @@ async function ui() {
   check(gut.house >= 1 && gut.paid >= 1 && gut.gain === gut.paid * 1, 'a coin into a HOUSE gutter pays nothing, a coin over the front pays its value', JSON.stringify(gut));
   /* a Stackhead box off the front */
   const box = await ev(`(()=>{const n0=S.figs.length;const c=pzCoin(PU.st,0,PZ.D+.1,0,'b',VARS[3].m*PZ_BOXX,2.5,{vi:3,fi:0});pzStep(PU.st,1/60).forEach(onExit);const f=S.figs[S.figs.length-1];return{got:S.figs.length-n0,val:f&&f.val,src:f&&f.src,pop:$('figPop').classList.contains('on')}})()`);
-  check(box.got === 1 && box.val === 300 && box.src === 'pusher' && box.pop, 'a Stackhead box pushed off the front is yours: Gold x 3 coins x $1 = $300', JSON.stringify(box));
+  check(box.got === 1 && box.val === 300 && box.src === 'pusher' && box.pop, 'a Stackhead box pushed off the front is yours: Gummy (100x) x 3 coins x $1 = $300', JSON.stringify(box));
   /* a Lucky Slot feature plays out */
   const lk = await ev(`(async()=>{const n0=PU.st.c.length;PU.featQ.push(PZ_FEAT.find(f=>f.k==='jack'));await new Promise(r=>setTimeout(r,2600));const mid=$('banT').textContent;await new Promise(r=>setTimeout(r,5000));return{mid,bar:PU.st.c.some(c=>c.k==='g')||PU.won>0,added:PU.st.c.length-n0,q:PU.spawnQ.length}})()`);
   check(/JACKPOT/.test(lk.mid) && lk.q === 0 && lk.added > 20, 'the Lucky Slot spins up the JACKPOT and rains in the gold bar and coins', JSON.stringify(lk));
@@ -116,7 +116,11 @@ async function ui() {
   check(all.n > 2000 && all.bad === 0, 'every box in the cabinet, front row to back, gets its full chance when the claw is centred on it', JSON.stringify(all));
   const w = await round(0, 0);
   check(w.cost === 5 && w.got === 1 && w.q === 1 && Math.abs(w.shown - w.exp) < 1e-12 && w.val === 5 * [2, 6, 20, 100, 500][w.vi] && w.rev && !w.left, 'claw win: costs the play, shows the true chance, the box leaves the cabinet and the figure is worth multiplier x play', JSON.stringify(w));
-  await pg.waitForTimeout(2600); await shot('reveal');
+  const r3 = await pg.waitForFunction('RV.done', null, { timeout: 90000 }).then(() => ev("({mode:RV.mode,ph:R3D.ph,webgl:G3.ok})"), () => ev("({mode:RV.mode,ph:R3D.ph,webgl:G3.ok,timeout:true})"));
+  check(r3.mode === '3d' && r3.ph === 'idle' && !r3.timeout, 'the win opens as a 3D unboxing: box drops, flaps open, the figure rises onto the turntable', JSON.stringify(r3));
+  await shot('reveal');
+  const bk = await ev("(()=>{figReadyAll([[3,4],[7,3]]);const a=figCanvas(3,4),b=figCanvas(7,3);return {a:a.baked,b:b.baked,names:VARS.map(v=>v.n).join('/')}})()");
+  check(bk.a && bk.b && bk.names === 'Standard/Silver/Gold/Gummy/Confetti', 'figures are baked from the 3D models, in the five finishes', JSON.stringify(bk));
   await pg.click('#revKeep'); await pg.waitForTimeout(300);
   const l = await round(.9999, 0);
   check(l.cost === 5 && l.got === 0 && l.left, 'claw slip: the box stays in the cabinet and nothing is added', JSON.stringify(l));
