@@ -53,6 +53,8 @@ node test-egypt.js sim   # Ra's Fortune: RTP, both buys, feature odds, honest st
 node test-egypt.js ui    # Ra's Fortune: collect, Sun, Rain, Book of Ra, Treasure, buys, gamble - wallet audited
 node test-olympus.js sim # Olympus Storm: RTP, bought-bonus RTP, FS odds, cap, honest draws (~2 min)
 node test-olympus.js ui  # Olympus Storm: tumbles, orbs, a bought bonus with the wallet audited, autoplay
+node test-arcade.js sim  # Stack Arcade: claw odds exact, pusher RTP from its own physics by aim, money conserved (~2 min)
+node test-arcade.js ui   # Stack Arcade: floor, pusher drops/payouts/gutters/cabinets/Lucky Slot, claw win/slip/miss/timer, selling, shelf, reload
 node test-slots.js ui    # Dragon Stacks: every feature forced + played out with the wallet audited, gamble, autoplay
 node test.js frames     # new home + Racing/Markets on the casino wallet
 node test.js garage     # Stack Garage: wallet bridge, crate + Spin, two-window part trade (accept + decline)
@@ -89,8 +91,8 @@ storage/account layer.
 
 ## 2. Current scope
 
-**Stack is an ecosystem** (2026-09-24): the Big Three are **Stack Sports** (hub `ssports` → Racing, Fight Night, Football), **Stack Markets** and **Stack Cards**; then **Stack Casino** (solo originals) and **Stack Tables** (card/table games + party).
-18 single-player games + Football sportsbook + fight night + Stack Racing + Stack GP + Stack League (NRL) + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
+**Stack is an ecosystem** (2026-09-24): the Big Three are **Stack Sports** (hub `ssports` → Racing, Fight Night, Football), **Stack Markets** and **Stack Cards**; then **Stack Arcade** (2026-09-26, its own banner under the Big Three: claw machine, coin pusher, Stackheads figures), **Stack Casino** (solo originals) and **Stack Tables** (card/table games + party).
+18 single-player games + Football sportsbook + fight night + Stack Racing + Stack GP + Stack League (NRL) + Stack Markets + Stack Cards (with the Stack Clash battle game) + Stack Arcade (claw + coin pusher + Stackheads) + Stack Garage, 8 party tables, 8 card skins, 2 cosmetic types, accounts, admin portal, dev mode.
 
 **Single player:** Moles, Long Shot, Plinko, Blackjack, Video Poker, Dragon Stacks (slots, frame game), Olympus Storm (tumble slot, frame game), Ra's Fortune (Egyptian coin slot, frame game), Chicken Road, Balloon Pump, Fortune Wheel, Mines, Dice, Roulette, Keno, Hi-Lo, Baccarat, Tower, Limbo, Scratch (4 ticket designs), Craps.
 
@@ -270,6 +272,26 @@ mask `COLL` (reel 5 only) collects every coin. Minis: Sun of Ra (`SUN_P` 1/40, a
 symbol, `EXPAY` pays by reels covered, collects multiply and step up to x10), Pharaoh's Treasure hold & win (6+ coins,
 `runHold` on a 5 x 4..6 board: sun coins double, pyramid coins add a row, full board = GRAND). Buys: free games 31x,
 treasure 26x. Tuned for frequent wins (any win 1 in 2.1) after Alex said Dragon Stacks felt slow; measured 97.1-98.2%.
+
+**Stack Arcade** (`arcade` view, added 2026-09-26) - `stack-arcade.html` frame game (edit it, then `node sync-cards.js`;
+built from scratchpad parts, maths between `/*==CORE==*/` and `/*==END CORE==*/`). One frame holds the arcade floor (hub),
+the Claw, the Coin Pusher and the Stackheads shelf; state is `P().arcade` (figures, a saved field per pusher cabinet, the
+claw pile). **Stackheads** are vinyl figures (big head, black eyes, window box - Funko-Pop-inspired but our own name and
+look; don't use "Pop"): 12 characters from across Stack x 5 finishes (Standard 2x, Metallic 6x, Glow 20x, Gold 100x,
+Diamond 500x). A figure's value is fixed when won (multiplier x the play price, or x 3 coins off the pusher) and it can
+always be sold back for exactly that - figures are money on a shelf, which is what keeps the house rule honest.
+**Claw:** the chance to win the box under the claw is shown before the drop, `clawP = 0.97/multiplier x lineUp` (line-up
+100% within 35% of the box centre, 0 at the edge; a box with another on top can't be lifted). Rolled once when the claw
+closes; the grip is never rigged. A miss lets go EARLY in the lift, never near the chute (no staged near misses).
+**Pusher:** real 2D physics with stacking (`pzStep`: pusher top rides and the back wall scrapes coins off, the face
+shoves the field, squeezed coins ride up, stacked coins fall when unsupported). Coins over the front pay; the red HOUSE
+gutters at the front corners (`PZ.G`) are the whole edge. Everything leaves eventually, so RTP = front share + Lucky Slot
+value. Lucky Slot 1 in 65 drops (reels spin ONLY for a real feature): coin rain, gold shower, x10 jumbo, walls (no gutter
+for 25 coins), a Stackhead box on the field, frenzy, jackpot (x100 bar + 50 coins). Measured ~97-98% across the chute,
+~99% dead centre (the ceiling), ~96% at the chute ends. The chute only travels +-5.5 of the 22-wide field, because
+aiming at the gutters would otherwise swing the return by 12 points. Five cabinets (20c/$1/$5/$20/$100), each with its own
+saved field, so a coin never changes value after it's dropped (a shared field let you build up with cheap coins and
+harvest at a big bet). New cabinets start from `PZ_START`, a field pre-settled by simulation.
 
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
@@ -546,6 +568,8 @@ Two patterns, don't mix them up:
 - **2026-09-26** — Ra's Fortune gamble: the flip animation ended on the wrong face (9 half-turns flipped it), so a Scarab result could land showing the Pharaoh. Payout was always right. Now 10 half-turns + the result, verified 30/30, and a LANDED line says what came up.
 - **2026-09-26** — All three slots: bet ladder extended to 150/200/250/300 (max 300 a spin, Alex's ask). Ra's Fortune gamble: coin now always lands showing the result (was 9 half-turns, flipping it) + LANDED line; verified 30/30.
 - **2026-09-26** — Admin line: admin portal reaches remote players without a party (own PeerJS id per account, 4 slots, token from ADMIN_PW), live balance every 2 s, grant as a delta, offline commands queued in S.admQ. Alex needed to manage his mate's balance mid-session outside a party.
+- **2026-09-26** — Stack Arcade added as a new platform (banner under the Big Three, own sidebar brand): one frame game with the arcade floor, a claw machine and a coin pusher, both paying Stackheads - Funko-Pop-style vinyl figures (Alex's ask) of 12 Stack characters x 5 finishes, each worth a fixed multiple of the play and sellable back, which keeps the 97% honest. Claw shows its real chance before the drop; pusher RTP comes from its own physics (house gutters + Lucky Slot), measured ~97-98%, one saved field per coin value so a coin never changes value.
+- **2026-09-26** — Stack Arcade rendering: neon signs and bulb glows are pre-rendered (NEON cache per text/size/scale, glowSpr per colour) and the arcade floor's attractions are baked per spot, because live shadowBlur on ~150 bulbs + every sign each frame was most of the frame. All three scenes hold 60fps even in headless software rendering (Olympus measures 20ms there). The claw LCD redraws only when its content changes.
 
 ---
 

@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.26.6",
-  "notes": "Admin portal works without a party: live balance, set balance, grant credits and messages reach remote players; offline commands queue until they log in",
-  "bytes": 2436461,
-  "at": "2026-09-26T06:25:08.479Z"
+  "version": "2026.09.26.7",
+  "notes": "Stack Arcade: new platform with a claw machine and a 5-cabinet coin pusher, both paying Stackheads collectable figures (12 characters x 5 finishes) you can keep on your shelf or sell back",
+  "bytes": 2592544,
+  "at": "2026-09-26T12:54:06.150Z"
 }
