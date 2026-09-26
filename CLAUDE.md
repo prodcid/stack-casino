@@ -124,6 +124,14 @@ flawless and a sloppy aimer and requires the sloppy one to return strictly less.
 
 **Admin portal** (`admin` view, `ADM` state, unlocked with `ADMIN_PW`, hidden from the nav until then). Two populations, and the distinction matters:
 
+**Admin line (2026-09-26, works without a party):** every logged-in client listens on its own PeerJS id,
+`adlId(user,slot)` with 4 slots (the broker can hold a released id for ~a minute after logout/relaunch, so the
+player takes the first free slot and the admin dials all four). Admin proves `adlTok(user)` (hash of ADMIN_PW), then
+the player streams `myProf()` every 2 s; admin commands `{t:'adm',a:'bal'|'give'|'msg'|'susp'}` apply via
+`onAdminCmd`. Grant is a delta (`give`), not an absolute set. Offline commands queue in `S.admQ` and flush when
+the line answers; the portal redials remote users every 10 s while it's open. `node test.js adminline` covers it
+with two browser contexts (needs internet). Same trust model as before: ADMIN_PW is in the (public) file.
+
 - **Local accounts** (`S.players`) — full control: balance, rename, reset password, grant admin, suspend, delete, log in as.
 - **Roster** (`S.roster`) — everyone who has ever joined one of your parties, kept after they disconnect. Their figures are **self-reported by their client** on every `prof` message via `myProf().st`. Balance / suspend / message / kick are sent as `{t:'adm'}` and handled by `onAdminCmd()` on their side, so they only land while connected and only if their client co-operates. **Advisory, not enforcement** — never describe it otherwise.
 
@@ -537,6 +545,7 @@ Two patterns, don't mix them up:
 - **2026-09-26** — Added Ra's Fortune (Egyptian, red + gold): coin collect, Sun of Ra, Coin Rain, Book of Ra free games, Pharaoh's Treasure hold & win with growing rows, two buys, coin-flip gamble. Built for hit frequency (1 in 2.1) because Alex finds Dragon Stacks slow and loves Olympus's frequent wins.
 - **2026-09-26** — Ra's Fortune gamble: the flip animation ended on the wrong face (9 half-turns flipped it), so a Scarab result could land showing the Pharaoh. Payout was always right. Now 10 half-turns + the result, verified 30/30, and a LANDED line says what came up.
 - **2026-09-26** — All three slots: bet ladder extended to 150/200/250/300 (max 300 a spin, Alex's ask). Ra's Fortune gamble: coin now always lands showing the result (was 9 half-turns, flipping it) + LANDED line; verified 30/30.
+- **2026-09-26** — Admin line: admin portal reaches remote players without a party (own PeerJS id per account, 4 slots, token from ADMIN_PW), live balance every 2 s, grant as a delta, offline commands queued in S.admQ. Alex needed to manage his mate's balance mid-session outside a party.
 
 ---
 

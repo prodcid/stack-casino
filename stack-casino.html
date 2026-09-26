@@ -16830,7 +16830,7 @@ function teleAdminOut(){const out=$('taOut');if(!out)return;const ev=TA.ev;if(!e
  out.querySelectorAll('[data-tu]').forEach(b=>b.onclick=()=>{TA.who=b.dataset.tu;teleAdminOut()})}
 
 function playTick(){if(!loggedIn())return;const p=P();if(++TELE.hb%6===0)tele('hb',{bal:p.bal});p.playMs=(p.playMs||0)+10000;p.lastSeen=Date.now();save()}
-function playStart(){teleStart();if(playT)return;playT=setInterval(()=>{if(!document.hidden)playTick()},10000)}
+function playStart(){teleStart();try{adlListen()}catch(e){}if(playT)return;playT=setInterval(()=>{if(!document.hidden)playTick()},10000)}
 function playStop(){teleEnd();clearInterval(playT);playT=null}
 addEventListener('visibilitychange',()=>{if(loggedIn()&&!document.hidden){P().lastSeen=Date.now()}});
 
@@ -16893,7 +16893,7 @@ function doAuth(){const u=($('auU').value||'').trim(),pw=$('auP').value||'';
  authRender();renderBal(true);renderHist();
  SND.init();SND.win(2);toast('Welcome, '+P().name)}
 
-function logout(){if(typeof NET!=='undefined'&&NET.status!=='off')netLeave();
+function logout(){try{adlStop()}catch(e){}if(typeof NET!=='undefined'&&NET.status!=='off')netLeave();
  if(loggedIn()){P().lastSeen=Date.now()}
  playStop();S.cur=-1;S.session=null;save(true);tcgReload();AUTH.mode='login';AUTH.err='';
  renderBal();renderHist();authRender()}
@@ -16907,7 +16907,7 @@ $('closeP').onclick=()=>$('pModal').classList.remove('show');
 $('admOpen').onclick=()=>{$('pModal').classList.remove('show');if(ADM.on)go('admin');else admUnlock()};
 $('admLock').onclick=admLock;
 $('admExport').onclick=admExport;
-$('admRefresh').onclick=()=>{if(connected())send({t:'admreq'});admRender();toast('Refreshed')};
+$('admRefresh').onclick=()=>{if(connected())send({t:'admreq'});for(const u of admUsers())if(!u.local&&u.key){const L=ADL.links[u.key];if(L&&L.st!=='on')L.st='off';adlDial(u.key)}admRender();toast('Refreshing live links')};
 $('admSearch').oninput=e=>{ADM.q=e.target.value;admRender()};
 const STACK_VER=(document.querySelector('meta[name="stack-version"]')||{content:'?'}).content||'?';
 if($('verLine'))$('verLine').textContent='Build '+STACK_VER;
@@ -19373,6 +19373,8 @@ function admUsers(){
    bets:r.bets,big:r.big,suspended:!!r.suspended,admin:false,local:false,idx:-1,live:false,me:false})}
  const rl=NET.remote&&NET.remote.user?String(NET.remote.user).toLowerCase():null;
  if(rl&&connected())for(const u of out)if(u.key===rl){u.live=true;u.bal=NET.remote.bal}
+ for(const u of out){const L=ADL.links[u.key];u.line=L?L.st:'off';u.queued=(S.admQ&&S.admQ[u.key]||[]).length;
+  if(L&&L.st==='on'&&L.data){const st=L.data.st||{};u.bal=L.data.bal;u.name=L.data.name||u.name;Object.assign(u,{playMs:st.playMs,sessions:st.sessions,wagered:st.wagered,won:st.won,bets:st.bets,big:st.big,lastSeen:Date.now()});u.live=true}}
  return out}
 
 function admRender(){if(!$('adminView'))return;
@@ -19402,7 +19404,7 @@ function admRender(){if(!$('adminView'))return;
  </tr></thead><tbody>${rows.length?rows.map(u=>`<tr data-u="${esc(u.key)}" class="${ADM.sel===u.key?'sel':''}">
   <td><div class="admwho">${avHTML(u,26)}<div><div style="font-weight:800">${esc(u.name||'?')}
    ${u.me?'<span class="pill adminp">YOU</span>':''}${u.admin?'<span class="pill adminp">ADMIN</span>':''}
-   ${u.live?'<span class="pill live">ONLINE</span>':''}${u.suspended?'<span class="pill susp">SUSPENDED</span>':''}</div>
+   ${u.live?'<span class="pill live">ONLINE</span>':u.line==='connecting'?'<span class="pill remote">CONNECTING</span>':''}${u.queued?`<span class="pill susp">${u.queued} QUEUED</span>`:''}${u.suspended?'<span class="pill susp">SUSPENDED</span>':''}</div>
    <div style="color:var(--dim);font-size:11px">@${esc(u.user||'?')} · <span class="pill ${u.local?'here':'remote'}">${u.local?'this device':'remote'}</span></div></div></div></td>
   <td>${fmt(u.bal||0)}</td><td>${dur(u.playMs)}</td><td>${u.sessions||0}</td>
   <td>${u.bets||0}</td><td>${fmt(u.wagered||0)}</td><td>${ago(u.created)}</td><td>${ago(u.lastSeen)}</td>
@@ -19418,8 +19420,8 @@ function admRender(){if(!$('adminView'))return;
   .map(a=>`<div><b>${esc(a.by)}</b> ${esc(a.action)} ${a.target?`<b>${esc(a.target)}</b>`:''} ${a.detail?esc(a.detail):''} <span style="color:var(--dim)">· ${ago(a.at)}</span></div>`).join('')
   : '<div>Nothing yet.</div>';
  $('admNote').innerHTML='Accounts live in each player\u2019s own browser \u2014 there is no central server. '+
-  'People here marked <span class="pill remote">remote</span> are known from party sessions, and their figures are whatever their game last reported. '+
-  'Commands to a remote player only apply while they are connected and their client accepts them.';
+  'Remote players are reached over a live admin link that works without a party: while they are logged in, their balance and stats update every 2 seconds. '+
+  'Anything you send while they are offline is queued and delivered as soon as they come online.';
 }
 
 function admDrawer(all){const d=$('admDrawer');if(!ADM.sel){d.innerHTML='';return}
@@ -19443,12 +19445,13 @@ function admDrawer(all){const d=$('admDrawer');if(!ADM.sel){d.innerHTML='';retur
    <button data-a="pw" ${u.local?'':'disabled'}>Reset password</button>
    <button data-a="admin" ${u.local&&!u.me?'':'disabled'}>${u.admin?'Remove admin':'Make admin'}</button>
    <button data-a="susp" class="warn" ${u.me?'disabled':''}>${u.suspended?'Unsuspend':'Suspend'}</button>
-   <button data-a="msg" ${u.live?'':'disabled'}>Send message</button>
+   <button data-a="msg" ${u.local?'disabled':''}>Send message</button>
+   <button data-a="dial" ${u.local?'disabled':''}>Reconnect live</button>
    <button data-a="kick" class="warn" ${u.live?'':'disabled'}>Kick from party</button>
    <button data-a="as" ${u.local&&!u.me?'':'disabled'}>Log in as</button>
    <button data-a="del" class="warn" ${u.me?'disabled':''}>Delete</button>
   </div>
-  ${u.local?'':'<p class="admnote">This person\u2019s account lives on their device. Balance, suspend, message and kick are sent over the party link and only apply while they are connected.</p>'}
+  ${u.local?'':`<p class="admnote">Live link: <b>${u.line==='on'?'connected, updating every 2 seconds':u.line==='connecting'?'connecting\u2026':u.line==='denied'?'refused (their game has a different admin password)':'offline \u2014 they need to be logged in with the updated game'}</b>. Works without a party. ${u.queued?`<b>${u.queued} command${u.queued>1?'s':''} queued</b> and will apply the moment they come online.`:'Commands sent while they are offline are queued and delivered when they come online.'}</p>`}
  </div>`;
  d.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>admAct(b.dataset.a,u));
 }
@@ -19458,22 +19461,24 @@ const admLocal=u=>u.local?S.players[u.idx]:null;
 
 function admAct(a,u){
  const acct=admLocal(u),live=u.live;
- const pushRemote=(o)=>{if(live)send(Object.assign({t:'adm'},o))};
+ const pushRemote=(o)=>{o=Object.assign({t:'adm',user:u.user},o);
+  if(live&&connected()&&NET.remote&&String(NET.remote.user||'').toLowerCase()===u.key){send(o);return 'sent'}
+  if(adlSend(u.key,o))return 'sent';if(!acct){adlQueue(u.key,o);adlDial(u.key);return 'queued'}return ''};
 
  if(a==='bal'){const v=prompt(`Set ${u.name}'s balance to:`,String(Math.round(u.bal||0)));
   if(v===null)return;const n=Math.max(0,Math.round((parseFloat(v)||0)*100)/100);
   if(acct){acct.bal=n;if(u.me)renderBal(true)}
   if(S.roster[u.key])S.roster[u.key].bal=n;
-  pushRemote({a:'bal',v:n,by:P().name});
-  audit('set balance of',u.user,'to '+fmt(n));save();toast('Balance set');return admRender()}
+  const how=pushRemote({a:'bal',v:n,by:P().name});
+  audit('set balance of',u.user,'to '+fmt(n)+(how==='queued'?' (queued)':''));save();toast(how==='queued'?`Queued: ${u.name} gets it the moment they're online`:'Balance set');return admRender()}
 
  if(a==='give'){const v=prompt(`Grant how many credits to ${u.name}?`,'1000');
   if(v===null)return;const n=Math.round((parseFloat(v)||0)*100)/100;if(!n)return;
   const nb=Math.max(0,Math.round(((u.bal||0)+n)*100)/100);
   if(acct){acct.bal=nb;if(u.me)renderBal(true)}
   if(S.roster[u.key])S.roster[u.key].bal=nb;
-  pushRemote({a:'bal',v:nb,by:P().name});
-  audit('granted',u.user,fmt(n)+' credits');save();toast('Granted');return admRender()}
+  const how=pushRemote({a:'give',v:n,by:P().name});
+  audit('granted',u.user,fmt(n)+' credits'+(how==='queued'?' (queued)':''));save();toast(how==='queued'?`Queued: ${u.name} gets it the moment they're online`:'Granted');return admRender()}
 
  if(a==='rename'){if(!acct)return;const v=prompt('New display name:',acct.name);
   if(!v||!v.trim())return;acct.name=v.trim().slice(0,14);
@@ -19500,7 +19505,8 @@ function admAct(a,u){
   save();return admRender()}
 
  if(a==='msg'){const m=prompt(`Message to ${u.name}:`);if(!m)return;
-  pushRemote({a:'msg',m,by:P().name});audit('messaged',u.user,m);toast('Sent');return}
+  const how=pushRemote({a:'msg',m,by:P().name});audit('messaged',u.user,m);toast(how==='queued'?'Queued until they are online':'Sent');return admRender()}
+ if(a==='dial'){const L=ADL.links[u.key];if(L){try{L.conn&&L.conn.close()}catch(e){}L.st='off'}adlDial(u.key);toast('Connecting to '+u.name);return admRender()}
 
  if(a==='kick'){if(!confirm(`Kick ${u.name} out of the party?`))return;
   pushRemote({a:'kick',by:P().name});audit('kicked',u.user);
@@ -19525,7 +19531,9 @@ function admAct(a,u){
 /* ---- guest side: what an admin command actually does to you ---- */
 function onAdminCmd(m){
  if(!m||!m.a)return;
- if(m.a==='bal'){P().bal=Math.max(0,Math.round((m.v||0)*100)/100);renderBal(true);save();
+ if(m.a==='give'){if(!loggedIn())return;P().bal=Math.max(0,Math.round((P().bal+(+m.v||0))*100)/100);renderBal(true);save();try{FRAME_IDS.forEach(fgRefresh)}catch(e){}
+  toast(`${m.by||'Admin'} granted you ${fmt(+m.v||0)}`);return}
+ if(m.a==='bal'){P().bal=Math.max(0,Math.round((m.v||0)*100)/100);renderBal(true);save();try{FRAME_IDS.forEach(fgRefresh)}catch(e){}
   toast(`${m.by||'Admin'} set your balance to ${fmt(P().bal)}`);chatSys(`Admin set your balance to ${fmt(P().bal)}`);return}
  if(m.a==='msg'){chatSys(`${m.by||'Admin'}: ${m.m}`);toast(`${m.by||'Admin'}: ${m.m}`);SND.tick();return}
  if(m.a==='kick'){toast(`${m.by||'Admin'} removed you from the party`);netLeave();return}
@@ -19539,6 +19547,60 @@ function onAdminCmd(m){
    save(true);toast('Your account was reinstated')}
   return}
 }
+
+
+/* ===================== ADMIN LINE: live admin link without a party =====================
+   Every logged-in client listens on its own PeerJS id, made from its username (adlId). The admin
+   portal dials that id and proves it knows the admin password (token = hashPw(user, ADMIN_PW+'|adl')).
+   Once accepted, the player streams their profile every 2 s and applies admin commands. Commands
+   for someone offline wait in S.admQ and are delivered the moment their line answers. Same trust
+   model as the party admin: ADMIN_PW is in the file, so this is fine for mates, not security. */
+const ADL={peer:null,user:null,dialer:null,links:{},rT:0};
+const ADL_PREFIX='stackcasino-v1-acct-';
+/* four addresses per player: the broker can hold a just-released one for up to a minute (logout/login,
+   a launcher restart), so the player takes the first free slot and the admin dials all four */
+const ADL_SLOTS=4;
+function adlId(u,slot){const k=String(u||'').toLowerCase();return ADL_PREFIX+k.replace(/[^a-z0-9]/g,'').slice(0,24)+'-'+String(hashPw('adl-id',k)).replace(/[^a-z0-9]/gi,'').slice(0,10).toLowerCase()+'-'+(slot||0)}
+const adlTok=u=>String(hashPw(String(u||'').toLowerCase(),ADMIN_PW+'|adl'));
+async function adlListen(slot){slot=slot||0;if(!loggedIn())return;const u=String(P().user||P().name||'').toLowerCase();if(!u||(ADL.peer&&ADL.user===u&&!ADL.peer.destroyed))return;adlStop();ADL.user=u;
+ try{await loadPeer()}catch(e){return}
+ if(!loggedIn()||ADL.user!==u)return;
+ const peer=new Peer(adlId(u,slot),ICE);ADL.peer=peer;ADL.slot=slot;
+ peer.on('connection',c=>{let ok=false,iv=null;
+  c.on('data',m=>{if(!m||typeof m!=='object')return;
+   if(m.t==='admHello'){ok=m.key===adlTok(u);if(!ok){try{c.send({t:'admNo'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},300);return}
+    const push=()=>{try{if(c.open&&loggedIn())c.send({t:'admStat',p:myProf()})}catch(e){}};push();clearInterval(iv);iv=setInterval(push,2000);return}
+   if(!ok)return;
+   if(m.t==='adm'){onAdminCmd(m);try{c.send({t:'admAck',p:myProf()})}catch(e){}}});
+  c.on('close',()=>clearInterval(iv));c.on('error',()=>clearInterval(iv))});
+ peer.on('error',e=>{if(e&&e.type==='unavailable-id'&&ADL.peer===peer){try{peer.destroy()}catch(x){}ADL.peer=null;const next=slot+1;
+  setTimeout(()=>{if(loggedIn()&&ADL.user===u&&!ADL.peer){ADL.user=null;adlListen(next%ADL_SLOTS)}},next<ADL_SLOTS?100:4000)}});
+ peer.on('disconnected',()=>{try{if(!peer.destroyed)peer.reconnect()}catch(e){}})}
+function adlStop(){try{ADL.peer&&ADL.peer.destroy()}catch(e){}ADL.peer=null;ADL.user=null}
+/* ---- admin side ---- */
+async function adlDialer(){if(ADL.dialer&&!ADL.dialer.destroyed&&ADL.dialer.open)return ADL.dialer;await loadPeer();
+ if(!ADL.dialer||ADL.dialer.destroyed){ADL.dialer=new Peer(undefined,ICE);ADL.dialer.on('error',()=>{});ADL.dialer.on('disconnected',()=>{try{ADL.dialer.reconnect()}catch(e){}})}
+ const d=ADL.dialer;if(!d.open)await new Promise(r=>{d.on('open',r);setTimeout(r,8000)});return d}
+function admRenderSoon(){if(ADL.rT)return;ADL.rT=setTimeout(()=>{ADL.rT=0;if($('adminView')&&$('adminView').classList.contains('on'))admRender()},400)}
+async function adlDial(key){key=String(key||'').toLowerCase();if(!key)return;const L=ADL.links[key]||(ADL.links[key]={st:'off',data:null,at:0,conn:null});if(L.st==='connecting'||L.st==='on')return;L.st='connecting';admRenderSoon();
+ try{const d=await adlDialer();const tries=[];
+  const to=setTimeout(()=>{if(L.st==='connecting'){L.st='off';tries.forEach(c=>{try{c.close()}catch(e){}});admRenderSoon()}},10000);
+  for(let sl=0;sl<ADL_SLOTS;sl++){const c=d.connect(adlId(key,sl),{reliable:true});tries.push(c);
+   c.on('open',()=>{try{c.send({t:'admHello',key:adlTok(key)})}catch(e){}});
+   c.on('data',m=>{if(!m)return;
+    if(m.t==='admStat'||m.t==='admAck'){if(L.conn&&L.conn!==c&&L.st==='on'){try{c.close()}catch(e){}return}
+     clearTimeout(to);const first=L.st!=='on';L.st='on';L.conn=c;L.data=m.p;L.at=Date.now();if(m.p)rosterSee(m.p);
+     if(first){tries.forEach(o=>{if(o!==c)try{o.close()}catch(e){}});adlFlush(key)}admRenderSoon()}
+    if(m.t==='admNo'){clearTimeout(to);L.st='denied';admRenderSoon()}});
+   c.on('close',()=>{if(L.conn===c){L.st='off';L.conn=null;admRenderSoon()}});c.on('error',()=>{})}
+ }catch(e){L.st='off';admRenderSoon()}}
+function adlSend(key,o){const L=ADL.links[key];if(L&&L.st==='on'&&L.conn&&L.conn.open){try{L.conn.send(o);return true}catch(e){}}return false}
+function adlQueue(key,o){S.admQ=S.admQ||{};(S.admQ[key]=S.admQ[key]||[]).push(Object.assign({at:Date.now()},o));save()}
+function adlFlush(key){const q=S.admQ&&S.admQ[key];if(!q||!q.length)return;const left=[];for(const o of q)if(!adlSend(key,o))left.push(o);
+ if(left.length)S.admQ[key]=left;else delete S.admQ[key];save();if(q.length>left.length)toast(`Delivered ${q.length-left.length} queued command${q.length-left.length>1?'s':''} to ${key}`)}
+/* while the admin portal is open, keep dialling every remote player who isn't connected */
+function adlTick(){if(!ADM.on||!$('adminView')||!$('adminView').classList.contains('on'))return;for(const u of admUsers())if(!u.local&&u.key)adlDial(u.key)}
+setInterval(adlTick,10000);
 
 function admExport(){
  const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),

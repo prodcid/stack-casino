@@ -1428,6 +1428,51 @@ async function frames(ctx, errs) {
   await pg.close();
 }
 
+
+/* ADMIN LINE: two separate "devices", no party. The admin sees the player's balance live and can
+   set it, grant credits and message them; commands sent while they're offline are queued and land
+   when they log back in. Needs internet (PeerJS broker), like the party tests. */
+async function adminline(browser, errs) {
+  console.log('\nADMIN LINE (no party)');
+  const tag = Math.random().toString(36).slice(2, 7);
+  const cA = await browser.newContext({ viewport: { width: 1320, height: 900 } }), cB = await browser.newContext({ viewport: { width: 1320, height: 900 } });
+  const A = await newPage(cA, errs, 'adm' + tag), B = await newPage(cB, errs, 'mate' + tag);
+  const mate = ('umate' + tag).toLowerCase();
+  await B.evaluate("P().bal=500;renderBal();save()");
+  await A.evaluate(`S.roster['${mate}']={user:'${mate}',name:'${mate}',bal:0,created:Date.now(),lastSeen:0};ADM.on=true;buildNav();go('admin');adlDial('${mate}')`);
+  const up = await A.waitForFunction(k => ADL.links[k] && ADL.links[k].st === 'on', mate, { timeout: 30000 }).then(() => true, () => false);
+  const seen = await A.evaluate(k => { const u = admUsers().find(x => x.key === k); return u ? { live: u.live, bal: u.bal, line: u.line } : null }, mate);
+  (up && seen && seen.live && seen.bal === 500) ? pass('admin connects without a party and sees the live balance', JSON.stringify(seen)) : fail('admin connects without a party and sees the live balance', JSON.stringify(seen));
+  // the player spends; the admin sees it within a few seconds
+  await B.evaluate("P().bal=432.1;renderBal();save()");
+  const live = await A.waitForFunction(k => { const u = admUsers().find(x => x.key === k); return u && u.bal === 432.1 }, mate, { timeout: 8000 }).then(() => true, () => false);
+  live ? pass('balance updates in real time') : fail('balance updates in real time', JSON.stringify(await A.evaluate(k => admUsers().find(x => x.key === k), mate)));
+  // grant + set balance through the portal buttons
+  A.removeAllListeners('dialog');let ANS='';A.on('dialog', d => d.accept(ANS).catch(() => {}));
+  const clickAct = async (a, answer) => { ANS = answer; await A.evaluate(([k, act]) => { ADM.sel = k; admRender(); document.querySelector(`#admDrawer [data-a="${act}"]`).click() }, [mate, a]); };
+  await clickAct('give', '1000');
+  const g = await B.waitForFunction('P().bal===1432.1', null, { timeout: 8000 }).then(() => true, () => false);
+  g ? pass('Grant credits lands on their device', '432.10 + 1000') : fail('Grant credits lands on their device', String(await B.evaluate('P().bal')));
+  await clickAct('bal', '777');
+  const sb = await B.waitForFunction('P().bal===777', null, { timeout: 8000 }).then(() => true, () => false);
+  sb ? pass('Set balance lands on their device') : fail('Set balance lands on their device', String(await B.evaluate('P().bal')));
+  // offline: queue, then deliver when they log back in
+  await B.evaluate("logout()"); await A.waitForTimeout(2500);
+  await A.evaluate(k => { const L = ADL.links[k]; if (L) { try { L.conn && L.conn.close() } catch (e) { } L.st = 'off' } }, mate);
+  await clickAct('give', '50');
+  const q = await A.evaluate(k => (S.admQ && S.admQ[k] || []).length, mate);
+  q === 1 ? pass('a grant while they are offline is queued') : fail('a grant while they are offline is queued', 'queue ' + q);
+  await B.evaluate(`(()=>{const i=acctIdx('${mate}');S.cur=i;S.session=S.players[i].user;save(true);authRender();playStart()})()`);
+  await A.evaluate(k => adlDial(k), mate);
+  const dq = await B.waitForFunction('P().bal===827', null, { timeout: 30000 }).then(() => true, () => false);
+  (dq && await A.evaluate(k => !(S.admQ && S.admQ[k]), mate)) ? pass('the queued grant is delivered when they come back online', '777 + 50') : fail('the queued grant is delivered when they come back online', String(await B.evaluate('P().bal')));
+  // a wrong admin password is refused
+  const slot = await B.evaluate('ADL.slot||0');
+  const denied = await A.evaluate(([k, sl]) => new Promise(async res => { const d = await adlDialer(); const c = d.connect(adlId(k, sl), { reliable: true }); c.on('open', () => c.send({ t: 'admHello', key: 'nope' })); c.on('data', m => { if (m.t === 'admNo') res(true); if (m.t === 'admStat') res(false) }); setTimeout(() => res('timeout'), 10000) }), [mate, slot]);
+  denied === true ? pass('a wrong admin key is refused') : fail('a wrong admin key is refused', String(denied));
+  await cA.close(); await cB.close();
+}
+
 async function garage(browser, errs) {
   console.log('\nSTACK GARAGE');
   const [A, B] = await connectPair(browser, errs);
@@ -1510,6 +1555,7 @@ async function garage(browser, errs) {
     if (which === 'all' || which === 'clash') await clashbattle(browser, errs);
     if (which === 'all' || which === 'frames') await frames(ctx, errs);
     if (which === 'all' || which === 'garage') await garage(browser, errs);
+    if (which === 'all' || which === 'adminline') await adminline(browser, errs);
     if (which === 'all' || which === 'coop') await coop(browser, errs);
     if (which === 'all' || which === 'strip') await strip(browser, errs);
     if (which === 'all' || which === 'rtp') await rtp(ctx, errs);

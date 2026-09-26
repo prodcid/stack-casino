@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.26.5",
-  "notes": "Slots max bet raised to 300 a spin; Ra's Fortune coin flip now lands showing the face that came up",
-  "bytes": 2429245,
-  "at": "2026-09-25T23:41:55.315Z"
+  "version": "2026.09.26.6",
+  "notes": "Admin portal works without a party: live balance, set balance, grant credits and messages reach remote players; offline commands queue until they log in",
+  "bytes": 2436461,
+  "at": "2026-09-26T06:25:08.479Z"
 }
