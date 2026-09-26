@@ -301,6 +301,13 @@ aiming at the gutters would otherwise swing the return by 12 points. Five cabine
 saved field, so a coin never changes value after it's dropped (a shared field let you build up with cheap coins and
 harvest at a big bet). New cabinets start from `PZ_START`, a field pre-settled by simulation.
 
+**Stack Reef** (arcade scene `reef`, added 2026-09-27, `48-reef.js`) - a three.js fish table seen from above: caustic sand,
+coral, rocks, rays, bubbles; 15 procedural species + 3 bosses (Great White 150x, Kraken 250x, Golden Dragon 400x, one every
+~2 min). Each shot costs the shot size and bounces off the glass until it hits; a hit catches with `rfP = 0.97 / pays`, so
+every shot returns 97% wherever you aim. Lightning Jelly (chains 6 nearest) and Bomb Crab (blast radius) pay for everything
+they take, and their chance comes from that total at the moment of the hit (`rfValue`). Shots idle 12 s or still in the
+water on leaving are refunded. Hover shows pays/chance; right-click locks on; AUTO fires. Tests in `test-arcade.js`.
+
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
 as `x-script`) and `garMount()` runs it in a same-origin **srcdoc iframe** — its page-wide CSS and
@@ -581,6 +588,7 @@ Two patterns, don't mix them up:
 - **2026-09-27** — Claw fix: removed the loose lying-box top layer - those boxes overhung their neighbours and became the claw's target, so 40-55% of boxes (worst at the front) showed near-0% even perfectly centred, and the 'buried' check fired on neighbours by centre distance. Now one layer, buried = real footprint overlap, a test covers every box. Added a chance tag over the targeted box, target info before paying, a first-visit how-to, and a 3D unboxing (textured 3D box + extruded figure) at Alex's ask.
 - **2026-09-27** — Stackheads rebuilt in real 3D (three.js bundled inline, same as the garage, so offline still works): 12 modelled characters, finishes renamed to Alex's list Standard/Silver/Gold/Gummy/Confetti (same rarity index, so owned figures keep value), per-finish packaging with character scenes, a 3D unboxing and a 3D shelf inspector. Figures bake to sprites through a queue so the claw/pusher/shelf never stall; 2D art is the WebGL fallback.
 - **2026-09-27** — sync-cards.js syntax-checks every plain <script> block in a frame file, not first-to-last: the arcade now carries three.js in its own block and the old slice fed '</script><script>' to the checker.
+- **2026-09-27** — Stack Reef added as the 4th Stack Arcade attraction (fish table, three.js): chance per hit 0.97/pays so every shot returns 97% regardless of aim; the chain/blast specials price their chance from the total they'd take at hit time; shots bounce until they hit and are refunded if they find nothing or you leave. Built inside the arcade to reuse its bundled three.js, wallet and sound rather than as a new frame.
 
 ---
 

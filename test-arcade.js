@@ -63,6 +63,15 @@ function sim() {
     const lhs = v0 + st.inV + free, rhs = val() + st.outV + st.houseV;
     check(Math.abs(lhs - rhs) < 1e-6, 'every coin and prize leaves over the front, into a gutter, or is still on the field', `in ${lhs} = out ${st.outV} + house ${st.houseV} + field ${val()}`); }
   { const F = G.PZ_FEAT; check(F.every(f => f.w > 0) && F.some(f => f.k === 'jack') && G.PZ_BOXMIX.reduce((a, b) => a + b, 0) === 1, 'Lucky Slot table and box finish mix are well formed'); }
+  console.log('\n-- Stack Reef --');
+  { const plain = G.RF_SPEC.filter(x => !x.chain && !x.bomb);
+    check(plain.every(x => Math.abs(G.rfP(x.m) * x.m - .97) < 1e-12), 'every fish returns exactly 97% a hit', plain.map(x => `${x.n} ${(100 * G.rfP(x.m)).toFixed(2)}%`).slice(0, 5).join(' · ') + ' ...');
+    const R = mulberry(21); let hits = 0, paid = 0, tk = 0;
+    for (let n = 0; n < 200000; n++) { const all = []; for (let i = 0; i < 30; i++) all.push({ s: G.rfPickSpecies(R), x: (R() * 2 - 1) * 16, z: (R() * 2 - 1) * 9 });
+      const f = { s: n % 2 ? 13 : 14, x: (R() * 2 - 1) * 12, z: (R() * 2 - 1) * 7 }; all.push(f); const h = G.rfHit(f, all, R); hits++; paid += h.pay; tk += h.taken.length; }
+    check(Math.abs(paid / hits - .97) < .03, 'the Lightning Jelly and Bomb Crab return 97% a hit, counting everything they take', `${(100 * paid / hits).toFixed(2)}% · ${(tk / hits).toFixed(1)} fish a hit`);
+    const R2 = mulberry(5); let ph = 0, pp = 0; for (let n = 0; n < 400000; n++) { const f = { s: G.rfPickSpecies(R2), x: 0, z: 0 }; const h = G.rfHit(f, [f], R2); ph++; pp += h.pay; }
+    check(Math.abs(pp / ph - .97) < .02, 'a random stream of hits returns 97%', (100 * pp / ph).toFixed(2) + '%'); }
   console.log('\n-- saving + the starting field --');
   { const st = G.pzUnpack(G.PZ_START); let bad = 0; for (const c of st.c) if (c.y < 0 || c.y > G.PZ.D || Math.abs(c.x) > G.PZ.W / 2) bad++;
     check(st.c.length > 70 && !bad, 'the baked starting field is full and inside the cabinet', st.c.length + ' coins');
@@ -82,8 +91,8 @@ async function ui() {
   const ev = s => pg.evaluate(s);
   await ev("localStorage.clear();S.bal=10000;S.figs=[];drawBal();auInit=()=>{}");
   /* the floor */
-  check(await ev("S.scene==='hall'&&hallHit(300,500)==='claw'&&hallHit(800,500)==='push'&&hallHit(1250,500)==='shelf'"), 'the arcade floor leads to the claw, the pusher and the shelf'); await shot('hall');
-  await pg.mouse.click(pg.viewportSize().width * .52, 420); await pg.waitForTimeout(400);
+  check(await ev("S.scene==='hall'&&hallHit(200,500)==='claw'&&hallHit(620,500)==='push'&&hallHit(1050,500)==='reef'&&hallHit(1400,500)==='shelf'"), 'the arcade floor leads to the claw, the pusher, the reef and the shelf'); await shot('hall');
+  await pg.mouse.click(pg.viewportSize().width * .44, 420); await pg.waitForTimeout(400);
   check(await ev("S.scene==='push'&&$('gPush').classList.contains('on')&&PU.st&&PU.st.c.length>70"), 'clicking the pusher opens it with a full field');
   /* drops + payouts on the wallet */
   const d1 = await ev(`(async()=>{const b0=bal();let n=0;for(let i=0;i<40;i++){PU.lastDrop=0;if(pzDropCoin())n++}const spent=n*PZ_TIERS[S.tier];await new Promise(r=>setTimeout(r,6000));payFlush(true);return{b0,n,spent,won:PU.won,b1:bal()}})()`);
@@ -104,6 +113,12 @@ async function ui() {
   const lk = await ev(`(async()=>{const n0=PU.st.c.length;PU.featQ.push(PZ_FEAT.find(f=>f.k==='jack'));await new Promise(r=>setTimeout(r,2600));const mid=$('banT').textContent;await new Promise(r=>setTimeout(r,5000));return{mid,bar:PU.st.c.some(c=>c.k==='g')||PU.won>0,added:PU.st.c.length-n0,q:PU.spawnQ.length}})()`);
   check(/JACKPOT/.test(lk.mid) && lk.q === 0 && lk.added > 20, 'the Lucky Slot spins up the JACKPOT and rains in the gold bar and coins', JSON.stringify(lk));
   await shot('pusher-feature');
+  /* reef */
+  await ev("setScene('reef')"); await pg.waitForTimeout(1500);
+  const rf = await ev(`(async()=>{if(!RF.ready)return{ready:false};S.rfBet=3;const b0=bal();RF.aim.x=0;RF.aim.z=-5;for(let i=0;i<5;i++){RF.lastShot=-9;rfFire()}const spent=+(b0-bal()).toFixed(2);
+    const f=rfSpawn(0,{x:0,z:-2,a:0});f.age=1;const R=Math.random;Math.random=()=>0;const b1=bal()+RF.payAcc;rfResolve({x:0,z:-2,bet:1,done:false},f);Math.random=R;const caught=f.dead;RF.payT=-9;rfUpdate(.016);const gain=+(bal()-b1).toFixed(2);
+    const b2=bal();const inWater=RF.shots.filter(x=>!x.done).length;setScene('hall');const back=+(bal()-b2).toFixed(2);return{ready:true,spent,caught,gain,inWater,back}})()`);
+  check(rf.ready && rf.spent === 5 && rf.caught && rf.gain === 2 && Math.abs(rf.back - rf.inWater) < 1e-9, 'Stack Reef: each shot costs the shot size, a catch pays multiplier x shot, shots still in the water are refunded on leaving', JSON.stringify(rf));
   /* claw */
   await ev("setScene('claw');S.pile=pileNew();S.prI=PRICES.indexOf(5);drawPrice()");
   check(await ev("$('clawHelp').classList.contains('on')"), 'the first visit to the claw explains how it works');
