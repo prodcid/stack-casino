@@ -107,6 +107,13 @@ input,select{font-family:inherit}
 .b3-cards .b3go{color:#2a1300}
 .b3go svg{width:20px;height:20px;fill:currentColor}
 .b3go:hover{filter:brightness(1.12)}
+#corpStrip{display:grid;grid-template-columns:1.3fr 1fr .8fr .9fr;gap:12px;margin-top:22px}
+.corp{background:linear-gradient(160deg,#0f1b27,#0a121b);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px 16px;min-width:0}
+.corp h5{margin:0 0 10px;font-size:10.5px;letter-spacing:.16em;color:#8a9aac;font-weight:900;display:flex;align-items:center;gap:8px}.corp h5 .sim{margin-left:auto;font-size:9px;letter-spacing:.1em;background:rgba(255,176,32,.14);color:#ffb020;padding:2px 7px;border-radius:99px}
+.corp .hl{padding:6px 0;border-top:1px solid rgba(255,255,255,.05)}.corp .hl:first-of-type{border-top:0}.corp .hl b{display:block;font-size:13px;line-height:1.3}.corp .hl small{color:#7d8ea3;font-size:11px}
+.corp .kv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:12.5px}.corp .kv span{color:#8a9aac}.corp .kv b{font-family:"JetBrains Mono",Consolas,monospace;font-weight:700}
+.corp .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:0}.corp .lnk{margin-top:8px;font-size:12px;font-weight:800;color:#00e701;cursor:pointer}.corp .up{color:#2bd96b}.corp .dn{color:#ff4f5e}
+#certOv{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:90;display:flex;align-items:center;justify-content:center}#certOv>div{width:min(720px,92vw);max-height:84vh;overflow:auto;background:#0f1b27;border:1px solid #1e2b3b;border-radius:16px;padding:22px}
 .arcb{min-height:300px;margin-top:18px;justify-content:center;cursor:pointer}
 .arcb .b3in{max-width:540px;padding-top:58px}
 .arcb .b3art{inset:0 0 0 auto;width:62%;height:100%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 28%);mask-image:linear-gradient(90deg,transparent,#000 28%)}
@@ -1434,6 +1441,7 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
             <div class="eh-plats" id="ehPlats"></div></div>
         </div>
       </div>
+      <div id="corpStrip"></div>
       <div class="eco-sec"><div><small>FLAGSHIP</small><h2>The Big Three</h2></div><span>Stack's own platforms, built from the ground up</span></div>
       <div class="big3" id="big3"></div>
       <div class="b3 arcb" id="arcBan" style="--bc:#c64bff;--bc2:#6a1be0;--acc:#3cf0ff"></div>
@@ -1502,6 +1510,8 @@ select.sel{width:100%;background:var(--bg);color:#fff;border:2px solid var(--lin
       </div>
     </section>
 
+    <!-- HQ: Stack HQ (stack-hq.html, frame game), admin only -->
+    <section class="view" id="hqView"><div class="garhost" id="hqHost"><div class="garload" id="hqLoad">Loading Stack HQ…</div></div></section>
     <!-- ARCADE: Stack Arcade (stack-arcade.html, frame game): claw machine, coin pusher, Stackheads -->
     <section class="view" id="arcadeView"><div class="garhost" id="arcadeHost"><div class="garload" id="arcadeLoad">Loading Stack Arcade…</div></div></section>
     <!-- EGYPT: Ra's Fortune (stack-egypt.html, frame game) -->
@@ -1999,7 +2009,7 @@ function frameBridge(id){return{
  goParty:()=>{try{go('party')}catch(e){}},
  log:(t,d)=>{try{tele(t,d)}catch(e){}}
 }}
-window.FrameBridges={garage:frameBridge('garage'),racing:frameBridge('racing'),markets:frameBridge('markets'),gp:frameBridge('gp'),nrl:frameBridge('nrl'),slots:frameBridge('slots'),olympus:frameBridge('olympus'),egypt:frameBridge('egypt'),arcade:frameBridge('arcade')};
+window.FrameBridges={garage:frameBridge('garage'),racing:frameBridge('racing'),markets:frameBridge('markets'),gp:frameBridge('gp'),nrl:frameBridge('nrl'),slots:frameBridge('slots'),olympus:frameBridge('olympus'),egypt:frameBridge('egypt'),arcade:frameBridge('arcade'),hq:Object.assign(frameBridge('hq'),{real:()=>hqRealStats(),publish:c=>corpPublish(c)})};
 window.GarageBridge=window.FrameBridges.garage;
 window.StackBridge={
  getBalance:()=>{try{return loggedIn()?P().bal:0}catch(e){return 0}},
@@ -18476,6 +18486,495 @@ requestAnimationFrame(frame);
 </x-script></body></html>
 
 </script><!--/stack-arcade-->
+<script type="text/plain" id="stack-hq">
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stack HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,800;1,900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05080d;--p1:#0b1119;--p2:#101823;--p3:#172231;--line:#1e2b3b;--txt:#e8eef6;--mute:#7d8ea3;--dim:#4a5a6e;--g:#00e701;--gs:#00e70122;--up:#2bd96b;--dn:#ff4f5e;--am:#ffb020;--cy:#3cc8ff}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font:13px/1.4 Inter,"Segoe UI",Arial,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}input,select{font:inherit;color:inherit}
+.mono{font-family:"JetBrains Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+#app{position:fixed;inset:0;display:grid;grid-template-rows:58px 28px 1fr;grid-template-columns:196px 1fr}
+header{grid-column:1/3;display:flex;align-items:center;gap:18px;padding:0 16px;background:linear-gradient(#0b121b,#070b11);border-bottom:1px solid var(--line)}
+.lock{display:flex;align-items:center;gap:9px;margin-right:6px}.lock svg{width:30px;height:30px}.lock b{font:italic 900 22px "Barlow Condensed",Inter;letter-spacing:.02em}.lock i{font:italic 900 22px "Barlow Condensed";color:var(--g);font-style:italic}
+.kpi{display:flex;flex-direction:column;line-height:1.15;min-width:0}.kpi small{font-size:10px;letter-spacing:.14em;color:var(--mute);font-weight:700}.kpi b{font:700 16px "JetBrains Mono",monospace}
+.kpi .up{color:var(--up)}.kpi .dn{color:var(--dn)}
+.date{padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--p1)}.date b{font-size:14px}
+.speed{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.speed button{padding:7px 10px;font-weight:800;font-size:12px;color:var(--mute);border-right:1px solid var(--line)}.speed button:last-child{border-right:0}.speed button.on{background:var(--g);color:#031a05}
+.dayb{width:120px;height:4px;background:var(--p3);border-radius:4px;overflow:hidden}.dayb i{display:block;height:100%;background:var(--g)}
+.hsp{flex:1}
+.meter{width:80px;height:6px;border-radius:6px;background:var(--p3);overflow:hidden;margin-top:4px}.meter i{display:block;height:100%}
+#tape{grid-column:1/3;overflow:hidden;white-space:nowrap;border-bottom:1px solid var(--line);background:#03060a;display:flex;align-items:center}
+#tapeIn{display:inline-block;padding-left:100%;animation:tape 90s linear infinite;font:600 12px "JetBrains Mono",monospace}#tapeIn span{margin-right:34px}@keyframes tape{to{transform:translateX(-100%)}}
+nav{border-right:1px solid var(--line);background:var(--p1);padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow:auto}
+nav button{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;font-weight:700;color:var(--mute);text-align:left}nav button svg{width:17px;height:17px;fill:currentColor;flex:none}nav button:hover{background:var(--p2);color:var(--txt)}nav button.on{background:var(--gs);color:var(--g);box-shadow:inset 3px 0 0 var(--g)}
+nav .badge{margin-left:auto;background:var(--am);color:#231400;border-radius:10px;padding:0 7px;font-size:11px;font-weight:900}
+nav .nsec{font-size:10px;letter-spacing:.16em;color:var(--dim);font-weight:800;padding:14px 12px 6px}
+main{overflow:auto;padding:18px 20px 40px}
+h1{margin:0 0 4px;font:800 24px Inter;letter-spacing:-.01em}.sub{color:var(--mute);margin:0 0 16px}
+h2{margin:22px 0 10px;font:800 13px Inter;letter-spacing:.12em;color:var(--mute);text-transform:uppercase}
+.grid{display:grid;gap:12px}.g6{grid-template-columns:repeat(6,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g21{grid-template-columns:2fr 1fr}
+.card{background:var(--p2);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.tile small{display:block;font-size:10px;letter-spacing:.14em;color:var(--mute);font-weight:800}.tile b{display:block;font:700 22px "JetBrains Mono",monospace;margin-top:4px}.tile em{font-style:normal;font-size:12px;font-weight:700}
+.up{color:var(--up)}.dn{color:var(--dn)}.am{color:var(--am)}.gg{color:var(--g)}
+canvas.ch{width:100%;display:block}
+.btn{padding:8px 14px;border-radius:8px;font-weight:800;background:var(--g);color:#031a05}.btn:hover{filter:brightness(1.1)}.btn:disabled{opacity:.35;cursor:default;filter:none}
+.btn.ghost{background:var(--p3);color:var(--txt);border:1px solid var(--line)}.btn.red{background:#3a0e14;color:#ff8a94;border:1px solid #5a1a22}.btn.sm{padding:5px 10px;font-size:12px}
+table{width:100%;border-collapse:collapse}th{font-size:10px;letter-spacing:.12em;color:var(--mute);font-weight:800;text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}
+td{padding:7px 8px;border-bottom:1px solid #121b27;text-align:right;font-family:"JetBrains Mono",monospace;font-size:12px}tr:hover td{background:#0f1722}td.lbl{font-family:Inter;font-weight:600}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:900;letter-spacing:.08em}
+.bar{height:6px;background:var(--p3);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px}
+.row{display:flex;align-items:center;gap:10px}.row.sb{justify-content:space-between}
+.inbox .card{border-color:#5a3a00;background:linear-gradient(#1a1406,#101823)}.inbox h3{margin:0 0 4px;font-size:14px}.inbox p{margin:0 0 10px;color:var(--mute)}.opt{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:8px 10px;border-radius:8px;background:var(--p3);border:1px solid var(--line);margin:0 6px 6px 0}.opt:hover{border-color:var(--am)}.opt b{font-size:12px}.opt small{color:var(--mute);font-size:11px}
+.news div{padding:9px 0;border-bottom:1px solid #121b27}.news b{display:block;font-size:13px}.news small{color:var(--mute)}.tag{font-size:9px;font-weight:900;letter-spacing:.1em;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:1px}
+#mapWrap{position:relative}#map{width:100%;display:block;border-radius:12px;background:radial-gradient(ellipse at 50% 40%,#0b1a28,#04080d)}
+.side{position:sticky;top:0}
+label.fld{display:block;margin:8px 0 4px;font-size:11px;color:var(--mute);font-weight:700;letter-spacing:.06em}
+input[type=range]{width:100%;accent-color:#00e701}select,input[type=text]{width:100%;padding:8px 10px;background:var(--p1);border:1px solid var(--line);border-radius:8px}
+.sw{width:30px;height:30px;border-radius:8px;border:2px solid transparent;display:inline-block;margin:0 6px 6px 0;cursor:pointer}.sw.on{border-color:#fff}
+.mk{width:74px;height:74px;border-radius:12px;background:var(--p1);border:1px solid var(--line);display:inline-grid;place-items:center;margin:0 8px 8px 0;cursor:pointer}.mk.on{border-color:var(--g);box-shadow:0 0 0 2px var(--gs)}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--p3);border:1px solid var(--g);border-radius:10px;padding:10px 16px;font-weight:700;display:none;z-index:50}#toast.on{display:block}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:40}.modal.on{display:flex}.modal .card{width:min(760px,92vw);max-height:86vh;overflow:auto}
+.exec{display:flex;gap:12px;align-items:center}.av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:900;flex:none}
+.spark{width:120px;height:34px}
+</style></head><body>
+<div id="app">
+ <header>
+  <div class="lock"><svg viewBox="0 0 32 32"><path d="M16 2 29 9v14L16 30 3 23V9z" fill="#00e701"/><path d="M11 12h10M11 16h10M11 20h10" stroke="#06200b" stroke-width="2.6" stroke-linecap="round"/></svg><b>STACK</b><i>HQ</i></div>
+  <div class="date kpi"><small>DATE</small><b id="hDate" class="mono">Jan 2027</b></div>
+  <div class="speed" id="speed"><button data-s="0" title="Pause">&#10074;&#10074;</button><button data-s="1">1&times;</button><button data-s="5">5&times;</button><button data-s="20">20&times;</button></div>
+  <div class="kpi"><small>THIS MONTH</small><div class="dayb"><i id="hDay"></i></div></div>
+  <div class="hsp"></div>
+  <div class="kpi"><small>CASH</small><b id="hCash">$0</b></div>
+  <div class="kpi"><small>VALUATION</small><b id="hVal">$0</b></div>
+  <div class="kpi"><small id="hTick">STCK (PRIVATE)</small><b id="hPrice">$0</b></div>
+  <div class="kpi"><small>YOUR STAKE</small><b id="hMine">0%</b></div>
+  <div class="kpi"><small>BOARD</small><b id="hBoard">0</b><div class="meter"><i id="hBoardM"></i></div></div>
+ </header>
+ <div id="tape"><div id="tapeIn"></div></div>
+ <nav id="nav"></nav>
+ <main id="main"></main>
+</div>
+<div class="modal" id="modal"><div class="card"><div id="modalBody"></div></div></div>
+<div id="toast"></div>
+<x-script>
+/*==CORE==*/
+/* ================= STACK HQ: the company simulation =================
+   A monthly model of Stack as a global company, with a simulated world around the real one.
+   Per country and product: attractiveness = quality x brand x price x satisfaction; your share of
+   the market moves toward attractiveness / (you + rivals + local players). Users = market size x fit
+   x share; revenue = users x spend x margin, so a greedy margin earns more per user but loses users.
+   Costs are staff, servers, support, marketing, R&D, licences, execs and tax. Cash below zero at a
+   month end triggers an emergency bailout: new shares at a deep discount dilute you. Real Stack play
+   is the Australian home market's boost. None of this touches the real games' 97%. */
+const HQ_TYPES={casino:{n:'Casino',w:.34,arpu:1.2},sports:{n:'Sports',w:.36,arpu:1},markets:{n:'Markets',w:.14,arpu:.8},cards:{n:'Cards',w:.16,arpu:.6},arcade:{n:'Arcade',w:.2,arpu:.5},tables:{n:'Tables',w:.12,arpu:.9},
+ poker:{n:'Poker',w:.1,arpu:.9},esports:{n:'Esports',w:.14,arpu:.7},lotto:{n:'Lotto',w:.22,arpu:.5},fantasy:{n:'Fantasy',w:.12,arpu:.6},bingo:{n:'Bingo',w:.1,arpu:.6},vr:{n:'VR',w:.05,arpu:1.4},pay:{n:'Payments',w:.25,arpu:.3},stream:{n:'Streaming',w:.18,arpu:.4}};
+/* countries: tam = thousands of online players, arpu = monthly spend at a 3% margin, reg = regulatory strictness */
+const HQ_C=[
+ {id:'AU',n:'Australia',lat:-25,lon:134,tam:900,arpu:12.7,reg:.5,lic:0,mo:0,fit:{sports:1.3,casino:1.1,cards:1,arcade:1,markets:1,tables:1}},
+ {id:'NZ',n:'New Zealand',lat:-41,lon:174,tam:220,arpu:10.0,reg:.4,lic:1.5e6,mo:3,fit:{sports:1.3}},
+ {id:'SG',n:'Singapore',lat:1.3,lon:104,tam:320,arpu:14.0,reg:.8,lic:8e6,mo:8,fit:{markets:1.5,cards:1.2}},
+ {id:'JP',n:'Japan',lat:36,lon:139,tam:4200,arpu:9.3,reg:.9,lic:2e7,mo:10,fit:{arcade:1.8,cards:1.8,casino:.5,sports:.7}},
+ {id:'PH',n:'Philippines',lat:13,lon:122,tam:2300,arpu:1.7,reg:.3,lic:2e6,mo:3,fit:{casino:1.3,cards:1.1}},
+ {id:'IN',n:'India',lat:21,lon:78,tam:9500,arpu:1.0,reg:.6,lic:5e6,mo:8,fit:{cards:1.4,fantasy:1.8,sports:1.3,casino:.5}},
+ {id:'ZA',n:'South Africa',lat:-29,lon:25,tam:900,arpu:3.0,reg:.4,lic:2e6,mo:4,fit:{sports:1.4}},
+ {id:'UK',n:'United Kingdom',lat:54,lon:-2,tam:3100,arpu:13.3,reg:.85,lic:1.2e7,mo:8,fit:{sports:1.3,casino:1.1,bingo:1.8}},
+ {id:'IE',n:'Ireland',lat:53,lon:-8,tam:260,arpu:12.0,reg:.5,lic:3e6,mo:4,fit:{sports:1.4}},
+ {id:'DE',n:'Germany',lat:51,lon:10,tam:3300,arpu:10.0,reg:.8,lic:1.5e7,mo:9,fit:{markets:1.3,casino:.8}},
+ {id:'ES',n:'Spain',lat:40,lon:-4,tam:1900,arpu:7.3,reg:.6,lic:6e6,mo:6,fit:{sports:1.3,lotto:1.5}},
+ {id:'SE',n:'Sweden',lat:62,lon:15,tam:520,arpu:11.3,reg:.7,lic:5e6,mo:6,fit:{casino:1.3,esports:1.4}},
+ {id:'CA',n:'Canada',lat:57,lon:-100,tam:1700,arpu:11.3,reg:.6,lic:8e6,mo:6,fit:{sports:1.2}},
+ {id:'US',n:'United States',lat:39,lon:-98,tam:12500,arpu:15.0,reg:.9,lic:4e7,mo:12,fit:{sports:1.4,fantasy:1.6,casino:1.1,markets:1.3}},
+ {id:'MX',n:'Mexico',lat:23,lon:-102,tam:2700,arpu:3.3,reg:.4,lic:4e6,mo:5,fit:{sports:1.3,lotto:1.3}},
+ {id:'BR',n:'Brazil',lat:-10,lon:-52,tam:5200,arpu:4.0,reg:.5,lic:6e6,mo:6,fit:{sports:1.6,casino:1.1,lotto:1.3}}];
+const HQ_RIVALS=[
+ {id:'VNTG',n:'Vantage Play',col:'#3a8bff',home:'US',cash:4e8,agg:.7,q:{sports:74,casino:66,markets:52,fantasy:70},cs:{US:45,CA:35,UK:18,MX:20}},
+ {id:'CRWN',n:'Crown & Anchor',col:'#e8b020',home:'UK',cash:3e8,agg:.5,q:{casino:72,tables:74,sports:62,bingo:70},cs:{UK:50,IE:35,DE:25,ES:22,SE:28,AU:22,ZA:18}},
+ {id:'KAIJ',n:'Kaiju Games',col:'#ff4d8d',home:'JP',cash:3.5e8,agg:.6,q:{arcade:80,cards:76,esports:70},cs:{JP:55,SG:30,PH:25,IN:20,US:10}},
+ {id:'RIOL',n:'Rio Luck',col:'#22d6a4',home:'BR',cash:1.5e8,agg:.8,q:{sports:66,casino:60,lotto:68},cs:{BR:48,MX:30,ES:15}}];
+/* what R&D can build: new product lines and upgrades */
+const HQ_IDEAS=[
+ {id:'poker',n:'Stack Poker Tour',type:'poker',cost:6e5,mo:6,q:70,d:'Online poker with live tournaments and a world tour'},
+ {id:'fantasy',n:'Stack Fantasy',type:'fantasy',cost:8e5,mo:7,q:68,d:'Season-long fantasy leagues for NRL, GP and football'},
+ {id:'esports',n:'Stack Esports',type:'esports',cost:9e5,mo:8,q:66,d:'Esports tournaments, teams and match markets'},
+ {id:'lotto',n:'Stack Lotto',type:'lotto',cost:4e5,mo:4,q:62,d:'Daily draws and instant lotto, huge reach, thin spend'},
+ {id:'bingo',n:'Stack Bingo Halls',type:'bingo',cost:3e5,mo:4,q:64,d:'Social bingo rooms with hosts and chat'},
+ {id:'vr',n:'Stack VR',type:'vr',cost:1.6e6,mo:12,q:74,d:'A virtual casino floor for VR headsets. Tiny market, big spenders'},
+ {id:'pay',n:'Stack Pay',type:'pay',cost:1.2e6,mo:9,q:70,d:'A wallet and payments app for the whole ecosystem'},
+ {id:'stream',n:'Stack Live',type:'stream',cost:1e6,mo:8,q:66,d:'Streaming platform for creators playing Stack games'},
+ {id:'up-sports',n:'Sports 2.0',type:'sports',up:12,cost:5e5,mo:5,d:'In-play engine rebuild, faster markets'},
+ {id:'up-casino',n:'Casino 2.0',type:'casino',up:12,cost:5e5,mo:5,d:'New slot studio and live dealer tables'},
+ {id:'up-arcade',n:'Arcade 2.0',type:'arcade',up:12,cost:4e5,mo:4,d:'More cabinets, 3D prizes, tournaments'},
+ {id:'up-cards',n:'Cards 2.0',type:'cards',up:12,cost:4e5,mo:4,d:'Series 2, grading service, player marketplace'},
+ {id:'up-markets',n:'Markets 2.0',type:'markets',up:12,cost:5e5,mo:5,d:'Real-time order book and social trading'}];
+const HQ_CHANNELS={social:{n:'Social media',eff:3.2,min:5e4},tv:{n:'TV',eff:5,min:1e6},billboards:{n:'Billboards',eff:2.6,min:2e5},influencers:{n:'Influencers',eff:3.8,min:1e5}};
+const HQ_SPONSORS=[
+ {id:'nrl',n:'Stack League club (NRL)',c:'AU',fee:8e5,boost:6},
+ {id:'gp',n:'Stack GP team',c:'*',fee:3e6,boost:3.5},
+ {id:'epl',n:'Premier League football club',c:'UK',fee:4e6,boost:8},
+ {id:'nfl',n:'NFL team',c:'US',fee:6e6,boost:7},
+ {id:'esp',n:'Esports team',c:'*',fee:9e5,boost:1.6},
+ {id:'jl',n:'J-League club',c:'JP',fee:1.5e6,boost:7}];
+const HQ_ROLES={cfo:'Chief Financial Officer',cmo:'Chief Marketing Officer',cto:'Chief Technology Officer',coo:'Chief Operating Officer',clo:'Chief Legal Officer'};
+const HQ_TRAITS={growth:{n:'Growth hacker',d:'Campaigns work 30% harder'},pincher:{n:'Penny pincher',d:'Running costs 8% lower'},visionary:{n:'Visionary',d:'R&D quality +8 and 20% faster'},fixer:{n:'Fixer',d:'Licences 40% faster, regulators calmer'},cannon:{n:'Loose cannon',d:'Very skilled, but scandals happen'},veteran:{n:'Veteran',d:'Players happier everywhere'},poacher:{n:'Poacher',d:'Steals share from rivals'}};
+const HQ_FIRST=['Mia','Arjun','Chloe','Kenji','Sofia','Liam','Aisha','Mateo','Hannah','Tariq','Yuki','Oliver','Priya','Lucas','Zara','Noah','Amara','Felix','Leila','Hugo'];
+const HQ_LAST=['Chen','Okafor','Walsh','Tanaka','Silva','Brennan','Kapoor','Novak','Haddad','Larsen','Moreau','Nguyen','Reyes','Fischer','Adeyemi','Kowalski','Ito','Murphy','Santos','Berg'];
+const HQ_SU_A=['Nova','Pixel','Lucky','Orbit','Kite','Blaze','Echo','Zen','Vault','Pulse','Drift','Spark'],HQ_SU_B=['Labs','Play','Games','Loop','Studio','Works','Club','Bet','Hub','Stack'];
+function hqPick(a,r){return a[Math.floor(r()*a.length)]}
+function hqNew(r){const st={v:1,month:0,day:0,cash:1.2e7,shares:1e8,mine:6e7,board:60,bailouts:0,ipo:false,brandId:{mark:0,col:'#00e701',slogan:'Stack it up.',mascot:11,score:55},
+  countries:{},products:{},rivals:[],startups:[],execs:{},cands:{},campaigns:[],sponsors:[],rnd:[],ideas:HQ_IDEAS.map(i=>i.id),inbox:[],news:[],hist:[],ticks:[],milestones:{},eventsOff:0,lastReal:null,realBoost:{users:0,rev:0},downturn:0,seed:Math.floor(r()*1e9)};
+ for(const c of HQ_C)st.countries[c.id]={st:c.id==='AU'?'live':'none',due:0,brand:c.id==='AU'?14:2,sat:.72,margin:{},share:{},users:{},rev:{}};
+ for(const k of['casino','sports','markets','cards','arcade','tables'])st.products[k]={q:{casino:62,sports:70,markets:55,cards:68,arcade:72,tables:58}[k],live:true};
+ st.rivals=HQ_RIVALS.map(x=>({id:x.id,n:x.n,col:x.col,home:x.home,cash:x.cash,agg:x.agg,q:Object.assign({},x.q),cs:Object.assign({},x.cs),margin:{},share:{},rev:0,val:0,price:0,alive:true,hist:[]}));
+ for(const k in HQ_ROLES)st.cands[k]=hqCands(k,r,3);
+ hqMonth(st,r,null,true);hqNews(st,'press','Stack Holdings opens its global HQ','Stack sets out to become the world\u2019s favourite gaming company, starting from Australia.');return st}
+function hqCands(role,r,n){const out=[];const tr=Object.keys(HQ_TRAITS);for(let i=0;i<n;i++){const sk=.3+r()*.6,t=hqPick(tr,r);out.push({name:hqPick(HQ_FIRST,r)+' '+hqPick(HQ_LAST,r),role,skill:Math.round((t==='cannon'?Math.min(1,sk+.2):sk)*100)/100,trait:t,salary:Math.round((1.2e5+sk*3.5e5)/1e3)*1e3})}return out}
+const hqExec=(st,role)=>st.execs[role]||null;
+const hqTrait=(st,t)=>Object.values(st.execs).some(e=>e&&e.trait===t);
+function hqMargin(cs,type){return cs.margin[type]==null?.03:cs.margin[type]}
+const hqPF=m=>Math.exp(-(m-.03)*38);
+function hqFit(C,type){return C.fit[type]||1}
+/* attractiveness of one offer */
+const hqA=(q,brand,m,sat)=>Math.pow(Math.max(5,q)/60,1.6)*(.25+brand/100)*hqPF(m)*(.6+.8*sat);
+function hqRivalBrand(rv,cid){return rv.cs[cid]||0}
+/* the heavy monthly step */
+function hqMonth(st,r,real,init){const out={rev:0,cost:0,users:0,byC:{},lines:{}};const ex=k=>hqExec(st,k);
+ const cmoK=1+(ex('cmo')?ex('cmo').skill*.5:0)+(hqTrait(st,'growth')?.3:0),ctoQ=hqTrait(st,'visionary')?8:0;
+ const idF=.7+st.brandId.score/150,down=st.downturn>0?.9:1;
+ /* real play: the home market's boost */
+ if(real&&!init){const d=st.lastReal?Math.max(-5e4,real.ggr-st.lastReal.ggr):0;st.realBoost={users:real.players*1500,rev:Math.max(0,d)*200+real.players*3000,players:real.players,ggr:d};st.lastReal={ggr:real.ggr}}
+ else if(real&&init)st.lastReal={ggr:real.ggr};
+ /* marketing: campaigns + sponsorships move brand */
+ let mk=0;for(const cp of st.campaigns){if(cp.left<=0)continue;cp.left--;mk+=cp.budget;const ch=HQ_CHANNELS[cp.ch],ids=cp.c==='*'?Object.keys(st.countries).filter(k=>st.countries[k].st!=='none'):[cp.c];
+  const per=cp.budget/ids.length;for(const id of ids){const cs=st.countries[id];let g=ch.eff*Math.log(1+per/2.5e5)*cmoK*idF*(cp.ch==='influencers'?.5+r():1);cs.brand=Math.min(100,cs.brand+g*(1-cs.brand/110))}}
+ for(const sp of st.sponsors){mk+=sp.fee;const S=HQ_SPONSORS.find(x=>x.id===sp.id),ids=S.c==='*'?Object.keys(st.countries):[S.c];for(const id of ids){const cs=st.countries[id];cs.brand=Math.min(100,cs.brand+S.boost*idF*(1-cs.brand/110)*(st.countries[id].st==='live'?1:.4))}}
+ st.campaigns=st.campaigns.filter(c=>c.left>0);
+ /* markets */
+ const types=Object.keys(st.products).filter(k=>st.products[k].live);let licFees=0,users=0,rev=0,satW=0,duty=0;
+ for(const C of HQ_C){const cs=st.countries[C.id];cs.brand=Math.max(0,Math.min(100,cs.brand*.985+(cs.st==='live'?(cs.sat-.62)*3:0)));
+  if(cs.st==='pending'){cs.due--;if(cs.due<=0){cs.st='live';hqNews(st,'launch',`Stack launches in ${C.n}`,`Stack is now live in ${C.n} with ${types.length} products.`)}}
+  if(cs.st!=='live'){cs.users={};cs.rev={};continue}
+  licFees+=C.lic*.1/12;let cu=0,cr=0,mSum=0,qSum=0;
+  for(const t of types){const P=st.products[t],m=hqMargin(cs,t),fit=hqFit(C,t);mSum+=m;qSum+=P.q;
+   const aY=hqA(P.q,cs.brand,m,cs.sat)*(hqTrait(st,'poacher')?1.12:1);let aR=0;
+   for(const rv of st.rivals){if(!rv.alive||rv.cs[C.id]==null||!rv.q[t])continue;aR+=hqA(rv.q[t],rv.cs[C.id],rv.margin[C.id]||.04,.7)}
+   const a0=C.id==='AU'&&t==='sports'?.5:.45,tgt=aY/(aY+aR+a0),sh=cs.share[t]==null?tgt:cs.share[t];cs.share[t]=sh+(tgt-sh)*.22;
+   const reach=Math.pow(.05+.95*cs.brand/100,.85),u=C.tam*1e3*HQ_TYPES[t].w*fit*cs.share[t]*reach*down,rv2=u*(C.arpu/.03)*m*HQ_TYPES[t].arpu*down;cs.users[t]=u;cs.rev[t]=rv2;cu+=u;cr+=rv2;out.lines[t]=(out.lines[t]||0)+rv2}
+  const avgM=types.length?mSum/types.length:.03,avgQ=types.length?qSum/types.length:60;
+  const satT=Math.max(.1,Math.min(.98,.78-(avgM-.03)*4.5+(avgQ-65)/220+(hqTrait(st,'veteran')?.06:0)+(ex('coo')?ex('coo').skill*.05:0)));cs.sat+=(satT-cs.sat)*.18;
+  if(C.id==='AU'&&st.realBoost){cu+=st.realBoost.users;cr+=st.realBoost.rev}
+  out.byC[C.id]={users:cu,rev:cr};users+=cu;rev+=cr;satW+=cs.sat*cu;duty+=cr*(.1+C.reg*.12)}
+ /* costs */
+ const pinch=hqTrait(st,'pincher')?.92:1;let execPay=0;for(const k in st.execs)if(st.execs[k])execPay+=st.execs[k].salary;
+ let rnd=0;for(const d of st.rnd){rnd+=d.cost;d.left-=hqTrait(st,'visionary')?1.25:1;d.prog=1-d.left/d.mo}
+ const staff=(4.5e5+users*.6)*pinch,servers=users*.35*pinch,fees=rev*.08+duty,support=users*.25*(1-(ex('coo')?ex('coo').skill*.3:0))*pinch;
+ const cost=staff+servers+support+fees+mk+rnd+execPay+licFees;let profit=rev-cost;const tax=profit>0?profit*.25:0;profit-=tax;
+ if(!init)st.cash+=profit;
+ /* R&D finishing */
+ for(const d of st.rnd.filter(x=>x.left<=0)){const I=HQ_IDEAS.find(x=>x.id===d.id);st.rnd.splice(st.rnd.indexOf(d),1);
+  if(I.up){st.products[I.type].q=Math.min(99,st.products[I.type].q+I.up);hqNews(st,'product',`${I.n} rolls out worldwide`,`${HQ_TYPES[I.type].n} quality is now ${Math.round(st.products[I.type].q)}.`)}
+  else{const q=Math.min(95,I.q+ctoQ+(ex('cto')?ex('cto').skill*10:0)+(r()-.5)*14);st.products[I.type]={q,live:true};hqNews(st,'product',`Stack unveils ${I.n}`,`${I.d}. Launching in every Stack market (quality ${Math.round(q)}).`)}}
+ /* rivals + startups */
+ if(!init){hqRivals(st,r);hqStartups(st,r)}
+ /* valuation and share price */
+ const h=st.hist,prev=h.length?h[h.length-1]:null,rev3=h.slice(-3).reduce((a,x)=>a+x.rev,0)/Math.max(1,Math.min(3,h.length)),g=prev&&rev3>0?(rev-rev3)/rev3:0;
+ const worldUsers=hqWorldUsers(st);const lead=users/Math.max(1,worldUsers);
+ const mult=Math.max(.8,Math.min(8,1.4+g*6+(rev>0?profit/rev*4:0)+lead*5+st.board/200));const val=Math.max(5e6,rev*12*mult+st.cash*.9);
+ st.val=val;const price=val/st.shares;
+ if(!init){st.board=Math.max(0,Math.min(100,st.board+(profit>0?2:-3)+g*20));
+  /* emergency bailout */
+  if(st.cash<0){const need=-st.cash+Math.max(1e7,cost*1.5),disc=.4+(ex('cfo')?ex('cfo').skill*.25:0),newSh=need/(price*disc);st.shares+=newSh;st.cash+=need;st.bailouts++;st.board=Math.max(0,st.board-35);
+   hqNews(st,'crisis',`Stack rescued in emergency funding round`,`Investors inject ${hqMoney(need)} at a ${Math.round((1-disc)*100)}% discount. The founder's stake falls to ${(st.mine/st.shares*100).toFixed(1)}%.`);out.bailout={need,disc,newSh}}}
+ st.price=st.val/st.shares;
+ const rec={m:st.month,rev,cost:cost+tax,profit,cash:st.cash,val:st.val,price:st.price,users,share:lead,brand:hqAvgBrand(st),lines:out.lines,tax,mk,rnd,staff,ops:servers+support,fees,execPay,licFees,real:st.realBoost?st.realBoost.rev:0};
+ if(!init){st.hist.push(rec);if(st.hist.length>240)st.hist.shift();st.month++;if(st.downturn>0)st.downturn--;hqMilestones(st);if(st.cands&&st.month%4===0)for(const k in HQ_ROLES)st.cands[k]=hqCands(k,r,3)}
+ st.last=rec;return rec}
+function hqAvgBrand(st){let s=0,n=0;for(const k in st.countries){const c=st.countries[k];if(c.st==='live'){s+=c.brand;n++}}return n?s/n:0}
+function hqWorldUsers(st){let t=0;for(const C of HQ_C)for(const k in HQ_TYPES)t+=C.tam*1e3*HQ_TYPES[k].w*(C.fit[k]||1)*.62;return t}
+function hqRivals(st,r){for(const rv of st.rivals){if(!rv.alive)continue;let rev=0;
+  for(const cid in rv.cs){const C=HQ_C.find(x=>x.id===cid),cs=st.countries[cid];let rs=0;
+   for(const t in rv.q){const aR=hqA(rv.q[t],rv.cs[cid],rv.margin[cid]||.04,.7),aY=cs.st==='live'&&st.products[t]&&st.products[t].live?hqA(st.products[t].q,cs.brand,hqMargin(cs,t),cs.sat):0,s=aR/(aR+aY+.45);
+    rs+=C.tam*1e3*HQ_TYPES[t].w*hqFit(C,t)*s*Math.pow(.05+.95*rv.cs[cid]/100,.85)*(C.arpu/.03)*(rv.margin[cid]||.04)*HQ_TYPES[t].arpu}
+   rev+=rs;rv.cs[cid]=Math.min(95,rv.cs[cid]*.99+(rv.agg*1.6)*(cs.st==='live'?1.3:1));
+   /* price war where you're winning */
+   const mine=cs.st==='live'?Object.values(cs.share).reduce((a,b)=>a+b,0)/Math.max(1,Object.keys(cs.share).length):0;
+   if(mine>.35&&r()<rv.agg*.06&&(rv.margin[cid]||.04)>.018){rv.margin[cid]=(rv.margin[cid]||.04)-.01;hqNews(st,'rival',`${rv.n} starts a price war in ${C.n}`,`${rv.n} cuts its margins to ${((rv.margin[cid])*100).toFixed(1)}% to win back players from Stack.`)}}
+  rv.rev=rev;rv.cash+=rev*.12;for(const t in rv.q)rv.q[t]=Math.min(96,rv.q[t]+r()*.35);
+  if(rv.cash>2e8&&r()<.05){const cands=HQ_C.filter(c=>rv.cs[c.id]==null).sort((a,b)=>b.tam*b.arpu-a.tam*a.arpu);if(cands.length){const c=cands[Math.floor(r()*Math.min(3,cands.length))];rv.cs[c.id]=8;rv.cash-=c.lic;hqNews(st,'rival',`${rv.n} enters ${c.n}`,`${rv.n} has launched in ${c.n}.`)}}
+  rv.val=Math.max(5e7,rev*12*(1.6+rv.agg)+rv.cash*.9);rv.price=rv.val/1e8;rv.hist.push(rv.price);if(rv.hist.length>60)rv.hist.shift()}}
+function hqStartups(st,r){for(const s of st.startups){s.users*=1.06+r()*.05;s.val*=1.03+r()*.04;s.age++}
+ st.startups=st.startups.filter(s=>{if(s.age>10&&r()<.12){const rv=st.rivals.filter(x=>x.alive)[Math.floor(r()*st.rivals.filter(x=>x.alive).length)];if(rv){rv.q[s.type]=Math.max(rv.q[s.type]||0,s.q);hqNews(st,'rival',`${rv.n} buys ${s.n}`,`${rv.n} has acquired the startup ${s.n} for ${hqMoney(s.val*1.3)}.`)}return false}return true});
+ if(st.startups.length<5&&r()<.3){const ts=Object.keys(HQ_TYPES),t=hqPick(ts,r),c=hqPick(HQ_C,r);st.startups.push({id:'su'+st.month+Math.floor(r()*1e4),n:hqPick(HQ_SU_A,r)+' '+hqPick(HQ_SU_B,r),type:t,home:c.id,q:68+r()*24,users:2e4+r()*2e5,val:4e6+r()*6e7,age:0})}}
+function hqMilestones(st){const M=st.milestones,add=(k,t,d)=>{if(M[k])return;M[k]=st.month;hqNews(st,'milestone',t,d)};
+ if(st.val>=1e8)add('v100m','Stack passes a $100M valuation','A major milestone for the company.');
+ if(st.val>=5e8)add('v500m','Stack valued at half a billion','Investors pile in as Stack keeps growing.');
+ if(st.val>=1e9){add('v1b','Stack becomes a unicorn','Stack is now valued at over $1 billion.');if(!st.ipo){st.ipo=true;add('ipo','Stack lists on the stock exchange as STCK','Shares in Stack begin trading publicly.')}}
+ if(st.val>=1e10)add('v10b','Stack hits a $10 billion valuation','One of the biggest gaming companies on the planet.');
+ const live=Object.values(st.countries).filter(c=>c.st==='live').length;if(live>=5)add('c5','Stack is live in 5 countries','Going global.');if(live>=10)add('c10','Stack is live in 10 countries','A truly global company.');
+ const vs=st.rivals.filter(x=>x.alive).every(x=>x.val<st.val);if(vs)add('top','Stack is now the world’s most valuable gaming company','Stack has overtaken every rival.')}
+function hqNews(st,kind,t,d){st.news.unshift({m:st.month,kind,t,d});if(st.news.length>80)st.news.pop()}
+/* ---- decisions ---- */
+function hqLaunch(st,cid){const C=HQ_C.find(x=>x.id===cid),cs=st.countries[cid];if(cs.st!=='none')return'already';if(st.cash<C.lic)return'cash';st.cash-=C.lic;
+ const f=(hqTrait(st,'fixer')?.6:1)*(1-(hqExec(st,'clo')?hqExec(st,'clo').skill*.3:0));cs.st='pending';cs.due=Math.max(1,Math.round(C.mo*f));hqNews(st,'expansion',`Stack applies for a ${C.n} licence`,`Launch expected in ${cs.due} months.`);return'ok'}
+function hqSetMargin(st,cid,type,m){st.countries[cid].margin[type]=Math.max(.01,Math.min(.15,m))}
+function hqCampaign(st,ch,cid,budget,months){if(budget<HQ_CHANNELS[ch].min)return'min';st.campaigns.push({id:'cp'+st.month+st.campaigns.length,ch,c:cid,budget,left:months,mo:months});return'ok'}
+function hqSponsor(st,id,on){const i=st.sponsors.findIndex(s=>s.id===id);if(on&&i<0){const S=HQ_SPONSORS.find(x=>x.id===id);st.sponsors.push({id,fee:S.fee,since:st.month});hqNews(st,'brand',`Stack signs as official partner of the ${S.n}`,`A new sponsorship for the Stack brand.`)}else if(!on&&i>=0)st.sponsors.splice(i,1)}
+function hqHire(st,role,i){const c=st.cands[role][i];if(!c)return;if(st.execs[role])hqFire(st,role);st.execs[role]=c;st.cands[role].splice(i,1);hqNews(st,'people',`Stack names ${c.name} as ${HQ_ROLES[role]}`,`${c.name} joins the executive team (${HQ_TRAITS[c.trait].n}).`)}
+function hqFire(st,role){const e=st.execs[role];if(!e)return;st.cash-=e.salary*3;st.execs[role]=null;hqNews(st,'people',`${e.name} leaves Stack`,`The ${HQ_ROLES[role]} departs with a severance package.`)}
+function hqStartRnd(st,id){const I=HQ_IDEAS.find(x=>x.id===id);if(!I||st.rnd.some(d=>d.id===id))return'busy';if(!I.up&&st.products[I.type])return'have';const mo=I.mo;st.rnd.push({id,cost:I.cost,mo,left:mo,prog:0});st.ideas=st.ideas.filter(x=>x!==id||I.up);return'ok'}
+function hqBuyStartup(st,id){const s=st.startups.find(x=>x.id===id);if(!s)return'gone';const price=s.val*1.35;if(st.cash<price)return'cash';st.cash-=price;st.startups.splice(st.startups.indexOf(s),1);
+ if(st.products[s.type])st.products[s.type].q=Math.max(st.products[s.type].q,s.q);else st.products[s.type]={q:s.q,live:true};const cs=st.countries[s.home];cs.brand=Math.min(100,cs.brand+6);
+ hqNews(st,'deal',`Stack acquires ${s.n}`,`Stack buys the ${HQ_TYPES[s.type].n.toLowerCase()} startup ${s.n} for ${hqMoney(price)}.`);return'ok'}
+function hqTakeover(st,rid){const rv=st.rivals.find(x=>x.id===rid);if(!rv||!rv.alive)return'gone';const price=rv.val*1.4;if(st.cash<price)return'cash';st.cash-=price;rv.alive=false;
+ for(const cid in rv.cs){const cs=st.countries[cid];if(cs.st==='none'){cs.st='live'}cs.brand=Math.min(100,Math.max(cs.brand,rv.cs[cid]*.8))}for(const t in rv.q){if(st.products[t])st.products[t].q=Math.max(st.products[t].q,rv.q[t]);else st.products[t]={q:rv.q[t],live:true}}
+ hqNews(st,'deal',`Stack completes takeover of ${rv.n}`,`In the biggest deal in its history, Stack buys ${rv.n} for ${hqMoney(price)}.`);return'ok'}
+function hqRaise(st,amount){const price=st.val/st.shares*.9,n=amount/price;st.shares+=n;st.cash+=amount;st.board=Math.min(100,st.board+2);hqNews(st,'finance',`Stack raises ${hqMoney(amount)}`,`New shares sold to investors at ${hqMoney(price,2)} each.`);return n}
+/* ---- events: some happen, some land in the inbox as decisions ---- */
+const HQ_EVENTS=[
+ {id:'probe',w:3,need:st=>hqLiveIds(st).some(id=>HQ_C.find(c=>c.id===id).reg>=.7),make:(st,r)=>{const id=hqPick(hqLiveIds(st).filter(id=>HQ_C.find(c=>c.id===id).reg>=.7),r);return{t:`Regulators in ${hqCN(id)} are looking at Stack's margins`,d:'A regulator wants to know whether Stack prices fairly.',c:id,opts:[{k:'cut',n:'Cut margins to 3%',d:'Players and regulator happy, less revenue'},{k:'court',n:'Fight it in court ($3M)',d:'50/50: win and nothing changes, lose and pay a $15M fine'},{k:'ignore',n:'Ignore it',d:'Risky: a big fine and brand damage are likely'}]}}},
+ {id:'celeb',w:3,need:()=>true,make:(st,r)=>{const id=hqPick(hqLiveIds(st),r);return{t:`A celebrity wants to be the face of Stack in ${hqCN(id)}`,d:'They want $2.5M for a year of posts and appearances.',c:id,opts:[{k:'yes',n:'Sign them ($2.5M)',d:'Brand +12 in that country'},{k:'no',n:'Pass',d:'Nothing happens'}]}}},
+ {id:'poach',w:2,need:st=>!!st.execs.cto,make:()=>({t:'A rival is trying to poach your engineers',d:'Your best engineers have offers from a rival.',opts:[{k:'pay',n:'Retention bonuses ($1.5M)',d:'Keep the team'},{k:'let',n:'Let them go',d:'All product quality -4'}]})},
+ {id:'merger',w:1,need:st=>st.val>4e8,make:(st,r)=>{const rv=hqPick(st.rivals.filter(x=>x.alive),r);return rv?{t:`${rv.n} proposes a joint venture`,d:`${rv.n} offers to share a country with you: both brands grow, both give up some margin.`,rv:rv.id,opts:[{k:'yes',n:'Agree',d:'Brand +8 everywhere you both operate, margins -0.5pt'},{k:'no',n:'Decline',d:`${rv.n} gets more aggressive`}]}:null}}];
+function hqLiveIds(st){return Object.keys(st.countries).filter(k=>st.countries[k].st==='live')}
+function hqCN(id){return(HQ_C.find(c=>c.id===id)||{n:id}).n}
+function hqEvents(st,r){/* passive events */
+ const roll=r();if(roll<.05){st.downturn=6;hqNews(st,'world','Global downturn hits gaming spend','Players spend about 10% less for the next six months.')}
+ else if(roll<.09){const pen=.45-(hqExec(st,'cto')?hqExec(st,'cto').skill*.35:0);if(r()<pen){for(const k in st.countries)st.countries[k].brand*=.9;st.cash-=2e6;hqNews(st,'crisis','Stack hit by a data breach','Customer data was exposed. Brand trust falls everywhere and the clean-up costs $2M.')}}
+ else if(roll<.14){const id=hqPick(hqLiveIds(st),r);st.countries[id].brand=Math.min(100,st.countries[id].brand+7);hqNews(st,'brand',`Stack goes viral in ${hqCN(id)}`,'A clip of a huge win spreads everywhere. Brand +7.')}
+ else if(roll<.17&&hqTrait(st,'cannon')){for(const k in st.countries)st.countries[k].brand*=.95;hqNews(st,'crisis','Stack executive in a public row','An executive’s comments cause a backlash. Brand -5% everywhere.')}
+ /* decisions */
+ if(st.inbox.length<3&&r()<.3){const pool=HQ_EVENTS.filter(e=>e.need(st));if(pool.length){const e=pool[pickWHQ(pool.map(x=>x.w),r())];const card=e.make(st,r);if(card){card.id=e.id;card.at=st.month;card.uid='ev'+st.month+Math.floor(r()*1e5);st.inbox.push(card)}}}
+ /* unanswered decisions expire into their default (the last option) */
+ for(const card of st.inbox.slice())if(st.month-card.at>=3)hqDecide(st,card.uid,card.opts[card.opts.length-1].k,r)}
+function pickWHQ(w,u){let s=0;for(const x of w)s+=x;u*=s;for(let i=0;i<w.length;i++){u-=w[i];if(u<0)return i}return w.length-1}
+function hqDecide(st,uid,k,r){const card=st.inbox.find(x=>x.uid===uid);if(!card)return;st.inbox.splice(st.inbox.indexOf(card),1);const cs=card.c?st.countries[card.c]:null;
+ if(card.id==='probe'){if(k==='cut'){for(const t in st.products)cs.margin[t]=Math.min(hqMargin(cs,t),.03);hqNews(st,'regulation',`Stack agrees fair-pricing terms in ${hqCN(card.c)}`,'Margins capped at 3%.')}
+  else if(k==='court'){st.cash-=3e6;if(r()<.5)hqNews(st,'regulation',`Stack wins court case in ${hqCN(card.c)}`,'The regulator’s case is thrown out.');else{st.cash-=1.5e7;cs.brand*=.85;hqNews(st,'regulation',`Stack fined $15M in ${hqCN(card.c)}`,'The court rules against Stack.')}}
+  else{if(r()<.7){st.cash-=2e7;cs.brand*=.75;hqNews(st,'regulation',`Stack fined $20M in ${hqCN(card.c)}`,'The regulator acts after Stack ignored its inquiry.')}}}
+ if(card.id==='celeb'&&k==='yes'){st.cash-=2.5e6;cs.brand=Math.min(100,cs.brand+12);hqNews(st,'brand',`New face of Stack in ${hqCN(card.c)}`,'A celebrity signs on as Stack’s ambassador.')}
+ if(card.id==='poach'){if(k==='pay')st.cash-=1.5e6;else for(const t in st.products)st.products[t].q=Math.max(20,st.products[t].q-4)}
+ if(card.id==='merger'){const rv=st.rivals.find(x=>x.id===card.rv);if(k==='yes'&&rv){for(const cid in rv.cs){const c2=st.countries[cid];if(c2.st==='live'){c2.brand=Math.min(100,c2.brand+8);for(const t in st.products)c2.margin[t]=Math.max(.01,hqMargin(c2,t)-.005)}}hqNews(st,'deal',`Stack and ${rv.n} form a joint venture`,'Both brands will grow together.')}else if(rv)rv.agg=Math.min(1,rv.agg+.15)}}
+function hqMoney(n,dp){const a=Math.abs(n),s=n<0?'-':'';if(dp!=null&&a<1e3)return s+'$'+a.toFixed(dp);if(a>=1e9)return s+'$'+(a/1e9).toFixed(a>=1e10?1:2)+'B';if(a>=1e6)return s+'$'+(a/1e6).toFixed(a>=1e8?0:1)+'M';if(a>=1e3)return s+'$'+(a/1e3).toFixed(0)+'K';return s+'$'+a.toFixed(0)}
+/* one full month: events, then the model */
+function hqAdvance(st,r,real){hqEvents(st,r);return hqMonth(st,r,real,false)}
+/* what the public sees: the Stack World numbers (simulated) and the newsroom */
+function hqPublic(st){const live=hqLiveIds(st);return{at:Date.now(),month:st.month,val:st.val,price:st.price,chg:st.hist.length>1?st.price/st.hist[st.hist.length-2].price-1:0,ipo:st.ipo,countries:live.length,players:Math.round(st.last?st.last.users:0),
+ news:st.news.filter(n=>['launch','product','brand','deal','milestone','expansion','press'].includes(n.kind)).slice(0,6).map(n=>({t:n.t,d:n.d,m:n.m})),sponsors:st.sponsors.map(s=>HQ_SPONSORS.find(x=>x.id===s.id).n),slogan:st.brandId.slogan,col:st.brandId.col}}
+if(typeof module!=='undefined')module.exports={HQ_TYPES,HQ_C,HQ_RIVALS,HQ_IDEAS,HQ_CHANNELS,HQ_SPONSORS,HQ_ROLES,HQ_TRAITS,hqNew,hqMonth,hqAdvance,hqLaunch,hqSetMargin,hqCampaign,hqSponsor,hqHire,hqFire,hqStartRnd,hqBuyStartup,hqTakeover,hqRaise,hqDecide,hqPublic,hqMoney,hqA,hqPF,hqLiveIds};
+/*==END CORE==*/
+/* ================= WORLD MAP + CHARTS =================
+   The map is a dot-matrix world: simplified continent outlines (lon/lat) sampled on a 2-degree grid
+   once, then drawn as dots. Markets glow by size and by who leads them. */
+const LAND=[
+ [[-168,65],[-160,71],[-140,70],[-125,70],[-100,73],[-85,70],[-80,63],[-65,60],[-60,52],[-53,47],[-66,44],[-70,41],[-76,35],[-81,31],[-80,25],[-83,29],[-90,30],[-97,27],[-97,21],[-92,18],[-87,21],[-88,16],[-83,10],[-77,8],[-80,8],[-86,12],[-92,14],[-105,20],[-110,23],[-115,30],[-118,34],[-124,40],[-124,48],[-130,54],[-138,58],[-150,60],[-165,60]],
+ [[-73,78],[-60,82],[-30,83],[-20,75],[-22,70],[-40,62],[-50,64],[-55,70]],
+ [[-80,-2],[-78,8],[-72,12],[-62,10],[-50,2],[-35,-5],[-39,-15],[-41,-22],[-48,-26],[-53,-34],[-58,-38],[-65,-42],[-68,-50],[-72,-54],[-75,-50],[-73,-40],[-71,-30],[-71,-18],[-76,-14],[-81,-5]],
+ [[-10,36],[-9,43],[-2,44],[-4,48],[-1,50],[5,53],[8,57],[5,58],[5,62],[12,66],[20,70],[30,70],[40,68],[45,68],[60,70],[60,55],[50,45],[40,42],[28,41],[26,38],[22,37],[20,40],[16,38],[12,42],[8,44],[3,43],[-1,37]],
+ [[-6,50],[1,51],[2,53],[-2,56],[-3,58],[-6,58],[-5,55],[-3,54],[-5,52]],[[-10,52],[-6,52],[-6,55],[-8,55],[-10,54]],
+ [[-17,15],[-17,21],[-13,27],[-9,32],[-5,36],[10,37],[11,33],[20,31],[32,31],[34,28],[43,12],[51,12],[42,-2],[40,-10],[40,-16],[35,-24],[33,-29],[27,-34],[20,-35],[18,-30],[12,-17],[13,-6],[9,4],[3,6],[-8,4],[-13,8]],
+ [[44,-25],[47,-25],[50,-15],[49,-12],[44,-17]],
+ [[26,41],[36,36],[35,32],[43,13],[52,16],[58,22],[57,26],[62,25],[68,23],[73,17],[77,8],[80,15],[80,20],[88,22],[92,22],[98,16],[100,6],[103,1],[104,10],[109,11],[108,20],[111,22],[119,25],[122,31],[118,38],[122,40],[127,40],[129,35],[130,43],[141,48],[140,55],[135,55],[143,59],[155,59],[163,60],[178,65],[180,69],[140,73],[110,77],[100,78],[80,73],[70,73],[60,70],[45,68],[40,42]],
+ [[130,31],[132,34],[135,34],[140,35],[141,39],[141,42],[140,45],[142,45],[145,43],[141,41],[140,38],[137,35],[133,33]],
+ [[95,5],[98,4],[106,-6],[103,-5]],[[109,1],[115,5],[119,5],[118,1],[116,-4],[110,-3]],[[105,-6],[114,-7],[114,-8],[106,-7]],[[120,18],[122,18],[124,12],[126,7],[122,7],[121,13]],[[131,-1],[141,-3],[150,-10],[142,-9],[134,-4]],
+ [[114,-22],[114,-34],[118,-35],[124,-34],[131,-31],[138,-35],[141,-38],[146,-39],[150,-37],[153,-32],[153,-25],[146,-19],[142,-11],[136,-12],[136,-15],[130,-13],[126,-14],[122,-17]],
+ [[145,-41],[148,-41],[147,-43.5],[145,-43]],[[172,-34.5],[174,-37],[178,-38],[175,-41],[172,-41],[167,-46],[170,-46],[174,-41]],[[80,10],[82,7],[81,6],[80,8]]];
+function inPoly(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const [xi,yi]=p[i],[xj,yj]=p[j];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c}
+let DOTS=null;function mapDots(){if(DOTS)return DOTS;DOTS=[];for(let lat=80;lat>=-56;lat-=2)for(let lon=-168;lon<=180;lon+=2){if(LAND.some(p=>inPoly(lon,lat,p)))DOTS.push([lon,lat])}return DOTS}
+const proj=(lon,lat,w,h)=>[(lon+170)/352*w,(82-lat)/140*h];
+function drawMap(cv,st,sel,t,small){const dpr=Math.min(2,devicePixelRatio||1),w=cv.clientWidth,h=Math.round(w*.42);cv.style.height=h+'px';if(cv.width!==Math.round(w*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+ const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
+ const ds=Math.max(1.1,w/520);c.fillStyle='#1d3348';for(const [lon,lat] of mapDots()){const [x,y]=proj(lon,lat,w,h);c.fillRect(x-ds/2,y-ds/2,ds,ds)}
+ /* rival presence rings, then your markets */
+ for(const C of HQ_C){const [x,y]=proj(C.lon,C.lat,w,h),cs=st.countries[C.id],R=Math.sqrt(C.tam)/(small?9:6.5);
+  const rv=st.rivals.filter(q=>q.alive&&q.cs[C.id]!=null).sort((a,b)=>b.cs[C.id]-a.cs[C.id]);
+  rv.forEach((q,i)=>{c.strokeStyle=q.col;c.globalAlpha=.55;c.lineWidth=1.5;c.beginPath();c.arc(x,y,R+4+i*3,0,Math.PI*2);c.stroke()});c.globalAlpha=1;
+  if(cs.st==='live'){const u=Object.values(cs.users).reduce((a,b)=>a+b,0),r=Math.max(4,Math.sqrt(u)/(small?60:42));const gr=c.createRadialGradient(x,y,0,x,y,r*2.4);gr.addColorStop(0,'rgba(0,231,1,.55)');gr.addColorStop(1,'rgba(0,231,1,0)');c.fillStyle=gr;c.beginPath();c.arc(x,y,r*2.4,0,Math.PI*2);c.fill();
+   c.fillStyle='#00e701';c.beginPath();c.arc(x,y,Math.max(3,r*.45),0,Math.PI*2);c.fill()}
+  else if(cs.st==='pending'){c.strokeStyle='#ffb020';c.lineWidth=2;c.globalAlpha=.5+.5*Math.sin(t*4);c.beginPath();c.arc(x,y,6+2*Math.sin(t*4),0,Math.PI*2);c.stroke();c.globalAlpha=1;c.fillStyle='#ffb020';c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill()}
+  else{c.fillStyle='#4a5a6e';c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill()}
+  if(!small||cs.st==='live'){c.fillStyle=sel===C.id?'#ffffff':'#9fb0c4';c.font=`${sel===C.id?800:600} ${small?10:11}px Inter`;c.fillText(C.id,x+7,y-6)}
+  if(sel===C.id){c.strokeStyle='#fff';c.lineWidth=1.5;c.setLineDash([3,3]);c.beginPath();c.arc(x,y,16,0,Math.PI*2);c.stroke();c.setLineDash([])}}
+ cv._hit=(mx,my)=>{let best=null,bd=22;for(const C of HQ_C){const [x,y]=proj(C.lon,C.lat,w,h),d=Math.hypot(mx-x,my-y);if(d<bd){bd=d;best=C.id}}return best}}
+/* line/area chart: series = [{v:[...], col, fill?}], fmt for the axis */
+function drawLine(cv,series,{h=180,fmt=v=>v,zero=false,bars=null}={}){const dpr=Math.min(2,devicePixelRatio||1),w=cv.clientWidth;cv.style.height=h+'px';cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+ const all=series.flatMap(s=>s.v).concat(bars?bars.flatMap(b=>b.v):[]);if(!all.length){c.fillStyle='#4a5a6e';c.font='12px Inter';c.fillText('Data appears after the first month',12,h/2);return}
+ let lo=Math.min(...all),hi=Math.max(...all);if(zero)lo=Math.min(0,lo);if(hi===lo)hi=lo+1;const pad=(hi-lo)*.08;lo-=zero&&lo>=0?0:pad;hi+=pad;const L=56,R=8,T=8,B=18,X=i=>L+(w-L-R)*i/Math.max(1,n-1),Y=v=>T+(h-T-B)*(1-(v-lo)/(hi-lo));const n=Math.max(...series.map(s=>s.v.length),bars?bars[0].v.length:0);
+ c.strokeStyle='#15202d';c.fillStyle='#4a5a6e';c.font='10px "JetBrains Mono"';for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4,y=Y(v);c.beginPath();c.moveTo(L,y);c.lineTo(w-R,y);c.stroke();c.fillText(fmt(v),4,y+3)}
+ if(bars){const bw=Math.max(2,(w-L-R)/n/(bars.length+1));bars.forEach((b,j)=>{c.fillStyle=b.col;b.v.forEach((v,i)=>{const x=X(i)-bw*bars.length/2+j*bw,y0=Y(Math.max(lo,0)),y=Y(v);c.fillRect(x,Math.min(y,y0),bw-1,Math.abs(y0-y))})})}
+ for(const s of series){if(s.v.length<2)continue;c.beginPath();s.v.forEach((v,i)=>i?c.lineTo(X(i),Y(v)):c.moveTo(X(i),Y(v)));c.strokeStyle=s.col;c.lineWidth=2;c.stroke();
+  if(s.fill){c.lineTo(X(s.v.length-1),h-B);c.lineTo(X(0),h-B);c.closePath();const g2=c.createLinearGradient(0,T,0,h-B);g2.addColorStop(0,s.col+'55');g2.addColorStop(1,s.col+'00');c.fillStyle=g2;c.fill()}}}
+function spark(cv,v,col){const dpr=Math.min(2,devicePixelRatio||1),w=cv.clientWidth||120,h=cv.clientHeight||34;cv.width=w*dpr;cv.height=h*dpr;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);if(v.length<2)return;const lo=Math.min(...v),hi=Math.max(...v)||1;
+ c.beginPath();v.forEach((x,i)=>{const px=i/(v.length-1)*w,py=h-2-(x-lo)/((hi-lo)||1)*(h-4);i?c.lineTo(px,py):c.moveTo(px,py)});c.strokeStyle=col;c.lineWidth=1.6;c.stroke()}
+/* ================= HQ SCREENS ================= */
+const $=id=>document.getElementById(id);
+const M=hqMoney,P=(n,d=1)=>(n*100).toFixed(d)+'%';
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dateOf=m=>MONTHS[m%12]+' '+(2027+Math.floor(m/12));
+const TAGC={launch:'#00e701',product:'#3cc8ff',brand:'#c64bff',deal:'#ffb020',milestone:'#ffd84a',expansion:'#00e701',rival:'#ff4f5e',crisis:'#ff4f5e',regulation:'#ff8a3a',people:'#7d8ea3',world:'#7d8ea3',finance:'#3cc8ff',press:'#ffffff'};
+const ICONS={overview:'<path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/>',world:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.9 6h-2.9a15.7 15.7 0 0 0-1.4-3.6A8 8 0 0 1 18.9 8zM12 4c.8 1.2 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.8 1.9-4zM4.3 14a8 8 0 0 1 0-4h3.4a16 16 0 0 0 0 4zm.8 2h2.9c.3 1.3.8 2.5 1.4 3.6A8 8 0 0 1 5.1 16zM8 8H5.1a8 8 0 0 1 4.3-3.6C8.8 5.5 8.3 6.7 8 8zm4 12c-.8-1.2-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.8-1.9 4zm2.3-6H9.7a14 14 0 0 1 0-4h4.6a14 14 0 0 1 0 4zm.3 5.6c.6-1.1 1.1-2.3 1.4-3.6h2.9a8 8 0 0 1-4.3 3.6zm1.7-5.6a16 16 0 0 0 0-4h3.4a8 8 0 0 1 0 4z"/>',
+ products:'<path d="M12 2 2 7l10 5 10-5zm0 12L2 9v6l10 5 10-5V9z"/>',brand:'<path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/>',people:'<path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.7 0-8 1.3-8 4v3h16v-3c0-2.7-5.3-4-8-4zm8 0h-1c1.2.9 2 2.1 2 4v3h7v-3c0-2.7-5.3-4-8-4z"/>',
+ deals:'<path d="M3 12l4-4 4 4 6-6 4 4v8H3z"/>',finance:'<path d="M4 20h16v2H4zM6 10h3v8H6zm5-4h3v12h-3zm5 7h3v5h-3z"/>',news:'<path d="M4 4h13v16H6a2 2 0 0 1-2-2zm15 4h2v10a2 2 0 0 1-2 2zM7 7v4h7V7zm0 6v2h7v-2zm0 4v1h7v-1z"/>'};
+let TAB='overview',SEL='AU';
+function navRender(){const n=st.inbox.length;$('nav').innerHTML=`<div class="nsec">COMPANY</div>`+[['overview','Overview'],['world','World'],['products','Products'],['brand','Brand'],['people','People'],['deals','Deals'],['finance','Finance'],['news','Newsroom']].map(([k,l])=>
+ `<button data-t="${k}" class="${TAB===k?'on':''}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${l}${k==='overview'&&n?`<span class="badge">${n}</span>`:''}</button>`).join('')+
+ `<div class="nsec">PUBLIC</div><button data-pub="1"><svg viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm1 12h-2v-5h2zm0-7h-2V7h2z"/></svg>Publish to players</button>`;
+ $('nav').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{TAB=b.dataset.t;snd('click');render()});$('nav').querySelector('[data-pub]').onclick=()=>{publish(true)}}
+function hdr(){const s=st;$('hDate').textContent=dateOf(s.month);$('hCash').textContent=M(s.cash);$('hCash').className=s.cash<0?'dn':'';$('hVal').textContent=M(s.val);
+ const pr=s.dayPrice||s.price,ch=s.hist.length>1?pr/s.hist[s.hist.length-2].price-1:0;$('hTick').textContent=s.ipo?'STCK · LISTED':'STCK (PRIVATE)';$('hPrice').innerHTML=`${M(pr,2)} <span class="${ch>=0?'up':'dn'}" style="font-size:12px">${ch>=0?'▲':'▼'}${P(Math.abs(ch))}</span>`;
+ $('hMine').textContent=P(s.mine/s.shares);$('hBoard').textContent=Math.round(s.board);const bm=$('hBoardM');bm.style.width=s.board+'%';bm.style.background=s.board>60?'#2bd96b':s.board>30?'#ffb020':'#ff4f5e';$('hDay').style.width=(DAY/30*100)+'%';
+ document.querySelectorAll('#speed button').forEach(b=>b.classList.toggle('on',+b.dataset.s===SPEED))}
+function tape(){const s=st,items=[`<span>STCK <b>${M(s.price,2)}</b></span>`].concat(s.rivals.filter(r=>r.alive).map(r=>{const h=r.hist,ch=h.length>1?h[h.length-1]/h[h.length-2]-1:0;return `<span style="color:${r.col}">${r.id} <b>${M(r.price,2)}</b> <span class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'}${P(Math.abs(ch))}</span></span>`}))
+ .concat(s.news.slice(0,6).map(n=>`<span style="color:#9fb0c4">● ${n.t}</span>`));$('tapeIn').innerHTML=items.join('')}
+function render(){navRender();hdr();tape();const m=$('main');m.innerHTML=({overview:vOverview,world:vWorld,products:vProducts,brand:vBrand,people:vPeople,deals:vDeals,finance:vFinance,news:vNews}[TAB])();wire(TAB)}
+const tile=(l,v,sub,cls='')=>`<div class="card tile"><small>${l}</small><b class="${cls}">${v}</b>${sub?`<em>${sub}</em>`:''}</div>`;
+function delta(a,b){if(b==null||!b)return'';const d=a/b-1;return `<span class="${d>=0?'up':'dn'}">${d>=0?'▲':'▼'} ${P(Math.abs(d))} vs last month</span>`}
+function vOverview(){const s=st,L=s.last||{},pr=s.hist.length>1?s.hist[s.hist.length-2]:null,run=L.profit>=0?'Profitable':Math.max(0,Math.floor(s.cash/-L.profit))+' months';
+ return `<h1>Good ${new Date().getHours()<12?'morning':'afternoon'}, CEO</h1><p class="sub">${dateOf(s.month)} · Stack is live in ${hqLiveIds(s).length} of ${HQ_C.length} markets${s.bailouts?` · ${s.bailouts} emergency bailout${s.bailouts>1?'s':''}`:''}</p>
+ <div class="grid g6">${tile('REVENUE / MONTH',M(L.rev||0),delta(L.rev,pr&&pr.rev))}${tile('PROFIT / MONTH',M(L.profit||0),'',L.profit>=0?'up':'dn')}${tile('PLAYERS',((L.users||0)/1e3).toFixed(0)+'K',delta(L.users,pr&&pr.users))}${tile('WORLD SHARE',P(L.share||0,2))}${tile('BRAND (AVG)',Math.round(L.brand||0)+'/100')}${tile('RUNWAY',run,'',L.profit>=0?'up':'am')}</div>
+ ${s.inbox.length?`<h2>Needs your decision</h2><div class="grid g3 inbox">${s.inbox.map(c=>`<div class="card"><h3>${c.t}</h3><p>${c.d} <span class="am">Decide within ${Math.max(0,3-(s.month-c.at))} months.</span></p>${c.opts.map(o=>`<button class="opt" data-dec="${c.uid}" data-k="${o.k}"><b>${o.n}</b><small>${o.d}</small></button>`).join('')}</div>`).join('')}</div>`:''}
+ <div class="grid g21" style="margin-top:14px"><div class="card"><div class="row sb"><b>Company valuation</b><span class="mono gg">${M(s.val)}</span></div><canvas class="ch" id="cVal"></canvas><div class="row sb" style="margin-top:8px"><b>Revenue vs profit</b><span class="sub" style="margin:0">monthly</span></div><canvas class="ch" id="cRev"></canvas></div>
+  <div class="card news"><b>Latest</b>${s.news.slice(0,8).map(n=>`<div><span class="tag" style="background:${TAGC[n.kind]||'#555'}22;color:${TAGC[n.kind]||'#aaa'}">${n.kind.toUpperCase()}</span><b>${n.t}</b><small>${dateOf(n.m)} · ${n.d}</small></div>`).join('')||'<p class="sub">Nothing yet.</p>'}</div></div>
+ <h2>Stack around the world</h2><div class="card" id="mapWrap"><canvas id="map"></canvas></div>`}
+function vWorld(){const C=HQ_C.find(x=>x.id===SEL),cs=st.countries[SEL];let side='';
+ if(cs.st==='none'){const reg=C.reg>.75?'Strict':C.reg>.5?'Moderate':'Light';const riv=st.rivals.filter(r=>r.alive&&r.cs[C.id]!=null);
+  side=`<h1>${C.n}</h1><p class="sub">Not launched</p><div class="grid g2">${tile('MARKET',(C.tam/1e3).toFixed(1)+'M players')}${tile('SPEND / PLAYER',M(C.arpu,2)+'/mo')}${tile('REGULATION',reg)}${tile('LICENCE',M(C.lic)+' · '+C.mo+' mo')}</div>
+  <h2>Best fits</h2><p>${Object.entries(C.fit).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="pill" style="background:#0f2a14;color:#7dff8a;margin:0 4px 4px 0">${HQ_TYPES[k].n} ×${v}</span>`).join('')||'Balanced market'}</p>
+  <h2>Competition</h2>${riv.length?riv.map(r=>`<div class="row sb" style="margin:6px 0"><span style="color:${r.col};font-weight:800">${r.n}</span><span class="mono">brand ${Math.round(r.cs[C.id])}</span></div>`).join(''):'<p class="sub">No big rivals here yet.</p>'}
+  <button class="btn" data-launch="${C.id}" ${st.cash<C.lic?'disabled':''} style="margin-top:12px;width:100%">Apply for licence · ${M(C.lic)}</button>${st.cash<C.lic?`<p class="sub dn" style="margin-top:6px">Not enough cash. Raise capital in Deals.</p>`:''}`}
+ else if(cs.st==='pending')side=`<h1>${C.n}</h1><p class="sub am">Licence pending · launches in ${cs.due} month${cs.due>1?'s':''}</p><div class="bar"><i style="width:${Math.max(5,100-cs.due/C.mo*100)}%;background:var(--am)"></i></div>`;
+ else{const u=Object.values(cs.users).reduce((a,b)=>a+b,0),rv=Object.values(cs.rev).reduce((a,b)=>a+b,0);
+  side=`<h1>${C.n}</h1><p class="sub gg">Live</p><div class="grid g2">${tile('PLAYERS',(u/1e3).toFixed(1)+'K')}${tile('REVENUE / MO',M(rv))}</div>
+  <label class="fld">BRAND ${Math.round(cs.brand)}/100</label><div class="bar"><i style="width:${cs.brand}%;background:#c64bff"></i></div>
+  <label class="fld">PLAYER SATISFACTION ${Math.round(cs.sat*100)}%</label><div class="bar"><i style="width:${cs.sat*100}%;background:${cs.sat>.6?'#2bd96b':cs.sat>.4?'#ffb020':'#ff4f5e'}"></i></div>
+  <h2>Pricing (house margin) per product</h2><p class="sub" style="margin-top:-6px">Higher margins earn more per player but drive players to rivals and hurt satisfaction. 3% matches Stack's real games.</p>
+  ${Object.keys(st.products).filter(t=>st.products[t].live).map(t=>{const m=hqMargin(cs,t);return `<div style="margin:8px 0"><div class="row sb"><b>${HQ_TYPES[t].n}</b><span class="mono">${P(m,1)} · share ${P(cs.share[t]||0,1)}</span></div><input type="range" min="1" max="15" step=".5" value="${m*100}" data-mg="${t}"></div>`}).join('')}`}
+ return `<div class="grid g21"><div><h1>World</h1><p class="sub">Click a market. Green = Stack is live (size = players), amber = licence pending, rings = rival brands.</p><div class="card" id="mapWrap"><canvas id="map"></canvas></div>
+  <h2>All markets</h2><div class="card"><table><tr><th>Market</th><th>Status</th><th>Players</th><th>Revenue/mo</th><th>Brand</th><th>Satisfaction</th></tr>${HQ_C.map(C=>{const cs2=st.countries[C.id],u=Object.values(cs2.users).reduce((a,b)=>a+b,0),rv=Object.values(cs2.rev).reduce((a,b)=>a+b,0);return `<tr data-sel="${C.id}" style="cursor:pointer"><td class="lbl">${C.n}</td><td>${cs2.st==='live'?'<span class="gg">LIVE</span>':cs2.st==='pending'?`<span class="am">${cs2.due} MO</span>`:'—'}</td><td>${cs2.st==='live'?(u/1e3).toFixed(1)+'K':'—'}</td><td>${cs2.st==='live'?M(rv):'—'}</td><td>${Math.round(cs2.brand)}</td><td>${cs2.st==='live'?Math.round(cs2.sat*100)+'%':'—'}</td></tr>`}).join('')}</table></div></div>
+  <div class="side card">${side}</div></div>`}
+function vProducts(){const live=Object.keys(st.products).filter(t=>st.products[t].live),L=st.last||{lines:{}};
+ return `<h1>Products</h1><p class="sub">Quality drives how many players pick Stack over rivals. Greenlight R&D to launch new lines or rebuild old ones.</p>
+ <div class="grid g3">${live.map(t=>{const q=st.products[t].q;return `<div class="card"><div class="row sb"><b style="font-size:15px">Stack ${HQ_TYPES[t].n}</b><span class="mono gg">${M((L.lines||{})[t]||0)}/mo</span></div><label class="fld">QUALITY ${Math.round(q)}/100</label><div class="bar"><i style="width:${q}%;background:#3cc8ff"></i></div>
+  <p class="sub" style="margin:8px 0 0">Best rival: ${(()=>{let b=null;for(const r of st.rivals)if(r.alive&&r.q[t]&&(!b||r.q[t]>b.q))b={n:r.n,q:r.q[t],col:r.col};return b?`<span style="color:${b.col}">${b.n} ${Math.round(b.q)}</span>`:'none'})()}</p></div>`}).join('')}</div>
+ ${st.rnd.length?`<h2>In development</h2><div class="grid g3">${st.rnd.map(d=>{const I=HQ_IDEAS.find(x=>x.id===d.id);return `<div class="card"><b>${I.n}</b><p class="sub" style="margin:4px 0 8px">${M(d.cost)}/mo · ${Math.max(0,Math.ceil(d.left))} months left</p><div class="bar"><i style="width:${Math.min(100,d.prog*100)}%;background:var(--am)"></i></div></div>`}).join('')}</div>`:''}
+ <h2>R&amp;D ideas</h2><div class="grid g3">${HQ_IDEAS.filter(I=>!st.rnd.some(d=>d.id===I.id)&&(I.up||!st.products[I.type])).map(I=>`<div class="card"><div class="row sb"><b>${I.n}</b><span class="pill" style="background:${I.up?'#0f2130':'#2a1a06'};color:${I.up?'#3cc8ff':'#ffb020'}">${I.up?'UPGRADE':'NEW LINE'}</span></div><p class="sub" style="margin:6px 0 10px">${I.d}</p><div class="row sb"><span class="mono">${M(I.cost)}/mo × ${I.mo} mo</span><button class="btn sm" data-rnd="${I.id}">Greenlight</button></div></div>`).join('')}</div>`}
+const MARKS=[`<path d="M16 2 29 9v14L16 30 3 23V9z" fill="C"/><path d="M11 12h10M11 16h10M11 20h10" stroke="#06200b" stroke-width="2.6" stroke-linecap="round"/>`,`<path d="M16 2 29 9v14L16 30 3 23V9z" fill="none" stroke="C" stroke-width="2.6"/><text x="16" y="21.5" font-family="Barlow Condensed" font-style="italic" font-weight="900" font-size="15" text-anchor="middle" fill="C">S</text>`,`<rect x="5" y="18" width="22" height="5" rx="2.5" fill="C"/><rect x="7" y="12" width="18" height="5" rx="2.5" fill="C" opacity=".8"/><rect x="9" y="6" width="14" height="5" rx="2.5" fill="C" opacity=".6"/>`,`<circle cx="16" cy="16" r="13" fill="C"/><path d="M10 13h12M10 17h12M10 21h8" stroke="#06200b" stroke-width="2.6" stroke-linecap="round"/>`];
+const markSvg=(i,col,sz=40)=>`<svg viewBox="0 0 32 32" width="${sz}" height="${sz}">${MARKS[i].replace(/C/g,col)}</svg>`;
+const COLS=['#00e701','#3cc8ff','#c64bff','#ffb020','#ff4d8d','#ffffff'];
+const MASCOTS=['Zeus','Lucky Dragon','Pharaoh','Infernax','Emberfox','The Mole','Road Chicken','GP Driver','League Prop','The Champ','The Trader','Stacky'];
+let DRAFT=null;
+function vBrand(){const B=st.brandId;DRAFT=DRAFT||Object.assign({},B);const dirty=JSON.stringify(DRAFT)!==JSON.stringify(B);
+ return `<h1>Brand</h1><p class="sub">Your identity makes every campaign work harder. A strong, stable brand compounds; rebranding costs money and resets it.</p>
+ <div class="grid g2"><div class="card"><div class="row sb"><b>Brand identity</b><span class="mono">score ${Math.round(B.score)}/100</span></div>
+  <label class="fld">LOGO MARK</label>${MARKS.map((_,i)=>`<span class="mk ${DRAFT.mark===i?'on':''}" data-mark="${i}">${markSvg(i,DRAFT.col,44)}</span>`).join('')}
+  <label class="fld">PRIMARY COLOUR</label>${COLS.map(c=>`<span class="sw ${DRAFT.col===c?'on':''}" style="background:${c}" data-col="${c}"></span>`).join('')}
+  <label class="fld">SLOGAN</label><input type="text" id="slogan" maxlength="40" value="${DRAFT.slogan.replace(/"/g,'&quot;')}">
+  <label class="fld">MASCOT</label><select id="mascot">${MASCOTS.map((n,i)=>`<option value="${i}" ${DRAFT.mascot===i?'selected':''}>${n}</option>`).join('')}</select>
+  <div class="row" style="margin-top:12px"><button class="btn" id="rebrand" ${dirty?'':'disabled'}>Apply rebrand · $2M</button>${dirty?'<span class="sub am" style="margin:0">Identity score drops to 45 and rebuilds</span>':''}</div></div>
+  <div class="card"><b>Brand book</b><div style="margin-top:12px;padding:22px;border-radius:12px;background:#070b11;border:1px solid var(--line)"><div class="row" style="gap:14px">${markSvg(DRAFT.mark,DRAFT.col,64)}<div><div style="font:italic 900 40px 'Barlow Condensed';line-height:1">STACK</div><div style="color:${DRAFT.col};font-weight:800;letter-spacing:.1em">${DRAFT.slogan.toUpperCase()}</div></div></div>
+  <div class="row" style="margin-top:18px;gap:8px">${[DRAFT.col,'#05080d','#e8eef6','#7d8ea3'].map(c=>`<div style="flex:1"><div style="height:42px;border-radius:8px;background:${c};border:1px solid #1e2b3b"></div><small class="mono" style="color:var(--mute)">${c}</small></div>`).join('')}</div>
+  <p class="sub" style="margin:14px 0 0">Type: Barlow Condensed Black Italic / Inter · Mascot: ${MASCOTS[DRAFT.mascot]}</p></div></div></div>
+ <h2>Ad campaigns</h2><div class="grid g21"><div class="card"><table><tr><th>Campaign</th><th>Where</th><th>Budget/mo</th><th>Months left</th></tr>${st.campaigns.map(c=>`<tr><td class="lbl">${HQ_CHANNELS[c.ch].n}</td><td>${c.c==='*'?'Global':hqCN(c.c)}</td><td>${M(c.budget)}</td><td>${c.left}</td></tr>`).join('')||'<tr><td class="lbl" colspan="4" style="color:var(--mute)">No campaigns running. Brands fade without them.</td></tr>'}</table></div>
+  <div class="card"><b>New campaign</b><label class="fld">CHANNEL</label><select id="cCh">${Object.entries(HQ_CHANNELS).map(([k,c])=>`<option value="${k}">${c.n} (min ${M(c.min)}/mo)</option>`).join('')}</select>
+  <label class="fld">WHERE</label><select id="cC"><option value="*">Every live market</option>${hqLiveIds(st).map(id=>`<option value="${id}">${hqCN(id)}</option>`).join('')}</select>
+  <label class="fld">BUDGET / MONTH <span class="mono" id="cBv">$500K</span></label><input type="range" id="cB" min="50000" max="10000000" step="50000" value="500000">
+  <label class="fld">MONTHS <span class="mono" id="cMv">6</span></label><input type="range" id="cM" min="1" max="24" value="6"><button class="btn" id="cGo" style="margin-top:10px;width:100%">Launch campaign</button></div></div>
+ <h2>Sponsorships</h2><div class="grid g3">${HQ_SPONSORS.map(S=>{const on=st.sponsors.some(x=>x.id===S.id);return `<div class="card"><div class="row sb"><b>${S.n}</b>${on?'<span class="pill" style="background:#0f2a14;color:#7dff8a">ACTIVE</span>':''}</div><p class="sub" style="margin:6px 0 10px">${S.c==='*'?'Global exposure':hqCN(S.c)} · ${M(S.fee)}/mo · brand +${S.boost}/mo</p><button class="btn sm ${on?'red':''}" data-spon="${S.id}">${on?'End deal':'Sign deal'}</button></div>`}).join('')}</div>`}
+function vPeople(){return `<h1>People</h1><p class="sub">Executives change how the company runs. Skill matters; so do their traits. Firing costs three months' pay. New candidates arrive every four months.</p>
+ <div class="grid g3">${Object.entries(HQ_ROLES).map(([k,n])=>{const e=st.execs[k];return `<div class="card"><small style="font-size:10px;letter-spacing:.14em;color:var(--mute);font-weight:800">${n.toUpperCase()}</small>
+  ${e?`<div class="exec" style="margin-top:10px"><div class="av" style="background:#0f2a14;color:#7dff8a">${e.name.split(' ').map(x=>x[0]).join('')}</div><div><b>${e.name}</b><div class="sub" style="margin:0">${HQ_TRAITS[e.trait].n} · ${M(e.salary)}/mo</div></div></div><div class="bar" style="margin:10px 0"><i style="width:${e.skill*100}%;background:#3cc8ff"></i></div><p class="sub" style="margin:0 0 8px">${HQ_TRAITS[e.trait].d}</p><button class="btn sm red" data-fire="${k}">Fire</button>`:'<p class="sub am" style="margin:10px 0">Vacant</p>'}
+  <h2 style="margin:14px 0 6px">Candidates</h2>${(st.cands[k]||[]).map((c,i)=>`<div class="row sb" style="padding:6px 0;border-top:1px solid #121b27"><div><b>${c.name}</b><div class="sub" style="margin:0;font-size:11px">${HQ_TRAITS[c.trait].n} · skill ${Math.round(c.skill*100)} · ${M(c.salary)}/mo</div></div><button class="btn sm ghost" data-hire="${k}:${i}">Hire</button></div>`).join('')||'<p class="sub">None right now.</p>'}</div>`}).join('')}</div>`}
+function vDeals(){const own=st.mine/st.shares;return `<h1>Deals</h1><p class="sub">Raise money, buy startups before your rivals do, or take a rival over outright.</p>
+ <div class="grid g2"><div class="card"><b>Raise capital</b><p class="sub" style="margin:4px 0 10px">Sell new shares at 90% of the current price. Every raise dilutes your stake.</p><label class="fld">AMOUNT <span class="mono" id="rAv">$10M</span></label><input type="range" id="rA" min="1000000" max="${Math.max(2e7,Math.round(st.val*.5/1e6)*1e6)}" step="1000000" value="10000000">
+  <p class="sub" id="rAd" style="margin:6px 0 10px"></p><button class="btn" id="rGo">Raise</button></div>
+  <div class="card"><b>Ownership</b><div class="row" style="margin:10px 0"><div class="bar" style="flex:1;height:14px"><i style="width:${own*100}%;background:var(--g)"></i></div><span class="mono">${P(own)}</span></div><p class="sub" style="margin:0">You own ${P(own)} of ${(st.shares/1e6).toFixed(1)}M shares, worth ${M(st.val*own)}. ${st.bailouts?`Bailouts so far: ${st.bailouts}.`:''} Board confidence ${Math.round(st.board)}/100.</p></div></div>
+ <h2>Startups for sale</h2><div class="card"><table><tr><th>Startup</th><th>Sector</th><th>Home</th><th>Quality</th><th>Players</th><th>Price</th><th></th></tr>${st.startups.map(s=>`<tr><td class="lbl">${s.n}</td><td>${HQ_TYPES[s.type].n}${st.products[s.type]?'':' <span class="am">NEW</span>'}</td><td>${hqCN(s.home)}</td><td>${Math.round(s.q)}</td><td>${(s.users/1e3).toFixed(0)}K</td><td>${M(s.val*1.35)}</td><td><button class="btn sm" data-buy="${s.id}" ${st.cash<s.val*1.35?'disabled':''}>Acquire</button></td></tr>`).join('')||'<tr><td class="lbl" colspan="7" style="color:var(--mute)">No startups right now. New ones appear most months.</td></tr>'}</table></div>
+ <h2>Rivals</h2><div class="grid g4">${st.rivals.map(r=>`<div class="card" style="${r.alive?'':'opacity:.45'}"><div class="row sb"><b style="color:${r.col}">${r.n}</b><span class="mono">${r.id}</span></div><canvas class="spark" data-sp="${r.id}"></canvas><div class="sub" style="margin:6px 0">${r.alive?`Valued ${M(r.val)} · in ${Object.keys(r.cs).length} markets`:'Acquired by Stack'}</div>${r.alive?`<button class="btn sm ${st.cash<r.val*1.4?'ghost':''}" data-take="${r.id}" ${st.cash<r.val*1.4?'disabled':''}>Take over · ${M(r.val*1.4)}</button>`:''}</div>`).join('')}</div>`}
+function vFinance(){const H=st.hist.slice(-12);const row=(l,f,cls)=>`<tr><td class="lbl">${l}</td>${H.map(h=>`<td class="${cls?cls(f(h)):''}">${M(f(h))}</td>`).join('')}</tr>`;
+ return `<h1>Finance</h1><p class="sub">The last 12 months. Real Stack play is counted in the Australian home market.</p>
+ <div class="grid g4">${tile('CASH',M(st.cash),'',st.cash<0?'dn':'')}${tile('VALUATION',M(st.val))}${tile('SHARE PRICE',M(st.price,2))}${tile('SHARES OUT',(st.shares/1e6).toFixed(1)+'M')}</div>
+ <div class="card" style="margin-top:12px;overflow:auto"><table><tr><th>P&amp;L</th>${H.map(h=>`<th>${dateOf(h.m)}</th>`).join('')}</tr>
+ ${row('Revenue',h=>h.rev)}${row(' from real Stack play',h=>h.real||0)}${row('Duties & payment fees',h=>-(h.fees||0))}${row('Staff',h=>-(h.staff||0))}${row('Servers & support',h=>-(h.ops||0))}${row('Marketing',h=>-(h.mk||0))}${row('R&D',h=>-(h.rnd||0))}${row('Executives',h=>-(h.execPay||0))}${row('Licences',h=>-(h.licFees||0))}${row('Tax',h=>-(h.tax||0))}
+ ${row('Net profit',h=>h.profit,v=>v>=0?'up':'dn')}${row('Cash at month end',h=>h.cash)}</table></div>
+ <div class="grid g2" style="margin-top:12px"><div class="card"><b>Cash</b><canvas class="ch" id="cCash"></canvas></div><div class="card"><b>Share price</b><canvas class="ch" id="cPrice"></canvas></div></div>
+ <div style="margin-top:12px"><button class="btn ghost" id="qRep">Quarterly report</button></div>`}
+function vNews(){return `<h1>Newsroom</h1><p class="sub">Everything that happens to Stack. Press releases and the public headlines appear on the Stack home page for every player.</p>
+ <div class="grid g21"><div class="card news">${st.news.map(n=>`<div><span class="tag" style="background:${TAGC[n.kind]||'#555'}22;color:${TAGC[n.kind]||'#aaa'}">${n.kind.toUpperCase()}</span><b>${n.t}</b><small>${dateOf(n.m)} · ${n.d}</small></div>`).join('')||'<p class="sub">No news yet.</p>'}</div>
+ <div class="card side"><b>Write a press release</b><label class="fld">TEMPLATE</label><select id="prT"><option value="">Custom</option><option value="results">Monthly results</option><option value="growth">Growth milestone</option><option value="promise">Fair-play promise</option></select>
+  <label class="fld">HEADLINE</label><input type="text" id="prH" maxlength="90"><label class="fld">BODY</label><textarea id="prB" rows="5" style="width:100%;padding:8px 10px;background:var(--p1);border:1px solid var(--line);border-radius:8px;color:var(--txt);font:inherit"></textarea>
+  <button class="btn" id="prGo" style="margin-top:10px;width:100%">Publish to the newsroom</button><p class="sub" style="margin:8px 0 0">Published releases go on the Stack home page. Your mate sees them the next time his game connects to yours.</p></div></div>`}
+function wire(tab){const m=$('main');
+ m.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>{hqDecide(st,b.dataset.dec,b.dataset.k,Math.random);snd('ok');commit()});
+ m.querySelectorAll('[data-sel]').forEach(b=>b.onclick=()=>{SEL=b.dataset.sel;TAB='world';render()});
+ m.querySelectorAll('[data-launch]').forEach(b=>b.onclick=()=>{const r=hqLaunch(st,b.dataset.launch);if(r==='ok'){snd('cash');toast('Licence application filed in '+hqCN(b.dataset.launch))}commit()});
+ m.querySelectorAll('[data-mg]').forEach(i=>i.oninput=()=>{hqSetMargin(st,SEL,i.dataset.mg,+i.value/100);i.previousElementSibling.querySelector('.mono').textContent=P(+i.value/100)+' · share '+P(st.countries[SEL].share[i.dataset.mg]||0);saveSoon()});
+ m.querySelectorAll('[data-rnd]').forEach(b=>b.onclick=()=>{hqStartRnd(st,b.dataset.rnd);snd('ok');commit()});
+ m.querySelectorAll('[data-mark]').forEach(b=>b.onclick=()=>{DRAFT.mark=+b.dataset.mark;render()});m.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{DRAFT.col=b.dataset.col;render()});
+ if($('slogan')){$('slogan').onchange=()=>{DRAFT.slogan=$('slogan').value||'Stack it up.';render()};$('mascot').onchange=()=>{DRAFT.mascot=+$('mascot').value;render()};
+  $('rebrand').onclick=()=>{st.cash-=2e6;Object.assign(st.brandId,DRAFT,{score:45});hqNews(st,'brand','Stack unveils a new brand identity',`New look, new line: "${st.brandId.slogan}"`);snd('cash');commit()};
+  const bv=()=>{$('cBv').textContent=M(+$('cB').value);$('cMv').textContent=$('cM').value};$('cB').oninput=bv;$('cM').oninput=bv;
+  $('cGo').onclick=()=>{const r=hqCampaign(st,$('cCh').value,$('cC').value,+$('cB').value,+$('cM').value);if(r==='min'){toast('Budget below the minimum for that channel');return}snd('ok');toast('Campaign live');commit()}}
+ m.querySelectorAll('[data-spon]').forEach(b=>b.onclick=()=>{hqSponsor(st,b.dataset.spon,!st.sponsors.some(x=>x.id===b.dataset.spon));snd('ok');commit()});
+ m.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.hire.split(':');hqHire(st,k,+i);snd('ok');commit()});
+ m.querySelectorAll('[data-fire]').forEach(b=>b.onclick=()=>{hqFire(st,b.dataset.fire);snd('no');commit()});
+ m.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{if(hqBuyStartup(st,b.dataset.buy)==='ok'){snd('cash');toast('Acquired')}commit()});
+ m.querySelectorAll('[data-take]').forEach(b=>b.onclick=()=>{if(!confirm('Take over this rival? This is the biggest deal you can make.'))return;if(hqTakeover(st,b.dataset.take)==='ok'){snd('big');toast('Takeover complete')}commit()});
+ if($('rA')){const upd=()=>{const a=+$('rA').value,pr=st.val/st.shares*.9,n=a/pr;$('rAv').textContent=M(a);$('rAd').textContent=`Sells ${(n/1e6).toFixed(2)}M shares. Your stake goes from ${P(st.mine/st.shares)} to ${P(st.mine/(st.shares+n))}.`};$('rA').oninput=upd;upd();$('rGo').onclick=()=>{hqRaise(st,+$('rA').value);snd('cash');commit()}}
+ m.querySelectorAll('[data-sp]').forEach(cv=>{const r=st.rivals.find(x=>x.id===cv.dataset.sp);spark(cv,r.hist,r.col)});
+ if($('prGo')){$('prT').onchange=()=>{const L=st.last||{},v=$('prT').value;const T={results:[`Stack reports ${M(L.rev||0)} in monthly revenue`,`Stack served ${((L.users||0)/1e3).toFixed(0)}K players across ${hqLiveIds(st).length} markets this month.`],growth:[`Stack is now live in ${hqLiveIds(st).length} countries`,`Stack keeps growing, with more markets on the way.`],promise:['Stack’s fair-play promise','Every Stack game publishes its return to player, and every game is tested to return about 97%.']}[v];if(T){$('prH').value=T[0];$('prB').value=T[1]}};
+  $('prGo').onclick=()=>{const t=$('prH').value.trim();if(!t){toast('Write a headline first');return}hqNews(st,'press',t,$('prB').value.trim()||'');snd('ok');toast('Published');commit();publish(true)}}
+ if($('qRep'))$('qRep').onclick=report;
+ const mp=$('map');if(mp){drawMap(mp,st,SEL,T0(),tab==='overview');mp.onclick=e=>{const r=mp.getBoundingClientRect(),id=mp._hit(e.clientX-r.left,e.clientY-r.top);if(id){SEL=id;TAB='world';snd('click');render()}}}
+ if($('cVal'))drawLine($('cVal'),[{v:st.hist.map(h=>h.val),col:'#00e701',fill:true}],{h:150,fmt:v=>M(v)});
+ if($('cRev'))drawLine($('cRev'),[],{h:130,fmt:v=>M(v),zero:true,bars:[{v:st.hist.slice(-24).map(h=>h.rev),col:'#3cc8ff'},{v:st.hist.slice(-24).map(h=>h.profit),col:'#00e701'}]});
+ if($('cCash'))drawLine($('cCash'),[{v:st.hist.map(h=>h.cash),col:'#3cc8ff',fill:true}],{h:160,fmt:v=>M(v)});
+ if($('cPrice'))drawLine($('cPrice'),[{v:(st.ticks.length?st.ticks:st.hist.map(h=>h.price)),col:'#00e701',fill:true}],{h:160,fmt:v=>M(v,2)})}
+function report(){const H=st.hist.slice(-3),sum=k=>H.reduce((a,h)=>a+(h[k]||0),0),q=Math.floor(st.month/3),yr=2027+Math.floor((st.month-1)/12);
+ $('modalBody').innerHTML=`<div class="row sb"><h1 style="margin:0">Quarterly report</h1><button class="btn ghost sm" id="mX">Close</button></div><p class="sub">Stack Holdings · the last three months to ${dateOf(Math.max(0,st.month-1))}</p>
+ <div class="grid g3">${tile('REVENUE',M(sum('rev')))}${tile('NET PROFIT',M(sum('profit')),'',sum('profit')>=0?'up':'dn')}${tile('VALUATION',M(st.val))}</div>
+ <h2>Highlights</h2><div class="news">${st.news.filter(n=>n.m>=st.month-3).slice(0,8).map(n=>`<div><b>${n.t}</b><small>${n.d}</small></div>`).join('')||'<p class="sub">A quiet quarter.</p>'}</div>
+ <h2>Markets</h2><p>${hqLiveIds(st).map(hqCN).join(', ')}</p><h2>Outlook</h2><p class="sub">${st.board>60?'The board is confident in the strategy.':st.board>30?'The board wants to see stronger results next quarter.':'The board is losing patience. Cut costs or grow fast.'}</p>`;
+ $('modal').classList.add('on');$('mX').onclick=()=>$('modal').classList.remove('on')}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2200)}
+/* ================= TIME, SAVING, THE REAL LINK ================= */
+const SB=window.StackBridge,KEY='stackHQ.v1';
+let st=null;try{st=SB&&SB.load?SB.load():JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+if(!st||!st.countries){st=hqNew(Math.random);st.fresh=true}
+let SPEED=st.speed==null?1:st.speed,DAY=st.day||0,acc=0,saveT=0;
+const DAYSEC=20;/* 1x: a day every 20 s, a month every 10 minutes */
+function save(){try{st.speed=SPEED;st.day=DAY;SB&&SB.save?SB.save(st):localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,800)}
+function commit(){save();render()}
+function real(){try{return SB&&SB.real?SB.real():{players:1,ggr:0}}catch(e){return null}}
+function publish(loud){try{if(SB&&SB.publish){SB.publish(hqPublic(st));if(loud)toast('Published to the Stack home page')}else if(loud)toast('Publishing works inside Stack')}catch(e){}}
+const T0=()=>performance.now()/1000;
+/* the share price walks between month ends and lands on the real valuation each month */
+function dayTick(){const tgt=st.price,p=st.dayPrice||tgt;st.dayPrice=Math.max(.01,p+(tgt-p)*.15+p*(Math.random()-.5)*.03);st.ticks.push(st.dayPrice);if(st.ticks.length>360)st.ticks.shift()}
+function monthEnd(){const before=st.bailouts,news0=st.news.length?st.news[0]:null;const rec=hqAdvance(st,Math.random,real());st.brandId.score=Math.min(95,st.brandId.score+1.2);
+ publish(false);save();snd('month');
+ if(st.bailouts>before){snd('no');modal(`<h1 class="dn">Emergency bailout</h1><p>Stack ran out of cash. Investors stepped in with a rescue round at a steep discount, and your stake has fallen to <b>${P(st.mine/st.shares)}</b>. The board's confidence is badly shaken.</p><p class="sub">Cut costs, fix pricing, and grow your way back.</p>`)}
+ else{const fresh=st.news.filter(n=>n.m===st.month-1&&n.kind==='milestone');if(fresh.length){snd('big');modal(`<h1 class="gg">${fresh[0].t}</h1><p>${fresh[0].d}</p>`)}}
+ render()}
+function modal(html){$('modalBody').innerHTML=html+`<div style="margin-top:14px"><button class="btn" id="mX">Continue</button></div>`;$('modal').classList.add('on');$('mX').onclick=()=>$('modal').classList.remove('on')}
+let lastF=0,mapT=0;
+function frame(ts){requestAnimationFrame(frame);const dt=Math.min(.25,(ts-lastF)/1000||0);lastF=ts;if(window.__gPaused)return;
+ if(SPEED>0&&!$('modal').classList.contains('on')){acc+=dt*SPEED;while(acc>=DAYSEC){acc-=DAYSEC;DAY++;dayTick();if(DAY>=30){DAY=0;monthEnd()}}}
+ hdr();mapT+=dt;if(mapT>.1&&$('map')){mapT=0;drawMap($('map'),st,SEL,T0(),TAB==='overview')}}
+document.querySelectorAll('#speed button').forEach(b=>b.onclick=()=>{SPEED=+b.dataset.s;snd('click');save();hdr()});
+addEventListener('resize',()=>render());
+/* ---- a little sound ---- */
+let AC=null;function snd(k){try{if(!AC){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;AC=new A()}const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);
+ const f={click:[900,1200,.05,.04],ok:[660,990,.12,.06],cash:[1200,1800,.18,.07],no:[300,180,.2,.07],month:[520,780,.25,.04],big:[440,1320,.5,.08]}[k]||[800,800,.05,.03];
+ o.type='triangle';o.frequency.setValueAtTime(f[0],t);o.frequency.exponentialRampToValueAtTime(f[1],t+f[2]);g.gain.setValueAtTime(f[3],t);g.gain.exponentialRampToValueAtTime(.0005,t+f[2]+.05);o.start(t);o.stop(t+f[2]+.1)}catch(e){}}
+window.StackFrame={refresh:()=>{render()}};
+render();requestAnimationFrame(frame);
+if(st.fresh){delete st.fresh;save();publish(false);modal(`<h1>Welcome to Stack HQ</h1><p>You're the founder and CEO. Stack is a young company live in Australia, valued at about <b>${M(st.val)}</b>, and you own <b>${P(st.mine/st.shares)}</b> of it.</p>
+ <p>Grow it into a global empire: launch in new countries, set prices, run campaigns and sponsorships, hire executives, fund R&amp;D, buy startups and take over rivals.</p>
+ <p class="sub">Time moves while HQ is open: a month every 10 minutes at 1× (use 5× or 20× to speed up). Real Stack play feeds the Australian market. Run out of cash and investors bail you out, at a heavy cost to your stake.</p>`)}
+</x-script></body></html>
+
+</script><!--/stack-hq-->
 <script>
 /* ============ ICONS ============ */
 const IC={
@@ -18506,6 +19005,7 @@ IC.sports='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.3" fill="none" 
 IC.shot='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2" /><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 IC.moles='<svg viewBox="0 0 24 24"><ellipse cx="12" cy="19" rx="9" ry="3.4" opacity=".45"/><path d="M12 5c3.3 0 6 2.7 6 6v6H6v-6c0-3.3 2.7-6 6-6z"/><circle cx="9.4" cy="11" r="1.5" fill="#0f212e"/><circle cx="14.6" cy="11" r="1.5" fill="#0f212e"/><path d="M10.7 14h2.6v2.4h-2.6z" fill="#0f212e"/></svg>';
 IC.arcade='<svg viewBox="0 0 24 24"><path d="M11 2h2v6.2a3 3 0 0 1 2.3 2.1l3.2 3.6-1.5 1.3-3-3.4a3 3 0 0 1-1 .8V16h-2v-3.4a3 3 0 0 1-1-.8l-3 3.4-1.5-1.3 3.2-3.6A3 3 0 0 1 11 8.2z"/><path d="M4 18h16v4H4z" opacity=".55"/></svg>';
+IC.hq='<svg viewBox="0 0 24 24"><path d="M4 21V5l8-3v19zm10 0V9l6 2v10zM6 7h2v2H6zm0 4h2v2H6zm0 4h2v2H6zm3-8h1v2H9zm0 4h1v2H9zm0 4h1v2H9zm7-2h2v2h-2zm0 3h2v2h-2z"/></svg>';
 IC.admin='<svg viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 9.3 8 10.5 4.6-1.2 8-5.5 8-10.5v-6z"/><path d="M12 7a2.4 2.4 0 1 1 0 4.8A2.4 2.4 0 0 1 12 7zm0 6c2.4 0 4.4 1.3 4.4 2.8v1.2H7.6v-1.2C7.6 14.3 9.6 13 12 13z" fill="#0f212e"/></svg>';
 IC.party='<svg viewBox="0 0 24 24"><path d="M8 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 19c0-3.3 2.7-6 6-6s6 2.7 6 6v1H2zm13.5-6c2.9.2 5.5 2.4 5.5 5.5V20h-5v-1c0-2.3-.9-4.4-2.4-5.9.6-.1 1.2-.1 1.9-.1z"/></svg>';
 IC.tower='<svg viewBox="0 0 24 24"><path d="M6 21V9l6-6 6 6v12h-5v-5h-2v5z"/><path d="M9 11h2v2H9zm4 0h2v2h-2z" fill="#0f212e"/></svg>';
@@ -18764,7 +19264,7 @@ function seg(id,cb){const el=$(id);el.querySelectorAll('button').forEach(b=>b.on
 const segVal=id=>$(id).querySelector('.on').dataset.v;
 
 /* ============ NAV ============ */
-function navList(){const G=GAMES.filter(x=>GARAGE_LIVE||x[0]!=='garage');return ADM.on?[['admin','Admin']].concat(G):G}
+function navList(){const G=GAMES.filter(x=>GARAGE_LIVE||x[0]!=='garage');return ADM.on?[['admin','Admin'],['hq','Stack HQ']].concat(G):G}
 /* the sidebar is grouped by platform: the Big Three first, each under its own brand
    lockup, then the casino, the tables and everything else */
 const NAVG=[
@@ -18778,12 +19278,12 @@ const NAVG=[
  {label:'More',items:[['garage','Stack Garage'],['locker','Cosmetics']].filter(x=>GARAGE_LIVE||x[0]!=='garage')}];
 function buildNav(){const s=$('side'),m=$('mob'),L=navList();$('topLogo').innerHTML=bLock('stack','top');$('topLogo').onclick=()=>go('lobby');
  const item=([k,n],cls)=>`<button class="nav${cls||''}" data-g="${k}">${IC[k]||''}<span>${n}</span></button>`;
- s.innerHTML=(ADM.on?item(['admin','Admin'],' adm'):'')+NAVG.map(G=>{
+ s.innerHTML=(ADM.on?item(['admin','Admin'],' adm')+item(['hq','Stack HQ'],' adm'):'')+NAVG.map(G=>{
    if(G.brand&&G.go){const B=BRANDS[G.brand];return `<div class="navgrp b-${G.brand}"><button class="navb" data-g="${G.go}" style="--bc:${B.c1}">${bMark(G.brand)}<span class="bwm sm"><b>STACK</b><i>${B.name}</i></span></button>${(G.items||[]).map(x=>item(x,' sub')).join('')}</div>`}
    return `<div class="navgrp">${G.label?`<h4>${G.brand?bMark(G.brand):''}${G.label}</h4>`:''}${G.items.map(x=>item(x)).join('')}</div>`}).join('');
  m.innerHTML=L.map(([k,n])=>`<button data-g="${k}">${IC[k]}${n.split(' ').pop()}</button>`).join('');
  document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>go(b.dataset.g))}
-function go(g){SND.click();coOnView(g);teleView(g);document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=['lobby','ssports','racing','markets','garage','gp','nrl','slots','olympus','egypt','arcade'].includes(g)?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='sports')fbRender();tcgView(g);garView(g);if(g==='fight'){fnFit();fnUI()}if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild()}
+function go(g){SND.click();coOnView(g);teleView(g);document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(g+'View').classList.add('on');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===g));$('histWrap').style.display=['lobby','ssports','racing','markets','garage','gp','nrl','slots','olympus','egypt','arcade','hq'].includes(g)?'none':'';$('main').scrollTop=0;if(g==='plinko')plResize();if(g==='locker')lkTabs();if(g==='party')partyRender();if(g==='admin')admRender();if(g==='moles')moClouds();if(g==='shot')lsFit();if(g==='sports')fbRender();tcgView(g);garView(g);if(g==='fight'){fnFit();fnUI()}if(g==='scratch'&&SC.phase==='play')setTimeout(scFoilAll,80);if(g==='tower')$('twStage').scrollTop=$('twStage').scrollHeight;if(g==='chicken'&&CK.phase==='idle')ckBuild()}
 $('mute').onclick=()=>{SND.on=!SND.on;$('muteIco').style.opacity=SND.on?1:.35;if(SND.on)SND.click()};
 $('refill').onclick=()=>{if(P().bal>=100){flash('Top up unlocks under 100 credits');return}P().bal+=1000;renderBal(true);save();SND.win(3);tele('topup',{amt:1000,bal:P().bal})};
 
@@ -19702,7 +20202,7 @@ function coPresSend(){if(!connected())return;
    close that block; they're swapped back here. Mounted on first visit (the garage
    also when a party trade needs it), told when they're shown so the balance is
    fresh, and rebuilt when the logged-in account changes. */
-const FRAME_IDS=['garage','racing','markets','gp','nrl','slots','olympus','egypt','arcade'],FRAME_NAME={garage:'Stack Garage',racing:'Stack Racing',markets:'Stack Markets',gp:'Stack GP',nrl:'Stack League',slots:'Dragon Stacks',olympus:'Olympus Storm',egypt:"Ra's Fortune",arcade:'Stack Arcade'},FG={};
+const FRAME_IDS=['garage','racing','markets','gp','nrl','slots','olympus','egypt','arcade','hq'],FRAME_NAME={garage:'Stack Garage',racing:'Stack Racing',markets:'Stack Markets',gp:'Stack GP',nrl:'Stack League',slots:'Dragon Stacks',olympus:'Olympus Storm',egypt:"Ra's Fortune",arcade:'Stack Arcade',hq:'Stack HQ'},FG={};
 FRAME_IDS.forEach(id=>FG[id]={frame:null,ready:false,q:[]});
 function fgMount(id){const F=FG[id];if(F.frame)return;const el=document.getElementById('stack-'+id);if(!el)return;
  const src=el.textContent.replace(/<(\/?)x-script/g,'<$1script');
@@ -21600,6 +22100,7 @@ function admAct(a,u){
 /* ---- guest side: what an admin command actually does to you ---- */
 function onAdminCmd(m){
  if(!m||!m.a)return;
+ if(m.a==='corp'){if(m.c&&typeof m.c==='object'){S.corp=m.c;save();try{corpRender()}catch(e){}}return}
  if(m.a==='give'){if(!loggedIn())return;P().bal=Math.max(0,Math.round((P().bal+(+m.v||0))*100)/100);renderBal(true);save();try{FRAME_IDS.forEach(fgRefresh)}catch(e){}
   toast(`${m.by||'Admin'} granted you ${fmt(+m.v||0)}`);return}
  if(m.a==='bal'){P().bal=Math.max(0,Math.round((m.v||0)*100)/100);renderBal(true);save();try{FRAME_IDS.forEach(fgRefresh)}catch(e){}
@@ -21659,7 +22160,7 @@ async function adlDial(key){key=String(key||'').toLowerCase();if(!key)return;con
    c.on('data',m=>{if(!m)return;
     if(m.t==='admStat'||m.t==='admAck'){if(L.conn&&L.conn!==c&&L.st==='on'){try{c.close()}catch(e){}return}
      clearTimeout(to);const first=L.st!=='on';L.st='on';L.conn=c;L.data=m.p;L.at=Date.now();if(m.p)rosterSee(m.p);
-     if(first){tries.forEach(o=>{if(o!==c)try{o.close()}catch(e){}});adlFlush(key)}admRenderSoon()}
+     if(first){tries.forEach(o=>{if(o!==c)try{o.close()}catch(e){}});adlFlush(key);if(S.corp)adlSend(key,{t:'adm',a:'corp',c:S.corp})}admRenderSoon()}
     if(m.t==='admNo'){clearTimeout(to);L.st='denied';admRenderSoon()}});
    c.on('close',()=>{if(L.conn===c){L.st='off';L.conn=null;admRenderSoon()}});c.on('error',()=>{})}
  }catch(e){L.st='off';admRenderSoon()}}
@@ -22962,7 +23463,36 @@ function arcBanner(){const box=(x,y,c1,c2,sk,tag)=>`<g transform="translate(${x}
   <p>A claw machine full of 3D Stackheads figures, five coin pusher cabinets and the Stack Reef fish table with bosses. Collect all 12 characters in Standard, Silver, Gold, Gummy and Confetti.</p>
   <div class="b3chips"><span>Claw machine</span><span>Coin pusher</span><span>Stack Reef</span><span>3D Stackheads</span></div><button class="b3go" data-go="arcade">Enter Stack Arcade<svg viewBox="0 0 24 24"><path d="M5 11h11l-4-4 1.4-1.4L20 12l-6.6 6.4L12 17l4-4H5z"/></svg></button></div>`;
  $('arcBan').onclick=()=>go('arcade')}
+/* ============ STACK HQ: real figures in, the public corporate strip out ============
+   HQ (admin only) reads the real figures below and publishes a snapshot: newsroom headlines and the
+   simulated "Stack World" numbers. The snapshot is shown on everyone's home page, reaching other
+   players over the admin line (and a party). Simulated numbers are always labelled as such. */
+function hqRealStats(){const seen={};let players=0,wag=0,won=0;
+ for(const p of S.players){const k=String(p.user||p.name||'').toLowerCase();if(!k||seen[k])continue;seen[k]=1;players++;wag+=p.wagered||0;won+=p.won||0}
+ for(const k in S.roster){if(seen[k])continue;seen[k]=1;const r=S.roster[k];players++;wag+=r.wagered||0;won+=r.won||0}
+ let online=0;try{online=Object.values(ADL.links).filter(l=>l.st==='on').length}catch(e){}
+ return{players,wagered:Math.round(wag*100)/100,won:Math.round(won*100)/100,ggr:Math.round((wag-won)*100)/100,online}}
+function corpPublish(c){if(!c)return;c.real=hqRealStats();S.corp=c;save();try{corpRender()}catch(e){}
+ try{for(const k in ADL.links)adlSend(k,{t:'adm',a:'corp',c})}catch(e){}
+ try{if(connected())send({t:'adm',a:'corp',c})}catch(e){}}
+const CORP_MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function corpMoney(n){const a=Math.abs(n||0);return (n<0?'-':'')+'$'+(a>=1e9?(a/1e9).toFixed(2)+'B':a>=1e6?(a/1e6).toFixed(1)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':a.toFixed(2))}
+function corpRender(){const el=$('corpStrip');if(!el)return;const c=S.corp,real=(c&&c.real)||hqRealStats(),ver=(document.querySelector('meta[name=stack-version]')||{}).content||'dev';
+ const online=typeof NET!=='undefined'&&NET.status==='on'?'Connected':navigator.onLine?'Online':'Offline';
+ el.innerHTML=(c?`<div class="corp"><h5>${bMark('stack')} STACK NEWSROOM</h5>${(c.news||[]).slice(0,3).map(n=>`<div class="hl"><b>${n.t}</b><small>${CORP_MO[n.m%12]} ${2027+Math.floor(n.m/12)} \u00b7 ${n.d}</small></div>`).join('')||'<div class="hl"><small>No announcements yet.</small></div>'}</div>
+  <div class="corp"><h5>STACK WORLD \u00b7 LIVE <span class="sim">SIMULATED</span></h5>
+   <div class="kv"><span>Company valuation</span><b>${corpMoney(c.val)}</b></div><div class="kv"><span>${c.ipo?'STCK share price':'STCK (private)'}</span><b>$${(c.price||0).toFixed(2)} <span class="${c.chg>=0?'up':'dn'}">${c.chg>=0?'\u25B2':'\u25BC'}${Math.abs((c.chg||0)*100).toFixed(1)}%</span></b></div>
+   <div class="kv"><span>Countries</span><b>${c.countries}</b></div><div class="kv"><span>Players worldwide</span><b>${(c.players/1e3).toFixed(0)}K</b></div>${c.sponsors&&c.sponsors.length?`<div class="kv"><span>Partner of</span><b style="font-family:Outfit;font-size:11.5px">${c.sponsors[0]}</b></div>`:''}</div>`:'')+
+  `<div class="corp"><h5>REAL STACK</h5><div class="kv"><span>Paid out to players</span><b>${corpMoney(real.won)}</b></div><div class="kv"><span>Played</span><b>${corpMoney(real.wagered)}</b></div><div class="kv"><span>Players</span><b>${real.players}</b></div></div>
+  <div class="corp"><h5>TRUST &amp; STATUS</h5><div class="kv"><span><i class="dot" style="background:#2bd96b"></i>Game updates</span><b>v${ver}</b></div><div class="kv"><span><i class="dot" style="background:${online==='Offline'?'#ff4f5e':'#2bd96b'}"></i>Party network</span><b>${online}</b></div>
+   <div class="kv"><span><i class="dot" style="background:#2bd96b"></i>Fair play</span><b>96\u201399%</b></div><div class="lnk" id="certGo">See game certifications \u2192</div></div>`;
+ el.style.gridTemplateColumns=c?'':'1fr 1fr';const g=$('certGo');if(g)g.onclick=corpCerts}
+function corpCerts(){const ov=document.createElement('div');ov.id='certOv';const games=GAMES.filter(x=>!['lobby','ssports','party','locker','garage','cards','markets'].includes(x[0]));
+ ov.innerHTML=`<div><h2 style="margin:0 0 6px">Game certifications</h2><p style="color:#8a9aac;margin:0 0 14px">Every Stack game's return to player is verified by Stack's automated test suite (millions of simulated rounds) before each release. House rule: every game returns between 96% and 99%, with no hidden odds, fake near misses or losses dressed up as wins.</p>
+  <table style="width:100%;border-collapse:collapse">${games.map(g=>`<tr><td style="padding:7px 4px;border-bottom:1px solid #1e2b3b">${g[1]}</td><td style="padding:7px 4px;border-bottom:1px solid #1e2b3b;text-align:right;color:#2bd96b;font-weight:800">\u2713 Verified 96\u201399%</td></tr>`).join('')}</table>
+  <div style="margin-top:14px;text-align:right"><button class="btn" id="certX">Close</button></div></div>`;document.body.appendChild(ov);ov.onclick=e=>{if(e.target===ov||e.target.id==='certX')ov.remove()}}
 function buildEco(){
+ corpRender();
  arcBanner();
  $('ehBrand').innerHTML=bLock('stack','xl');
  $('ehPlats').innerHTML=['sports','markets','cards','arcade','casino'].map(k=>`<span class="eh-pl" style="--bc:${BRANDS[k].c1}">${bMark(k)}</span>`).join('');

@@ -53,6 +53,8 @@ node test-egypt.js sim   # Ra's Fortune: RTP, both buys, feature odds, honest st
 node test-egypt.js ui    # Ra's Fortune: collect, Sun, Rain, Book of Ra, Treasure, buys, gamble - wallet audited
 node test-olympus.js sim # Olympus Storm: RTP, bought-bonus RTP, FS odds, cap, honest draws (~2 min)
 node test-olympus.js ui  # Olympus Storm: tumbles, orbs, a bought bonus with the wallet audited, autoplay
+node test-hq.js sim      # Stack HQ: economy balance, licences, bailouts, deals, public snapshot
+node test-hq.js ui       # Stack HQ: screens, months, actions, save; admin-only in Stack; publishes the home strip
 node test-arcade.js sim  # Stack Arcade: claw odds exact, pusher RTP from its own physics by aim, money conserved (~2 min)
 node test-arcade.js ui   # Stack Arcade: floor, pusher drops/payouts/gutters/cabinets/Lucky Slot, claw win/slip/miss/timer, selling, shelf, reload
 node test-slots.js ui    # Dragon Stacks: every feature forced + played out with the wallet audited, gamble, autoplay
@@ -307,6 +309,20 @@ coral, rocks, rays, bubbles; 15 procedural species + 3 bosses (Great White 150x,
 every shot returns 97% wherever you aim. Lightning Jelly (chains 6 nearest) and Bomb Crab (blast radius) pay for everything
 they take, and their chance comes from that total at the moment of the hit (`rfValue`). Shots idle 12 s or still in the
 water on leaving are refunded. Hover shows pays/chance; right-click locks on; AUTO fires. Tests in `test-arcade.js`.
+
+**Stack HQ** (`hq` view, added 2026-09-27, admin only: nav entry only when `ADM.on`) - `stack-hq.html` frame game (built
+from scratchpad `hq/` parts; the maths between `/*==CORE==*/` and `/*==END CORE==*/`, tests in `test-hq.js`). A company
+strategy sim where you run Stack as a global company: 16 countries (licences cost money and take months), per-country
+per-product margins (greedy margins lose players - `hqPF`), campaigns + sponsorships (brand), 5 exec roles with traits,
+R&D (new product lines + upgrades), startups to buy, 4 fictional rival giants (Vantage Play, Crown & Anchor, Kaiju Games,
+Rio Luck) with price wars and a takeover option, share price/valuation/IPO/milestones, decision cards, and real stakes:
+cash < 0 at a month end = an emergency bailout that dilutes your stake. Time only moves while HQ is open: a month per 10
+minutes at 1x (5x/20x). Real Stack play (`hqRealStats`: accounts + roster wagered/won) boosts the Australian home market.
+Balanced by sim: hands-off ~ $100M after 4 years, steady expansion ~ $1B+. None of it touches the real games' RTP.
+**The public side:** HQ publishes `hqPublic()` through the bridge (`corpPublish`) as `S.corp` (+ real figures); the home
+page strip (`#corpStrip`, `corpRender`) shows the newsroom, **Stack World (always labelled SIMULATED)**, real payouts and
+trust & status (+ a game certifications list). Other players get the snapshot over the admin line (`{a:'corp'}` in
+`onAdminCmd`, sent on connect and on every publish) or a party.
 
 **Stack Garage** (`garage` view) — 3D car-parts game (three.js). **`stack-garage.html` is the source of
 truth**; `sync-cards.js` copies it into an inert `text/plain` block (`#stack-garage`, script tags escaped
@@ -589,6 +605,7 @@ Two patterns, don't mix them up:
 - **2026-09-27** — Stackheads rebuilt in real 3D (three.js bundled inline, same as the garage, so offline still works): 12 modelled characters, finishes renamed to Alex's list Standard/Silver/Gold/Gummy/Confetti (same rarity index, so owned figures keep value), per-finish packaging with character scenes, a 3D unboxing and a 3D shelf inspector. Figures bake to sprites through a queue so the claw/pusher/shelf never stall; 2D art is the WebGL fallback.
 - **2026-09-27** — sync-cards.js syntax-checks every plain <script> block in a frame file, not first-to-last: the arcade now carries three.js in its own block and the old slice fed '</script><script>' to the checker.
 - **2026-09-27** — Stack Reef added as the 4th Stack Arcade attraction (fish table, three.js): chance per hit 0.97/pays so every shot returns 97% regardless of aim; the chain/blast specials price their chance from the total they'd take at hit time; shots bounce until they hit and are refunded if they find nothing or you leave. Built inside the arcade to reuse its bundled three.js, wallet and sound rather than as a new frame.
+- **2026-09-27** — Stack HQ: admin-only company strategy sim (frame) + a public corporate strip on everyone's home page. Alex wanted to feel like he runs Stack as a global company: brand + empire, real stakes (bailouts dilute), fast-forward time, real play boosts the sim. The simulated world numbers are always labelled SIMULATED on the public strip so players never mistake them for real figures; real payouts are shown separately.
 
 ---
 
