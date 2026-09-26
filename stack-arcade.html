@@ -40,6 +40,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 #info .panel{width:min(980px,94vw)}#info h2{margin:18px 0 8px;font:20px Bungee,Outfit;color:var(--cy)}#info p,#info li{color:#e0d4f4;margin:6px 0}
 .odds{display:grid;grid-template-columns:1fr auto auto;gap:4px 18px;max-width:620px}.odds span{white-space:nowrap}.odds span.r{text-align:right;font-weight:900;color:#fff}
 .x{position:absolute;right:14px;top:10px;font-size:26px;color:var(--mute)}.x:hover{color:#fff}
+#clawHelp .chSteps{margin:14px 0;padding-left:22px}#clawHelp .chSteps li{margin:8px 0;color:#e8dcf8;font-size:15px}#clawHelp .chSteps b{color:#fff}
 #toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:40;background:#1e0a3a;border:1px solid #c64bff;border-radius:10px;padding:10px 16px;font-weight:800;display:none;box-shadow:0 0 20px #c64bff55}#toast.on{display:block;animation:ovIn .2s}
 #figPop{position:absolute;right:18px;top:18px;z-index:27;display:none;align-items:center;gap:12px;background:linear-gradient(#24104a,#0e061c);border:2px solid #c64bff;border-radius:16px;padding:10px 14px 10px 10px;box-shadow:0 10px 30px #000,0 0 26px #c64bff66}#figPop.on{display:flex;animation:slideIn .4s cubic-bezier(.3,1.5,.5,1)}
 @keyframes slideIn{from{transform:translateX(120%)}to{transform:none}}#figPop canvas{width:66px;height:86px}#figPop b{display:block;font:16px Bungee,Outfit}#figPop small{color:var(--mute);font-weight:800}
@@ -64,6 +65,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
   <div class="ov" id="reveal"><canvas id="revCv" width="1520" height="1120"></canvas><div id="revInfo"><div class="nm" id="revN"></div><div class="fn" id="revF"></div><div class="vl" id="revV"></div></div>
    <div id="revBtns"><button class="gbtn pink" id="revKeep">KEEP IT</button><button class="gbtn" id="revSell">SELL</button></div></div>
   <div class="ov" id="figDet"><div class="panel"><button class="x" data-close="figDet">×</button><div id="fdBody"></div></div></div>
+  <div class="ov" id="clawHelp"><div class="panel" style="width:min(720px,92vw)"><div class="ttl" style="font-size:34px">HOW THE CLAW WORKS</div>
+   <ol class="chSteps"><li><b>Point at a box.</b> A tag over it and the green screen show what it's worth and your chance to win it, before you pay anything.</li>
+   <li><b>Press PLAY</b> (or space). You have 15 seconds to line up. Get the claw over the <b>middle</b> of the box: LINE-UP 100% means you get the full chance.</li>
+   <li><b>Drop it</b>: click the glass or press space. Win and the box drops down the chute for you to unbox.</li></ol>
+   <p class="sub" style="text-align:left">Your chance depends on the box's <b>finish</b> (the sticker on the box). The rarer the finish, the bigger the prize and the smaller the chance. Every box pays back 97% on average:</p>
+   <div class="odds" style="margin:8px auto 0"><span style="color:#9fb3c8;font-weight:900">Standard</span><span class="r">2&times; your play</span><span class="r">48.5% (about 1 in 2)</span><span style="color:#dfe8f4;font-weight:900">Metallic</span><span class="r">6&times;</span><span class="r">16.2% (1 in 6)</span><span style="color:#7dff9a;font-weight:900">Glow</span><span class="r">20&times;</span><span class="r">4.85% (1 in 21)</span><span style="color:#ffd84a;font-weight:900">Gold</span><span class="r">100&times;</span><span class="r">0.97% (1 in 103)</span><span style="color:#9fe8ff;font-weight:900">Diamond</span><span class="r">500&times;</span><span class="r">0.19% (1 in 515)</span></div>
+   <div style="text-align:center;margin-top:18px"><button class="gbtn pink" id="chOk">GOT IT</button></div></div></div>
   <div class="ov" id="info"><div class="panel"><button class="x" data-close="info">×</button><div class="ttl" style="font-size:38px">STACK ARCADE</div><div id="infoBody"></div></div></div>
   <div id="toast"></div>
  </div>
@@ -644,7 +652,8 @@ function star4(g,x,y,s,col,a=1){if(s<=.3)return;g.save();g.globalAlpha=a;g.globa
 const BOXC={},BX_W=260,BX_H=340;
 const FIN_LBL={met:'METALLIC',glow:'GLOWS IN THE DARK',gold:'24K GOLD FINISH',dia:'DIAMOND EDITION'};
 const FIN_COL={std:'#9fb3c8',met:'#dfe8f4',glow:'#7dff9a',gold:'#ffd84a',dia:'#9fe8ff'};
-function boxFront(fi,vi){const key=fi+'_'+vi;if(BOXC[key])return BOXC[key];const F=FIGS[fi],fin=VARS[vi].k;
+/* empty=true: the window is clear plastic with nothing behind it (the 3D unboxing puts the real figure inside) */
+function boxFront(fi,vi,empty){const key=fi+'_'+vi+(empty?'e':'');if(BOXC[key])return BOXC[key];const F=FIGS[fi],fin=VARS[vi].k;
  const c=document.createElement('canvas');c.width=BX_W;c.height=BX_H;const g=c.getContext('2d');
  /* card body */
  let gr=g.createLinearGradient(0,0,BX_W,BX_H);
@@ -656,12 +665,12 @@ function boxFront(fi,vi){const key=fi+'_'+vi;if(BOXC[key])return BOXC[key];const
  g.save();g.globalAlpha=.12;g.strokeStyle='#fff';g.lineWidth=2;for(let y=-10;y<BX_H;y+=28)for(let x=(y/28%2)*16-10;x<BX_W;x+=32){g.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3+Math.PI/6;g.lineTo(x+Math.cos(a)*10,y+Math.sin(a)*10)}g.closePath();g.stroke()}g.restore();
  /* window */
  const wx=22,wy=58,ww=BX_W-44,wh=218,win=rrp(wx,wy,ww,wh,[26,26,6,6]);
- g.save();g.clip(win);gr=g.createRadialGradient(BX_W/2,wy+wh*.45,10,BX_W/2,wy+wh*.5,wh*.8);gr.addColorStop(0,fin==='glow'?'#1a4a2a':shade(F.c1,.35));gr.addColorStop(1,fin==='glow'?'#06140a':shade(F.c2,-.2));g.fillStyle=gr;g.fillRect(wx,wy,ww,wh);
+ g.save();g.clip(win);if(empty){g.clearRect(wx,wy,ww,wh);g.globalAlpha=.1}gr=g.createRadialGradient(BX_W/2,wy+wh*.45,10,BX_W/2,wy+wh*.5,wh*.8);gr.addColorStop(0,fin==='glow'?'#1a4a2a':shade(F.c1,.35));gr.addColorStop(1,fin==='glow'?'#06140a':shade(F.c2,-.2));g.fillStyle=gr;g.fillRect(wx,wy,ww,wh);
  /* backdrop rays */
- g.globalAlpha=.16;g.fillStyle='#fff';for(let i=0;i<14;i++){const a=i/14*TAU;g.beginPath();g.moveTo(BX_W/2,wy+wh*.5);g.lineTo(BX_W/2+Math.cos(a)*300,wy+wh*.5+Math.sin(a)*300);g.lineTo(BX_W/2+Math.cos(a+.12)*300,wy+wh*.5+Math.sin(a+.12)*300);g.fill()}g.globalAlpha=1;
+ if(!empty){g.globalAlpha=.16;g.fillStyle='#fff';for(let i=0;i<14;i++){const a=i/14*TAU;g.beginPath();g.moveTo(BX_W/2,wy+wh*.5);g.lineTo(BX_W/2+Math.cos(a)*300,wy+wh*.5+Math.sin(a)*300);g.lineTo(BX_W/2+Math.cos(a+.12)*300,wy+wh*.5+Math.sin(a+.12)*300);g.fill()}g.globalAlpha=1;
  /* shelf the figure stands on */
  g.fillStyle='rgba(0,0,0,.35)';g.fillRect(wx,wy+wh-22,ww,22);
- drawFig(g,fi,vi,BX_W/2,wy+wh-12,186,0);
+ drawFig(g,fi,vi,BX_W/2,wy+wh-12,186,0)}g.globalAlpha=1;
  /* plastic sheen */
  gr=g.createLinearGradient(wx,wy,wx+ww,wy+wh);gr.addColorStop(0,'rgba(255,255,255,.28)');gr.addColorStop(.25,'rgba(255,255,255,.04)');gr.addColorStop(.6,'rgba(255,255,255,0)');gr.addColorStop(.7,'rgba(255,255,255,.12)');gr.addColorStop(.78,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(wx,wy,ww,wh);
  g.restore();g.lineWidth=4;g.strokeStyle='rgba(255,255,255,.55)';g.stroke(win);g.lineWidth=1.5;g.strokeStyle='rgba(0,0,0,.35)';g.stroke(rrp(wx-3,wy-3,ww+6,wh+6,[28,28,8,8]));
@@ -1029,8 +1038,8 @@ function C3(x,y,z){const dz=z+CC.Zc,dy=y-CC.Yc,F=-dy*CC.s+dz*CC.c,U=dy*CC.c+dz*C
 /* ---- the pile ---- */
 function pileNew(){const P=[];const r=Math.random;
  for(const z of[1.1,2.3,3.5,4.45])for(let x=-4.2;x<=4.25;x+=1.68){if(x<CHUTE.x1+.3&&z<CHUTE.z1+.3)continue;P.push(boxRoll(x+(r()-.5)*.18,z+(r()-.5)*.14,0,0))}
- /* a partial second layer, lying flat with the window up */
- for(let i=0;i<10;i++){const x=-2.4+r()*6.6,z=1.3+r()*3.2,base=pileTop(P,x,z);if(base>0&&base<CBH+.1)P.push(boxRoll(x,z,base,1))}
+ /* one layer only: loose boxes lying on top used to overhang their neighbours and steal the claw's
+    target, so a dead-centre line-up on the box below showed almost no chance */
  return P}
 function boxRoll(x,z,y,lay){return{fi:Math.floor(Math.random()*FIGS.length),vi:pickW(CLAW_MIX,Math.random()),x,z,y,lay,yaw:(Math.random()-.5)*.28,dy:0,ft:0}}
 function bdims(b){return b.lay?[CBW,CBD,CBH]:[CBW,CBH,CBD]}/* [w (x), h (y), d (z)] */
@@ -1040,7 +1049,7 @@ function pileTop(P,x,z){let h=0;for(const b of P){if(underPt(b,x,z)){const t=b.y
 function clawTarget(x,z){let best=null,bh=-1;for(const b of S.pile){if(b.gone||b.chute)continue;const u=underPt(b,x,z);if(!u)continue;const t=b.y+bdims(b)[1];if(t>bh){bh=t;best=b}}
  if(!best)return{b:null,q:0,p:0,top:0};const u=underPt(best,x,z),a=Math.hypot(u[0]*(best.lay?1:1),u[1]*.9);const q=clawQ(a,1);
  /* a box with another box resting on it can't be lifted out */
- const buried=S.pile.some(o=>o!==best&&o.y>best.y+.05&&Math.hypot(o.x-best.x,o.z-best.z)<CBW*.9);
+ const top=best.y+bdims(best)[1],buried=S.pile.some(o=>o!==best&&!o.gone&&!o.chute&&o.y>=top-.05&&Math.abs(o.x-best.x)<(bdims(o)[0]+bdims(best)[0])/2&&Math.abs(o.z-best.z)<(bdims(o)[2]+bdims(best)[2])/2);
  const qq=buried?0:q;return{b:best,q:qq,p:clawP(best.vi,qq),top:bh,buried}}
 /* ---- flow ---- */
 const PRICE=()=>PRICES[S.prI];
@@ -1099,6 +1108,7 @@ function clawDraw(c,t,dt){roomBg(c,t,'#c64bff');vset(c);c.drawImage(bake('claw',
  /* the pile, far to near, bottom to top */
  const tg=CL.ph==='aim'||CL.ph==='idle'?clawTarget(CL.x,CL.z):CL.res;const hl=tg&&tg.b;
  const L=S.pile.slice().sort((a,b)=>(b.z-a.z)*10+(a.y-b.y));for(const b of L)if(b!==CL.held&&!b.chute&&!b.gone)boxDraw(c,b,t,b===hl);
+ if(hl&&(CL.ph==='aim'||CL.ph==='idle'))boxTag(c,tg,t);
  /* claw shadow on whatever is under it */
  const sh=C3(CL.x,pileTop(S.pile,CL.x,CL.z)+.01,CL.z);c.save();c.fillStyle='rgba(0,0,0,.45)';c.beginPath();c.ellipse(sh[0],sh[1],sh[2]*.5,sh[2]*.16,0,0,TAU);c.fill();c.restore();
  /* gantry */
@@ -1155,14 +1165,20 @@ const LCD={cv:document.createElement('canvas'),key:'',k:0};
 function lcdArt(c,t,tg){c.fillStyle='#021008';rr(c,580,740,480,136,14);c.fill();c.strokeStyle='#39ff8855';c.lineWidth=2;c.stroke();
  c.save();c.beginPath();rr(c,584,744,472,128,12);c.clip();c.fillStyle='rgba(57,255,136,.05)';for(let y=744;y<872;y+=3)c.fillRect(584,y,472,1);
  c.font='900 15px Outfit';c.textAlign='left';const G='#39ff88';c.fillStyle=G;c.shadowColor=G;c.shadowBlur=8;
- if(CL.ph==='idle'&&!(CL.msg&&CL.t-CL.msgT<4)){c.font='900 26px Bungee,Outfit';c.textAlign='center';c.fillText('INSERT '+money(PRICE()),820,792);c.font='800 14px Outfit';c.fillText('press PLAY, steer with the mouse or arrow keys, DROP with space',820,826);c.fillText('perfect line-up returns 97% of the play price in figure value',820,850)}
- else if(CL.ph==='idle'){c.font='900 24px Bungee,Outfit';c.textAlign='center';c.fillText(CL.msg,820,808)}
- else if(tg&&tg.b){const F=FIGS[tg.b.fi],V=VARS[tg.b.vi];c.fillText('TARGET',600,770);c.font='900 20px Outfit';c.fillStyle=FIN_COL[V.k];{const nm=V.n.toUpperCase()+' '+F.n.toUpperCase(),mw=c.measureText(nm).width,k=Math.min(1,215/mw);c.save();c.translate(600,796);c.scale(k,1);c.fillText(nm,0,0);c.restore()}
+ const msg=CL.ph==='idle'&&CL.msg&&CL.t-CL.msgT<4;
+ if(msg){c.font='900 24px Bungee,Outfit';c.textAlign='center';c.fillText(CL.msg,820,808)}
+ else if(tg&&tg.b)lcdTarget(c,tg,G);
+ else if(CL.ph==='idle'){c.font='900 26px Bungee,Outfit';c.textAlign='center';c.fillText('INSERT '+money(PRICE()),820,792);c.font='800 14px Outfit';c.fillText('press PLAY, steer with the mouse or arrow keys, DROP with space',820,826);c.fillText('perfect line-up returns 97% of the play price in figure value',820,850)}
+ else{c.font='900 22px Bungee,Outfit';c.textAlign='center';c.fillText('NO BOX UNDER THE CLAW',820,800);c.font='800 14px Outfit';c.fillText('move over a box \u2014 the chance shows here before you drop',820,834)}
+ c.restore()}
+function lcdTarget(c,tg,G){{const F=FIGS[tg.b.fi],V=VARS[tg.b.vi];c.fillText(CL.ph==='idle'?'THIS BOX \u00b7 PRESS PLAY TO TRY FOR IT':'TARGET',600,770);c.font='900 20px Outfit';c.fillStyle=FIN_COL[V.k];{const nm=V.n.toUpperCase()+' '+F.n.toUpperCase(),mw=c.measureText(nm).width,k=Math.min(1,215/mw);c.save();c.translate(600,796);c.scale(k,1);c.fillText(nm,0,0);c.restore()}
   c.fillStyle=G;c.font='800 14px Outfit';c.fillText('worth '+money(figVal(tg.b.vi,CL.paid||PRICE()))+' · '+V.m+'× the play',600,820);
   c.fillText(tg.buried?'BURIED — another box is on top of it':'LINE-UP',600,850);if(!tg.buried){c.fillStyle='#0a3a1a';c.fillRect(670,840,150,14);c.fillStyle=tg.q>=1?'#39ff88':tg.q>.5?'#ffd84a':'#ff5a5a';c.fillRect(670,840,150*tg.q,14);c.fillStyle=G;c.fillText(Math.round(tg.q*100)+'%',828,852)}
-  c.textAlign='right';c.font='900 13px Outfit';c.fillText('CHANCE TO WIN',1040,770);c.font='900 44px Bungee,Outfit';c.fillStyle=tg.p>0?'#fff':'#ff5a5a';c.fillText(pctS(tg.p),1040,820);c.font='800 13px Outfit';c.fillStyle=G;c.fillText(tg.p>0?'about 1 in '+oneIn(tg.p):'line up over a free box',1040,850)}
- else{c.font='900 22px Bungee,Outfit';c.textAlign='center';c.fillText('NO BOX UNDER THE CLAW',820,800);c.font='800 14px Outfit';c.fillText('move over a box — the chance shows here before you drop',820,834)}
- c.restore()}
+  c.textAlign='right';c.font='900 13px Outfit';c.fillText('CHANCE TO WIN',1040,770);c.font='900 44px Bungee,Outfit';c.fillStyle=tg.p>0?'#fff':'#ff5a5a';c.fillText(pctS(tg.p),1040,820);c.font='800 13px Outfit';c.fillStyle=G;c.fillText(tg.p>0?'about 1 in '+oneIn(tg.p):tg.buried?'another box is on top of it':'centre the claw over the box',1040,850)}}
+function boxTag(c,tg,t){const b=tg.b,V=VARS[b.vi],col=FIN_COL[V.k],p=C3(b.x,b.y+bdims(b)[1]+.2,b.z),v=figVal(b.vi,CL.paid||PRICE());
+ const txt=V.n.toUpperCase()+'  '+pctS(tg.p)+'  \u2192 '+moneyS(v);c.save();c.font='900 15px Outfit';const w=c.measureText(txt).width+26,y=p[1]-18-Math.sin(t*4)*3;
+ c.fillStyle='rgba(6,2,14,.9)';rr(c,p[0]-w/2,y-15,w,30,15);c.fill();c.strokeStyle=col;c.lineWidth=2;c.stroke();c.fillStyle=col;c.beginPath();c.moveTo(p[0]-7,y+15);c.lineTo(p[0]+7,y+15);c.lineTo(p[0],y+23);c.closePath();c.fill();
+ c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,p[0],y+1);c.restore()}
 const pctS=p=>p<=0?'0%':p>=.1?(p*100).toFixed(1)+'%':p>=.01?(p*100).toFixed(2)+'%':(p*100).toFixed(3)+'%';
 const oneIn=p=>{const n=1/p;return n<10?n.toFixed(1):Math.round(n).toLocaleString('en-AU')};
 /* ---- input: the claw follows the pointer over the box you point at ---- */
@@ -1177,27 +1193,10 @@ function clawKeys(dt){if(CL.ph!=='aim'&&CL.ph!=='idle')return;const sp=2.4*dt;if
  if(KEYS.ArrowUp||KEYS.KeyW)CL.tz=Math.min(4.6,CL.tz+sp);if(KEYS.ArrowDown||KEYS.KeyS)CL.tz=Math.max(.45,CL.tz-sp)}
 /* ================= UNBOXING, THE SHELF, SELLING ================= */
 const RV={f:null,t:0,on:false,rc:null};
-function openReveal(f){RV.f=f;RV.t=0;RV.on=true;RV.rip=false;RV.rose=false;RV.done=false;$('reveal').classList.add('on');$('revInfo').style.visibility='hidden';$('revBtns').style.visibility='hidden';musMode('reveal');
+function openReveal(f){RV.f=f;RV.t=0;RV.on=true;RV.rip=false;RV.rose=false;RV.done=false;RV.shk=0;$('reveal').classList.add('on');$('revInfo').style.visibility='hidden';$('revBtns').style.visibility='hidden';musMode('reveal');
  $('revSell').textContent='SELL FOR '+money(f.val)}
 function closeReveal(){RV.on=false;$('reveal').classList.remove('on');musMode(S.scene==='claw'?'claw':S.scene==='push'?'push':'hall')}
-function revDraw(dt){if(!RV.on)return;const c=$('revCv').getContext('2d'),W=1520,H=1120,f=RV.f,F=FIGS[f.fi],V=VARS[f.vi],fin=V.k,col=FIN_COL[fin];RV.t+=dt;const t=RV.t;
- c.clearRect(0,0,W,H);
- /* light rays */
- const ra=Math.min(1,Math.max(0,(t-1)/.6));if(ra>0){c.save();c.translate(W/2,H*.48);c.rotate(t*.25);c.globalAlpha=.35*ra;for(let i=0;i<18;i++){c.rotate(TAU/18);const gr=c.createLinearGradient(0,0,700,0);gr.addColorStop(0,col);gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.beginPath();c.moveTo(0,0);c.lineTo(700,-50);c.lineTo(700,50);c.closePath();c.fill()}c.restore();
-  const hg=c.createRadialGradient(W/2,H*.48,0,W/2,H*.48,420);hg.addColorStop(0,col+'aa');hg.addColorStop(1,'rgba(0,0,0,0)');c.globalAlpha=ra;c.fillStyle=hg;c.fillRect(0,0,W,H);c.globalAlpha=1}
- /* the box: flies in, shakes, then the window tears away */
- const bs=Math.min(1,t/.5),bsc=1.9*(.2+.8*(1-Math.pow(1-bs,3)));
- if(t<1.5){const sh=t>.5&&t<1.1?Math.sin(t*70)*6*(t-.5):0;c.save();c.translate(W/2+sh,H*.5);c.rotate((1-bs)*-1.2);c.scale(bsc,bsc);c.globalAlpha=t<1.1?1:Math.max(0,1-(t-1.1)/.4);c.drawImage(boxFront(f.fi,f.vi),-BX_W/2,-BX_H/2);c.restore()}
- if(t>=1.1&&!RV.rip){RV.rip=true;SFX.rip();setTimeout(()=>SFX.pop(),120)}
- if(t>1.1&&t<1.9){const u=(t-1.1)/.8;c.save();c.translate(W/2+u*700,H*.45-u*300);c.rotate(u*3);c.globalAlpha=1-u;c.fillStyle='rgba(220,240,255,.5)';c.fillRect(-190,-200,380,400);c.restore()}
- /* the figure rises and turns on a turntable */
- if(t>1.2){if(!RV.rose){RV.rose=true;SFX.reveal(f.vi);spark(innerWidth/2,innerHeight*.42,fin==='std'?30:90,{col:fin==='dia'?['#e8fbff','#9fe8ff','#fff']:fin==='gold'?['#fff3a0','#ffd84a','#fff']:fin==='glow'?['#b8ffc8','#39ff88']:['#fff','#c64bff','#3cf0ff'],sp:11,kind:fin==='std'?'conf':'star',size:5,g:.18,life:1.6})}
-  const u=Math.min(1,(t-1.2)/.8),e=1-Math.pow(1-u,3),h=620,y=H*.82-(1-e)*200;
-  /* turntable */
-  c.save();c.translate(W/2,H*.83);c.scale(1,.22);const tg=c.createRadialGradient(0,0,20,0,0,300);tg.addColorStop(0,col+'aa');tg.addColorStop(.7,'rgba(40,10,70,.8)');tg.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=tg;c.beginPath();c.arc(0,0,300,0,TAU);c.fill();c.restore();
-  const ang=t>2?(t-2)*1.2:0,sx=Math.cos(ang);c.save();c.globalAlpha=e;c.translate(W/2,y);c.scale(Math.max(.04,Math.abs(sx)),1);if(sx<0)c.filter='brightness(.55)';drawFig(c,f.fi,f.vi,0,0,h,t,true);c.restore();
-  if(t>2&&!RV.done){RV.done=true;$('revN').textContent=F.n;$('revF').textContent=V.n.toUpperCase()+' FINISH';$('revF').style.color=col;$('revV').textContent='Worth '+money(f.val)+' · keep it on your shelf or sell it back any time';$('revInfo').style.visibility='visible';$('revBtns').style.visibility='visible'}}}
-$('reveal').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;if(RV.t<2)RV.t=Math.max(RV.t,1.99)});
+$('reveal').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;if(RV.t<3.1)RV.t=Math.max(RV.t,3.09)});
 $('revKeep').onclick=()=>{SFX.keep();closeReveal();toast(FIGS[RV.f.fi].n+' is on your shelf')};
 $('revSell').onclick=()=>{sellFig(RV.f.u);closeReveal()};
 function sellFig(u){const i=S.figs.findIndex(f=>f.u===u);if(i<0)return 0;const f=S.figs[i];S.figs.splice(i,1);credit(f.val);S.stats.figsSold++;SFX.sell();save();toast('Sold '+VARS[f.vi].n+' '+FIGS[f.fi].n+' for '+money(f.val));if(S.scene==='shelf')shelfRender();return f.val}
@@ -1224,6 +1223,106 @@ function figDetail(fi){const F=FIGS[fi];const cards=VARS.map((V,vi)=>{const mine
  $('fdBody').querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{sellFig(b.dataset.sell);figDetail(fi)});$('figDet').classList.add('on')}
 function sellDupes(){const keep={};let n=0,v=0;for(const f of S.figs.slice().sort((a,b)=>b.val-a.val)){if(f.vi!==0)continue;const k=f.fi;if(!keep[k]){keep[k]=1;continue}v+=f.val;n++;S.figs.splice(S.figs.indexOf(f),1)}
  if(!n){toast('No Standard duplicates to sell');SFX.no();return}credit(r2(v));S.stats.figsSold+=n;SFX.sell();save();toast(`Sold ${n} Standard duplicate${n>1?'s':''} for ${money(v)}`);shelfRender()}
+/* ================= THE 3D UNBOXING =================
+   A real 3D box (window front, printed sides, back and top flaps) projected with a perspective
+   camera, textures mapped per triangle so they sit flat on each face. It spins in, shakes, pops its
+   top flaps and the figure rises out through the top. The figure is a solid vinyl piece: its art is
+   extruded into a stack of layers (darker behind) so it has real thickness as it turns. */
+const R3={f:1500,Zc:7.5,cx:760,cy:540};
+const BHW=1,BHH=1.3,BHD=.6;/* box half sizes */
+const BOX3={};
+function boxArt(kind,fi,vi){const key=kind+fi+'_'+vi;if(BOX3[key])return BOX3[key];const [s1,s2]=boxSideCol(fi,vi),F=FIGS[fi],fin=VARS[vi].k;
+ const c=document.createElement('canvas');const x=c.getContext('2d');
+ const hexes=(w,h)=>{x.save();x.globalAlpha=.12;x.strokeStyle='#fff';x.lineWidth=2;for(let y=-10;y<h;y+=28)for(let xx=(y/28%2)*16-10;xx<w;xx+=32){x.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3+Math.PI/6;x.lineTo(xx+Math.cos(a)*10,y+Math.sin(a)*10)}x.closePath();x.stroke()}x.restore()};
+ if(kind==='side'){c.width=160;c.height=BX_H;let gr=x.createLinearGradient(0,0,160,0);gr.addColorStop(0,shade(s1,.1));gr.addColorStop(1,s2);x.fillStyle=gr;x.fillRect(0,0,160,BX_H);hexes(160,BX_H);
+  x.fillStyle='rgba(0,0,0,.25)';x.fillRect(0,0,160,54);x.save();x.translate(80,30);bhex(x,0,0,15,'#00e701');x.restore();
+  x.fillStyle='rgba(0,0,0,.28)';rr(x,14,64,132,150,14);x.fill();drawFig(x,fi,vi,80,206,132,0,true);
+  x.save();x.translate(116,BX_H-20);x.rotate(-Math.PI/2);x.font='italic 900 30px "Barlow Condensed",Outfit';x.fillStyle='#fff';x.fillText('STACKHEADS',0,0);x.restore();
+  x.fillStyle='#fff';x.font='900 15px Outfit';x.save();x.translate(46,BX_H-20);x.rotate(-Math.PI/2);x.fillText(F.n.toUpperCase()+' #'+String(fi+1).padStart(2,'0'),0,0);x.restore()}
+ else if(kind==='back'){c.width=BX_W;c.height=BX_H;const gr=x.createLinearGradient(0,0,0,BX_H);gr.addColorStop(0,s1);gr.addColorStop(1,shade(s2,-.2));x.fillStyle=gr;x.fillRect(0,0,BX_W,BX_H);hexes(BX_W,BX_H);
+  x.save();x.translate(BX_W/2,90);bhex(x,0,0,40,'#00e701');x.restore();x.textAlign='center';x.fillStyle='#fff';x.font='italic 900 34px "Barlow Condensed",Outfit';x.fillText('STACKHEADS',BX_W/2,170);x.font='900 14px Outfit';x.fillText('COLLECT ALL 12 · 5 FINISHES',BX_W/2,200);
+  for(let i=0;i<12;i++)drawFig(x,i,0,34+(i%6)*38,262+Math.floor(i/6)*56,44,0,true)}
+ else if(kind==='top'){c.width=BX_W;c.height=160;const gr=x.createLinearGradient(0,0,0,160);gr.addColorStop(0,shade(s2,-.1));gr.addColorStop(1,s1);x.fillStyle=gr;x.fillRect(0,0,BX_W,160);hexes(BX_W,160);
+  x.save();x.translate(BX_W/2,80);bhex(x,0,0,28,'#00e701');x.restore();x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=2;x.beginPath();x.moveTo(0,80);x.lineTo(BX_W,80);x.stroke()}
+ else if(kind==='inner'){c.width=BX_W;c.height=BX_H;const gr=x.createRadialGradient(BX_W/2,BX_H*.45,10,BX_W/2,BX_H*.5,BX_H*.7);gr.addColorStop(0,fin==='glow'?'#1a4a2a':shade(FIGS[fi].c1,.25));gr.addColorStop(1,fin==='glow'?'#06140a':shade(FIGS[fi].c2,-.35));x.fillStyle=gr;x.fillRect(0,0,BX_W,BX_H);
+  x.globalAlpha=.14;x.fillStyle='#fff';for(let i=0;i<14;i++){const a=i/14*TAU;x.beginPath();x.moveTo(BX_W/2,BX_H*.5);x.lineTo(BX_W/2+Math.cos(a)*400,BX_H*.5+Math.sin(a)*400);x.lineTo(BX_W/2+Math.cos(a+.12)*400,BX_H*.5+Math.sin(a+.12)*400);x.fill()}x.globalAlpha=1}
+ return BOX3[key]=c}
+/* map an image onto a projected quad (tl,tr,br,bl) as two affine triangles */
+function texTri(c,img,p0,p1,p2,u0,v0,u1,v1,u2,v2){c.save();c.beginPath();const cx=(p0[0]+p1[0]+p2[0])/3,cy=(p0[1]+p1[1]+p2[1])/3,ex=p=>[p[0]+(p[0]-cx)*.012,p[1]+(p[1]-cy)*.012];
+ const a=ex(p0),b=ex(p1),d=ex(p2);c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.lineTo(d[0],d[1]);c.closePath();c.clip();
+ const den=u0*(v1-v2)+u1*(v2-v0)+u2*(v0-v1);if(!den){c.restore();return}
+ const m11=(p0[0]*(v1-v2)+p1[0]*(v2-v0)+p2[0]*(v0-v1))/den,m12=(p0[1]*(v1-v2)+p1[1]*(v2-v0)+p2[1]*(v0-v1))/den,
+  m21=(p0[0]*(u2-u1)+p1[0]*(u0-u2)+p2[0]*(u1-u0))/den,m22=(p0[1]*(u2-u1)+p1[1]*(u0-u2)+p2[1]*(u1-u0))/den,
+  dx=(p0[0]*(u1*v2-u2*v1)+p1[0]*(u2*v0-u0*v2)+p2[0]*(u0*v1-u1*v0))/den,dy=(p0[1]*(u1*v2-u2*v1)+p1[1]*(u2*v0-u0*v2)+p2[1]*(u0*v1-u1*v0))/den;
+ c.transform(m11,m12,m21,m22,dx,dy);c.drawImage(img,0,0);c.restore()}
+function texQuad(c,img,q){const w=img.width,h=img.height;texTri(c,img,q[0],q[1],q[3],0,0,w,0,0,h);texTri(c,img,q[1],q[2],q[3],w,0,w,h,0,h)}
+function shadeQuad(c,q,a){if(a<=0)return;c.save();c.fillStyle=`rgba(0,0,0,${a})`;c.beginPath();q.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill();c.restore()}
+/* object -> world -> screen */
+function xf(T,x,y,z){x*=T.s;y*=T.s;z*=T.s;const cy=Math.cos(T.yaw),sy=Math.sin(T.yaw);let X=x*cy+z*sy,Z=-x*sy+z*cy;const cp=Math.cos(T.pit),sp=Math.sin(T.pit);const Y=y*cp-Z*sp;Z=y*sp+Z*cp;return[X+T.x,Y+T.y,Z+T.z]}
+function pj(p){const k=R3.f/(R3.Zc+p[2]);return[R3.cx+p[0]*k,R3.cy-p[1]*k,k]}
+const P3o=(T,x,y,z)=>pj(xf(T,x,y,z));
+const area=q=>(q[1][0]-q[0][0])*(q[2][1]-q[0][1])-(q[1][1]-q[0][1])*(q[2][0]-q[0][0]);
+/* the figure as a solid: layers of its art stacked through its thickness */
+const FIGD={};function figDark(fi,vi){const k=fi+'_'+vi;if(FIGD[k])return FIGD[k];const s=figCanvas(fi,vi),c=document.createElement('canvas');c.width=s.width;c.height=s.height;const x=c.getContext('2d');x.filter='brightness(.42) saturate(.9)';x.drawImage(s,0,0);return FIGD[k]=c}
+const FIGSH={cv:document.createElement('canvas')};
+function fig3D(c,fi,vi,W,yaw,hWorld,t,alpha=1){/* W = world anchor (feet) */const fin=VARS[vi].k,img=figCanvas(fi,vi),dk=figDark(fi,vi),K=14,T=.26*hWorld/2.05;
+ const cs=Math.cos(yaw),sn=Math.sin(yaw);c.save();c.globalAlpha=alpha;
+ for(let i=0;i<K;i++){const d=T*(1-i/(K-1)),P=pj([W[0]+sn*d,W[1],W[2]+cs*d]),hp=hWorld*P[2],k=hp/(100*FIG_S)*1.02;const front=i===K-1;
+  c.save();c.translate(P[0],P[1]);c.scale(Math.max(.05,Math.abs(cs))*k,k);
+  if(front&&cs>0){if(fin==='glow'){c.shadowColor='rgba(120,255,160,.8)';c.shadowBlur=40}else if(fin==='gold'){c.shadowColor='rgba(255,200,60,.55)';c.shadowBlur=30}else if(fin==='dia'){c.shadowColor='rgba(150,230,255,.85)';c.shadowBlur=40}
+   /* light sweeps across the front as it turns */
+   const sh=FIGSH.cv;sh.width=img.width;sh.height=img.height;const q=sh.getContext('2d');q.drawImage(img,0,0);q.globalCompositeOperation='source-atop';const bx=img.width*(.5-sn*.9),gr=q.createLinearGradient(bx-90,0,bx+90,img.height);gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(.5,'rgba(255,255,255,.32)');gr.addColorStop(1,'rgba(255,255,255,0)');q.fillStyle=gr;q.fillRect(0,0,img.width,img.height);
+   c.drawImage(sh,-FIG_OX,-FIG_OY)}
+  else c.drawImage(front?dk:dk,-FIG_OX,-FIG_OY);
+  c.restore()}
+ c.restore();
+ if(fin==='gold'||fin==='dia'||fin==='glow'){const P=pj(W),hp=hWorld*P[2];for(let i=0;i<4;i++){const ph=(t*.7+i*.27)%1,r=seeded(fi*11+i*5+Math.floor(t*.7+i*.27));star4(c,P[0]+(r()-.5)*hp*.6,P[1]-hp*(.15+r()*.8),hp*.07*Math.sin(ph*Math.PI),fin==='dia'?'#e8fbff':fin==='gold'?'#fff6c0':'#d8ffe0',alpha)}}}
+/* the box, with its flaps open by `open` (0..1) and a callback that draws what's inside */
+function box3D(c,fi,vi,T,open,inside,alpha=1){const q=(pts)=>pts.map(p=>P3o(T,...p));
+ const F=q([[-BHW,BHH,-BHD],[BHW,BHH,-BHD],[BHW,-BHH,-BHD],[-BHW,-BHH,-BHD]]),B=q([[BHW,BHH,BHD],[-BHW,BHH,BHD],[-BHW,-BHH,BHD],[BHW,-BHH,BHD]]),
+  Rt=q([[BHW,BHH,-BHD],[BHW,BHH,BHD],[BHW,-BHH,BHD],[BHW,-BHH,-BHD]]),Lf=q([[-BHW,BHH,BHD],[-BHW,BHH,-BHD],[-BHW,-BHH,-BHD],[-BHW,-BHH,BHD]]),Tp=q([[-BHW,BHH,BHD],[BHW,BHH,BHD],[BHW,BHH,-BHD],[-BHW,BHH,-BHD]]);
+ const side=boxArt('side',fi,vi),yawL=Math.cos(T.yaw);c.save();c.globalAlpha=alpha;
+ /* inside: back wall, then the far side walls, seen through the window/opening */
+ texQuad(c,boxArt('inner',fi,vi),[B[1],B[0],B[3],B[2]]);
+ if(area(Rt)<=0){c.fillStyle='rgba(10,4,20,.85)';c.beginPath();Rt.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.fill()}
+ if(area(Lf)<=0){c.fillStyle='rgba(10,4,20,.85)';c.beginPath();Lf.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.fill()}
+ /* back flap (hinged at the back top edge) opens up and away */
+ const a=open*2.05,L=BHD;const flap=(sgn)=>q([[-BHW,BHH,sgn*BHD],[BHW,BHH,sgn*BHD],[BHW,BHH+L*Math.sin(a),sgn*(BHD-L*Math.cos(a))],[-BHW,BHH+L*Math.sin(a),sgn*(BHD-L*Math.cos(a))]]);
+ const top=boxArt('top',fi,vi);if(open>0){const bf=flap(1);texQuad(c,top,[bf[3],bf[2],bf[1],bf[0]]);shadeQuad(c,bf,.25)}
+ inside();
+ /* outer faces */
+ if(area(B)>0){texQuad(c,boxArt('back',fi,vi),B)}
+ if(area(Rt)>0){texQuad(c,side,Rt);shadeQuad(c,Rt,.18+.2*Math.max(0,yawL))}
+ if(area(Lf)>0){texQuad(c,side,Lf);shadeQuad(c,Lf,.3)}
+ if(area(F)>0)texQuad(c,boxFront(fi,vi,true),F);
+ if(open<=0){if(area(Tp)>0){texQuad(c,top,Tp);shadeQuad(c,Tp,.05)}}
+ else{/* the front flap swings toward you */const ff=flap(-1);texQuad(c,top,ff);shadeQuad(c,ff,.12+.2*open)}
+ c.restore();return{F,Tp}}
+function revDraw(dt){if(!RV.on)return;const c=$('revCv').getContext('2d'),W=1520,H=1120,f=RV.f,F=FIGS[f.fi],V=VARS[f.vi],fin=V.k,col=FIN_COL[fin];RV.t+=dt;const t=RV.t;
+ c.clearRect(0,0,W,H);
+ const E=u=>1-Math.pow(1-Math.max(0,Math.min(1,u)),3);
+ /* timeline: fly in 0-.7, wobble to 1.3, flaps 1.3-1.75, rise 1.75-2.75, box drops away 2.75-3.3 */
+ const fly=E(t/.7),open=E((t-1.3)/.45),rise=E((t-1.75)/1),away=E((t-2.75)/.55);
+ const shake=t>.95&&t<1.3?Math.sin(t*80)*.05*(1-(t-.95)/.35):0;
+ const T={s:1,yaw:-2.8*(1-fly)-.42+Math.sin(t*.8)*.12*fly+shake,pit:-.2,x:0,y:-1.05-away*2.6,z:(1-fly)*14+away*2};
+ /* light behind */
+ const ra=Math.min(1,Math.max(0,(t-1.4)/.6));if(ra>0){c.save();c.translate(W/2,H*.46);c.rotate(t*.25);c.globalAlpha=.32*ra;for(let i=0;i<18;i++){c.rotate(TAU/18);const gr=c.createLinearGradient(0,0,760,0);gr.addColorStop(0,col);gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.beginPath();c.moveTo(0,0);c.lineTo(760,-54);c.lineTo(760,54);c.closePath();c.fill()}c.restore();
+  const hg=c.createRadialGradient(W/2,H*.46,0,W/2,H*.46,460);hg.addColorStop(0,col+'99');hg.addColorStop(1,'rgba(0,0,0,0)');c.globalAlpha=ra;c.fillStyle=hg;c.fillRect(0,0,W,H);c.globalAlpha=1}
+ /* turntable, fading in as the box goes */
+ const FH=2.05;const finalW=[0,-1.55,0],fs=1.28;
+ if(away>0){c.save();const p=pj(finalW);c.translate(p[0],p[1]);c.scale(1,.24);const tg=c.createRadialGradient(0,0,20,0,0,380);tg.addColorStop(0,col+'aa');tg.addColorStop(.7,'rgba(40,10,70,.8)');tg.addColorStop(1,'rgba(0,0,0,0)');c.globalAlpha=away;c.fillStyle=tg;c.beginPath();c.arc(0,0,380,0,TAU);c.fill();c.restore()}
+ /* the figure: stands inside, rises out through the top, then settles on the turntable */
+ const fyObj=-BHH+.06+rise*(2*BHH+.1);const inBox=xf(T,0,fyObj,0);const W0=away>0?[inBox[0]+(finalW[0]-inBox[0])*away,inBox[1]+(finalW[1]-inBox[1])*away,inBox[2]+(finalW[2]-inBox[2])*away]:inBox;
+ const fyaw=t<2.75?T.yaw:T.yaw+(Math.sin((t-2.75)*.9)*.75)*Math.min(1,(t-2.75)*2)+(-.42-T.yaw)*away;const fh=FH*(1+(fs-1)*away);
+ const drawFigure=()=>fig3D(c,f.fi,f.vi,W0,fyaw,fh,t);
+ if(away<1){const b=box3D(c,f.fi,f.vi,T,open,()=>{if(away<.01)drawFigure()},1-away*.9);
+  if(open>0&&away<.5){/* light pouring out of the opening */const m=P3o(T,0,BHH,0);c.save();c.globalCompositeOperation='lighter';const gr=c.createRadialGradient(m[0],m[1],0,m[0],m[1],260);gr.addColorStop(0,col+'aa');gr.addColorStop(1,'rgba(0,0,0,0)');c.globalAlpha=open*(1-away*2);c.fillStyle=gr;c.fillRect(m[0]-260,m[1]-260,520,520);c.restore()}}
+ if(away>=.01)drawFigure();
+ /* sounds + reveal beats */
+ if(t>=.95&&!RV.shk){RV.shk=1;SFX.clawGrip()}
+ if(t>=1.3&&!RV.rip){RV.rip=true;SFX.rip();setTimeout(()=>SFX.pop(),120)}
+ if(t>=1.75&&!RV.rose){RV.rose=true;SFX.reveal(f.vi);spark(innerWidth/2,innerHeight*.36,fin==='std'?30:90,{col:fin==='dia'?['#e8fbff','#9fe8ff','#fff']:fin==='gold'?['#fff3a0','#ffd84a','#fff']:fin==='glow'?['#b8ffc8','#39ff88']:['#fff','#c64bff','#3cf0ff'],sp:11,kind:fin==='std'?'conf':'star',size:5,g:.18,life:1.6})}
+ if(t>3.1&&!RV.done){RV.done=true;$('revN').textContent=F.n;$('revF').textContent=V.n.toUpperCase()+' FINISH';$('revF').style.color=col;$('revV').textContent='Worth '+money(f.val)+' · keep it on your shelf or sell it back any time';$('revInfo').style.visibility='visible';$('revBtns').style.visibility='visible'}}
 /* ================= THE ARCADE FLOOR =================
    The hub: the Claw, the Coin Pusher and your Stackheads shelf, under a giant neon sign. */
 const HALL={hover:null,t:0,spots:[{k:'claw',x:170,y:250,w:360,h:560},{k:'push',x:600,y:230,w:440,h:580},{k:'shelf',x:1110,y:260,w:330,h:550}]};
@@ -1279,7 +1378,7 @@ function sceneResize(){}
 function setScene(k){const was=S.scene;if(was==='push'&&k!=='push'){PU.hold=false;S.auto=false;$('autoBtn').classList.remove('on');payFlush(true);pzSave(true)}
  S.scene=k;$('gPush').classList.toggle('on',k==='push');$('gClaw').classList.toggle('on',k==='claw');$('gShelf').classList.toggle('on',k==='shelf');$('hallBtn').style.visibility=k==='hall'?'hidden':'visible';
  $('shelfUI').classList.toggle('on',k==='shelf');$('stage').style.cursor=k==='push'?'crosshair':k==='claw'?'pointer':'default';
- if(k==='push')pzLoad(S.tier);if(k==='shelf')shelfRender();if(k==='claw'){if(!S.pile||!S.pile.length)S.pile=pileNew();drawPrice()}
+ if(k==='push')pzLoad(S.tier);if(k==='shelf')shelfRender();if(k==='claw'){if(!S.pile||!S.pile.length)S.pile=pileNew();drawPrice();if(!S.clawHelp)$('clawHelp').classList.add('on')}
  for(const m of Object.values(MOT))m.set(0,0);musMode({hall:'hall',push:'push',claw:'claw',shelf:'shelf'}[k]);HALL.hover=null;
  setWin(0,k==='claw'?'LAST PRIZE':k==='push'?'LAST PAYOUT':'LAST WIN');save()}
 let lastT=0;
@@ -1304,8 +1403,8 @@ $('cv').addEventListener('pointerdown',e=>{auInit();const [vx,vy]=evV(e);
 addEventListener('pointerup',()=>{PU.hold=false;$('dropBtn').classList.remove('held')});
 addEventListener('blur',()=>{PU.hold=false;for(const k in KEYS)KEYS[k]=false});
 addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input'))return;KEYS[e.code]=true;
- if(e.code==='Escape'){['info','figDet'].forEach(k=>$(k).classList.remove('on'));if(RV.on){closeReveal();return}if(S.scene!=='hall')setScene('hall');return}
- if(RV.on||$('info').classList.contains('on')||$('figDet').classList.contains('on'))return;
+ if(e.code==='Escape'){['info','figDet','clawHelp'].forEach(k=>$(k).classList.remove('on'));if(RV.on){closeReveal();return}if(S.scene!=='hall')setScene('hall');return}
+ if(RV.on||$('info').classList.contains('on')||$('figDet').classList.contains('on')||$('clawHelp').classList.contains('on'))return;
  if(e.code==='Space'){e.preventDefault();auInit();if(S.scene==='push'&&!e.repeat){PU.hold=true;PU.holdT=PU.t;pzDropCoin()}if(S.scene==='claw'&&!e.repeat)clawPlay()}
  if(S.scene==='push'){if(e.code==='ArrowLeft'||e.code==='KeyA')PU.aimT=Math.max(-PZ.AIM,PU.aimT-.8);if(e.code==='ArrowRight'||e.code==='KeyD')PU.aimT=Math.min(PZ.AIM,PU.aimT+.8)}
  if(S.scene==='claw'&&e.code.startsWith('Arrow'))e.preventDefault()});
@@ -1319,6 +1418,7 @@ $('cabDn').onclick=()=>{auInit();cabStep(-1)};$('cabUp').onclick=()=>{auInit();c
 $('grabBtn').onclick=()=>{auInit();clawPlay()};
 $('prDn').onclick=()=>{if(CL.ph!=='idle'||S.prI<=0)return;auInit();S.prI--;SFX.click();drawPrice();save()};
 $('prUp').onclick=()=>{if(CL.ph!=='idle'||S.prI>=PRICES.length-1)return;auInit();S.prI++;SFX.click();drawPrice();save()};
+$('chOk').onclick=()=>{SFX.click();S.clawHelp=1;save();$('clawHelp').classList.remove('on')};
 $('sellDupes').onclick=()=>{auInit();sellDupes()};
 $('sndBtn').onclick=()=>{auInit();auMute(!S.mute);$('sndBtn').classList.toggle('off',S.mute);save()};
 $('musBtn').onclick=()=>{auInit();auMusic(!S.music);$('musBtn').classList.toggle('off',!S.music);SFX.click();save()};
@@ -1343,7 +1443,7 @@ window.StackFrame={refresh:()=>drawBal()};
 if(SB)$('topup').style.display='none';
 /* ---- boot ---- */
 S.tier=Math.max(0,Math.min(TIERS.length-1,S.tier|0));S.prI=Math.max(0,Math.min(PRICES.length-1,S.prI|0));S.auto=false;
-if(!Array.isArray(S.pile)||!S.pile.length)S.pile=pileNew();for(const b of S.pile){b.dy=0;b.fall=null;b.chute=null;b.gone=0;b.ft=0}
+if(!Array.isArray(S.pile)||!S.pile.length||S.pile.some(b=>b.lay))S.pile=pileNew();for(const b of S.pile){b.dy=0;b.fall=null;b.chute=null;b.gone=0;b.ft=0}
 resize();addEventListener('resize',resize);drawBal();drawCab();drawPrice();$('sndBtn').classList.toggle('off',S.mute);$('musBtn').classList.toggle('off',!S.music);
 setScene('hall');
 requestAnimationFrame(frame);

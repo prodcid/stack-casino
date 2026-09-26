@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.26.7",
-  "notes": "Stack Arcade: new platform with a claw machine and a 5-cabinet coin pusher, both paying Stackheads collectable figures (12 characters x 5 finishes) you can keep on your shelf or sell back",
-  "bytes": 2592544,
-  "at": "2026-09-26T12:54:06.150Z"
+  "version": "2026.09.27.1",
+  "notes": "Claw fix: every box now gets its full chance (loose top boxes were stealing the target), chance tag over the box you're aiming at, first-time how-to, and a 3D unboxing with a real box and a solid figure",
+  "bytes": 2605237,
+  "at": "2026-09-26T21:40:13.862Z"
 }

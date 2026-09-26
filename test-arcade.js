@@ -106,9 +106,14 @@ async function ui() {
   await shot('pusher-feature');
   /* claw */
   await ev("setScene('claw');S.pile=pileNew();S.prI=PRICES.indexOf(5);drawPrice()");
+  check(await ev("$('clawHelp').classList.contains('on')"), 'the first visit to the claw explains how it works');
+  await pg.click('#chOk'); await pg.waitForTimeout(200);
+  check(await ev("!$('clawHelp').classList.contains('on')&&S.clawHelp===1"), 'and it stays dismissed once you close it');
   const pick = "(()=>{const b=S.pile.find(b=>!b.lay&&clawTarget(b.x,b.z).b===b&&!clawTarget(b.x,b.z).buried&&b.x>-3&&!S.pile.some(o=>o!==b&&o.y>b.y&&Math.abs(o.x-(b.x+.75))<1.4&&Math.abs(o.z-b.z)<1.2));CL.x=CL.tx=b.x;CL.z=CL.tz=b.z;return b})()";
   const round = async (rnd, off) => ev(`(async()=>{const b0=bal(),n0=S.figs.length;clawPlay();const b=${pick};if(${off})CL.x=CL.tx=b.x+${off};const tg=clawTarget(CL.x,CL.z);const shown=tg.p;const R=Math.random;Math.random=()=>${rnd};clawDrop();
      for(let i=0;i<120&&CL.ph!=='idle';i++)await new Promise(r=>setTimeout(r,100));Math.random=R;const f=S.figs[S.figs.length-1];return{cost:+(b0-bal()).toFixed(2),got:S.figs.length-n0,q:tg.q,shown,exp:clawP(b.vi,tg.q),val:f&&f.val,vi:b.vi,rev:RV.on,left:S.pile.includes(b)}})()`);
+  const all = await ev("(()=>{let n=0,bad=0;for(let k=0;k<100;k++){const P=pileNew();S.pile=P;for(const b of P){n++;const t=clawTarget(b.x,b.z);if(t.b!==b||t.buried||t.q!==1)bad++}}S.pile=pileNew();return{n,bad}})()");
+  check(all.n > 2000 && all.bad === 0, 'every box in the cabinet, front row to back, gets its full chance when the claw is centred on it', JSON.stringify(all));
   const w = await round(0, 0);
   check(w.cost === 5 && w.got === 1 && w.q === 1 && Math.abs(w.shown - w.exp) < 1e-12 && w.val === 5 * [2, 6, 20, 100, 500][w.vi] && w.rev && !w.left, 'claw win: costs the play, shows the true chance, the box leaves the cabinet and the figure is worth multiplier x play', JSON.stringify(w));
   await pg.waitForTimeout(2600); await shot('reveal');
