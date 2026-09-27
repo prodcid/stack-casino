@@ -218,6 +218,11 @@ async function ui() {
   check(await pg.evaluate("$('iAmt').value==='1000'"), 'the IPO order amount stays at $1,000 while the book counts down');
   await pg.click('[data-ia="250000"]'); await pg.waitForTimeout(1500); const sb0 = await pg.evaluate('IPO.sub'); await pg.click('#iGo'); await pg.waitForTimeout(200);
   check(await pg.evaluate('IPO.sub') - sb0 === 250000, 'tapping $250K then Order shares orders $250K', String(await pg.evaluate('IPO.sub')));
+  /* regression: a new listing opened with the mouse over the chart used to throw and stop the whole market */
+  await pg.evaluate("save.ipoJump=true;IPO.st='bell';IPO.t=.5;IPO.d=nextIpoDeal();IPO.sub=0;showSec('term');CV.r=2"); await pg.mouse.move(700, 500); await pg.waitForTimeout(1800);
+  const lt = await pg.evaluate('T'); await pg.waitForTimeout(1000);
+  const lv = await pg.evaluate(`({T:T,sym:STOCKS[sel].sym,ipo:!!STOCKS[sel].ipo,candles:M[sel].candles.length,errs:ERRS.slice()})`);
+  check(lv.T > lt && lv.ipo && lv.candles >= 1 && lv.errs.length === 0, 'jumping to a brand-new listing keeps the market running (chart has its opening candle)', JSON.stringify(lv));
   check(errs.length === 0, 'no page errors', errs.slice(0, 3).join(' | '));
   await b.close();
 }

@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.27.7",
-  "notes": "Stack Markets: trade journal, earnings season, keyboard shortcuts, one-click trading, drag TP/SL on the chart, price alerts, favourites + sorting, close all/winners, remembered tickets; fixed the IPO amount resetting to 10K",
-  "bytes": 3568270,
-  "at": "2026-09-27T05:41:08.131Z"
+  "version": "2026.09.27.8",
+  "notes": "Stack Markets: fixed the freeze when a new IPO listed while the mouse was over the chart; the market loop can no longer be stopped by one error",
+  "bytes": 3569242,
+  "at": "2026-09-27T05:58:53.168Z"
 }

@@ -10924,6 +10924,7 @@ function drawChart(){if(!cv||SEC!=='term')return;if(!CW)resizeChart();if(!CW)ret
  if(res==='tick'){pts=tickPts(m,R.ms,dp);t0=nowW-R.ms;fut=R.ms*.3;res=DT*1000}
  else if(!R.hist){const from=R.ms?nowW-R.ms:midnight();bars=realBars(m,res,from,dp);t0=R.ms?from:(bars.length?bars[0].w:from);fut=R.ms&&R.ms<=3e5?R.ms*.3:0}
  else{bars=histBars(S,m,R,dp);t0=bars.length?bars[0].w:nowW-864e5}
+ if(!pts&&!bars.length){cx.clearRect(0,0,CW,CH);cx.fillStyle='#9fb0c8';cx.font='700 13px Outfit';cx.textAlign='center';cx.fillText(`Waiting for ${S.sym}'s first trades…`,CW/2,CH/2);cx.textAlign='left';return}
  const live=!R.hist,t1=nowW+fut+(live?0:res*.6),span=t1-t0,type=pts?(CV.type==='area'?'area':'line'):CV.type,drawB=type==='ha'?heikin(bars):bars;
  const closes=pts?pts.map(x=>x.p):bars.map(b=>b.c),AX=64,L=6,Rx=CW-AX,xB=CH-20,rsiH=CV.rsi?Math.max(50,CH*.17):0,volH=CV.vol?CH*.12:0,priceB=xB-rsiH-volH-(volH?4:0),padT=12;
  const X=w=>L+(w-t0)/span*(Rx-L),F=CV.log?Math.log:v=>v;
@@ -10967,7 +10968,7 @@ function drawChart(){if(!cv||SEC!=='term')return;if(!CW)resizeChart();if(!CW)ret
  /* the live price */const yp=Y(dp);cx.strokeStyle=upc?'rgba(0,231,1,.6)':'rgba(255,79,79,.6)';cx.setLineDash([2,3]);cx.beginPath();cx.moveTo(L,yp);cx.lineTo(Rx,yp);cx.stroke();cx.setLineDash([]);
  const xn=Math.min(Rx,X(live?nowW:(bars.length?cxs(bars[bars.length-1]):nowW)));const xnn=live?X(nowW):xn;cx.fillStyle=lc;cx.beginPath();cx.arc(xnn,yp,3.5,0,7);cx.fill();cx.globalAlpha=.35+.35*Math.sin(performance.now()/180);cx.beginPath();cx.arc(xnn,yp,8,0,7);cx.fill();cx.globalAlpha=1;
  cx.fillRect(Rx+2,yp-10,AX-4,20);cx.fillStyle='#04140a';cx.font='800 11.5px Outfit';cx.textBaseline='middle';cx.fillText(price(dp).slice(1),Rx+7,yp);cx.textBaseline='alphabetic';cx.font='600 11px Outfit'
- /* crosshair */;if(MX!=null&&MX>L&&MX<Rx&&MY>padT&&MY<xB){let k=0,bd=1e9;xs.forEach((x,j)=>{const d=Math.abs(x-MX);if(d<bd){bd=d;k=j}});const x=xs[k];
+ /* crosshair */;if(MX!=null&&xs.length&&MX>L&&MX<Rx&&MY>padT&&MY<xB){let k=0,bd=1e9;xs.forEach((x,j)=>{const d=Math.abs(x-MX);if(d<bd){bd=d;k=j}});const x=xs[k];
   cx.strokeStyle='rgba(255,255,255,.35)';cx.setLineDash([3,3]);cx.beginPath();cx.moveTo(x,padT);cx.lineTo(x,xB);cx.moveTo(L,MY);cx.lineTo(Rx,MY);cx.stroke();cx.setLineDash([]);
   if(MY<priceB){const v=CV.log?Math.exp(yHi-(MY-padT)/(priceB-padT)*(yHi-yLo)):yHi-(MY-padT)/(priceB-padT)*(yHi-yLo);cx.fillStyle='#264152';cx.fillRect(Rx+2,MY-9,AX-4,18);cx.fillStyle='#fff';cx.textBaseline='middle';cx.fillText(price(v).slice(1),Rx+7,MY);cx.textBaseline='alphabetic'}
   const b=pts?null:drawB[k],prevC=k?closes[k-1]:null,cl=closes[k],w=pts?pts[k].w:bars[k].w,chg=prevC?cl/prevC-1:null;
@@ -11282,7 +11283,7 @@ function ipoSecond(){IPO.t-=1;
  else if(IPO.st==='bell'&&IPO.t<=0)listIpo(IPO.d,IPO.sub,false);
  if(SEC==='ipo')drawIpo()}
 function listIpo(d,sub,quiet){const open=Math.round(ipoOpen(d.ipo)*1e4)/1e4;d.open=open;save.px[d.sym]={p:open,open,pend:0};
- const S=prep(ipoSpec(d));STOCKS.push(S);M.push(mkState(S,STOCKS.length-1));save.ipos=(save.ipos||[]).concat([{sym:d.sym,name:d.name,sector:d.sector,ipo:d.ipo,hue:d.hue,about:d.about,m60:d.m60}]);
+ const S=prep(ipoSpec(d));STOCKS.push(S);const nm=mkState(S,STOCKS.length-1);nm.candles.push({t:T-CP*DT,o:d.ipo,h:Math.max(d.ipo,open),l:Math.min(d.ipo,open),c:open,v:500});nm.ticks.push({w:Date.now(),p:open});nm.spark.push(d.ipo,open);M.push(nm);save.ipos=(save.ipos||[]).concat([{sym:d.sym,name:d.name,sector:d.sector,ipo:d.ipo,hue:d.hue,about:d.about,m60:d.m60}]);
  const pop=open/d.ipo-1;save.ipoHist=[{sym:d.sym,name:d.name,ipo:d.ipo,open,pop,sub,t:clock()}].concat(save.ipoHist||[]).slice(0,20);
  if(sub>0){const h=save.port[d.sym]||(save.port[d.sym]={q:0,cost:0});h.q+=sub/d.ipo;h.cost+=sub;save.act.unshift({t:clock(),k:'ipo',sym:d.sym,q:sub/d.ipo,amt:sub})}
  delete save.ipoPend;IPO.last={d,sub,open,pop};IPO.st='soon';IPO.t=IPO_GAP;
@@ -11505,17 +11506,21 @@ $('topup').onclick=()=>{SND.init();credit(1000);SND.coin();toast('Topped up','',
 window.StackFrame={refresh:()=>drawBal()};
 /* ---- the loop: 4 ticks a second; slower things once a second ---- */
 let acc=0,lastF=performance.now(),secAcc=0,qAcc=0,pvAcc=0;
-function frame(now){const dt=Math.min(3600e3,now-lastF);lastF=now;acc+=dt;
- if(acc>5000){/* came back after a while: replay what was missed (up to 10 minutes) quietly */QUIET=true;let n=Math.min(2400,Math.floor(acc/(DT*1000)));acc=0;while(n--){marketTick(false);checkAlerts();if(n%4===0)everySecond(true)}QUIET=false;lastReal=now;yLo=null;if(BUILD[SEC])showSec(SEC)}
- while(acc>=DT*1000){acc-=DT*1000;marketTick(false);checkAlerts();lastReal=now;secAcc+=DT;qAcc+=DT;pvAcc+=DT;
-  if(SEC==='term'){drawWatch();drawHead();if(BT==='open')drawBottom()}
+/* one broken piece must never stop the market: every part of the loop runs on its own, errors are logged */
+const ERRS=[];function safe(tag,f){try{f()}catch(e){if(ERRS.length<50)ERRS.push(tag+': '+(e&&e.message));console.error('[markets] '+tag,e)}}
+function frame(now){try{const dt=Math.min(3600e3,now-lastF);lastF=now;acc+=dt;
+ if(acc>5000){/* came back after a while: replay what was missed (up to 10 minutes) quietly */QUIET=true;let n=Math.min(2400,Math.floor(acc/(DT*1000)));acc=0;while(n--){safe('tick',()=>marketTick(false));safe('alerts',checkAlerts);if(n%4===0)everySecond(true)}QUIET=false;lastReal=now;yLo=null;if(BUILD[SEC])safe('rebuild',()=>showSec(SEC))}
+ while(acc>=DT*1000){acc-=DT*1000;safe('tick',()=>marketTick(false));safe('alerts',checkAlerts);lastReal=now;secAcc+=DT;qAcc+=DT;pvAcc+=DT;
+  if(SEC==='term')safe('terminal',()=>{drawWatch();drawHead();if(BT==='open')drawBottom()});
   if(secAcc>=1){secAcc=0;everySecond(false)}}
- tickerFrame(dt/1000);if(SEC==='term')drawChart();requestAnimationFrame(frame)}
+ safe('ticker',()=>tickerFrame(dt/1000));if(SEC==='term')safe('chart',drawChart)}finally{requestAnimationFrame(frame)}}
 let snapN=0;
-function everySecond(quiet){ipoSecond();earnSecond();predSecond(quiet);if(quiet)return;optSecond();drawTop();drawGauge();drawNav();IDXH.push(M[0].p);if(IDXH.length>300)IDXH.shift();
- if(SEC==='port')drawPort();else if(SEC==='pulse')drawPulse();
- if(SEC==='term'){const N=(tab==='trade'?ui.T:tab==='target'?ui.tT:ui.uT);qAcc>=(N>=120?3:1)&&(qAcc=0,quote())}
- if(pvAcc>=15){pvAcc=0;samplePV()}if(++snapN%5===0)snapshot();if(snapN%60===0)saveC1();if(SEC==='term'&&BT==='co')drawBottom();if(SEC==='term'&&UIP.sort!=='def'&&snapN%2===0)buildWatch()}
+function everySecond(quiet){safe('ipo',ipoSecond);safe('earnings',earnSecond);safe('predictions',()=>predSecond(quiet));if(quiet)return;
+ safe('options',optSecond);safe('header',()=>{drawTop();drawGauge();drawNav()});IDXH.push(M[0].p);if(IDXH.length>300)IDXH.shift();
+ safe('section',()=>{if(SEC==='port')drawPort();else if(SEC==='pulse')drawPulse()});
+ if(SEC==='term')safe('quote',()=>{const N=(tab==='trade'?ui.T:tab==='target'?ui.tT:ui.uT);if(qAcc>=(N>=120?3:1)){qAcc=0;quote()}});
+ if(pvAcc>=15){pvAcc=0;safe('value',samplePV)}if(++snapN%5===0)safe('save',snapshot);if(snapN%60===0)safe('charts save',saveC1);
+ if(SEC==='term')safe('terminal',()=>{if(BT==='co')drawBottom();if(UIP.sort!=='def'&&snapN%2===0)buildWatch()})}
 addEventListener('pagehide',()=>{snapshot();persist();saveC1()});addEventListener('beforeunload',()=>{snapshot();persist()});
 /* ---- first visit ---- */
 function help(){const h=document.createElement('div');h.className='help';h.innerHTML=`<div class="box"><h2>Welcome to Stack Markets</h2><ul><li><b>Terminal</b>: trade any market with leverage, bet on targets or up/down, or buy shares to hold.</li><li><b>Options</b>, <b>Predictions</b> and <b>IPO Centre</b>: new ways to play the same live market.</li><li><b>Portfolio</b>: the shares you own, which keep their value between visits.</li><li>Stakes go up to <b>$1M</b> on the majors.</li><li>Everything returns 96–98.5% on average. The <b>Guide</b> tab explains it all.</li></ul><button class="go" id="helpGo">Start trading</button></div>`;document.body.appendChild(h);$('helpGo').onclick=()=>{SND.init();h.remove();save.seen=true;persist()}}
