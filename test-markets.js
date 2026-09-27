@@ -218,6 +218,13 @@ async function ui() {
   check(await pg.evaluate("$('iAmt').value==='1000'"), 'the IPO order amount stays at $1,000 while the book counts down');
   await pg.click('[data-ia="250000"]'); await pg.waitForTimeout(1500); const sb0 = await pg.evaluate('IPO.sub'); await pg.click('#iGo'); await pg.waitForTimeout(200);
   check(await pg.evaluate('IPO.sub') - sb0 === 250000, 'tapping $250K then Order shares orders $250K', String(await pg.evaluate('IPO.sub')));
+  /* invest sells are journalled with realised P&L, hold time and dividends */
+  const ij = await pg.evaluate(`(async()=>{select(byS('AURA'));delete save.port.AURA;ui.inv='buy';ui.invAmt=20000;setTab('invest');invest();await new Promise(r=>setTimeout(r,2500));save.port.AURA.div=12.5;
+    const n=save.jr.length;ui.inv='sell';ui.invQ=save.port.AURA.q/2;buildTab();invest();const a=save.jr[0];sellAll('AURA');const b=save.jr[0];
+    return{added:save.jr.length-n,kindA:a.kind,kindB:b.kind,costA:+a.cost.toFixed(2),netA:a.net,divA:a.div,dur:a.dur,tr:a.tr.length,e:a.e,gone:!save.port.AURA}})()`);
+  check(ij.added === 2 && ij.kindA === 'inv' && ij.kindB === 'inv' && Math.abs(ij.costA - 1e4) < .02 && Math.abs(ij.divA - 6.25) < .01 && ij.dur >= 2 && ij.tr >= 1 && ij.gone, 'selling shares (ticket or Portfolio) lands in the journal with realised P&L, hold time and dividends', JSON.stringify(ij));
+  await pg.evaluate("showSec('jour');JF.kind='inv';drawJour()"); check(await pg.evaluate("/Invest/.test($('jRows').textContent)&&/Dividends while held/i.test($('jDet').textContent)"), 'the journal filters to Invest and shows the sale');
+  await pg.evaluate("JF.kind=''");
   /* regression: a new listing opened with the mouse over the chart used to throw and stop the whole market */
   await pg.evaluate("save.ipoJump=true;IPO.st='bell';IPO.t=.5;IPO.d=nextIpoDeal();IPO.sub=0;showSec('term');CV.r=2"); await pg.mouse.move(700, 500); await pg.waitForTimeout(1800);
   const lt = await pg.evaluate('T'); await pg.waitForTimeout(1000);
