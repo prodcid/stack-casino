@@ -33,7 +33,7 @@ function sim() {
   for (const [sym, rel, T] of [['NVRX', .02, 30], ['OIL', -.03, 60], ['SHRK', .1, 60], ['STK', .005, 30]]) {
     const S = bySym(sym), N = T / DT; let paid = 0, got = 0;
     /* a target pays rarely, so each live quote (4000 paths) is scored against the true chance from 40,000 fresh paths */
-    for (let s = 0; s < 24; s++) { const s0 = state(S), m = K.multFor(K.mcTarget(S, s0.st, s0.G, rel, N, 4000)); if (m < 1.05 || m > 100) continue;
+    for (let s = 0; s < 48; s++) { const s0 = state(S), m = K.multFor(K.mcTarget(S, s0.st, s0.G, rel, N, 4000)); if (m < 1.05 || m > 100) continue;
       paid++; got += m * K.mcTarget(S, s0.st, s0.G, rel, N, 40000); }
     check(band(got / paid), `target ${sym} ${rel > 0 ? '+' : ''}${rel * 100}% in ${T}s`, pct(got / paid));
   }
@@ -48,13 +48,13 @@ function sim() {
     for (const [sym, T] of [['STK', 60], ['VLTC', 120], ['SHRK', 60], ['OIL', 300], ['AURA', 30], ['NVRX', 120]]) {
       const S = bySym(sym), N = T / DT;
       for (let s = 0; s < 6; s++) { const s0 = state(S), typ = Math.sqrt(S.sig * S.sig * T + S.jr * T * S.js * S.js + (S.evRate || 0) * T * S.evX * S.evX);
-        const Ks = [-1.5, -.5, 0, .5, 1.5].map(z => s0.st.p * Math.exp(z * typ)), ch = K.chainFair(S, s0.st, s0.G, Ks, N, 3000);
+        const Ks = [-1.5, -.5, 0, .5, 1.5].map(z => s0.st.p * Math.exp(z * typ)), ch = K.chainFair(S, s0.st, s0.G, Ks, N, 8000), ch2 = K.chainFair(S, s0.st, s0.G, Ks, N, 8000);
         const outs = []; for (let j = 0; j < 6000; j++) outs.push(s0.st.p * walk(S, s0, N));
-        for (const o of ch) for (const d of [1, -1]) { const fair = d > 0 ? o.c : o.p; if (fair < s0.st.p * 5e-4) continue; const pay = outs.map(x => Math.max(0, d * (x - o.K))), mc = pay.reduce((a, x) => a + x, 0) / pay.length;
+        for (const [q, o] of ch.entries()) for (const d of [1, -1]) { const fair = d > 0 ? o.c : o.p, sf = Math.abs(fair - (d > 0 ? ch2[q].c : ch2[q].p)) / Math.SQRT2; if (fair < s0.st.p * 5e-4) continue; const pay = outs.map(x => Math.max(0, d * (x - o.K))), mc = pay.reduce((a, x) => a + x, 0) / pay.length;
           const se = Math.sqrt(pay.reduce((a, x) => a + (x - mc) * (x - mc), 0)) / pay.length;
-          paid += fair / HOUSE; got += mc; cnt++; worst = Math.max(worst, Math.abs(fair - mc) / (se + .02 * mc)); } } }
+          paid += fair / HOUSE; got += mc; cnt++; worst = Math.max(worst, Math.abs(fair - mc) / (Math.hypot(se, sf) + .02 * mc)); } } }
     check(band(got / paid), `options return (${cnt} contracts across 6 markets, 5 strikes, calls + puts)`, pct(got / paid));
-    check(worst < 4, 'each premium matches the simulated fair value (within noise + 2%)', 'worst ' + worst.toFixed(2) + ' noise units'); }
+    check(worst < 4, 'each premium matches the simulated fair value (within simulation + quote noise + 2%)', 'worst ' + worst.toFixed(2) + ' noise units'); }
   console.log('\n-- prediction contracts --');
   { let paid = 0, got = 0, maxErr = 0;
     for (const sym of ['STK', 'GLDN', 'OIL', 'AUDUSD', 'VLTC', 'NVRX']) { const S = bySym(sym);
@@ -67,6 +67,26 @@ function sim() {
     let worstB = 1, worstT = 0; for (let P = K.P_MIN; P <= K.P_MAX + 1e-9; P += .001) { worstB = Math.min(worstB, P / K.yesAsk(P)); worstT = Math.max(worstT, P / K.yesAsk(P)); }
     check(worstB >= .965 && worstT <= .97 + 1e-9, 'every buyable price returns 96.5-97% (rounding included)', pct(worstB) + ' to ' + pct(worstT));
     check(K.yesBid(.6) < .6 && K.yesAsk(.6) > .6, 'selling back pays below the fair price, buying costs above it'); }
+  console.log('\n-- ranges, touches and head to head --');
+  { let worst = 0, paid = 0, got = 0;
+    for (const sym of ['GLDN', 'OIL', 'VLTC', 'NVRX']) { const S = bySym(sym);
+      for (let s = 0; s < 6; s++) { const s0 = state(S), T = [120, 180, 300][s % 3], N = T / DT, typ = Math.sqrt(S.sig * S.sig * T + S.jr * T * S.js * S.js + S.evRate * T * S.evX * S.evX), e = [-1, -.35, .35, 1].map(z => s0.st.p * Math.exp(z * typ));
+        const P = K.pBuckets(S, s0.st, s0.G, e, N, 3000), c = [0, 0, 0, 0, 0], n = 5000; for (let j = 0; j < n; j++) { const x = s0.st.p * walk(S, s0, N); let b = 0; while (b < 4 && x > e[b]) b++; c[b]++; }
+        P.forEach((q, k) => { worst = Math.max(worst, Math.abs(q - c[k] / n)); if (K.canBuy(q)) { paid += K.yesAsk(q); got += c[k] / n; } }); } }
+    check(worst < .035, 'range buckets match the simulated chance', 'worst gap ' + (worst * 100).toFixed(1) + ' points');
+    check(band(got / paid), 'range contracts return in the band', pct(got / paid)); }
+  { let worst = 0, paid = 0, got = 0;
+    for (const [a, b] of [['VLTC', 'NBLA'], ['GLDN', 'OIL'], ['AURA', 'STK'], ['MOON', 'SHRK']]) { const A = bySym(a), B = bySym(b);
+      for (let s = 0; s < 5; s++) { const sa = state(A), sb = state(B), G = sa.G, N = [60, 120, 240][s % 3] / DT, lead = (Math.random() - .5) * .01, P = K.pBeat(A, sa.st, B, sb.st, G, N, 3000, lead); let w = 0; const n = 5000;
+        for (let j = 0; j < n; j++) { const x = { p: sa.st.p, pend: sa.st.pend ? { t: sa.st.pend.t } : null }, y = { p: sb.st.p, pend: sb.st.pend ? { t: sb.st.pend.t } : null }, G2 = { pend: G.pend ? { t: G.pend.t, e: G.pend.e } : null };
+          for (let k = 0; k < N; k++) { const g = K.stepGlobal(G2); K.applyG(g, A, x); K.applyG(g, B, y); K.stepStock(A, x); K.stepStock(B, y); } if (lead + Math.log(x.p / sa.st.p) > Math.log(y.p / sb.st.p)) w++; }
+        worst = Math.max(worst, Math.abs(P - w / n)); for (const [q, r] of [[P, w / n], [1 - P, 1 - w / n]]) if (K.canBuy(q)) { paid += K.yesAsk(q); got += r; } } }
+    check(worst < .035, 'head to head matches a joint simulation (shared market calls)', 'worst gap ' + (worst * 100).toFixed(1) + ' points');
+    check(band(got / paid), 'head-to-head contracts return in the band', pct(got / paid)); }
+  { let paid = 0, got = 0;
+    for (const [sym, rel, T] of [['VLTC', .02, 90], ['OIL', -.015, 120], ['SHRK', .05, 60], ['NVRX', -.02, 180]]) { const S = bySym(sym), N = T / DT;
+      for (let s = 0; s < 8; s++) { const s0 = state(S), q = K.mcTarget(S, s0.st, s0.G, rel, N, 2400), tr = K.mcTarget(S, s0.st, s0.G, rel, N, 30000); for (const [a, b] of [[q, tr], [1 - q, 1 - tr]]) if (K.canBuy(a)) { paid += K.yesAsk(a); got += b; } } }
+    check(band(got / paid), 'touch contracts (YES and NO) return in the band', pct(got / paid)); }
   console.log('\n-- IPOs and holding shares --');
   { let s = 0; const n = 400000; for (let i = 0; i < n; i++) s += K.ipoOpen(20) / 20; const m = s / n;
     check(Math.abs(m - K.IPO_MEAN) < .004, 'IPOs open at 98.5% of the IPO price on average', pct(m));
@@ -103,7 +123,7 @@ async function ui() {
   const ex = await pg.evaluate("(()=>{const o=OPTS[0],b=getBal();T=o.exp;resolveOpts();return{n:OPTS.length,paid:+(getBal()-b).toFixed(2),iv:+(o.units*Math.max(0,M[o.i].p-o.K)).toFixed(2)}})()");
   check(ex.n === 0 && Math.abs(ex.paid - ex.iv) < .02, 'an option settles to units x (price - strike)', JSON.stringify(ex));
   await pg.evaluate("showSec('pred')"); await pg.waitForTimeout(300);
-  await pg.click('[data-buy][data-side="1"]:not([disabled])'); const pr = await pg.evaluate("(()=>{const o=PRED_OWN[0],c=PRED.find(x=>x.id===o.cid);return{o,kind:c.kind}})()");
+  await pg.evaluate("PF='px';drawPred()");await pg.click('[data-buy][data-side="1"]:not([disabled])'); const pr = await pg.evaluate("(()=>{const o=PRED_OWN[0],c=PRED.find(x=>x.id===o.cid);return{o,kind:c.kind}})()");
   check(pr.o && pr.o.cost === 1000 && pr.o.n > 1000, 'a prediction buys $1 contracts below $1 each', `${pr.o.n.toFixed(0)} YES (${pr.kind})`);
   const ps = await pg.evaluate("(()=>{const o=PRED_OWN[0],c=PRED.find(x=>x.id===o.cid),b=getBal();settleContract(c,true);return{left:PRED_OWN.length,paid:+(getBal()-b).toFixed(2),n:+o.n.toFixed(2)}})()");
   check(ps.left === 0 && Math.abs(ps.paid - ps.n) < .02, 'a YES that comes true pays $1 a contract', JSON.stringify(ps));
@@ -121,6 +141,29 @@ async function ui() {
     'bets, options, holdings, IPO listings and prices survive a reload', JSON.stringify(after));
   for (const k of ['port', 'pulse']) { await pg.evaluate(`showSec('${k}')`); await pg.waitForTimeout(1100); }
   check(await pg.evaluate("document.querySelectorAll('#pfHold tr').length>=3"), 'the portfolio lists the holdings');
+  check(await pg.evaluate("document.querySelector('#nav button').dataset.s==='port'"), 'Portfolio is first in the nav');
+  /* charts: every timeframe and type draws, company page */
+  await pg.evaluate("showSec('term')");
+  const ch = await pg.evaluate(`(()=>{const out=[];for(let r=0;r<RANGES.length;r++)for(const t of['candle','bar','ha','line','area']){CV.r=r;CV.type=t;CV.rsi=true;CV.bb=true;CV.log=r>8;yLo=null;MX=300;MY=200;try{drawChart();out.push(1)}catch(e){out.push(RANGES[r].k+' '+t+': '+e.message)}}MX=MY=null;CV.rsi=CV.bb=CV.log=false;CV.r=2;return out.filter(x=>x!==1)})()`);
+  check(ch.length === 0, 'the chart draws on all 12 timeframes x 5 chart types with every overlay', ch.slice(0, 2).join(' | '));
+  const hs = await pg.evaluate("(()=>{const H=hist(STOCKS[1]);return{n:H.d.length,last:H.d[H.d.length-1].c,wk:H.wk.length,h:H.h.length,same:hist(STOCKS[1])===H}})()");
+  check(hs.n > 3000 && Math.abs(hs.last - 1) < 1e-9 && hs.h === 168 && hs.same, 'company history is years long and joins today\'s open exactly', JSON.stringify(hs));
+  await pg.click('[data-b="co"]'); await pg.waitForTimeout(200);
+  check(await pg.evaluate("/Performance/.test($('blist').textContent)&&/All-time high/.test($('blist').textContent)"), 'the Company tab shows the profile, performance and key numbers');
+  /* IPO: jump to it on launch */
+  await pg.evaluate("showSec('ipo')"); await pg.click('#iJump'); await pg.evaluate("IPO.st='bell';IPO.t=0.5;IPO.d=nextIpoDeal();IPO.sub=0");
+  const sym2 = await pg.evaluate('IPO.d.sym'); await pg.waitForTimeout(1600);
+  check(await pg.evaluate(`SEC==='term'&&STOCKS[sel].sym==='${sym2}'&&save.ipoJump===true`), 'with "jump to it on launch" ticked, a listing opens that stock in the Terminal', sym2);
+  /* predictions: build your own, ranges, head to head, touch */
+  await pg.evaluate("showSec('pred');pu.stake=500;pb.i=byS('OIL');pb.type='px';pb.T=120;pb.z=.3;buildBuilder()"); await pg.waitForTimeout(400);
+  const bo = await pg.evaluate("(()=>{const n=PRED_OWN.length;$('bYes').click();const o=PRED_OWN[PRED_OWN.length-1],c=PRED.find(x=>x.id===o.cid);return{made:PRED_OWN.length-n,mine:c.mine,kind:c.kind,cost:o.cost}})()");
+  check(bo.made === 1 && bo.mine && bo.cost === 500, 'Build your own makes a contract and buys it', JSON.stringify(bo));
+  const rg = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='rng'&&!x.done&&cOpen(x)&&canBuy(x.P));if(!c)return null;const g=PRED.filter(x=>x.g===c.g);buyPred(c.id,1);const o=PRED_OWN.find(x=>x.cid===c.id),b=getBal();M[c.i].p=(Math.max(c.lo,M[c.i].p*.5)+Math.min(c.hi,M[c.i].p*2))/2;g.forEach(x=>x.exp=T);resolvePreds();return{paid:+(getBal()-b).toFixed(2),n:+o.n.toFixed(2),sum:+g.reduce((a,x)=>a+x.P,0).toFixed(3),won:g.filter(x=>x.yes).length}})()");
+  check(rg && Math.abs(rg.paid - rg.n) < .02 && rg.won === 1 && Math.abs(rg.sum - 1) < .02, 'a range bucket that lands pays $1 a contract, and only one bucket wins', JSON.stringify(rg));
+  const hh = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='h2h'&&!x.done);if(!c)return null;const P=cP(c,3000);M[c.i].p*=1.05;const P2=cP(c,3000);c.exp=T;resolvePreds();return{P:+P.toFixed(2),P2:+P2.toFixed(2),yes:c.yes}})()");
+  check(hh && hh.P2 > hh.P && hh.yes === true, 'head to head: A pulling ahead lifts its price and A winning resolves it', JSON.stringify(hh));
+  const tc = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='tch'&&!x.done);if(!c)return null;M[c.i].p=c.up?c.L*1.001:c.L*.999;resolvePreds();return{done:c.done,yes:c.yes}})()");
+  check(tc && tc.done && tc.yes, 'a touch contract pays the moment the level is touched', JSON.stringify(tc));
   check(errs.length === 0, 'no page errors', errs.slice(0, 3).join(' | '));
   await b.close();
 }

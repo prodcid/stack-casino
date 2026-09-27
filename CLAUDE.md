@@ -57,6 +57,8 @@ node test-hq.js sim      # Stack HQ: economy balance, licences, bailouts, deals,
 node test-hq.js ui       # Stack HQ: screens, months, actions, save; admin-only in Stack; publishes the home strip
 node test-arcade.js sim  # Stack Arcade: claw odds exact, pusher RTP from its own physics by aim, money conserved (~2 min)
 node test-arcade.js ui   # Stack Arcade: floor, pusher drops/payouts/gutters/cabinets/Lucky Slot, claw win/slip/miss/timer, selling, shelf, reload
+node test-markets.js sim # Stack Markets: every product's return from the live model (trades, targets, up/down, options, predictions, ranges, touches, head to head, IPOs, holding) (~1 min)
+node test-markets.js ui  # Stack Markets: sections, trade/invest/option/prediction/IPO on the wallet, reload, all 12 chart timeframes x 5 types, company tab, IPO jump, build-your-own
 node test-slots.js ui    # Dragon Stacks: every feature forced + played out with the wallet audited, gamble, autoplay
 node test.js frames     # new home + Racing/Markets on the casino wallet
 node test.js garage     # Stack Garage: wallet bridge, crate + Spin, two-window part trade (accept + decline)
@@ -197,6 +199,11 @@ sports blue/yellow, markets violet/teal, cards gold, casino pink, tables teal, g
 `buildEco()` (hero, `BIG3` panels, `#tilesCasino`/`#tilesTables`, More, scoreboard). Sidebar = `NAVG`
 groups in `buildNav()`; keep `data-g` on every entry (tests + `go()` highlight rely on it).
 Don't name a CSS custom property `--a` — it's registered as an `<angle>` (`@property`).
+
+**Stack Markets v2** (`stack-markets.html`, built from scratchpad `mk2/` parts by `build.py`; engine between `/*==CORE==*/` markers). One fair price model (diffusion + jumps + announced 50/50 news + market-wide calls by beta + rare flash moves) prices everything at fair/0.97. Nav: Portfolio (far left), Terminal, Options, Predictions, IPO Centre, Market Pulse, Guide.
+Pricing for options/predictions is conditional Monte Carlo (`evLF`): event timing sampled, flash moves enumerated exactly (0-3, every up/down mix), every path paired with its mirror, smooth part exact lognormal. Keep it that way: sampling flashes made STK option quotes jump ~12% a second.
+Charts: 10s/30s (every tick), 2m-Today (2 s candles + 1-min candles kept in localStorage `stackMarkets.c1` for the day), 1W-All = each company's seeded backstory (`hist()`, pinned to end at today's open) + today's real prices. Chart prefs in localStorage `stackMarkets.chart`.
+Predictions: price, range (5 buckets), touch (MC, requoted in turn), head to head (`pBeat`, shared market calls), events, build your own. `save.ipoJump` = jump to a new listing in the Terminal.
 
 **Frame games** — Dragon Stacks (`stack-slots.html`), Olympus Storm (`stack-olympus.html`), Ra's Fortune (`stack-egypt.html`), Stack Garage, **Stack Racing** (`stack-racing.html`), **Stack GP** (`stack-gp.html`) and **Stack Markets**
 (`stack-markets.html`) all use the same host: `FRAME_IDS` / `FG[id]` / `fgMount` / `fgView` /
@@ -607,6 +614,7 @@ Two patterns, don't mix them up:
 - **2026-09-27** — Stack Reef added as the 4th Stack Arcade attraction (fish table, three.js): chance per hit 0.97/pays so every shot returns 97% regardless of aim; the chain/blast specials price their chance from the total they'd take at hit time; shots bounce until they hit and are refunded if they find nothing or you leave. Built inside the arcade to reuse its bundled three.js, wallet and sound rather than as a new frame.
 - **2026-09-27** — Stack HQ: admin-only company strategy sim (frame) + a public corporate strip on everyone's home page. Alex wanted to feel like he runs Stack as a global company: brand + empire, real stakes (bailouts dilute), fast-forward time, real play boosts the sim. The simulated world numbers are always labelled SIMULATED on the public strip so players never mistake them for real figures; real payouts are shown separately.
 - **2026-09-27** — Stack Markets v2 (built from scratchpad mk2 parts; v1 backup kept there): 12 markets incl. forex/commodities/index, stakes $1M majors/$100K others/$20K PNYM; market-wide events (rate/CPI/jobs by beta, flash moves); options desk (chainFair = conditional MC over event timing + exact lognormal, premium fair/0.97, sell back at 97%); prediction markets (pAbove quotes to 0.01c, only buyable at 5-96% so RTP 96.8-97%, event contracts 50/50); IPO days (open lognormal mean 0.985 so flip at bid = 97%, keep last 5 listings, older bought out at last price); Invest with 1.5% spread and dividends priced as a drift so holding is fair; trade fee from ev (can be a credit). Market pauses while closed; warm-up history rescaled to saved prices. test-markets.js sim 27/27, ui 14/14.
+- **2026-09-27** — Markets: Portfolio moved to the far left; IPO 'jump to it on launch' tick box; more ways to predict (ranges, touch, head to head, build your own, prediction record); charts from single ticks to all-time (12 timeframes, 5 chart types, MA/Bollinger/volume/RSI/log, crosshair, wheel zoom, expand) + Company tab. Options quotes were jumping ~12%/s on STK because flash moves (rare, 7%) were sampled: enumerated them exactly + mirrored paths instead of just raising n. Long-range history is a seeded backstory joined to today's open, labelled as not predictive. test-markets sim 32/32, ui 23/23.
 
 ---
 
