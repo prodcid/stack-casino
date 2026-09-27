@@ -19,7 +19,7 @@ function sim() {
   const K = core(), { DT, STOCKS, HOUSE } = K, bySym = s => STOCKS.find(S => S.sym === s);
   /* a random live state: run the market a random while so news and market calls are pending at random times */
   const state = S => { const st = { p: S.p0, pend: null }, G = { pend: null }, n = 40 + Math.floor(Math.random() * 400); for (let k = 0; k < n; k++) { K.applyG(K.stepGlobal(G), S, st); K.stepStock(S, st); } return { st, G }; };
-  const clone = (st, G) => ({ st: { p: st.p, pend: st.pend ? { t: st.pend.t } : null }, G: { pend: G.pend ? { t: G.pend.t, e: G.pend.e } : null } });
+  const clone = (st, G) => ({ st: { p: st.p, pend: st.pend ? { t: st.pend.t, x: st.pend.x } : null }, G: { pend: G.pend ? { t: G.pend.t, e: G.pend.e } : null } });
   const walk = (S, s0, N, each) => { const { st, G } = clone(s0.st, s0.G), p0 = st.p; for (let k = 1; k <= N; k++) { K.applyG(K.stepGlobal(G), S, st); K.stepStock(S, st); if (each && each(st.p / p0, k)) return st.p / p0; } return st.p / p0; };
   const band = r => r >= .96 && r <= .99;
   console.log('\n-- leveraged trades (fee from the model, played out on the model) --');
@@ -87,6 +87,30 @@ function sim() {
     for (const [sym, rel, T] of [['VLTC', .02, 90], ['OIL', -.015, 120], ['SHRK', .05, 60], ['NVRX', -.02, 180]]) { const S = bySym(sym), N = T / DT;
       for (let s = 0; s < 8; s++) { const s0 = state(S), q = K.mcTarget(S, s0.st, s0.G, rel, N, 2400), tr = K.mcTarget(S, s0.st, s0.G, rel, N, 30000); for (const [a, b] of [[q, tr], [1 - q, 1 - tr]]) if (K.canBuy(a)) { paid += K.yesAsk(a); got += b; } } }
     check(band(got / paid), 'touch contracts (YES and NO) return in the band', pct(got / paid)); }
+  console.log('\n-- earnings season and moving TP / SL --');
+  { /* a scheduled earnings report (bigger size, known time) is in every price */
+    let gap = 0, paid = 0, got = 0, tp = 0, tg = 0;
+    for (const sym of ['MOON', 'SHRK', 'NVRX', 'AURA']) { const S = bySym(sym);
+      for (let s = 0; s < 6; s++) { const s0 = state(S); s0.st.pend = { t: Math.round((10 + Math.random() * 150) / DT) * DT, x: K.EARNX[sym], k: 'earn' }; const T = [60, 120, 240][s % 3], N = T / DT;
+        const L = s0.st.p * Math.exp((Math.random() - .5) * .1), P = K.pAbove(S, s0.st, s0.G, L, N, 3000); let up = 0; const n = 5000; for (let j = 0; j < n; j++) if (s0.st.p * walk(S, s0, N) > L) up++; gap = Math.max(gap, Math.abs(P - up / n));
+        const ch = K.chainFair(S, s0.st, s0.G, [s0.st.p], N, 8000)[0], outs = []; for (let j = 0; j < 4000; j++) outs.push(walk(S, s0, N) * s0.st.p);
+        paid += (ch.c + ch.p) / HOUSE; got += outs.reduce((a, x) => a + Math.abs(x - s0.st.p), 0) / outs.length;
+        const q = K.mcTrade(S, s0.st, s0.G, { dir: 1, L: 2, N, tp: 0, sl: 0 }, 900), fee = K.feeFor(1000, q.ev) / 1000;
+        for (let j = 0; j < 300; j++) { let V = 1; walk(S, s0, N, r => { V = 1 + 2 * (r - 1); if (V <= 0) { V = 0; return 1; } return 0; }); tp += 1 + fee; tg += V; } } }
+    check(gap < .035, 'price contracts know about a scheduled earnings report', 'worst gap ' + (gap * 100).toFixed(1) + ' points');
+    check(band(got / paid), 'options across an earnings report return in the band (straddles)', pct(got / paid));
+    check(band(tg / tp), 'trades across an earnings report return in the band', pct(tg / tp)); }
+  { /* open a trade, then move its take profit / stop loss part way through; the fee change keeps it fair */
+    let paid = 0, got = 0;
+    for (const [sym, L, T, a, b] of [['VLTC', 5, 60, { tp: 0, sl: 0 }, { tp: .3, sl: .2 }], ['AUDUSD', 50, 30, { tp: 0, sl: 0 }, { tp: 0, sl: .3 }], ['MOON', 3, 60, { tp: .5, sl: .25 }, { tp: 0, sl: 0 }], ['GLDN', 20, 30, { tp: 0, sl: .5 }, { tp: 1, sl: 0 }]]) {
+      const S = bySym(sym), N = T / DT, k0 = Math.round(N / 3);
+      for (let s = 0; s < 20; s++) { const s0 = state(S), q = K.mcTrade(S, s0.st, s0.G, { dir: 1, L, N, ...a }, 900), fee = K.feeFor(1000, q.ev) / 1000;
+        for (let j = 0; j < 60; j++) { const { st, G } = clone(s0.st, s0.G), p0 = st.p; let V = 1, done = false, extra = 0;
+          for (let k = 1; k <= N && !done; k++) { K.applyG(K.stepGlobal(G), S, st); K.stepStock(S, st); V = 1 + L * (st.p / p0 - 1); const lim = k <= k0 ? a : b;
+            if (V <= 0) { V = 0; done = true; } else if (lim.tp && V >= 1 + lim.tp || lim.sl && V <= 1 - lim.sl) done = true;
+            if (k === k0 && !done) { const [ea, eb] = K.mcExit2(S, st, G, { dir: 1, L, p0, N: N - k }, a, b, 600); extra = (eb - ea) / HOUSE; } }
+          paid += 1 + fee + extra; got += V; } } }
+    check(band(got / paid), 'moving TP / SL mid-trade (fee re-balanced) still returns in the band', pct(got / paid)); }
   console.log('\n-- IPOs and holding shares --');
   { let s = 0; const n = 400000; for (let i = 0; i < n; i++) s += K.ipoOpen(20) / 20; const m = s / n;
     check(Math.abs(m - K.IPO_MEAN) < .004, 'IPOs open at 98.5% of the IPO price on average', pct(m));
@@ -164,6 +188,36 @@ async function ui() {
   check(hh && hh.P2 > hh.P && hh.yes === true, 'head to head: A pulling ahead lifts its price and A winning resolves it', JSON.stringify(hh));
   const tc = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='tch'&&!x.done);if(!c)return null;M[c.i].p=c.up?c.L*1.001:c.L*.999;resolvePreds();return{done:c.done,yes:c.yes}})()");
   check(tc && tc.done && tc.yes, 'a touch contract pays the moment the level is touched', JSON.stringify(tc));
+  /* quality of life */
+  await pg.evaluate("showSec('term');WF='All';UIP.sort='def';buildTerm();select(1)");
+  await pg.click('[data-fav="SHRK"]'); await pg.evaluate("UIP.sort='move';buildWatch()");
+  const fv = await pg.evaluate("(()=>{const rows=[...document.querySelectorAll('#wrows .wr')].map(b=>STOCKS[+b.dataset.i].sym);const ch=rows.slice(1).map(s=>Math.abs(M[byS(s)].p/M[byS(s)].open-1));return{first:rows[0],fav:save.favs.includes('SHRK'),sorted:ch.every((v,k)=>k===0||ch[k-1]>=v-1e-12)}})()");
+  check(fv.first === 'SHRK' && fv.fav && fv.sorted, 'favourites pin to the top and the watchlist sorts by biggest movers', JSON.stringify(fv));
+  await pg.evaluate("UIP.sort='def';buildWatch();select(1);ui.L=5;ui.T=60;quote()"); await pg.waitForTimeout(200); await pg.evaluate("select(4)"); await pg.evaluate("ui.L=2;quote()"); await pg.waitForTimeout(200);
+  check(await pg.evaluate("select(1),ui.L===5&&ui.T===60"), 'each market remembers its own ticket');
+  await pg.evaluate("document.activeElement&&document.activeElement.blur()"); await pg.keyboard.press('3'); const k3 = await pg.evaluate('ui.stake');
+  const s0 = await pg.evaluate('sel'); await pg.keyboard.press('ArrowDown'); const s1 = await pg.evaluate('sel');
+  await pg.evaluate("select(1);UIP.one=true;positions.length=0"); const n0 = await pg.evaluate('positions.length'); await pg.keyboard.press('b'); const n1 = await pg.evaluate('positions.length');
+  check(k3 === 1e4 && s1 !== s0 && n1 === n0 + 1, 'keys: 3 = $10K stake, arrows change market, B trades instantly in one-click mode', JSON.stringify({ k3, s0, s1, n1 }));
+  const cw = await pg.evaluate("(()=>{UIP.one=false;select(1);ui.stake=100;ui.T=120;openTrade(1);openTrade(-1);const n=positions.length,b=getBal(),vs=positions.map(o=>valueOf(o)-o.cost);closeAll(true);const w=positions.length;closeAll(false);return{n,wins:vs.filter(v=>v>0).length,afterWinners:w,afterAll:positions.length}})()");
+  check(cw.afterWinners === cw.n - cw.wins && cw.afterAll === 0, 'close winners closes only the ones in profit, close all closes the rest', JSON.stringify(cw));
+  const al = await pg.evaluate("(()=>{save.alerts=[];addAlert(1,M[1].p*1.001);const a=save.alerts.length;M[1].p*=1.01;checkAlerts();return{set:a,left:save.alerts.length}})()");
+  check(al.set === 1 && al.left === 0, 'a price alert fires when the price gets there', JSON.stringify(al));
+  const md = await pg.evaluate("(()=>{select(byS('VLTC'));ui.stake=1000;ui.L=5;ui.T=120;ui.tp=0;ui.sl=0;openTrade(1);const o=positions[positions.length-1],c0=o.cost,b0=getBal();const ok=modTrade(o.id,{sl:.4});return{ok,sl:o.sl,dc:+(o.cost-c0).toFixed(2),db:+(b0-getBal()).toFixed(2)}})()");
+  check(md.ok && md.sl === .4 && Math.abs(md.dc - md.db) < .011, 'moving a stop loss re-balances the fee on the wallet', JSON.stringify(md));
+  const jr = await pg.evaluate("(()=>{const n=save.jr.length;positions.slice().forEach(o=>cashOut(o.id));const j=save.jr[0];showSec('jour');return{added:save.jr.length-n,tr:j&&j.tr.length,e:j&&j.e,rows:document.querySelectorAll('#jRows tr').length,chart:!!$('jC')}})()");
+  check(jr.added >= 1 && jr.tr > 10 && jr.e > 0 && jr.rows >= 1 && jr.chart, 'closed bets land in the journal with their chart from before entry to exit', JSON.stringify(jr));
+  /* earnings season */
+  await pg.evaluate("EARN.next=1;showSec('pulse')"); await pg.waitForTimeout(2300);
+  const es = await pg.evaluate("(()=>{const l=EARN.list;return{st:EARN.st,n:l.length,set:l.filter(e=>e.set).length,earnPend:M.filter(m=>m.pend&&m.pend.k==='earn').length,card:/EARNINGS SEASON/.test($('puEarn').textContent)}})()");
+  check(es.st === 'on' && es.n >= 6 && es.earnPend >= 1 && es.card, 'an earnings season schedules every company\'s report as its pending news', JSON.stringify(es));
+  const er = await pg.evaluate("(async()=>{const e=EARN.list.find(e=>e.set),i=byS(e.sym);M[i].pend.t=.5;await new Promise(r=>setTimeout(r,1500));return{sym:e.sym,res:e.res,news:news.some(h=>/beats|misses/.test(h.text)&&h.sym===e.sym)}})()");
+  check(er.res && er.news, 'a report lands as a beat or a miss with its headline', JSON.stringify(er));
+  /* the IPO order box keeps what you pick */
+  await pg.evaluate("IPO.st='open';IPO.t=60;IPO.d=nextIpoDeal();showSec('ipo')"); await pg.waitForTimeout(300); await pg.click('[data-ia="1000"]'); await pg.waitForTimeout(2300);
+  check(await pg.evaluate("$('iAmt').value==='1000'"), 'the IPO order amount stays at $1,000 while the book counts down');
+  await pg.click('[data-ia="250000"]'); await pg.waitForTimeout(1500); const sb0 = await pg.evaluate('IPO.sub'); await pg.click('#iGo'); await pg.waitForTimeout(200);
+  check(await pg.evaluate('IPO.sub') - sb0 === 250000, 'tapping $250K then Order shares orders $250K', String(await pg.evaluate('IPO.sub')));
   check(errs.length === 0, 'no page errors', errs.slice(0, 3).join(' | '));
   await b.close();
 }
