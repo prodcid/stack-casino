@@ -184,7 +184,7 @@ async function ui() {
   check(bo.made === 1 && bo.mine && bo.cost === 500, 'Build your own makes a contract and buys it', JSON.stringify(bo));
   const rg = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='rng'&&!x.done&&cOpen(x)&&canBuy(x.P));if(!c)return null;const g=PRED.filter(x=>x.g===c.g);buyPred(c.id,1);const o=PRED_OWN.find(x=>x.cid===c.id),b=getBal();M[c.i].p=(Math.max(c.lo,M[c.i].p*.5)+Math.min(c.hi,M[c.i].p*2))/2;g.forEach(x=>x.exp=T);resolvePreds();return{paid:+(getBal()-b).toFixed(2),n:+o.n.toFixed(2),sum:+g.reduce((a,x)=>a+x.P,0).toFixed(3),won:g.filter(x=>x.yes).length}})()");
   check(rg && Math.abs(rg.paid - rg.n) < .02 && rg.won === 1 && Math.abs(rg.sum - 1) < .02, 'a range bucket that lands pays $1 a contract, and only one bucket wins', JSON.stringify(rg));
-  const hh = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='h2h'&&!x.done);if(!c)return null;const P=cP(c,3000);M[c.i].p*=1.05;const P2=cP(c,3000);c.exp=T;resolvePreds();return{P:+P.toFixed(2),P2:+P2.toFixed(2),yes:c.yes}})()");
+  const hh = await pg.evaluate("(()=>{newH2H(['GLDN','OIL']);const c=PRED.filter(x=>x.kind==='h2h'&&!x.done).pop();if(!c)return null;c.exp=T+120;const P=cP(c,3000);M[c.i].p*=1.05;const P2=cP(c,3000);c.exp=T;resolvePreds();return{P:+P.toFixed(2),P2:+P2.toFixed(2),yes:c.yes}})()");
   check(hh && hh.P2 > hh.P && hh.yes === true, 'head to head: A pulling ahead lifts its price and A winning resolves it', JSON.stringify(hh));
   const tc = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='tch'&&!x.done);if(!c)return null;M[c.i].p=c.up?c.L*1.001:c.L*.999;resolvePreds();return{done:c.done,yes:c.yes}})()");
   check(tc && tc.done && tc.yes, 'a touch contract pays the moment the level is touched', JSON.stringify(tc));
