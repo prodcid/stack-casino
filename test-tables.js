@@ -111,6 +111,13 @@ async function ui() {
     if (t === 'rou-eu') { const r = await pg.evaluate("(()=>{const n=RHIST()[0];const want=(n===17?180:0)+(rColor(n)==='red'?50:0)+(n>=13&&n<=24?30:0);return{n,want}})()");
       check(Math.abs(io.in - r.want) < .011, 'roulette pays exactly what the layout says for the number that came up', `landed ${r.n}, paid ${io.in}`); }
   }
+  console.log('\n-- keyboard --');
+  { await pg.evaluate("StackFrame.open('bj')"); await pg.waitForTimeout(600); await pg.click('[data-ch="2"]'); await pg.keyboard.press('2'); await pg.evaluate("placeChip('m1',25)");
+    const chip = await pg.evaluate('TB.chip'); await pg.keyboard.press('x'); const dbl = await pg.evaluate("TB.bets.m1"); await pg.keyboard.press('z'); const und = await pg.evaluate("TB.bets.m1");
+    await pg.keyboard.press('Space'); await pg.waitForFunction("document.querySelector('#acts [data-a]')", null, { timeout: 15000 }); await pg.keyboard.press('s');
+    await pg.waitForFunction("TB.phase==='bet'", null, { timeout: 30000 });
+    check(chip === 1 && dbl === 50 && und === 25, 'keys 1-6 pick a chip, X doubles, Z undoes', JSON.stringify({ chip, dbl, und }));
+    pass('Space deals and S stands (a round played through on keys alone)'); }
   console.log('\n-- sound, dealer, saving --');
   check(await pg.evaluate("AU.ready&&Object.keys(AU.buf).length>=50"), 'all 50 recorded casino sounds decode', String(await pg.evaluate('Object.keys(AU.buf).length')));
   await pg.evaluate("StackFrame.open('bj')"); await pg.waitForTimeout(600);
@@ -128,6 +135,9 @@ async function ui() {
   await cp.evaluate("go('tb-sb')"); await cp.waitForFunction("FG.tables.ready&&FG.tables.frame.contentWindow.eval('CUR&&CUR.g')==='sb'", null, { timeout: 40000 });
   const w = await cp.evaluate("(async()=>{const w=FG.tables.frame.contentWindow,b0=P().bal;w.placeChip('big',50);const b1=P().bal;await w.go();return{b0,b1,after:P().bal,shown:w.document.getElementById('bal').textContent,top:getComputedStyle(w.document.getElementById('topup')).display}})()");
   check(w.b0 - w.b1 === 50 && w.top === 'none' && /\$/.test(w.shown), 'a sidebar entry opens that table; bets come off the Stack wallet and wins go back', JSON.stringify(w));
+  await cp.evaluate("go('tb-bj')"); await cp.waitForFunction("FG.tables.frame.contentWindow.eval('CUR&&CUR.g')==='bj'&&FG.tables.frame.contentWindow.eval('TB.phase')==='bet'", null, { timeout: 40000 }); await cp.waitForTimeout(400);
+  await cp.evaluate("FG.tables.frame.contentWindow.placeChip('m1',25)"); await cp.keyboard.press('Space'); await cp.waitForTimeout(800);
+  check(await cp.evaluate("FG.tables.frame.contentWindow.eval('TB.phase')") === 'play', 'inside Stack, opening a table from the sidebar gives it the keyboard (Space deals)');
   check(errs.length === 0, 'no page errors', errs.slice(0, 3).join(' | '));
   await b.close();
 }

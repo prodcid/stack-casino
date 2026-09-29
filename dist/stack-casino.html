@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Stack — Mates Casino</title>
-<meta name="stack-version" content="2026.09.28.1">
+<meta name="stack-version" content="2026.09.29.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Titan+One&family=Barlow+Condensed:ital,wght@0,600;0,800;1,700;1,800;1,900&display=swap" rel="stylesheet">
 <style>
@@ -10403,6 +10403,9 @@ h1{font-size:22px;font-weight:900;margin-bottom:2px}.lead{color:var(--mute);font
 .jsel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-weight:800;font-size:12.5px}table.jt td{text-align:left}table.jt td:last-child{text-align:right}tr.jon td{background:#23204a !important}
 textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:600 13px Outfit,sans-serif;color:#fff;resize:vertical;outline:none}
 tr.soon td{background:#2a2200}
+/* the Terminal's bottom panel always keeps a usable, scrollable share of the height; the chart gives way on short screens */
+@media (max-height:760px){.about{display:none}.stats div{padding:5px 12px}.ih{padding:8px 14px}}
+#botCard{flex:0 0 clamp(150px,34%,250px)!important;display:flex;flex-direction:column;min-height:0}#botCard .blist{flex:1;max-height:none;min-height:0;overflow:auto}.chartbox{min-height:150px!important}
 .bell{font-size:40px;animation:ring .6s 3}@keyframes ring{25%{transform:rotate(18deg)}75%{transform:rotate(-18deg)}}
 </style>
 </head>
@@ -19426,10 +19429,10 @@ function casinoBackdrop(seed=1,tint='#2a140a'){const w=2048,h=1024,c=cnv(w,h),x=
 function gxInit(canvas){const r=new V.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});r.outputColorSpace=V.SRGBColorSpace;r.toneMapping=V.ACESFilmicToneMapping;r.toneMappingExposure=.95;
  r.shadowMap.enabled=true;r.shadowMap.type=V.PCFSoftShadowMap;GX.r=r;makeMats();GX.env=makeEnv();gxSize()}
 function gxSize(){const c=GX.r.domElement,p=c.parentElement,W=p.clientWidth,H=p.clientHeight;if(!W||!H)return;GX.W=W;GX.H=H;GX.r.setPixelRatio(Math.min(2,devicePixelRatio||1)*(GX.q==='smooth'?.75:1));GX.r.setSize(W,H,false);if(GX.cam){GX.cam.aspect=W/H;GX.cam.updateProjectionMatrix()}}
-addEventListener('resize',()=>{if(GX.r)gxSize()});
+addEventListener('resize',()=>{if(GX.r){gxSize();if(TB.g&&CUR)fitCam(Object.values(TB.spots))}});
 /* a fresh scene for one table: lights, backdrop, camera */
 function newScene(opt={}){const s=new V.Scene();s.environment=GX.env;GX.scene=s;
- const cam=new V.PerspectiveCamera(opt.fov||40,GX.W/GX.H||1.6,.05,40);cam.position.set(...(opt.cam||[0,1.02,1.24]));GX.camBase=cam.position.clone();GX.look=new V.Vector3(...(opt.look||[0,.21,-.38]));cam.lookAt(GX.look);GX.cam=cam;GX.lookBase=GX.look.clone();
+ GX.cam0=null;const cam=new V.PerspectiveCamera(opt.fov||40,GX.W/GX.H||1.6,.05,40);cam.position.set(...(opt.cam||[0,1.02,1.24]));GX.camBase=cam.position.clone();GX.look=new V.Vector3(...(opt.look||[0,.21,-.38]));cam.lookAt(GX.look);GX.cam=cam;GX.lookBase=GX.look.clone();
  s.add(new V.HemisphereLight(0xffe2c0,0x1a0c06,.28));
  const key=new V.SpotLight(0xfff0dc,15,0,.66,.9,1.4);key.position.set(0,2.35,.35);key.target.position.set(0,0,-.05);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-.0002;key.shadow.radius=6;key.shadow.camera.near=.5;key.shadow.camera.far=5;s.add(key,key.target);GX.key=key;
  const fill=new V.DirectionalLight(0xffd7a8,.3);fill.position.set(-1.5,1.2,2);s.add(fill);
@@ -19443,6 +19446,13 @@ function carpetCanvas(){const c=cnv(256,256),x=c.getContext('2d');x.fillStyle='#
 let CAMX={blend:0,to:null};
 function camUpdate(){const c=GX.cam;if(!c)return;const t=GX.t/1000,dx=Math.sin(t*.31)*.004+Math.sin(t*.73)*.002,dy=Math.sin(t*.27+1)*.003;
  const b=CAMX.blend,p=CAMX.to?GX.camBase.clone().lerp(CAMX.to.pos,b):GX.camBase,l=CAMX.to?GX.lookBase.clone().lerp(CAMX.to.look,b):GX.lookBase;c.position.set(p.x+dx,p.y+dy,p.z);c.lookAt(l)}
+/* frame the table for the window it's in: keep the dealer's head and every betting spot clear of the top edge and
+   the chip rack at the bottom, dollying back and re-aiming only as much as needed (small windows inside Stack) */
+function fitCam(spots,head){const c=GX.cam;if(!c||!GX.H||!spots||!spots.length)return;if(!GX.cam0){GX.cam0=GX.camBase.clone();GX.look0=GX.lookBase.clone()}
+ const front=spots.map(s=>new V.Vector3(s.x,0,s.z+(s.r||(s.h||.04)/2))),top=head||new V.Vector3(DL.wx,.8,DL.wz),H=GX.H,bot=H-128,tp=10;
+ const fits=(C,L)=>{c.position.copy(C);c.lookAt(L);c.updateMatrixWorld();if(toScreen(top).y<tp)return false;for(const p of front)if(toScreen(p).y>bot)return false;return true};
+ for(let d=1;d<=1.9;d+=.04)for(const ly of[0,-.02,.02,-.04,.04,-.06,.06,-.08,.08,-.1,.1,-.13,.13]){const L=GX.look0.clone();L.y+=ly;const C=L.clone().add(GX.cam0.clone().sub(GX.look0).multiplyScalar(d));if(fits(C,L)){GX.camBase=C;GX.lookBase=L;camUpdate();return}}
+ GX.camBase=GX.cam0.clone();GX.lookBase=GX.look0.clone();camUpdate()}
 async function camTo(pos,look,ms=900){CAMX.to={pos:new V.Vector3(...pos),look:new V.Vector3(...look)};const b0=CAMX.blend;await anim(ms,t=>CAMX.blend=lerp(b0,1,t),ease.io)}
 async function camBack(ms=900){const b0=CAMX.blend;await anim(ms,t=>CAMX.blend=lerp(b0,0,t),ease.io);CAMX.to=null}
 /* ---------- tables ---------- */
@@ -19872,8 +19882,10 @@ async function go(){if(!canBet()||!TB.g.play)return;if(!minOk())return;auResume(
  try{await TB.g.play()}catch(e){console.error('[tables] round',e);flash('Something went wrong - bets returned');for(const [id,a] of Object.entries(TB.bets))credit(a)}
  if(!TB.g.persist)TB.bets={};TB.undo=[];TB.phase='bet';acts([]);drawDock();persist()}
 /* big round decision buttons over the table */
-function acts(list,hint){const a=$('acts');a.innerHTML=list.map(b=>`<button class="act${hint===b.k?' hint':''}" data-a="${b.k}" style="--c:${b.c}">${b.i||''}<span>${b.l}</span>${b.key?`<kbd>${b.key}</kbd>`:''}</button>`).join('');
+function acts(list,hint){const a=$('acts');if(!list.length){a.innerHTML='';const r=TB.actRes;TB.actRes=null;if(r)r(null);return Promise.resolve(null)}a.innerHTML=list.map(b=>`<button class="act${hint===b.k?' hint':''}" data-a="${b.k}" style="--c:${b.c}">${b.i||''}<span>${b.l}</span>${b.key?`<kbd>${b.key}</kbd>`:''}</button>`).join('');
  return new Promise(res=>{TB.actRes=res;a.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{uiTick();a.innerHTML='';TB.actRes=null;res(b.dataset.a)})})}
+/* a clicked button keeps focus, and Space would press it again: hand focus back to the table after every click */
+addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b)b.blur()},true);
 addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const k=e.key.toLowerCase();
  if(TB.actRes){const b=[...document.querySelectorAll('#acts [data-a]')].find(b=>{const kb=b.querySelector('kbd');return kb&&kb.textContent.toLowerCase()===k});if(b){e.preventDefault();b.click()}return}
  if(!TB.g||!canBet())return;if(k===' '){e.preventDefault();go()}else if(k==='z')undoBet();else if(k==='c')clearBets();else if(k==='x')doubleBets();else if(k==='r')rebet();else if(k>='1'&&k<='6'){TB.chip=Math.min(room().chips.length-1,+k-1);drawDock()}});
@@ -20167,22 +20179,22 @@ const TCPG={name:'Three Card Poker',id:'tcp',goLabel:'DEAL',back:'blue',tray:[0,
   roundDone(staked,back);await wait(1300);await chipsHome();await collectCards();clearLabels();dealerExpr('neutral')}};
 /* ---------------- casino hold'em ---------------- */
 const CHEG={name:"Casino Hold'em",id:'che',goLabel:'DEAL',back:'red',tray:[0,-.41],shoe:[.62,-.33],discard:[-.62,-.33],needMain:'Put an ante down',
- build(){kidneyTable(L=>{betCircle(L,-.07,.18,.05,'ANTE','');betCircle(L,.08,.18,.05,'CALL','2× ANTE');
-   arcText(L,'DEALER QUALIFIES WITH A PAIR OF FOURS OR BETTER',0,-.44,.37,.017,'rgba(246,220,154,.95)',1.15);
-   for(let i=0;i<5;i++){ink(L.x,'rgba(238,214,160,.35)',.0012);L.x.strokeRect(-.155+i*.07-.034,-.155,.068,.092);L.x.shadowBlur=0}
+ build(){kidneyTable(L=>{betCircle(L,-.075,.1,.048,'ANTE','');betCircle(L,.075,.1,.048,'CALL','2× ANTE');
+   arcText(L,'DEALER QUALIFIES WITH A PAIR OF FOURS OR BETTER',0,-.44,.405,.015,'rgba(246,220,154,.95)',1.15);
+   for(let i=0;i<5;i++){ink(L.x,'rgba(238,214,160,.35)',.0012);L.x.strokeRect(-.155+i*.07-.034,-.21,.068,.092);L.x.shadowBlur=0}txt(L,'COMMUNITY CARDS',0,-.105,.011,'rgba(238,214,160,.5)',{sp:.003});
    paytableOnFelt(L,-.5,-.1,'ANTE PAYS',[['Royal flush','100 to 1'],['Straight flush','20 to 1'],['Four of a kind','10 to 1'],['Full house','3 to 1'],['Flush','2 to 1'],['Straight or less','1 to 1']]);
    paytableOnFelt(L,.52,-.06,"CASINO HOLD'EM",[['Dealer doesn’t qualify','ante pays,'],['','call pushes'],['Dealer qualifies','ante and call'],['','pay 1 to 1']])});
   chipTray(0,-.41);cardShoe(.62,-.33);discardHolder(-.62,-.33);
-  setSpots([{id:'ante',x:-.07,z:.18,r:.05,name:'Ante',pays:'by the ante paytable',ret:.978,pri:1},{id:'call',x:.08,z:.18,r:.05,name:'Call',pays:'placed when you call',off:()=>true}]);dealerSet(DL.look,0,-.64,-.44);$('hintSw').style.display='flex'},
+  setSpots([{id:'ante',x:-.075,z:.1,r:.048,name:'Ante',pays:'by the ante paytable',ret:.978,pri:1},{id:'call',x:.075,z:.1,r:.048,name:'Call',pays:'placed when you call',off:()=>true}]);dealerSet(DL.look,0,-.64,-.44);$('hintSw').style.display='flex'},
  paytable(){return[['Ante (with calls)','1 to 100','97.8% per ante'],['Call','1 to 1',''],['Overall per $ staked','','98.2%']]},
  rules:'Ante, see your two cards and the flop, then Call (2x the ante) or Fold. Turn and river follow; best five of seven. If the dealer has less than a pair of fours, the ante pays and the call pushes.',
  async play(){const deck=freshDeck(),pc=deck.slice(0,2),dc=deck.slice(2,4),board=deck.slice(4,9),ante=TB.bets.ante;let staked=betTotal(),back=0;banner('','NO MORE BETS','',800);await wait(400);
-  const pm=await dealRow(pc,-.035,.06,.07,false),dm=await dealRow(dc,-.035,-.28,.07,false);for(const o of pm)await flipCard(o,true,220);const fm=await dealRow(board.slice(0,3),-.155,-.11,.07,true);
-  const now=best5(pc.concat(board.slice(0,3)));label('ph',0,.0,now.name.toUpperCase());
+  const pm=await dealRow(pc,-.035,-.015,.07,false),dm=await dealRow(dc,-.035,-.31,.07,false);for(const o of pm)await flipCard(o,true,220);const fm=await dealRow(board.slice(0,3),-.155,-.164,.07,true);
+  const now=best5(pc.concat(board.slice(0,3)));label('ph',0,-.075,now.name.toUpperCase());
   const a=await acts([{k:'call',l:'CALL',c:'#1f7a48',i:ICON.hit,key:'C'},{k:'fold',l:'FOLD',c:'#8a2a2a',i:ICON.stand,key:'F'}],save.hints?cheAdvice(pc,board.slice(0,3)):null);let called=false;
   if(a==='call'&&spend(ante*2)){called=true;staked+=ante*2;TB.bets.call=ante*2;restack('call');sfx('chip',.08,.18,.8)}
-  const tm=await dealRow(board.slice(3),.055,-.11,.07,true);if(called){for(const o of dm)await flipCard(o,true,240)}
-  const r=cheSettle(ante,called,pc,dc,board);if(called){label('ph',0,.0,r.P.name.toUpperCase());label('dh',0,-.2,r.D.name.toUpperCase()+(r.res==='noqual'?' · DOESN’T QUALIFY':''),r.res==='noqual'?'push':'');
+  const tm=await dealRow(board.slice(3),.055,-.164,.07,true);if(called){for(const o of dm)await flipCard(o,true,240)}
+  const r=cheSettle(ante,called,pc,dc,board);if(called){label('ph',0,-.075,r.P.name.toUpperCase());label('dh',0,-.235,r.D.name.toUpperCase()+(r.res==='noqual'?' · DOESN’T QUALIFY':''),r.res==='noqual'?'push':'');
    const ap=CHE_ANTE[r.P.cat]||1;let ar=0,cr=0;if(r.res==='noqual'){ar=ante*(1+ap);cr=ante*2}else if(r.res==='win'){ar=ante*(1+ap);cr=ante*4}else if(r.res==='push'){ar=ante;cr=ante*2}
    back=ar+cr;await payOut('ante',ar);await payOut('call',cr);banner(r.res==='win'?'YOU WIN':r.res==='noqual'?'DEALER DOESN’T QUALIFY':r.res==='push'?'PUSH':'DEALER WINS',`${r.P.name} vs ${r.D.name}`,'',2000)}
   else{dealerSay('Folded.');await payOut('ante',0)}
@@ -20317,7 +20329,7 @@ let CUR=null;
 async function openTable(t){$('lobby').classList.remove('on');CUR=t;const G=GAMES[t.g];TB.g=G;G.variant=t.v;TB.bets={};TB.stacks={};TB.undo=[];TB.last=null;TB.phase='bet';clearLabels();CARDS.length=0;HL=null;CAMX={blend:0,to:null};
  const R=room();newScene({seed:t.d+1,tint:R.tint,cam:G.cam,look:G.look,fov:G.fov});DL.look=DEALERS[(t.d+save.room)%DEALERS.length];DL.hidden=false;G.build();
  $('crumb').innerHTML=`<b>${t.name}</b><i>·</i>${R.name}<i>·</i>Dealer ${DL.look.name}`;$('lim').textContent=`${moneyS(R.min)} – ${moneyS(R.max)}`;$('liveT').textContent=`LIVE · ${t.name.toUpperCase()}`;
- drawSide();$('side').classList.toggle('hid',!!G.wide);drawDock();acts([]);await wait(200);dealerExpr('smile',1800);dealerSay(pickA([`Welcome to ${t.name}! I'm ${DL.look.name}.`,`Hi, I'm ${DL.look.name}. Place your bets!`,`Welcome in. Good luck tonight!`]),2600)}
+ fitCam(Object.values(TB.spots));drawSide();$('side').classList.toggle('hid',!!G.wide);drawDock();acts([]);await wait(200);dealerExpr('smile',1800);dealerSay(pickA([`Welcome to ${t.name}! I'm ${DL.look.name}.`,`Hi, I'm ${DL.look.name}. Place your bets!`,`Welcome in. Good luck tonight!`]),2600)}
 function drawSide(){const G=TB.g;if(!G){$('side').innerHTML='';return}const pt=G.paytable?G.paytable():[];
  $('side').innerHTML=`<div class="card"><div class="ch">PAYTABLE<span class="mut" style="letter-spacing:0">return to player</span></div><table class="pt">${pt.map(([a,b,c,su])=>`<tr class="${su?'su':''}"><td>${a}</td><td>${b}</td><td>${c}</td></tr>`).join('')}</table>
   ${G.rules?`<div style="padding:9px 12px;font-size:11.5px;color:var(--mute);line-height:1.45">${G.rules}</div>`:''}</div>${G.side?G.side():''}`;if(G.afterSide)G.afterSide()}
@@ -22076,10 +22088,10 @@ function fgMount(id){const F=FG[id];if(F.frame)return;const el=document.getEleme
  const inject='<style>'+FRAME_SB+'</style><scr'+'ipt>window.StackBridge=parent.FrameBridges.'+id+';window.__gPaused=true;('+frameAudio+')();<\/scr'+'ipt>';
  const f=document.createElement('iframe');f.title=FRAME_NAME[id];F.frame=f;F.ready=false;
  f.onload=()=>{F.ready=true;const L=$(id+'Load');L&&L.remove();const on=$(id+'View').classList.contains('on');fgPause(id,!on);
-   const q=F.q;F.q=[];q.forEach(m=>fgDeliver(id,m));if(on)fgRefresh(id)};
+   const q=F.q;F.q=[];q.forEach(m=>fgDeliver(id,m));if(on){fgRefresh(id);fgFocus(id)}};
  f.srcdoc=src.replace('<head>','<head>'+inject);$(id+'Host').appendChild(f)}
 /* open a table in Stack Tables (from the sidebar or a home tile): switch to the view, then ask the frame once it's up */
-function tablesGo(k){go('tables');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g==='tb-'+k));let n=0;const tryOpen=()=>{const w=fgWin('tables');if(FG.tables.ready&&w&&w.StackFrame&&w.StackFrame.open){w.StackFrame.open(k);return}if(++n<150)setTimeout(tryOpen,120)};tryOpen()}
+function tablesGo(k){go('tables');document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g==='tb-'+k));let n=0;const tryOpen=()=>{const w=fgWin('tables');if(FG.tables.ready&&w&&w.StackFrame&&w.StackFrame.open){w.StackFrame.open(k);fgFocus('tables');return}if(++n<150)setTimeout(tryOpen,120)};tryOpen()}
 function fgWin(id){try{return FG[id].frame&&FG[id].frame.contentWindow}catch(e){return null}}
 const FRAME_SB='html,*{scrollbar-width:thin;scrollbar-color:#2a3d4c transparent}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a3d4c;border-radius:8px;border:2px solid transparent;background-clip:padding-box}::-webkit-scrollbar-thumb:hover{background-color:#3a5264}::-webkit-scrollbar-corner{background:transparent}';
 function fgPause(id,on){const w=fgWin(id);if(!w)return;w.__gPaused=!!on;try{w.__frameMute&&w.__frameMute(!!on)}catch(e){}}
@@ -22097,7 +22109,9 @@ function fgRefresh(id){const w=fgWin(id);try{if(w&&w.StackGarage)w.StackGarage.r
 function fgDeliver(id,m){const w=fgWin(id);try{w&&w.StackGarage&&w.StackGarage.onNet(m)}catch(e){}}
 function fgNet(id,m){const F=FG[id];if(!F.frame){if(/Lost$/.test(m.t))return;fgMount(id)}
  if(F.ready)fgDeliver(id,m);else F.q.push(m)}
-function fgView(g){FRAME_IDS.forEach(id=>{if(g===id){fgMount(id);if(FG[id].ready){fgPause(id,false);fgRefresh(id)}}else fgPause(id,true)})}
+/* keyboard shortcuts only reach a frame game that has focus: give it focus whenever it's shown */
+function fgFocus(id){setTimeout(()=>{try{const F=FG[id];if(F.frame&&$(id+'View').classList.contains('on')){F.frame.focus();const w=fgWin(id);w&&w.focus()}}catch(e){}},60)}
+function fgView(g){FRAME_IDS.forEach(id=>{if(g===id){fgMount(id);if(FG[id].ready){fgPause(id,false);fgRefresh(id);fgFocus(id)}}else fgPause(id,true)})}
 function fgReload(){FRAME_IDS.forEach(id=>{const F=FG[id];if(!F.frame)return;F.frame.remove();F.frame=null;F.ready=false;F.q=[];
  if(!$(id+'Load')){const d=document.createElement('div');d.className='garload';d.id=id+'Load';d.textContent='Loading '+FRAME_NAME[id]+'\u2026';$(id+'Host').appendChild(d)}
  if($(id+'View').classList.contains('on'))fgMount(id)})}

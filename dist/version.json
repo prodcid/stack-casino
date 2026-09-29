@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.28.1",
-  "notes": "Stack Tables: a new platform of 11 Vegas tables with live dealers - blackjack, three roulettes, baccarat, dragon tiger, three card poker, casino hold'em, money wheel, sic bo, craps - in 3D with real sounds, three rooms up to 1M",
-  "bytes": 5378407,
-  "at": "2026-09-28T11:20:34.783Z"
+  "version": "2026.09.29.1",
+  "notes": "Tables: keyboard shortcuts work (Space deals/spins/rolls), every table frames itself so bets never hide behind the chip rack (Casino Hold'em fixed); Markets: the Terminal's bottom panel scrolls on smaller screens",
+  "bytes": 5380687,
+  "at": "2026-09-29T10:33:41.370Z"
 }

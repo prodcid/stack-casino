@@ -117,6 +117,9 @@ h1{font-size:22px;font-weight:900;margin-bottom:2px}.lead{color:var(--mute);font
 .jsel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-weight:800;font-size:12.5px}table.jt td{text-align:left}table.jt td:last-child{text-align:right}tr.jon td{background:#23204a !important}
 textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:600 13px Outfit,sans-serif;color:#fff;resize:vertical;outline:none}
 tr.soon td{background:#2a2200}
+/* the Terminal's bottom panel always keeps a usable, scrollable share of the height; the chart gives way on short screens */
+@media (max-height:760px){.about{display:none}.stats div{padding:5px 12px}.ih{padding:8px 14px}}
+#botCard{flex:0 0 clamp(150px,34%,250px)!important;display:flex;flex-direction:column;min-height:0}#botCard .blist{flex:1;max-height:none;min-height:0;overflow:auto}.chartbox{min-height:150px!important}
 .bell{font-size:40px;animation:ring .6s 3}@keyframes ring{25%{transform:rotate(18deg)}75%{transform:rotate(-18deg)}}
 </style>
 </head>
