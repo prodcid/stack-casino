@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.29.1",
-  "notes": "Tables: keyboard shortcuts work (Space deals/spins/rolls), every table frames itself so bets never hide behind the chip rack (Casino Hold'em fixed); Markets: the Terminal's bottom panel scrolls on smaller screens",
-  "bytes": 5380687,
-  "at": "2026-09-29T10:33:41.370Z"
+  "version": "2026.10.01.1",
+  "notes": "Stack Pool joins Stack: 8-ball, 9-ball, snooker and more in Stack's style; AI games are friendlies (no bets); invite your party mate from Pool's Online tab, they accept in the Party HUD and it opens for them; live cue and every shot plays identically on both screens",
+  "bytes": 5560107,
+  "at": "2026-10-01T09:18:14.120Z"
 }
