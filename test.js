@@ -1403,7 +1403,7 @@ async function frames(ctx, errs) {
   const pg = await newPage(ctx, errs, 'fr');
   const home = await pg.evaluate(`({b3:document.querySelectorAll('#big3 .b3').length,cas:document.querySelectorAll('#tilesCasino .tile').length,tab:document.querySelectorAll('#tilesTables .tile').length,
     nav:['ssports','racing','gp','nrl','fight','sports','markets','cards','tables','tb-bj','pool'].every(g=>document.querySelector('#side [data-g="'+g+'"]'))})`);
-  (home.b3 === 3 && home.cas >= 15 && home.tab === 13 && home.nav ? pass : fail)('home: Big Three, casino + tables rows (11 Stack Tables + Stack Pool + party), grouped sidebar', JSON.stringify(home));
+  (home.b3 === 3 && home.cas >= 15 && home.tab === 14 && home.nav ? pass : fail)('home: Big Three, casino + tables rows (12 Stack Tables + Stack Pool + party), grouped sidebar', JSON.stringify(home));
   await pg.click('#big3 .b3-sports .b3go'); await pg.waitForTimeout(300);
   ((await pg.evaluate("$('ssportsView').classList.contains('on')&&document.querySelector('#side [data-g=ssports]').classList.contains('on')")) ? pass : fail)('Big Three opens the Stack Sports hub');
   for (const id of ['racing', 'markets', 'gp', 'nrl', 'slots', 'olympus', 'egypt', 'arcade', 'tables']) {

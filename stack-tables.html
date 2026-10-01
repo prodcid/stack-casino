@@ -82,6 +82,24 @@ button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer
 .ov{position:absolute;inset:0;background:rgba(5,3,2,.72);display:none;align-items:center;justify-content:center;z-index:30}.ov.on{display:flex}.ov .box{width:min(520px,92vw);background:#170e0a;border:1px solid var(--line);border-radius:16px;padding:22px}
 .ov h2{font:italic 900 30px "Barlow Condensed";margin-bottom:8px}.ov p{color:var(--mute);font-size:14px;line-height:1.5;margin-bottom:12px}
 .sw{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mute);cursor:pointer}.sw input{accent-color:var(--gold)}
+/* v2 card overlay: the hands, big and sharp, on the left of the stream */
+#hands{position:absolute;left:14px;top:44px;display:flex;flex-direction:column;gap:9px;z-index:3;pointer-events:none;opacity:0;transform:translateX(-12px);transition:.3s;max-height:calc(100% - 190px);overflow:hidden}
+#hands.on{opacity:1;transform:none}
+.hgrp{background:linear-gradient(180deg,rgba(26,17,11,.88),rgba(14,9,6,.88));border:1px solid var(--line);border-radius:12px;padding:8px 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.45);backdrop-filter:blur(4px)}
+.hgrp.me{border-color:rgba(246,220,154,.6)}
+.hgrp h4{display:flex;justify-content:space-between;gap:16px;align-items:baseline;font:800 13px "Barlow Condensed",sans-serif;letter-spacing:.12em;color:var(--mute);margin:0 0 7px}
+.hgrp.me h4 span{color:var(--gold2)}.hgrp h4 b{font:800 17px "Barlow Condensed",sans-serif;letter-spacing:.04em;color:#fff}.hgrp h4 b.win,.hgrp h4 b.bj{color:var(--green)}.hgrp h4 b.bust{color:var(--red)}
+.hc{display:flex;gap:6px;align-items:center}.hc .more{font:800 15px 'Barlow Condensed';color:var(--mute);padding:0 4px}.hc img{width:72px;height:101px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.55);animation:hin .32s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes hin{from{transform:translateY(-14px) rotate(-4deg);opacity:0}}
+@media (max-height:760px){.hc img{width:58px;height:81px}}
+/* v2 lobby */
+.hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;padding:26px 30px;margin:0 0 22px;border-radius:20px;border:1px solid rgba(246,220,154,.35);
+ background:radial-gradient(120% 140% at 85% 30%,rgba(120,20,30,.55),transparent 60%),radial-gradient(90% 120% at 0% 100%,rgba(10,74,45,.6),transparent 60%),linear-gradient(135deg,#1c120b,#0d0806);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.hero em{font:800 13px "Barlow Condensed";letter-spacing:.2em;color:var(--gold);font-style:normal}.hero h2{font:900 italic 48px/1 "Barlow Condensed";margin:6px 0 8px;color:#fff}
+.hero p{color:var(--mute);max-width:620px;line-height:1.5;font-size:14px}.hgo{margin-top:14px;padding:12px 22px;border-radius:12px;background:linear-gradient(180deg,#f6dc9a,#c99a45);color:#2a1a06;font:800 18px "Barlow Condensed";letter-spacing:.06em}
+.hcards{position:relative;width:300px;height:170px}.hcards img{position:absolute;left:calc(var(--i)*58px);top:calc(abs(var(--i) - 1.5)*10px);width:96px;height:134px;border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.6);transform:rotate(calc((var(--i) - 1.5)*9deg));transform-origin:50% 120%}
+.lcats{display:flex;gap:8px;margin:0 0 16px}.lcats button{padding:7px 16px;border-radius:20px;border:1px solid var(--line);color:var(--mute);font:700 13px "Barlow Condensed";letter-spacing:.08em}.lcats button.on{background:var(--gold);color:#2a1a06;border-color:var(--gold)}
+.tcard .nw{position:absolute;left:10px;top:38px;z-index:3;font:800 11px "Barlow Condensed";letter-spacing:.14em;background:#e8394a;color:#fff;padding:3px 9px;border-radius:6px}
 </style>
 </head>
 <body>
@@ -96,7 +114,7 @@ button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer
  </div>
  <div id="stage">
   <canvas id="gl"></canvas><canvas id="dl"></canvas><div class="vign"></div>
-  <div class="live"><i></i><span id="liveT">LIVE</span></div>
+  <div class="live"><i></i><span id="liveT">LIVE</span></div><div id="hands"></div>
   <div id="bubble"></div><div id="banner"><small></small><b></b></div><div id="tip"></div><div id="labels"></div>
   <div id="side"></div>
   <div id="acts"></div>
@@ -370,7 +388,7 @@ function casinoBackdrop(seed=1,tint='#2a140a'){const w=2048,h=1024,c=cnv(w,h),x=
 function gxInit(canvas){const r=new V.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});r.outputColorSpace=V.SRGBColorSpace;r.toneMapping=V.ACESFilmicToneMapping;r.toneMappingExposure=.95;
  r.shadowMap.enabled=true;r.shadowMap.type=V.PCFSoftShadowMap;GX.r=r;makeMats();GX.env=makeEnv();gxSize()}
 function gxSize(){const c=GX.r.domElement,p=c.parentElement,W=p.clientWidth,H=p.clientHeight;if(!W||!H)return;GX.W=W;GX.H=H;GX.r.setPixelRatio(Math.min(2,devicePixelRatio||1)*(GX.q==='smooth'?.75:1));GX.r.setSize(W,H,false);if(GX.cam){GX.cam.aspect=W/H;GX.cam.updateProjectionMatrix()}}
-addEventListener('resize',()=>{if(GX.r){gxSize();if(TB.g&&CUR)fitCam(Object.values(TB.spots))}});
+addEventListener('resize',()=>{if(GX.r){gxSize();if(TB.g&&CUR)fitCam(Object.values(TB.spots),TB.g.head?TB.g.head():undefined)}});
 /* a fresh scene for one table: lights, backdrop, camera */
 function newScene(opt={}){const s=new V.Scene();s.environment=GX.env;GX.scene=s;
  GX.cam0=null;const cam=new V.PerspectiveCamera(opt.fov||40,GX.W/GX.H||1.6,.05,40);cam.position.set(...(opt.cam||[0,1.02,1.24]));GX.camBase=cam.position.clone();GX.look=new V.Vector3(...(opt.look||[0,.21,-.38]));cam.lookAt(GX.look);GX.cam=cam;GX.lookBase=GX.look.clone();
@@ -751,7 +769,7 @@ function clearBets(){if(!canBet())return;for(const id of Object.keys(TB.bets)){i
 function doubleBets(){if(!canBet())return;const ids=Object.keys(TB.bets);for(const id of ids)placeChip(id,TB.bets[id])}
 function rebet(){if(!canBet()||!TB.last)return;for(const [id,a] of Object.entries(TB.last))if(TB.spots[id])placeChip(id,a)}
 /* the table minimum applies to the round's main bet(s) */
-function minOk(){if(TB.g.persist&&Object.keys(TB.bets).length)return true;const m=room().min,main=Object.entries(TB.bets).filter(([id])=>!TB.spots[id].side);if(!main.length){flash(TB.g.needMain||'Place a bet first');return false}
+function minOk(){if(TB.g.noBets)return true;if(TB.g.persist&&Object.keys(TB.bets).length)return true;const m=room().min,main=Object.entries(TB.bets).filter(([id])=>!TB.spots[id].side);if(!main.length){flash(TB.g.needMain||'Place a bet first');return false}
  if(main.some(([,a])=>a<m)){flash(`Table minimum is ${money(m)} a bet`);return false}return true}
 /* ---- paying out: winnings slide in from the dealer's tray next to the bet, then everything comes back to you ---- */
 const TRAY=()=>TB.g.tray||[0,-.4];
@@ -813,12 +831,12 @@ function wireStage(){const cv=$('gl'),tip=$('tip');
  cv.addEventListener('contextmenu',e=>e.preventDefault())}
 /* ---- the dock: chip rack, what's bet, the betting buttons and the big action ---- */
 function drawDock(){const d=$('dock');if(!d||!TB.g)return;const R=room();if(TB.chip>=R.chips.length)TB.chip=0;
- d.innerHTML=`<div class="rack">${R.chips.map((v,i)=>{const pl=DENOMS.find(x=>x.v===v).plaque;return `<button class="chipb${pl?' pl':''}${i===TB.chip?' on':''}" data-ch="${i}" title="${money(v)}"><img src="${CHIPIMG[v]}"></button>`}).join('')}</div>
- <div class="betinfo"><small>TOTAL BET</small><b>${money(betTotal())}</b><em>${TB.g.info?TB.g.info():`${R.name} · ${money(R.min)} min`}</em></div><div class="sp"></div>
- ${TB.phase==='bet'?`<div class="pills"><button class="pill" id="bUndo">UNDO<small>Z</small></button><button class="pill" id="bClr">CLEAR<small>C</small></button><button class="pill" id="bDbl">DOUBLE<small>X</small></button><button class="pill" id="bRe" ${TB.last?'':'disabled'}>REBET<small>R</small></button></div>
+ const nb=!!TB.g.noBets;d.innerHTML=`${nb?'':`<div class="rack">${R.chips.map((v,i)=>{const pl=DENOMS.find(x=>x.v===v).plaque;return `<button class="chipb${pl?' pl':''}${i===TB.chip?' on':''}" data-ch="${i}" title="${money(v)}"><img src="${CHIPIMG[v]}"></button>`}).join('')}</div>`}
+ <div class="betinfo"><small>${nb?'YOUR STACK':'TOTAL BET'}</small><b>${nb?money(save.pk.me):money(betTotal())}</b><em>${TB.g.info?TB.g.info():`${R.name} · ${money(R.min)} min`}</em></div><div class="sp"></div>
+ ${TB.phase==='bet'?`${nb?'':`<div class="pills"><button class="pill" id="bUndo">UNDO<small>Z</small></button><button class="pill" id="bClr">CLEAR<small>C</small></button><button class="pill" id="bDbl">DOUBLE<small>X</small></button><button class="pill" id="bRe" ${TB.last?'':'disabled'}>REBET<small>R</small></button></div>`}
   <button class="main" id="bGo">${TB.g.goLabel||'DEAL'}<small>SPACE</small></button>`:`<div class="betinfo" style="min-width:210px"><small>${TB.g.statusTitle||'IN PLAY'}</small><b style="font-size:20px">${TB.g.status?TB.g.status():'Good luck'}</b></div>`}`;
  d.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{TB.chip=+b.dataset.ch;sfx('chipHandle',0,.5,.35);drawDock()});
- if($('bGo')){$('bUndo').onclick=undoBet;$('bClr').onclick=clearBets;$('bDbl').onclick=doubleBets;$('bRe').onclick=rebet;$('bGo').onclick=go}}
+ if($('bGo')&&$('bUndo')){$('bUndo').onclick=undoBet;$('bClr').onclick=clearBets;$('bDbl').onclick=doubleBets;$('bRe').onclick=rebet}if($('bGo'))$('bGo').onclick=go}
 async function go(){if(!canBet()||!TB.g.play)return;if(!minOk())return;auResume();TB.last=Object.assign({},TB.bets);TB.phase='play';TB.paid=[];hoverMesh(null);$('tip').style.display='none';drawDock();
  try{await TB.g.play()}catch(e){console.error('[tables] round',e);flash('Something went wrong - bets returned');for(const [id,a] of Object.entries(TB.bets))credit(a)}
  if(!TB.g.persist)TB.bets={};TB.undo=[];TB.phase='bet';acts([]);drawDock();persist()}
@@ -1145,7 +1163,7 @@ const MWP={x:.34,y:.56,z:-.98,R:.4};
 const MW_COL={2:'#f2e6c8',4:'#3aa0d8',8:'#9b5de5',12:'#f08a24',24:'#15a05a',48:'#d42a3a'};
 function rectTable(x0,z0,x1,z1,layoutFn,px=1800){const R=room(),[fc,fd]=FELTS[R.felt];const sh=roundRectShape(x0,z0,x1,z1,.1);
  buildTable({shape:sh,railPts:[[x0,z0+.2],[x0,z1-.1],[x0+.1,z1],[x1-.1,z1],[x1,z1-.1],[x1,z0+.2]],layout:(bw,bh,bb)=>{const L=feltLayout(bw,bh,bb,px);feltBase(L,fc,fd);layoutFn(L);return L}})}
-const MWG={name:'Money Wheel',id:'mw',goLabel:'SPIN',tray:[-.3,-.42],needMain:'Bet on a number',cam:[0,.98,1.2],look:[.05,.24,-.42],wide:1,
+const MWG={name:'Money Wheel',id:'mw',head:()=>new V.Vector3(MWP.x,MWP.y+MWP.R+.12,MWP.z),goLabel:'SPIN',tray:[-.3,-.42],needMain:'Bet on a number',cam:[0,.98,1.2],look:[.05,.24,-.42],wide:1,
  build(){rectTable(-.9,-.55,.9,.45,L=>{const syms=MW.map(m=>m[0]);syms.forEach((m,i)=>{const x=-.6+i*.24,z=-.08;L.x.fillStyle=MW_COL[m];L.x.globalAlpha=.85;L.x.beginPath();L.x.roundRect?L.x.roundRect(x-.1,z-.09,.2,.18,.02):L.x.rect(x-.1,z-.09,.2,.18);L.x.fill();L.x.globalAlpha=1;ink(L.x,GOLDINK,.0022);L.x.stroke();L.x.shadowBlur=0;
     txt(L,'×'+m,x,z-.01,.05,m===2?'#2a1c08':'#fff',{w:900});txt(L,`${MW.find(q=>q[0]===m)[1]} of 49 · pays ${m-1} to 1`,x,z+.06,.012,m===2?'#2a1c08':'rgba(255,255,255,.9)')});
    txt(L,'STACK MONEY WHEEL · EVERY BET RETURNS 97.96%',0,.1,.018,GOLDINK,{sp:.004})});
@@ -1154,12 +1172,12 @@ const MWG={name:'Money Wheel',id:'mw',goLabel:'SPIN',tray:[-.3,-.42],needMain:'B
  paytable(){return MW.map(([m,c])=>['×'+m+` (${c} segments)`,`${m-1} to 1`,'97.96%'])},rules:'49 segments. A symbol that covers c segments pays 48/c times your stake back, so every bet returns the same 97.96%.',
  side(){const h=(save.hist.mw||[]).slice(0,30);return `<div class="card"><div class="ch">LAST SPINS</div><div class="hist">${h.map(m=>`<span class="hn" style="background:${MW_COL[m]};color:${m===2?'#2a1c08':'#fff'};width:34px;border-radius:8px">×${m}</span>`).join('')||'<span class="mut">No spins yet</span>'}</div></div>`},
  async play(){const staked=betTotal(),seg=Math.floor(Math.random()*49),m=MW_SEG[seg];banner('','NO MORE BETS','',900);dealerSay('Spinning the wheel!',1200);
-  await dealerHand('r',new V.Vector3(MWP.x-.3,.35,MWP.z+.1),450,'reach');dealerRest('r',500);
+  const cam=camTo([MWP.x-.02,MWP.y+.02,MWP.z+1.62],[MWP.x,MWP.y+.01,MWP.z],1100);await dealerHand('r',new V.Vector3(MWP.x-.3,.35,MWP.z+.1),450,'reach');dealerRest('r',500);await cam;
   const W=MWH,a0=W.a,step=TAU/49,turns=4+Math.floor(Math.random()*2);let end=seg*step;while(end<a0+turns*TAU)end+=TAU;let lastPeg=Math.floor(a0/step);
   await anim(7200,t=>{W.a=lerp(a0,end,t);W.disc.rotation.z=W.a;const pg=Math.floor(W.a/step);if(pg!==lastPeg){lastPeg=pg;flap(MWP.x,MWP.z,.45);W.flap.rotation.z=-.35}W.flap.rotation.z*=.85},t=>1-Math.pow(1-t,3.2));
-  W.flap.rotation.z=0;banner('×'+m,'','win',2000);dealerSay(`Times ${m}!`);let back=0;
+  W.flap.rotation.z=0;anim(1600,t=>{W.wedge.material.opacity=.55*Math.abs(Math.sin(t*Math.PI*3))});banner('×'+m,'it lands on','win',2200);dealerSay(`Times ${m}!`);await wait(1700);W.wedge.material.opacity=.35;await camBack(900);let back=0;
   for(const id of Object.keys(TB.bets)){const ret=id==='x'+m?TB.bets[id]*m:0;back+=ret;await payOut(id,ret)}
-  (save.hist.mw=save.hist.mw||[]).unshift(m);save.hist.mw=save.hist.mw.slice(0,60);drawSide();roundDone(staked,back);await wait(1200);await chipsHome();dealerExpr('neutral')}};
+  W.wedge.material.opacity=0;(save.hist.mw=save.hist.mw||[]).unshift(m);save.hist.mw=save.hist.mw.slice(0,60);drawSide();roundDone(staked,back);await wait(1200);await chipsHome();dealerExpr('neutral')}};
 let MWH=null;
 function mwWheel(){const g=new V.Group();g.position.set(MWP.x,MWP.y,MWP.z);const R=MWP.R;
  const c=cnv(1400,1400),x=c.getContext('2d'),C=700,rp=680;for(let i=0;i<49;i++){const m=MW_SEG[i],a0=(i-.5)/49*TAU-Math.PI/2,a1=(i+.5)/49*TAU-Math.PI/2;x.fillStyle=MW_COL[m];x.beginPath();x.moveTo(C,C);x.arc(C,C,rp,a0,a1);x.closePath();x.fill();x.strokeStyle='#c9a64a';x.lineWidth=4;x.stroke();
@@ -1169,8 +1187,15 @@ function mwWheel(){const g=new V.Group();g.position.set(MWP.x,MWP.y,MWP.z);const
  const rim=new V.Mesh(new V.TorusGeometry(R+.012,.018,16,128),MAT.brass);g.add(rim);const back=new V.Mesh(new V.CylinderGeometry(R+.03,R+.03,.05,96),MAT.woodDark);back.rotation.x=Math.PI/2;back.position.z=-.03;g.add(back);
  for(let i=0;i<49;i++){const a=(i+.5)/49*TAU,p=new V.Mesh(new V.CylinderGeometry(.004,.004,.03,8),MAT.chrome);p.rotation.x=Math.PI/2;p.position.set(Math.cos(a)*R*.985,Math.sin(a)*R*.985,.015);disc.add(p)}
  const flapG=new V.Group(),flap=new V.Mesh(new V.BoxGeometry(.018,.07,.006),MAT.leather);flap.position.y=-.03;flapG.add(flap);flapG.position.set(0,R+.045,.04);g.add(flapG);
+ /* v2: the pointer (Alex: "no arrow to show what it lands on") - a gold arrowhead over the top segment, lit from inside */
+ const ah=new V.Shape();ah.moveTo(0,-.075);ah.lineTo(.05,.01);ah.quadraticCurveTo(0,.04,-.05,.01);ah.closePath();
+ const arrow=new V.Mesh(new V.ExtrudeGeometry(ah,{depth:.014,bevelEnabled:true,bevelSize:.004,bevelThickness:.004,bevelSegments:3}),new V.MeshPhysicalMaterial({color:0xf2c45a,metalness:.85,roughness:.22,clearcoat:1,emissive:0x5a3a00,emissiveIntensity:.5}));
+ arrow.position.set(0,R+.075,.06);arrow.castShadow=true;g.add(arrow);
+ const gem=new V.Mesh(new V.SphereGeometry(.012,20,14),new V.MeshBasicMaterial({color:0xff3b3b}));gem.position.set(0,R+.08,.082);g.add(gem);
+ /* the winning wedge glows under the pointer once the wheel stops */
+ const wedge=new V.Mesh(new V.RingGeometry(R*.53,R*1.005,24,1,Math.PI/2-TAU/98,TAU/49),new V.MeshBasicMaterial({color:0xfff2b0,transparent:true,opacity:0,depthWrite:false,blending:V.AdditiveBlending}));wedge.position.z=.004;g.add(wedge);
  const stand=new V.Mesh(new V.CylinderGeometry(.03,.05,MWP.y+.4,16),MAT.woodDark);stand.position.set(0,-(MWP.y+.4)/2,-.05);g.add(stand);
- const lamp=new V.PointLight(0xfff0d0,2.2,2.5,1.4);lamp.position.set(0,0,.6);g.add(lamp);GX.scene.add(g);MWH={g,disc,flap:flapG,a:0};return MWH}
+ const lamp=new V.PointLight(0xfff0d0,2.2,2.5,1.4);lamp.position.set(0,0,.6);g.add(lamp);GX.scene.add(g);MWH={g,disc,flap:flapG,a:0,arrow,wedge,gem};return MWH}
 /* ================= SIC BO ================= */
 const SBD={x:.02,z:-.36};
 const SBG={name:'Sic Bo',id:'sb',goLabel:'SHAKE',tray:[-.42,-.44],needMain:'Place a bet on the layout',cam:[0,1.1,1.14],look:[0,.17,-.3],wide:1,
@@ -1258,27 +1283,184 @@ async function crRoll1(){const d1=1+Math.floor(Math.random()*6),d2=1+Math.floor(
 function crRollBet(b,d1,d2,pt,id){if(b.t==='pass'||b.t==='dpass'||b.t==='passOdds'||b.t==='dpassOdds')return crRoll(b,d1,d2,pt);if(b.t==='hard'){const r=crRoll(b,d1,d2,pt);return r.keep?{keep:true}:r}return crRoll(b,d1,d2,pt)}
 function crPointSpot(id,t,n){if(TB.spots[id])return;const x=crBoxX(n)+(t==='dcome'?-.035:.035),z=CRL.place[0]+(t==='dcome'?.03:.075);TB.spots[id]={id,b:{t,p:n},x,z,r:.02,chip:[x,z],name:(t==='come'?'Come ':"Don't come ")+n,dyn:true,placedBefore:true,off:()=>true}}
 function crCall(s,pt,a,b){if(!pt){if(s===7||s===11)return`${s}, front line winner!`;if([2,3,12].includes(s))return`${s}, craps! Line away.`;return`The point is ${s}. Mark it!`}if(s===pt)return`${s}, winner! Pay the line.`;if(s===7)return'Seven out. Line away.';return`${s}${a===b?' the hard way':''}, no field…`.replace(', no field…',[2,3,4,9,10,11,12].includes(s)?', field wins.':'.')}
+/* ================= v2: THE CARD OVERLAY (Alex: "you can barely see your cards") =================
+   Like the graphics on a real live-casino stream: every hand on the table is mirrored as big, sharp cards in a panel
+   on the left, with its name and total. It follows the 3D cards (dealt, flipped, squeezed, collected), so every
+   card game gets it without its own code: a game only names its hands (HAND_NAMES, by where the cards sit). */
+const HAND_NAMES={bj:(x,z)=>z<-.2?'Dealer':'You',tcp:(x,z)=>z<-.2?'Dealer':'You',che:(x,z)=>z<-.25?'Dealer':z<-.1?'Board':'You',
+ bac:(x,z)=>x<0?'Player':'Banker',dt:(x,z)=>x<0?'Dragon':'Tiger',war:(x,z)=>z<-.2?'Dealer':'You',ab:(x,z)=>Math.abs(x)<.05&&z<-.25?'Joker':x<0?'Andar':'Bahar'};
+const HUDIMG={};
+function hudImg(c){const k=c==null?'back'+(TB.g&&TB.g.back||'red'):c;if(HUDIMG[k])return HUDIMG[k];const src=c==null?cardBack(TB.g&&TB.g.back==='blue'?'#1d3f8a':'#8d1a24'):cardFace(c),s=cnv(160,224),x=s.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,0,0,160,224);return HUDIMG[k]=s.toDataURL('image/png')}
+let hudQ=0,hudKey='';
+function hudSoon(){if(hudQ)return;hudQ=requestAnimationFrame(()=>{hudQ=0;drawHud()})}
+function drawHud(){const el=$('hands');if(!el)return;if(!TB.g||!CARDS.length){if(hudKey){el.innerHTML='';hudKey=''}el.classList.remove('on');return}
+ const name=TB.g.handName||HAND_NAMES[TB.g.id]||((x,z)=>z<-.2?'Dealer':'You'),groups=[];
+ for(const o of CARDS){if(o.userData.hud===false)continue;const p=o.position,n=name(p.x,p.z);let g=groups.find(q=>q.n===n&&(!(TB.g.id==='bj'&&n==='You')||Math.abs(q.x-p.x)<.16));/* only a split blackjack hand makes two groups of one name */
+  if(!g){g={n,x:p.x,z:p.z,cards:[]};groups.push(g)}g.cards.push(o);g.x=(g.x*(g.cards.length-1)+p.x)/g.cards.length}
+ const same=groups.filter(g=>groups.filter(q=>q.n===g.n).length>1);same.sort((a,b)=>a.x-b.x);const base=same.map(g=>g.n);same.forEach((g,j)=>{const k=same.filter((q,m)=>base[m]===base[j]&&m<j).length;g.n=base[j]+' · hand '+(k+1)});
+ const order=['Dealer','Joker','Board','Player','Dragon','Andar','Banker','Tiger','Bahar','You'];const oi=n=>{const k=order.indexOf(n.split(' ')[0]);return k<0?2.5:k};groups.sort((a,b)=>oi(a.n)-oi(b.n)||a.x-b.x);
+ for(const g of groups){g.lab='';g.cls=''}/* each total belongs to the one hand it sits closest to */
+ for(const k in LBL){const L=LBL[k];if(!L.d.textContent||L.d.style.opacity==='0'||/turn|^pl/.test(k))continue;let best=null,bd=.16;for(const g of groups){const d=Math.hypot(L.x-g.x,L.z-g.z);if(d<bd){bd=d;best=g}}if(best){best.lab=L.d.textContent;best.cls=L.d.className.replace('lbl','')}}
+ const html=groups.map(g=>`<div class="hgrp${/You|Player|Dragon|Andar/.test(g.n)?' me':''}"><h4><span>${g.n.toUpperCase()}</span><b class="${g.cls}">${g.lab}</b></h4><div class="hc">${g.cards.length>8?`<span class="more">+${g.cards.length-7}</span>`:''}${g.cards.slice(g.cards.length>8?-7:0).map(o=>{const up=Math.abs(o.userData.flip.rotation.y)<.6&&o.userData.c!=null;return `<img src="${hudImg(up?o.userData.c:null)}" alt="">`}).join('')}</div></div>`).join('');
+ if(html!==hudKey){el.innerHTML=html;hudKey=html}el.classList.add('on')}
+/* follow everything that changes a card or a hand total */
+{const w=(f,after)=>async function(...a){const r=await f.apply(this,a);after(r);return r};
+ dealCard=w(dealCard,hudSoon);flipCard=w(flipCard,hudSoon);squeeze=w(squeeze,hudSoon);collectCards=w(collectCards,hudSoon);
+ const lb=label;label=function(...a){lb.apply(this,a);hudSoon()};const cl=clearLabels;clearLabels=function(){cl();hudSoon()}}
+/* ================= v2: TEXAS HOLD'EM POKER (no limit, you + 4 AI players) =================
+   A real poker table: blinds, four betting rounds, side pots, showdown. The AI players decide from a Monte Carlo
+   equity estimate of their own two cards against the live board (they never see yours), the pot odds and their
+   personality (tight/loose, passive/aggressive). The house takes a labelled rake: 5% of any pot that sees a flop,
+   capped at 3 big blinds ("no flop, no drop"). You sit down with 100 big blinds from your balance; your stack is
+   saved (save.pk) and goes back to your balance when you leave the table (or the next time Tables opens). */
+const PK_BL=[[1,2],[50,100],[1000,2000]];
+const PK_SEATS=[{x:0,z:.2},{x:-.53,z:-.06},{x:-.31,z:.12},{x:.31,z:.12},{x:.53,z:-.06}];
+const PK_ORD=[1,2,0,3,4];/* clockwise round the table, from the dealer's left */
+const PK_BOTS=[['Nova',.5,.55],['Marlowe',.7,.35],['Jinx',.35,.8],['Ruby',.6,.6],['Doc',.78,.28],['Vega',.45,.7],['Hollis',.65,.45],['Kiko',.4,.6]];
+const PK={btn:0,bots:{},hands:0};save.pk=save.pk||{me:0,won:0,hands:0};
+const pkBl=()=>PK_BL[save.room]||PK_BL[0];
+function pkBot(seat,taken){const pool=PK_BOTS.filter(b=>!taken.includes(b[0])),[n,tight,agg]=pickA(pool),bb=pkBl()[1];return{seat,name:n,tight,agg,stack:bb*(80+Math.floor(Math.random()*80)),bot:true}}
+function pkFill(){const taken=[];for(const s of[1,2,3,4]){const b=PK.bots[s];if(!b||b.stack<pkBl()[1]||b.room!==save.room){PK.bots[s]=Object.assign(pkBot(s,taken.concat(Object.values(PK.bots).map(x=>x.name))),{room:save.room});if(b&&b.room===save.room)dealerSay(`${PK.bots[s].name} takes ${b.name}'s seat.`,1500)}taken.push(PK.bots[s].name)}}
+function pkSeatName(x,z){if(z<-.12&&Math.abs(x)<.3)return'Board';let b=0,d=9;PK_SEATS.forEach((s,i)=>{const e=Math.hypot(s.x-x,s.z-z);if(e<d){d=e;b=i}});return b===0?'You':(PK.bots[b]||{name:'Seat '+b}).name}
+/* equity of a hand against n random hands, finishing the board */
+function pkEquity(hole,board,nOpp,n=180){const known=new Set(hole.concat(board)),rest=[];for(let c=0;c<52;c++)if(!known.has(c))rest.push(c);let win=0;
+ for(let s=0;s<n;s++){for(let i=rest.length-1;i>rest.length-1-(nOpp*2+5-board.length)-1&&i>0;i--){const j=Math.floor(Math.random()*(i+1));[rest[i],rest[j]]=[rest[j],rest[i]]}
+  let k=rest.length-1;const bd=board.slice();while(bd.length<5)bd.push(rest[k--]);const me=best5(hole.concat(bd)).score;let best=0,ties=0;
+  for(let o=0;o<nOpp;o++){const sc=best5([rest[k--],rest[k--]].concat(bd)).score;if(sc>best){best=sc;ties=0}if(sc===me)ties++}
+  if(me>best)win++;else if(me===best)win+=1/(ties+1)}return win/n}
+const PKG={name:"Texas Hold'em",id:'pk',goLabel:'DEAL HAND',back:'blue',tray:[0,-.41],shoe:[.62,-.33],discard:[-.62,-.33],noBets:1,statusTitle:'POKER',
+ handName:pkSeatName,
+ build(){kidneyTable(L=>{for(let i=0;i<5;i++){ink(L.x,'rgba(238,214,160,.3)',.0012);L.x.strokeRect(-.14+i*.07-.034,-.245,.068,.092);L.x.shadowBlur=0}
+   arcText(L,"STACK HOLD'EM · NO LIMIT",0,-.44,.36,.02,'rgba(246,220,154,.95)',1.2);txt(L,'RAKE 5% OF POTS THAT SEE A FLOP, MAX 3 BIG BLINDS',0,.02,.011,'rgba(238,214,160,.55)',{sp:.003});
+   PK_SEATS.forEach((s,i)=>{ink(L.x,i?'rgba(238,214,160,.35)':'rgba(246,220,154,.8)',.0018);L.x.beginPath();L.x.ellipse?L.x.ellipse(s.x,s.z,.085,.055,0,0,TAU):L.x.arc(s.x,s.z,.07,0,TAU);L.x.stroke();L.x.shadowBlur=0})});
+  chipTray(0,-.41);cardShoe(.62,-.33);discardHolder(-.62,-.33);
+  setSpots(PK_SEATS.map((s,i)=>({id:'seat'+i,x:s.x,z:s.z,r:.06,name:i?'AI player':'Your seat',pays:'',can:()=>false})));
+  dealerSet(DL.look,0,-.64,-.44);$('hintSw').style.display='none';pkFill();pkPlates()},
+ info(){const [sb,bb]=pkBl();return `Blinds ${money(sb)} / ${money(bb)} · your stack ${money(save.pk.me)}`},
+ status(){return PK.msg||'Your move soon'},
+ paytable(){const [sb,bb]=pkBl();return[['Blinds',`${money(sb)} / ${money(bb)}`,''],['Buy-in',money(bb*100),''],['Rake','5% of pots that see a flop','max '+money(bb*3)],['Your result here',(save.pk.won>=0?'+':'')+money(save.pk.won),save.pk.hands+' hands']]},
+ rules:"No-limit Texas Hold'em against four AI players. Two cards each, five on the board, best five-card hand wins. Fold, check, call or raise any amount. You sit down with 100 big blinds; whatever you have left goes back to your balance when you leave the table. A skill game: the AI plays a solid, varied strategy and never sees your cards.",
+ leave(){if(save.pk.me>0){credit(save.pk.me);flash(`Cashed out ${money(save.pk.me)} from the poker table`);save.pk.me=0;persist()}clearLabels()},
+ async play(){return pkHand()}};
+function pkPlates(P){for(let s=0;s<5;s++){const S=PK_SEATS[s],p=P&&P.find(q=>q.seat===s),b=s?PK.bots[s]:null,nm=s?b.name:'YOU',stk=p?p.stack:s?b.stack:save.pk.me;
+ label('pl'+s,S.x,S.z+(s?.075:.085),`${PK.btn===s?'Ⓓ ':''}${nm} · ${moneyS(stk)}${p&&p.act?' · '+p.act:''}`,p&&p.fold?'push':p&&p.win?'win':'')}}
+function pkStack(p,amt){dropStack(p.stk);p.stk=null;if(amt>0){const S=PK_SEATS[p.seat],x=S.x*.62,z=S.z*.62-.07;p.stk=chipStack(amt,x,z)}}
+function pkPot(amt){dropStack(PK.potStk);PK.potStk=amt>0?chipStack(amt,0,-.075):null}
+async function pkHand(){const [sb,bb]=pkBl();
+ if(save.pk.me<bb){const want=bb*100,have=getBal();if(have<bb){flash('Not enough balance to sit down');return}const buy=Math.min(want,Math.floor(have));if(!spend(buy))return;save.pk.me+=buy;persist();dealerSay(`Welcome to the table. ${money(buy)} in chips.`,1800);await wait(600)}
+ pkFill();PK.btn=PK_ORD[(PK_ORD.indexOf(PK.btn)+1)%5];PK.msg='';
+ const order=[];for(let k=1;k<=5;k++)order.push(PK_ORD[(PK_ORD.indexOf(PK.btn)+k)%5]);/* first to act after the button */
+ const P=order.map(s=>s===0?{seat:0,name:'You',stack:save.pk.me,bot:false}:Object.assign({},PK.bots[s])).map(p=>Object.assign(p,{cards:[],bet:0,tot:0,fold:false,allin:false,act:'',m:[]}));
+ const me=P.find(p=>!p.bot),start=save.pk.me;let pot=0,board=[],boardM=[];const deck=freshDeck();
+ const put=(p,a)=>{a=Math.min(a,p.stack);p.stack-=a;p.bet+=a;p.tot+=a;if(p.stack<=0)p.allin=true;pkStack(p,p.bet);sfx('chip',PK_SEATS[p.seat].x*.6,PK_SEATS[p.seat].z*.6,.6)};
+ put(P[0],sb);P[0].act='SB';put(P[1],bb);P[1].act='BB';pkPlates(P);banner('','NEW HAND','',900);
+ for(let r=0;r<2;r++)for(const p of P){const c=deck.pop(),S=PK_SEATS[p.seat],o=await dealCard(c,S.x-.035+r*.07,S.z-.005,!p.bot,{ms:300});o.userData.hud=!p.bot;p.cards.push(c);p.m.push(o)}
+ const live=()=>P.filter(p=>!p.fold),canAct=()=>P.filter(p=>!p.fold&&!p.allin);
+ for(let street=0;street<4;street++){
+  if(street){/* bets into the pot, then the board */for(const p of P){pot+=p.bet;p.bet=0;pkStack(p,0);p.act=p.fold?'FOLD':p.allin?'ALL IN':''}pkPot(pot);sfx('shove',0,-.1,.6);pkPlates(P);
+   const n=street===1?3:1;for(let k=0;k<n;k++){const c=deck.pop();board.push(c);boardM.push(await dealCard(c,-.14+(board.length-1)*.07,-.2,true,{ms:380}))}
+   label('bd',0,-.2,best5(me.cards.concat(board)).name.toUpperCase());await wait(300)}
+  if(live().length<2)break;if(canAct().length<2&&P.every(p=>p.fold||p.allin||p.bet>=Math.max(...P.map(q=>q.bet))))continue;
+  await pkRound(P,street,board,pot,bb);pkPlates(P);if(live().length<2)break}
+ for(const p of P){pot+=p.bet;p.bet=0;pkStack(p,0)}pkPot(pot);label('bd',0,0,'');
+ /* showdown: cards up, side pots from what each player put in, rake once if the flop came */
+ const L=live();let rake=0;if(board.length>=3&&L.length>1)rake=Math.min(Math.round(pot*.05*100)/100,bb*3);
+ if(L.length>1){for(const p of L)if(p.bot){for(const o of p.m){o.userData.hud=true;await flipCard(o,true,220)}}
+  for(const p of L){const h=best5(p.cards.concat(board));p.score=h.score;p.hname=h.name}}
+ const lv=[...new Set(P.map(p=>p.tot))].filter(v=>v>0).sort((a,b)=>a-b);let prev=0,first=true;const won={};
+ for(const v of lv){let amt=P.reduce((a,p)=>a+Math.max(0,Math.min(p.tot,v)-prev),0);const el=L.filter(p=>p.tot>=v);prev=v;if(!el.length||amt<=0)continue;
+  if(first&&rake){amt-=rake;first=false}const best=Math.max(...el.map(p=>p.score||0)),wins=el.filter(p=>(p.score||0)===best);
+  const share=Math.floor(amt/wins.length*100)/100;wins.forEach((p,k)=>{const a=k===0?Math.round((amt-share*(wins.length-1))*100)/100:share;p.stack+=a;won[p.seat]=(won[p.seat]||0)+a})}
+ pkPot(0);for(const p of P)if(won[p.seat]){p.win=true;p.act=`WINS ${moneyS(won[p.seat])}${p.hname&&L.length>1?' · '+p.hname.toUpperCase():''}`;const S=PK_SEATS[p.seat];popPay(S.x,S.z,'+'+moneyS(won[p.seat]))}
+ pkPlates(P);const w=P.filter(p=>p.win);sfx('chipHandle',0,0,.7);
+ banner(w.some(p=>!p.bot)?'YOU WIN':w.map(p=>p.name).join(' & ')+' WINS',`${money(Object.values(won).reduce((a,b)=>a+b,0))}${L.length>1?' · '+(w[0].hname||''):''}${rake?` · rake ${money(rake)}`:''}`,w.some(p=>!p.bot)?'win':'',2200);
+ if(w.some(p=>!p.bot))dealerExpr('smile',1500);
+ for(const p of P){if(p.bot){PK.bots[p.seat].stack=Math.round(p.stack*100)/100}else save.pk.me=Math.round(p.stack*100)/100}
+ save.pk.hands++;save.pk.won=Math.round((save.pk.won+save.pk.me-start)*100)/100;roundDone(Math.max(0,start-save.pk.me),Math.max(0,save.pk.me-start));persist();drawSide();
+ await wait(2400);for(const o of CARDS)o.userData.hud=true;await collectCards();clearLabels();pkPlates();dealerExpr('neutral')}
+/* one betting round */
+async function pkRound(P,street,board,pot0,bb){let max=Math.max(...P.map(p=>p.bet)),minR=bb;const acted=new Set();let i=street?0:2%P.length;
+ const need=p=>!p.fold&&!p.allin&&(p.bet<max||!acted.has(p));
+ for(let guard=0;guard<60;guard++){if(P.filter(p=>!p.fold).length<2)return;if(!P.some(need))return;const p=P[i%P.length];i++;if(!need(p))continue;
+  const pot=pot0+P.reduce((a,q)=>a+q.bet,0),toCall=Math.min(max-p.bet,p.stack);let a;
+  if(p.bot){PK.msg=`${p.name} is thinking…`;drawDock();dealerLook(new V.Vector3(PK_SEATS[p.seat].x,0,PK_SEATS[p.seat].z));await wait(450+Math.random()*700);a=pkBotAct(p,P,board,pot,toCall,max,minR,bb)}
+  else{PK.msg='Your move';drawDock();a=await pkMeAct(p,pot,toCall,max,minR,bb)}
+  if(a.t==='fold'){p.fold=true;p.act='FOLD';for(const o of p.m){o.userData.hud=false;o.visible=false}sfx('place',PK_SEATS[p.seat].x,PK_SEATS[p.seat].z,.4)}
+  else if(a.t==='call'){const c=Math.min(max-p.bet,p.stack);p.act=c?(p.stack-c<=0?'ALL IN':'CALL '+moneyS(c)):'CHECK';if(c)put2(p,c)}
+  else{const to=Math.min(a.to,p.bet+p.stack),inc=to-max;if(inc>=minR)minR=inc;max=Math.max(max,to);put2(p,to-p.bet);p.act=p.allin?'ALL IN':(street===0&&max===to&&acted.size===0&&false?'':'RAISE TO '+moneyS(to));acted.clear()}
+  acted.add(p);pkPlates(P)}
+ function put2(p,a){a=Math.min(a,p.stack);p.stack-=a;p.bet+=a;p.tot+=a;if(p.stack<=0)p.allin=true;pkStack(p,p.bet);sfx('chip',PK_SEATS[p.seat].x*.6,PK_SEATS[p.seat].z*.6,.7)}}
+function pkBotAct(p,P,board,pot,toCall,max,minR,bb){const opp=P.filter(q=>!q.fold&&q!==p).length,eq=pkEquity(p.cards,board,opp),r=Math.random(),odds=toCall/(pot+toCall||1);
+ const minTo=max+minR,raiseTo=f=>Math.max(minTo,Math.round((max+(pot+toCall)*f)/bb)*bb);
+ if(toCall<=0){if(eq>.62-(p.agg-.5)*.15&&r<.55+p.agg*.4)return{t:'raise',to:raiseTo(.45+r*.5)};if(r<p.agg*.12)return{t:'raise',to:raiseTo(.5)};return{t:'call'}}
+ if(eq>.78&&r<.35+p.agg*.5)return{t:'raise',to:raiseTo(.6+r*.6)};
+ if(eq>=odds*(.85+p.tight*.45)+(board.length?0:.02))return{t:'call'};
+ if(r<p.agg*.04&&toCall<pot*.6)return{t:'raise',to:raiseTo(.7)};return{t:'fold'}}
+async function pkMeAct(p,pot,toCall,max,minR,bb){const minTo=Math.min(max+minR,p.bet+p.stack),allTo=p.bet+p.stack,half=Math.max(minTo,Math.round((max+(pot+toCall)*.5)/bb)*bb),full=Math.max(minTo,Math.round((max+pot+toCall)/bb)*bb);
+ const L=[{k:'fold',l:'FOLD',c:'#8a2a2a',i:ICON.stand,key:'F'},toCall>0?{k:'call',l:toCall>=p.stack?'ALL IN '+moneyS(p.stack):'CALL '+moneyS(toCall),c:'#1f7a48',i:ICON.hit,key:'C'}:{k:'call',l:'CHECK',c:'#1f7a48',i:ICON.hit,key:'K'}];
+ if(allTo>max){if(minTo<allTo)L.push({k:'r:'+minTo,l:(max?'RAISE ':'BET ')+moneyS(minTo),c:'#7a5a1a',key:'R'});if(half<allTo&&half>minTo)L.push({k:'r:'+half,l:'½ POT '+moneyS(half),c:'#7a5a1a',key:'H'});if(full<allTo&&full>half)L.push({k:'r:'+full,l:'POT '+moneyS(full),c:'#7a5a1a',key:'P'});L.push({k:'r:'+allTo,l:'ALL IN '+moneyS(p.stack),c:'#9a2a6a',key:'A'})}
+ if(toCall<=0)L.shift();const a=await acts(L);if(a==='fold')return{t:'fold'};if(a==='call'||!a)return{t:'call'};return{t:'raise',to:+a.slice(2)}}
+/* ================= v2: CASINO WAR and ANDAR BAHAR ================= */
+const warV=c=>{const r=rk(c);return r===0?14:r+1};
+/* Casino War (one fresh deck a round): higher card wins 1 to 1. A tie: go to war (match your bet, three cards are
+   burned, one more each: you win or tie = the raise pays 1 to 1 and your bet pushes) or surrender half. Going to war
+   returns 97.6% of the main bet (simulated, 3M rounds). Tie side bet pays 15 to 1: 94.1%, a labelled sucker bet. */
+const WARG={name:'Casino War',id:'war',goLabel:'DEAL',back:'red',tray:[0,-.41],shoe:[.62,-.33],discard:[-.62,-.33],needMain:'Put a bet on WAR',
+ build(){kidneyTable(L=>{betCircle(L,0,.1,.055,'WAR','');betCircle(L,.15,.05,.04,'TIE','15 TO 1');arcText(L,'HIGH CARD WINS · ACES ARE HIGH · TIES GO TO WAR',0,-.44,.38,.018,'rgba(246,220,154,.95)',1.15)});
+  chipTray(0,-.41);cardShoe(.62,-.33);discardHolder(-.62,-.33);
+  setSpots([{id:'war',x:0,z:.1,r:.055,name:'War',pays:'1 to 1',ret:.976,pri:1},{id:'tie',x:.15,z:.05,r:.04,name:'Tie',pays:'15 to 1',ret:.941,side:1}]);dealerSet(DL.look,0,-.64,-.44);$('hintSw').style.display='none'},
+ paytable(){return[['War (higher card)','1 to 1','97.6%'],['Tie, then win the war','raise pays 1 to 1, bet pushes',''],['Tie side bet','15 to 1','94.1%','su']]},
+ rules:'You and the dealer get one card each, aces high. Higher card wins 1 to 1. On a tie you can go to war (put up the same again: three cards are burned, then one each; if yours is as high or higher, the raise pays 1 to 1 and your bet comes back) or surrender half your bet.',
+ async play(){const deck=freshDeck(),bet=TB.bets.war||0,tie=TB.bets.tie||0;let staked=betTotal(),back=0;banner('','NO MORE BETS','',800);await wait(400);
+  const p=deck.pop(),d=deck.pop(),pm=await dealCard(p,0,.0,true),dm=await dealCard(d,0,-.28,true);label('ph',0,-.07,RANKS[rk(p)]);label('dh',0,-.2,RANKS[rk(d)]);
+  if(tie){const r=warV(p)===warV(d)?tie*16:0;back+=r;await payOut('tie',r)}
+  if(bet){if(warV(p)>warV(d)){back+=bet*2;banner('YOU WIN','','win',1600);await payOut('war',bet*2)}
+   else if(warV(p)<warV(d)){banner('DEALER WINS','','',1600);await payOut('war',0)}
+   else{dealerSay("It's a tie. War or surrender?");const a=await acts([{k:'war',l:'GO TO WAR',c:'#1f7a48',i:ICON.hit,key:'W'},{k:'sur',l:'SURRENDER',c:'#8a2a2a',i:ICON.stand,key:'S'}],'war');
+    if(a==='war'&&spend(bet)){staked+=bet;TB.bets.war=bet*2;restack('war');sfx('chip',0,.1,.8);dealerSay('War!');for(let k=0;k<3;k++){deck.pop();const b=await dealCard(null,-.2+k*.03,-.12,false,{ms:260});b.userData.hud=false}
+     const p2=deck.pop(),d2=deck.pop();await dealCard(p2,.08,0,true);await dealCard(d2,.08,-.28,true);label('ph',.04,-.07,RANKS[rk(p)]+' · '+RANKS[rk(p2)]);label('dh',.04,-.2,RANKS[rk(d)]+' · '+RANKS[rk(d2)]);
+     const ok=warV(p2)>=warV(d2),ret=ok?bet*3:0;back+=ret;banner(ok?'YOU WIN THE WAR':'DEALER WINS THE WAR','','',1800);await payOut('war',ret)}
+    else{back+=bet/2;banner('SURRENDERED','half back','',1400);await payOut('war',bet/2)}}}
+  roundDone(staked,back);await wait(1200);await chipsHome();await collectCards();clearLabels();dealerExpr('neutral')}};
+/* Andar Bahar (one deck): a joker card goes face up; cards are then dealt alternately to Andar (first) and Bahar until
+   one matches the joker's rank. Andar pays 0.9 to 1 (97.9%), Bahar 1 to 1 (97.0%), simulated 2M rounds. */
+const ABG={name:'Andar Bahar',id:'ab',goLabel:'DEAL',back:'red',tray:[0,-.41],shoe:[.62,-.33],discard:[-.62,-.33],needMain:'Bet on Andar or Bahar',
+ build(){kidneyTable(L=>{const box=(x0,x1,col,lab,sub)=>{L.x.fillStyle=col;L.x.beginPath();L.x.rect(x0,.04,x1-x0,.13);L.x.fill();ink(L.x,GOLDINK,.0022);L.x.strokeRect(x0,.04,x1-x0,.13);L.x.shadowBlur=0;txt(L,lab,(x0+x1)/2,.1,.04,'#fff',{w:900});txt(L,sub,(x0+x1)/2,.145,.013,'rgba(255,255,255,.85)')};
+   box(-.42,-.02,'rgba(150,30,40,.55)','ANDAR','pays 0.9 to 1');box(.02,.42,'rgba(20,70,150,.55)','BAHAR','pays 1 to 1');arcText(L,'MATCH THE JOKER · FIRST CARD TO ANDAR',0,-.44,.38,.018,'rgba(246,220,154,.95)',1.15)});
+  chipTray(0,-.41);cardShoe(.62,-.33);discardHolder(-.62,-.33);
+  setSpots([{id:'andar',x:-.22,z:.105,w:.4,h:.13,name:'Andar',pays:'0.9 to 1',ret:.979,pri:1},{id:'bahar',x:.22,z:.105,w:.4,h:.13,name:'Bahar',pays:'1 to 1',ret:.97,pri:1}]);dealerSet(DL.look,0,-.64,-.44);$('hintSw').style.display='none'},
+ paytable(){return[['Andar','0.9 to 1','97.9%'],['Bahar','1 to 1','97.0%']]},
+ rules:'The joker card is turned face up. Cards then go one at a time to Andar (first) and Bahar. The first card to match the joker’s rank wins for its side. Andar gets the first card, so it wins a little more often and pays 0.9 to 1.',
+ async play(){const deck=freshDeck(),staked=betTotal();let back=0;banner('','NO MORE BETS','',800);await wait(400);
+  const j=deck.pop();await dealCard(j,0,-.29,true);label('jk',0,-.2,'JOKER '+RANKS[rk(j)]);dealerSay(`The joker is ${RANKS[rk(j)]}.`,1400);
+  let side=0,na=0,nb=0,win=null;while(deck.length){const c=deck.pop(),k=side?nb++:na++,row=Math.floor(k/12),col=k%12,x=(side?1:-1)*(.07+col*.024),z=-.13+row*.05;
+   await dealCard(c,x,z,true,{ms:190,flipMs:110});if(rk(c)===rk(j)){win=side?'bahar':'andar';break}side^=1}
+  label('jk',0,-.2,(win==='andar'?'ANDAR':'BAHAR')+' WINS · card '+(na+nb),'win');banner(win==='andar'?'ANDAR':'BAHAR','wins on card '+(na+nb),'win',1800);
+  for(const id of Object.keys(TB.bets)){const ret=id===win?TB.bets[id]*(id==='andar'?1.9:2):0;back+=ret;await payOut(id,ret)}
+  (save.hist.ab=save.hist.ab||[]).unshift(win==='andar'?'A':'B');save.hist.ab=save.hist.ab.slice(0,60);drawSide();roundDone(staked,back);await wait(1200);await chipsHome();await collectCards();clearLabels();dealerExpr('neutral')},
+ side(){const h=(save.hist.ab||[]).slice(0,40);return `<div class="card"><div class="ch">LAST ROUNDS</div><div class="hist">${h.map(x=>`<span class="hn" style="background:${x==='A'?'#962230':'#1d4f9a'}">${x}</span>`).join('')||'<span class="mut">No rounds yet</span>'}</div></div>`}};
 /* ================= LOBBY, OPENING A TABLE, START-UP ================= */
 const GAMES={};
 const TABLES=[
- {g:'bj',name:'Blackjack',sub:'Beat the dealer to 21',d:0,rtp:'99.1%'},{g:'rou',name:'Roulette',sub:'European single zero',d:1,rtp:'97.3%',v:'eu'},
- {g:'rou',name:'French Roulette',sub:'La Partage: half back on zero',d:4,rtp:'98.6%',v:'french'},{g:'rou',name:'Lightning Roulette',sub:'Lucky numbers up to 500x',d:2,rtp:'97.3%',v:'lightning'},
- {g:'bac',name:'Baccarat',sub:'Player or Banker',d:5,rtp:'98.9%'},{g:'dt',name:'Dragon Tiger',sub:'One card each, high wins',d:3,rtp:'96.3%'},
- {g:'tcp',name:'Three Card Poker',sub:'Ante, play, Pair Plus',d:0,rtp:'98.0%'},{g:'che',name:"Casino Hold'em",sub:'Your hand vs the dealer',d:1,rtp:'98.2%'},
- {g:'mw',name:'Money Wheel',sub:'Big Six, every bet 97.96%',d:2,rtp:'98.0%'},{g:'sb',name:'Sic Bo',sub:'Three dice, 50 bets',d:5,rtp:'97.2%'},{g:'cr',name:'Craps',sub:'Pass line, odds, place bets',d:3,rtp:'98.6%'}];
-let CUR=null;
-async function openTable(t){$('lobby').classList.remove('on');CUR=t;const G=GAMES[t.g];TB.g=G;G.variant=t.v;TB.bets={};TB.stacks={};TB.undo=[];TB.last=null;TB.phase='bet';clearLabels();CARDS.length=0;HL=null;CAMX={blend:0,to:null};
+ {c:'cards',g:'bj',name:'Blackjack',sub:'Beat the dealer to 21',d:0,rtp:'99.1%'},{c:'wheels',g:'rou',name:'Roulette',sub:'European single zero',d:1,rtp:'97.3%',v:'eu'},
+
+ {c:'poker',nw:1,g:'pk',name:"Texas Hold'em",sub:'No limit poker vs 4 AI players',d:4,rtp:'Skill'},{c:'cards',nw:1,g:'war',name:'Casino War',sub:'High card wins, ties go to war',d:2,rtp:'97.6%'},{c:'cards',nw:1,g:'ab',name:'Andar Bahar',sub:'Match the joker',d:5,rtp:'97.9%'},
+ {c:'cards',g:'bac',name:'Baccarat',sub:'Player or Banker',d:5,rtp:'98.9%'},{c:'cards',g:'dt',name:'Dragon Tiger',sub:'One card each, high wins',d:3,rtp:'96.3%'},
+ {c:'poker',g:'tcp',name:'Three Card Poker',sub:'Ante, play, Pair Plus',d:0,rtp:'98.0%'},{c:'poker',g:'che',name:"Casino Hold'em",sub:'Your hand vs the dealer',d:1,rtp:'98.2%'},
+ {c:'wheels',g:'mw',name:'Money Wheel',sub:'Big Six, every bet 97.96%',d:2,rtp:'98.0%'},{c:'wheels',g:'sb',name:'Sic Bo',sub:'Three dice, 50 bets',d:5,rtp:'97.2%'},{c:'wheels',g:'cr',name:'Craps',sub:'Pass line, odds, place bets',d:3,rtp:'98.6%'}];
+let CUR=null,LCAT='all';
+async function openTable(t){if(TB.g&&TB.g.leave)TB.g.leave();$('lobby').classList.remove('on');CUR=t;const G=GAMES[t.g];TB.g=G;G.variant=t.v;TB.bets={};TB.stacks={};TB.undo=[];TB.last=null;TB.phase='bet';clearLabels();CARDS.length=0;HL=null;CAMX={blend:0,to:null};
  const R=room();newScene({seed:t.d+1,tint:R.tint,cam:G.cam,look:G.look,fov:G.fov});DL.look=DEALERS[(t.d+save.room)%DEALERS.length];DL.hidden=false;G.build();
  $('crumb').innerHTML=`<b>${t.name}</b><i>·</i>${R.name}<i>·</i>Dealer ${DL.look.name}`;$('lim').textContent=`${moneyS(R.min)} – ${moneyS(R.max)}`;$('liveT').textContent=`LIVE · ${t.name.toUpperCase()}`;
- fitCam(Object.values(TB.spots));drawSide();$('side').classList.toggle('hid',!!G.wide);drawDock();acts([]);await wait(200);dealerExpr('smile',1800);dealerSay(pickA([`Welcome to ${t.name}! I'm ${DL.look.name}.`,`Hi, I'm ${DL.look.name}. Place your bets!`,`Welcome in. Good luck tonight!`]),2600)}
+ fitCam(Object.values(TB.spots),G.head?G.head():undefined);drawSide();$('side').classList.toggle('hid',!!G.wide);drawDock();acts([]);await wait(200);dealerExpr('smile',1800);dealerSay(pickA([`Welcome to ${t.name}! I'm ${DL.look.name}.`,`Hi, I'm ${DL.look.name}. Place your bets!`,`Welcome in. Good luck tonight!`]),2600)}
 function drawSide(){const G=TB.g;if(!G){$('side').innerHTML='';return}const pt=G.paytable?G.paytable():[];
  $('side').innerHTML=`<div class="card"><div class="ch">PAYTABLE<span class="mut" style="letter-spacing:0">return to player</span></div><table class="pt">${pt.map(([a,b,c,su])=>`<tr class="${su?'su':''}"><td>${a}</td><td>${b}</td><td>${c}</td></tr>`).join('')}</table>
   ${G.rules?`<div style="padding:9px 12px;font-size:11.5px;color:var(--mute);line-height:1.45">${G.rules}</div>`:''}</div>${G.side?G.side():''}`;if(G.afterSide)G.afterSide()}
-function showLobby(){CUR=null;TB.g=null;acts([]);$('side').innerHTML='';$('dock').innerHTML='';clearLabels();$('crumb').innerHTML='<b>Lobby</b>';$('lim').textContent='';$('liveT').textContent='LIVE';
- const R=room();$('lobby').innerHTML=`<div class="lob"><div class="lh"><div><h1>THE <b>TABLES</b></h1><p>Real Vegas tables with live dealers. Pick a room for your limits, then pull up a chair. Every table shows its return to player.</p></div></div>
+function showLobby(){if(TB.g&&TB.g.leave)TB.g.leave();CUR=null;TB.g=null;acts([]);$('side').innerHTML='';$('dock').innerHTML='';clearLabels();$('crumb').innerHTML='<b>Lobby</b>';$('lim').textContent='';$('liveT').textContent='LIVE';
+ const R=room();$('lobby').innerHTML=`<div class="lob"><div class="hero" data-hero="1"><div class="hx"><em>STACK TABLES 2.0</em><h2>Poker night is here.</h2><p>No-limit Texas Hold'em against four AI players, plus Casino War and Andar Bahar. Every card game now shows your hand big and sharp on screen, and the Money Wheel has a proper pointer.</p><button class="hgo">Take a seat at Hold'em</button></div><div class="hcards">${[0,25,38,51].map((c,i)=>`<img src="${hudImg(c)}" style="--i:${i}">`).join('')}</div></div><div class="lh"><div><h1>THE <b>TABLES</b></h1><p>Real Vegas tables with live dealers. Pick a room for your limits, then pull up a chair. Every table shows its return to player.</p></div></div>
   <div class="rooms">${ROOMS.map((r,i)=>`<button class="room ${i===2?'vip':''} ${i===save.room?'on':''}" data-r="${i}"><b>${r.name.toUpperCase()}</b><small>${moneyS(r.min)} – ${moneyS(r.max)} a bet · ${['green felt','burgundy salon','private, midnight blue'][i]}</small></button>`).join('')}</div>
-  <div class="tgrid">${TABLES.map((t,i)=>`<button class="tcard" data-t="${i}"><div class="im" style="background-image:url(${THUMBS[t.g+(t.v||'')+save.room]||''})"><span class="lv"><i></i>LIVE</span><span class="rtp">RTP ${t.rtp}</span></div><div class="tb"><h3>${t.name}</h3><div class="meta"><span>${t.sub}</span><span>Dealer ${DEALERS[(t.d+save.room)%DEALERS.length].name}</span></div></div></button>`).join('')}</div></div>`;
- $('lobby').classList.add('on');$('lobby').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{save.room=+b.dataset.r;persist();uiTick();showLobby();makeThumbs()});$('lobby').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{auResume();openTable(TABLES[+b.dataset.t])});makeThumbs()}
+  <div class="lcats">${[['all','All tables'],['cards','Cards'],['poker','Poker'],['wheels','Wheels & dice']].map(([k,l])=>`<button data-c="${k}" class="${LCAT===k?'on':''}">${l}</button>`).join('')}</div><div class="tgrid">${TABLES.map((t,i)=>LCAT!=='all'&&t.c!==LCAT?'':`<button class="tcard" data-t="${i}">${t.nw?'<span class="nw">NEW</span>':''}<div class="im" style="background-image:url(${THUMBS[t.g+(t.v||'')+save.room]||''})"><span class="lv"><i></i>LIVE</span><span class="rtp">RTP ${t.rtp}</span></div><div class="tb"><h3>${t.name}</h3><div class="meta"><span>${t.sub}</span><span>Dealer ${DEALERS[(t.d+save.room)%DEALERS.length].name}</span></div></div></button>`).join('')}</div></div>`;
+ $('lobby').classList.add('on');$('lobby').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{LCAT=b.dataset.c;uiTick();showLobby()});const hg=$('lobby').querySelector('.hgo');if(hg)hg.onclick=()=>{auResume();openTable(TABLES.find(t=>t.g==='pk'))};$('lobby').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{save.room=+b.dataset.r;persist();uiTick();showLobby();makeThumbs()});$('lobby').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{auResume();openTable(TABLES[+b.dataset.t])});makeThumbs()}
 /* lobby pictures are real renders of each table */
 const THUMBS={};let thumbBusy=false;
 async function makeThumbs(){if(thumbBusy)return;thumbBusy=true;try{for(const t of TABLES){if(CUR)break;const key=t.g+(t.v||'')+save.room;if(THUMBS[key])continue;const G=GAMES[t.g];if(!G)continue;const keep=TB.g;TB.g=G;G.variant=t.v;
@@ -1293,12 +1475,12 @@ function wireTop(){$('lobB').onclick=()=>{if(TB.phase!=='bet')return flash('Fini
 let BOOTED=false;
 /* the casino opens a table directly (Stack sidebar / home tiles); before start-up it waits */
 window.StackFrame={refresh:()=>drawBal(),open:k=>{if(!BOOTED){window.STACK_OPEN=k;return}if(TB.phase!=='bet')return;const t=TABLES.find(x=>(x.g+(x.v?'-'+x.v:''))===k||x.g===k&&!x.v||x.name.toLowerCase()===String(k).toLowerCase());if(t){clearBets();openTable(t)}},lobby:()=>{if(BOOTED&&TB.phase==='bet'){clearBets();showLobby()}}};
-async function boot(){try{await document.fonts.ready}catch(e){}gxInit($('gl'));dealerInit($('dl'));chipAssets();cardAssets();wireStage();wireTop();drawBal();AU.amb=save.amb;
+async function boot(){if(save.pk&&save.pk.me>0){const a=save.pk.me;save.pk.me=0;credit(a);persist()}/* a poker stack left at the table comes back */try{await document.fonts.ready}catch(e){}gxInit($('gl'));dealerInit($('dl'));chipAssets();cardAssets();wireStage();wireTop();drawBal();AU.amb=save.amb;
  requestAnimationFrame(gxLoop);addEventListener('pointerdown',()=>auResume(),{once:true});auInit();$('load').remove();BOOTED=true;
  if(SB)$('topup').style.display='none';$('topup').onclick=()=>{credit(1000);sfx('chip',0,.5,.6);flash('+$1,000')};
  const want=new URLSearchParams(location.search).get('t')||window.STACK_OPEN;if(want){showLobby();window.StackFrame.open(want);if(!CUR){const t=TABLES.find(x=>x.name.toLowerCase().includes(String(want).toLowerCase()));if(t)openTable(t)}}else showLobby()}
 /* ================= REGISTER THE TABLES AND GO ================= */
-GAMES.bj=BJG;GAMES.rou=ROU;GAMES.bac=BACG;GAMES.dt=DTG;GAMES.tcp=TCPG;GAMES.che=CHEG;GAMES.mw=MWG;GAMES.sb=SBG;GAMES.cr=CRG;
+GAMES.bj=BJG;GAMES.rou=ROU;GAMES.bac=BACG;GAMES.dt=DTG;GAMES.tcp=TCPG;GAMES.che=CHEG;GAMES.mw=MWG;GAMES.sb=SBG;GAMES.cr=CRG;GAMES.pk=PKG;GAMES.war=WARG;GAMES.ab=ABG;
 boot();
 </script>
 </body>

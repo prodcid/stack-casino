@@ -17,6 +17,12 @@ const pct = x => (x * 100).toFixed(2) + '%';
 function core() { const src = fs.readFileSync(FILE, 'utf8'), m = { exports: {} }; new Function('module', src.slice(src.indexOf('/*==CORE==*/'), src.indexOf('/*==END CORE==*/')))(m); return m.exports; }
 const inBand = r => r >= .96 - 1e-9 && r <= .995;
 function sim() {
+  console.log('\n-- v2: Casino War and Andar Bahar (one fresh deck a round, played out) --');
+  { const v = c => { const r = c % 13; return r === 0 ? 14 : r + 1 }, deal = n => { const d = [...Array(52).keys()]; for (let i = 51; i > 51 - n; i--) { const j = Math.random() * (i + 1) | 0;[d[i], d[j]] = [d[j], d[i]] } return d.slice(52 - n).reverse() };
+    let main = 0, back = 0, tie = 0, tieB = 0; const N = 2e6; for (let k = 0; k < N; k++) { const [p, q, , , , p2, q2] = deal(7); main++; tieB++; if (v(p) === v(q)) tie += 16; if (v(p) > v(q)) back += 2; else if (v(p) === v(q)) { back -= 1; if (v(p2) >= v(q2)) back += 3 } }
+    check(inBand(back / main), 'Casino War, always going to war (per main bet)', pct(back / main)); check(Math.abs(tie / tieB - .941) < .01, 'Casino War tie at 15 to 1 is the labelled 94.1% sucker bet', pct(tie / tieB));
+    let a = 0; const M = 1e6; for (let k = 0; k < M; k++) { const d = deal(52), jr = d[0] % 13; for (let i = 1, side = 0; i < 52; i++, side ^= 1) if (d[i] % 13 === jr) { if (!side) a++; break } }
+    check(inBand(a / M * 1.9) && inBand((1 - a / M) * 2), 'Andar Bahar: Andar 0.9 to 1 and Bahar 1 to 1 both in band', `${pct(a / M * 1.9)} / ${pct((1 - a / M) * 2)}`); }
   const K = core();
   console.log('\n-- blackjack (6 decks, H17, 3:2, basic strategy) --');
   { let staked = 0, back = 0; const N = +process.argv[3] || 400000; let S = K.newShoe(6);
@@ -90,17 +96,17 @@ async function ui() {
   await pg.goto('file://' + FILE); await pg.waitForTimeout(500); await pg.evaluate('localStorage.clear()'); await pg.reload();
   await pg.waitForFunction('typeof BOOTED!=="undefined"&&BOOTED', null, { timeout: 30000 }); await pg.waitForTimeout(800);
   console.log('\n-- lobby --');
-  check(await pg.evaluate("document.querySelectorAll('#lobby .tcard').length===TABLES.length&&TABLES.length===11"), 'the lobby lists all 11 tables');
-  await pg.waitForFunction("Object.keys(THUMBS).length>=11", null, { timeout: 60000 });
+  check(await pg.evaluate("document.querySelectorAll('#lobby .tcard').length===TABLES.length&&TABLES.length===12"), 'the lobby lists all 12 tables (one roulette, plus Hold\'em, Casino War, Andar Bahar)');
+  await pg.waitForFunction("Object.keys(THUMBS).length>=12", null, { timeout: 60000 });
   check(await pg.evaluate("[...document.querySelectorAll('#lobby .tcard .im')].every(e=>/data:image/.test(e.style.backgroundImage))"), 'every table card shows a live render of the table and its dealer');
   await pg.click('[data-r="2"]'); await pg.waitForTimeout(400); check(await pg.evaluate("save.room===2&&/Private VIP/i.test(document.querySelector('.room.on').textContent)"), 'rooms switch (Private VIP: $1K to $1M)');
   await pg.click('[data-r="0"]'); await pg.waitForTimeout(300);
   console.log('\n-- every table plays a round on the wallet --');
   /* wallet audit: every dollar in and out goes through spend/credit */
   await pg.evaluate("window.__io={out:0,in:0};const s0=spend,c0=credit;spend=n=>{const ok=s0(n);if(ok)__io.out+=Math.round(n*100)/100;return ok};credit=n=>{if(n>0)__io.in+=Math.round(n*100)/100;c0(n)}");
-  const bets = { bj: "placeChip('m1',25);placeChip('pp1',5);placeChip('t31',5)", 'rou-eu': "placeChip('n17',5);placeChip('red',25);placeChip('doz2',10)", 'rou-french': "placeChip('black',25);placeChip('n0',5)", 'rou-lightning': "for(const n of[1,7,13,19,25,31])placeChip('n'+n,5)",
+  const bets = { bj: "placeChip('m1',25);placeChip('pp1',5);placeChip('t31',5)", 'rou-eu': "placeChip('n17',5);placeChip('red',25);placeChip('doz2',10)", war: "placeChip('war',25);placeChip('tie',5)", ab: "placeChip('andar',25)",
     bac: "placeChip('banker',25);placeChip('tie',5)", dt: "placeChip('dragon',25)", tcp: "placeChip('ante',25);placeChip('pp',5)", che: "placeChip('ante',25)", mw: "placeChip('x2',25);placeChip('x12',5)", sb: "placeChip('small',25);placeChip('s10',5);placeChip('n3',5)", cr: "placeChip('pass',25);placeChip('field',5)" };
-  for (const t of await pg.evaluate("TABLES.map(t=>t.g+(t.v?'-'+t.v:''))")) {
+  for (const t of await pg.evaluate("TABLES.map(t=>t.g+(t.v?'-'+t.v:'')).filter(k=>k!=='pk')")) {
     await pg.evaluate(`StackFrame.open('${t}')`); await pg.waitForTimeout(700);
     const b0 = await pg.evaluate('getBal()'); await pg.evaluate("__io.out=0;__io.in=0"); await pg.evaluate(bets[t]); const placed = await pg.evaluate('betTotal()');
     const res = await pg.evaluate(`(async()=>{const clicker=setInterval(()=>{const a=document.querySelector('#acts [data-a]');if(a)a.click()},300);let moved=false;const mv=setInterval(()=>{for(const s of['l','r']){const c=DL.hands[s].cur;if(c&&c.distanceTo(restPt(s))>.03)moved=true}},80);
@@ -108,9 +114,25 @@ async function ui() {
     const b1 = await pg.evaluate('getBal()'), io = await pg.evaluate('__io'), persist = t === 'cr';
     const audit = Math.abs((b1 - b0) - (io.in - io.out)) < .011;
     check(res.phase === 'bet' && audit && placed > 0 && (persist || res.left === 0) && res.moved, `${t}: a full round, the dealer works it, and the wallet balances to the cent`, `staked ${placed} · back ${io.in.toFixed(2)} · ${res.ms} ms`);
+    if (t === 'bj') { const hd = await pg.evaluate("document.querySelectorAll('#hands .hgrp').length"); }
     if (t === 'rou-eu') { const r = await pg.evaluate("(()=>{const n=RHIST()[0];const want=(n===17?180:0)+(rColor(n)==='red'?50:0)+(n>=13&&n<=24?30:0);return{n,want}})()");
       check(Math.abs(io.in - r.want) < .011, 'roulette pays exactly what the layout says for the number that came up', `landed ${r.n}, paid ${io.in}`); }
   }
+  console.log('\n-- v2: the card overlay, the wheel pointer, poker --');
+  { await pg.evaluate("StackFrame.open('che')"); await pg.waitForTimeout(700); await pg.evaluate("placeChip('ante',25)");
+    pg.evaluate('go()').catch(() => {}); await pg.waitForFunction("document.querySelector('#acts [data-a]')", null, { timeout: 20000 });
+    const hd = await pg.evaluate("({on:$('hands').classList.contains('on'),groups:[...document.querySelectorAll('#hands .hgrp h4 span')].map(e=>e.textContent),imgs:document.querySelectorAll('#hands img').length,w:document.querySelector('#hands img').getBoundingClientRect().width})");
+    await pg.click('#acts [data-a="fold"]'); await pg.waitForFunction("TB.phase==='bet'", null, { timeout: 30000 });
+    check(hd.on && hd.groups.join() === 'DEALER,BOARD,YOU' && hd.imgs === 7 && hd.w >= 56, "every hand shows big on screen (Casino Hold'em: dealer, board, you)", JSON.stringify(hd)); }
+  { await pg.evaluate("StackFrame.open('mw')"); await pg.waitForTimeout(700); await pg.evaluate("placeChip('x2',5)"); await pg.evaluate('go()');
+    const wp = await pg.evaluate("(()=>{const step=TAU/49,i=Math.round(((MWH.a%TAU)+TAU)%TAU/step)%49;return{under:MW_SEG[i],res:save.hist.mw[0],arrow:!!MWH.arrow}})()");
+    check(wp.arrow && wp.under === wp.res, 'the Money Wheel has a pointer, and the segment under it is the result', JSON.stringify(wp)); }
+  { await pg.evaluate("StackFrame.open('pk')"); await pg.waitForTimeout(800); await pg.evaluate("__io.out=0;__io.in=0"); const b0 = await pg.evaluate('getBal()');
+    const pk = await pg.evaluate(`(async()=>{const clicker=setInterval(()=>{const b=[...document.querySelectorAll('#acts [data-a]')];const c=b.find(x=>x.dataset.a==='call')||b[0];if(c)c.click()},250);const st=[];
+      for(let h=0;h<3;h++){await go();st.push({me:save.pk.me,bots:Object.values(PK.bots).every(b=>b.stack>=0)})}clearInterval(clicker);const hands=save.pk.hands,me=save.pk.me;StackFrame.lobby();return{st,hands,me,left:save.pk.me}})()`);
+    const b1 = await pg.evaluate('getBal()'), io = await pg.evaluate('__io');
+    check(pk.hands >= 3 && pk.st.every(x => x.me >= 0 && x.bots) && pk.left === 0 && Math.abs((b1 - b0) - (io.in - io.out)) < .011 && Math.abs(io.in - pk.me) < .011,
+      "Hold'em: three full hands against the AI, and leaving the table cashes your stack back to the cent", JSON.stringify({ hands: pk.hands, cashed: io.in, bought: io.out })); }
   console.log('\n-- keyboard --');
   { await pg.evaluate("StackFrame.open('bj')"); await pg.waitForTimeout(600); await pg.click('[data-ch="2"]'); await pg.keyboard.press('2'); await pg.evaluate("placeChip('m1',25)");
     const chip = await pg.evaluate('TB.chip'); await pg.keyboard.press('x'); const dbl = await pg.evaluate("TB.bets.m1"); await pg.keyboard.press('z'); const und = await pg.evaluate("TB.bets.m1");
@@ -130,7 +152,7 @@ async function ui() {
   const cp = await b.newPage({ viewport: { width: 1600, height: 950 } }); cp.on('pageerror', e => errs.push('casino: ' + e)); cp.on('dialog', d => d.accept().catch(() => {}));
   await cp.goto('file://' + CASINO); await cp.waitForTimeout(600); await cp.waitForSelector('#authGate.show'); await cp.click('[data-am="signup"]'); const u = 'ut' + Date.now() % 1e6; await cp.fill('#auU', u); await cp.fill('#auP', 'pw123'); await cp.fill('#auP2', 'pw123'); await cp.click('#auGo'); await cp.waitForFunction('loggedIn()');
   await cp.evaluate("P().bal=5000;renderBal();go('lobby')"); await cp.waitForTimeout(500);
-  check(await cp.evaluate("document.querySelectorAll('#tilesTables .ttbl').length===11&&!!document.querySelector('#tblBan .b3go')&&[...document.querySelectorAll('#side [data-g^=\"tb-\"]')].length===11"), 'Stack home: the Tables row, the banner and 11 sidebar entries');
+  check(await cp.evaluate("document.querySelectorAll('#tilesTables .ttbl').length===13&&!!document.querySelector('#tblBan .b3go')&&[...document.querySelectorAll('#side [data-g^=\"tb-\"]')].length===12"), 'Stack home: the Tables row (12 tables + Stack Pool), the banner and 12 sidebar entries');
   check(await cp.evaluate("!document.querySelector('#tilesCasino [data-go=\"roulette\"]')&&!document.querySelector('#tilesCasino [data-go=\"craps\"]')&&!!document.querySelector('#tilesCasino [data-go=\"poker\"]')"), 'the old solo roulette and craps left the casino row; video poker moved in');
   await cp.evaluate("go('tb-sb')"); await cp.waitForFunction("FG.tables.ready&&FG.tables.frame.contentWindow.eval('CUR&&CUR.g')==='sb'", null, { timeout: 40000 });
   const w = await cp.evaluate("(async()=>{const w=FG.tables.frame.contentWindow,b0=P().bal;w.placeChip('big',50);const b1=P().bal;await w.go();return{b0,b1,after:P().bal,shown:w.document.getElementById('bal').textContent,top:getComputedStyle(w.document.getElementById('topup')).display}})()");
