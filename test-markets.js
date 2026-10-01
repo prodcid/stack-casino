@@ -18,8 +18,10 @@ const pct = x => (x * 100).toFixed(2) + '%';
 function sim() {
   const K = core(), { DT, STOCKS, HOUSE } = K, bySym = s => STOCKS.find(S => S.sym === s);
   /* a random live state: run the market a random while so news and market calls are pending at random times */
-  const state = S => { const st = { p: S.p0, pend: null }, G = { pend: null }, n = 40 + Math.floor(Math.random() * 400); for (let k = 0; k < n; k++) { K.applyG(K.stepGlobal(G), S, st); K.stepStock(S, st); } return { st, G }; };
-  const clone = (st, G) => ({ st: { p: st.p, pend: st.pend ? { t: st.pend.t, x: st.pend.x } : null }, G: { pend: G.pend ? { t: G.pend.t, e: G.pend.e } : null } });
+  const state = S => { const st = { p: S.p0, pend: null }, G = { pend: null }, n = 40 + Math.floor(Math.random() * 400); for (let k = 0; k < n; k++) { K.applyG(K.stepGlobal(G), S, st); K.stepStock(S, st); }
+    /* half the time a story is under way: drop in one at a random beat (v3 news) */
+    if (S.evRate && !st.pend && Math.random() < .5) { const b = K.storyShape(S), j = Math.floor(Math.random() * b.length), r = b.slice(j); r[0] = Object.assign({}, r[0], { t: Math.max(K.DT, Math.round(r[0].t * Math.random() / K.DT) * K.DT) }); st.pend = K.storyPend(r); } return { st, G }; };
+  const clone = (st, G) => ({ st: { p: st.p, pend: st.pend ? { t: st.pend.t, x: st.pend.x, q: st.pend.q } : null }, G: { pend: G.pend ? { t: G.pend.t, e: G.pend.e } : null } });
   const walk = (S, s0, N, each) => { const { st, G } = clone(s0.st, s0.G), p0 = st.p; for (let k = 1; k <= N; k++) { K.applyG(K.stepGlobal(G), S, st); K.stepStock(S, st); if (each && each(st.p / p0, k)) return st.p / p0; } return st.p / p0; };
   const band = r => r >= .96 && r <= .99;
   console.log('\n-- leveraged trades (fee from the model, played out on the model) --');
@@ -47,7 +49,7 @@ function sim() {
   { let worst = 0, paid = 0, got = 0, cnt = 0;
     for (const [sym, T] of [['STK', 60], ['VLTC', 120], ['SHRK', 60], ['OIL', 300], ['AURA', 30], ['NVRX', 120]]) {
       const S = bySym(sym), N = T / DT;
-      for (let s = 0; s < 6; s++) { const s0 = state(S), typ = Math.sqrt(S.sig * S.sig * T + S.jr * T * S.js * S.js + (S.evRate || 0) * T * S.evX * S.evX);
+      for (let s = 0; s < 6; s++) { const s0 = state(S), typ = Math.sqrt(S.sig * S.sig * T + S.jr * T * S.js * S.js + (S.evRate || 0) * T * S.evX * S.evX * 1.71);
         const Ks = [-1.5, -.5, 0, .5, 1.5].map(z => s0.st.p * Math.exp(z * typ)), ch = K.chainFair(S, s0.st, s0.G, Ks, N, 8000), ch2 = K.chainFair(S, s0.st, s0.G, Ks, N, 8000);
         const outs = []; for (let j = 0; j < 6000; j++) outs.push(s0.st.p * walk(S, s0, N));
         for (const [q, o] of ch.entries()) for (const d of [1, -1]) { const fair = d > 0 ? o.c : o.p, sf = Math.abs(fair - (d > 0 ? ch2[q].c : ch2[q].p)) / Math.SQRT2; if (fair < s0.st.p * 5e-4) continue; const pay = outs.map(x => Math.max(0, d * (x - o.K))), mc = pay.reduce((a, x) => a + x, 0) / pay.length;
@@ -70,7 +72,7 @@ function sim() {
   console.log('\n-- ranges, touches and head to head --');
   { let worst = 0, paid = 0, got = 0;
     for (const sym of ['GLDN', 'OIL', 'VLTC', 'NVRX']) { const S = bySym(sym);
-      for (let s = 0; s < 6; s++) { const s0 = state(S), T = [120, 180, 300][s % 3], N = T / DT, typ = Math.sqrt(S.sig * S.sig * T + S.jr * T * S.js * S.js + S.evRate * T * S.evX * S.evX), e = [-1, -.35, .35, 1].map(z => s0.st.p * Math.exp(z * typ));
+      for (let s = 0; s < 6; s++) { const s0 = state(S), T = [120, 180, 300][s % 3], N = T / DT, typ = Math.sqrt(S.sig * S.sig * T + S.jr * T * S.js * S.js + S.evRate * T * S.evX * S.evX * 1.71), e = [-1, -.35, .35, 1].map(z => s0.st.p * Math.exp(z * typ));
         const P = K.pBuckets(S, s0.st, s0.G, e, N, 3000), c = [0, 0, 0, 0, 0], n = 5000; for (let j = 0; j < n; j++) { const x = s0.st.p * walk(S, s0, N); let b = 0; while (b < 4 && x > e[b]) b++; c[b]++; }
         P.forEach((q, k) => { worst = Math.max(worst, Math.abs(q - c[k] / n)); if (K.canBuy(q)) { paid += K.yesAsk(q); got += c[k] / n; } }); } }
     check(worst < .035, 'range buckets match the simulated chance', 'worst gap ' + (worst * 100).toFixed(1) + ' points');
@@ -78,7 +80,7 @@ function sim() {
   { let worst = 0, paid = 0, got = 0;
     for (const [a, b] of [['VLTC', 'NBLA'], ['GLDN', 'OIL'], ['AURA', 'STK'], ['MOON', 'SHRK']]) { const A = bySym(a), B = bySym(b);
       for (let s = 0; s < 5; s++) { const sa = state(A), sb = state(B), G = sa.G, N = [60, 120, 240][s % 3] / DT, lead = (Math.random() - .5) * .01, P = K.pBeat(A, sa.st, B, sb.st, G, N, 3000, lead); let w = 0; const n = 5000;
-        for (let j = 0; j < n; j++) { const x = { p: sa.st.p, pend: sa.st.pend ? { t: sa.st.pend.t } : null }, y = { p: sb.st.p, pend: sb.st.pend ? { t: sb.st.pend.t } : null }, G2 = { pend: G.pend ? { t: G.pend.t, e: G.pend.e } : null };
+        for (let j = 0; j < n; j++) { const x = { p: sa.st.p, pend: sa.st.pend ? { t: sa.st.pend.t, x: sa.st.pend.x, q: sa.st.pend.q } : null }, y = { p: sb.st.p, pend: sb.st.pend ? { t: sb.st.pend.t, x: sb.st.pend.x, q: sb.st.pend.q } : null }, G2 = { pend: G.pend ? { t: G.pend.t, e: G.pend.e } : null };
           for (let k = 0; k < N; k++) { const g = K.stepGlobal(G2); K.applyG(g, A, x); K.applyG(g, B, y); K.stepStock(A, x); K.stepStock(B, y); } if (lead + Math.log(x.p / sa.st.p) > Math.log(y.p / sb.st.p)) w++; }
         worst = Math.max(worst, Math.abs(P - w / n)); for (const [q, r] of [[P, w / n], [1 - P, 1 - w / n]]) if (K.canBuy(q)) { paid += K.yesAsk(q); got += r; } } }
     check(worst < .035, 'head to head matches a joint simulation (shared market calls)', 'worst gap ' + (worst * 100).toFixed(1) + ' points');
@@ -128,8 +130,8 @@ async function ui() {
   await pg.goto('file://' + FILE); await pg.waitForTimeout(500); await pg.evaluate('localStorage.clear()'); await pg.reload(); await pg.waitForTimeout(1500);
   check(await pg.evaluate("!!document.querySelector('.help')"), 'first visit shows the welcome');
   await pg.click('#helpGo'); await pg.evaluate('credit(5e6)');
-  const secs = await pg.evaluate("(()=>{const o={};for(const k of['term','port','opt','pred','ipo','pulse','guide']){showSec(k);o[k]=document.querySelector('.sec.on').textContent.length}showSec('term');return o})()");
-  check(Object.values(secs).every(n => n > 150), 'all seven sections render', JSON.stringify(secs));
+  const secs = await pg.evaluate("(()=>{const o={};for(const k of['term','port','jour','scr','ipo','pulse','guide']){showSec(k);o[k]=document.querySelector('.sec.on').textContent.length}showSec('term');return o})()");
+  check(Object.values(secs).every(n => n > 150), 'all seven sections render (Options and Predictions are gone)', JSON.stringify(secs));
   check(await pg.evaluate("[...document.querySelectorAll('#chips,.chips button')].some(b=>b.textContent==='$1M')&&STOCKS[0].maxStake===1e6"), 'stake chips go up to $1M');
   await pg.evaluate('select(1)'); await pg.click('[data-c="100000"]'); await pg.click('#levs [data-v="10"]'); await pg.waitForTimeout(300);
   const b0 = await pg.evaluate('getBal()'); await pg.click('#go'); await pg.waitForTimeout(200);
@@ -140,24 +142,13 @@ async function ui() {
   await pg.evaluate('select(4)'); await pg.click('[data-t="invest"]'); await pg.click('[data-ic="10000"]'); await pg.waitForTimeout(200); await pg.click('#go');
   const inv = await pg.evaluate("({h:save.port.AURA,ask:askOf(M[4].p)})");
   check(inv.h && inv.h.cost === 1e4 && Math.abs(inv.h.q * inv.ask - 1e4) / 1e4 < .01, 'investing buys shares at the ask', `${inv.h && inv.h.q.toFixed(2)} AURA`);
-  await pg.evaluate("showSec('opt')"); await pg.waitForTimeout(300); await pg.click('#chain td[data-d="1"]'); await pg.waitForTimeout(300); await pg.click('[data-oc="10000"]'); await pg.waitForTimeout(200);
-  const ob = await pg.evaluate('getBal()'); await pg.click('#oGo'); await pg.waitForTimeout(200);
-  const op = await pg.evaluate('({n:OPTS.length,o:OPTS[0],bal:getBal()})');
-  check(op.n === 1 && op.o.cost === 1e4 && Math.abs(op.o.units * op.o.prem - 1e4) < .01 && Math.abs(ob - op.bal - 1e4) < .01, 'buying a call: stake / premium = units', `${op.o && op.o.units.toFixed(1)} units at $${op.o && op.o.prem.toFixed(2)}`);
-  const ex = await pg.evaluate("(()=>{const o=OPTS[0],b=getBal();T=o.exp;resolveOpts();return{n:OPTS.length,paid:+(getBal()-b).toFixed(2),iv:+(o.units*Math.max(0,M[o.i].p-o.K)).toFixed(2)}})()");
-  check(ex.n === 0 && Math.abs(ex.paid - ex.iv) < .02, 'an option settles to units x (price - strike)', JSON.stringify(ex));
-  await pg.evaluate("showSec('pred')"); await pg.waitForTimeout(300);
-  await pg.evaluate("PF='px';drawPred()");await pg.click('[data-buy][data-side="1"]:not([disabled])'); const pr = await pg.evaluate("(()=>{const o=PRED_OWN[0],c=PRED.find(x=>x.id===o.cid);return{o,kind:c.kind}})()");
-  check(pr.o && pr.o.cost === 1000 && pr.o.n > 1000, 'a prediction buys $1 contracts below $1 each', `${pr.o.n.toFixed(0)} YES (${pr.kind})`);
-  const ps = await pg.evaluate("(()=>{const o=PRED_OWN[0],c=PRED.find(x=>x.id===o.cid),b=getBal();settleContract(c,true);return{left:PRED_OWN.length,paid:+(getBal()-b).toFixed(2),n:+o.n.toFixed(2)}})()");
-  check(ps.left === 0 && Math.abs(ps.paid - ps.n) < .02, 'a YES that comes true pays $1 a contract', JSON.stringify(ps));
+  check(await pg.evaluate("!NAV.some(n=>n[0]==='opt'||n[0]==='pred')&&!$('sOpt')&&!$('sPred')"), 'Options and Predictions are removed from the nav and the page');
   await pg.evaluate("IPO.t=1;showSec('ipo')"); await pg.waitForTimeout(1600);
   await pg.evaluate("$('iAmt').value=20000"); await pg.click('#iGo');
   const sym = await pg.evaluate('IPO.d.sym'); await pg.evaluate('IPO.t=1'); await pg.waitForTimeout(7500);
   const ip = await pg.evaluate(`({st:IPO.st,listed:byS('${sym}'),h:save.port['${sym}'],ipo:IPO.last.d.ipo})`);
   check(ip.st === 'soon' && ip.listed > 0 && ip.h && Math.abs(ip.h.q * ip.ipo - 2e4) < .01, 'an IPO order becomes shares at the IPO price and the stock lists', `${sym}: ${ip.h && ip.h.q.toFixed(0)} shares`);
   await pg.evaluate("select(1)"); await pg.click('[data-t="trade"]'); await pg.click('#go'); await pg.waitForTimeout(200);
-  await pg.evaluate("showSec('opt')"); await pg.waitForTimeout(300); await pg.click('#chain td[data-d="-1"]'); await pg.waitForTimeout(300); await pg.click('#oGo');
   const before = await pg.evaluate("snapshot();persist();({pos:positions.map(o=>o.stake),opts:OPTS.length,port:Object.keys(save.port).sort().join(),n:STOCKS.length,p:M[4].p})");
   await pg.reload(); await pg.waitForTimeout(1500);
   const after = await pg.evaluate("({pos:positions.map(o=>o.stake),opts:OPTS.length,port:Object.keys(save.port).sort().join(),n:STOCKS.length,p:M[4].p})");
@@ -178,16 +169,22 @@ async function ui() {
   await pg.evaluate("showSec('ipo')"); await pg.click('#iJump'); await pg.evaluate("IPO.st='bell';IPO.t=0.5;IPO.d=nextIpoDeal();IPO.sub=0");
   const sym2 = await pg.evaluate('IPO.d.sym'); await pg.waitForTimeout(1600);
   check(await pg.evaluate(`SEC==='term'&&STOCKS[sel].sym==='${sym2}'&&save.ipoJump===true`), 'with "jump to it on launch" ticked, a listing opens that stock in the Terminal', sym2);
-  /* predictions: build your own, ranges, head to head, touch */
-  await pg.evaluate("showSec('pred');pu.stake=500;pb.i=byS('OIL');pb.type='px';pb.T=120;pb.z=.3;buildBuilder()"); await pg.waitForTimeout(400);
-  const bo = await pg.evaluate("(()=>{const n=PRED_OWN.length;$('bYes').click();const o=PRED_OWN[PRED_OWN.length-1],c=PRED.find(x=>x.id===o.cid);return{made:PRED_OWN.length-n,mine:c.mine,kind:c.kind,cost:o.cost}})()");
-  check(bo.made === 1 && bo.mine && bo.cost === 500, 'Build your own makes a contract and buys it', JSON.stringify(bo));
-  const rg = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='rng'&&!x.done&&cOpen(x)&&canBuy(x.P));if(!c)return null;const g=PRED.filter(x=>x.g===c.g);buyPred(c.id,1);const o=PRED_OWN.find(x=>x.cid===c.id),b=getBal();M[c.i].p=(Math.max(c.lo,M[c.i].p*.5)+Math.min(c.hi,M[c.i].p*2))/2;g.forEach(x=>x.exp=T);resolvePreds();return{paid:+(getBal()-b).toFixed(2),n:+o.n.toFixed(2),sum:+g.reduce((a,x)=>a+x.P,0).toFixed(3),won:g.filter(x=>x.yes).length}})()");
-  check(rg && Math.abs(rg.paid - rg.n) < .02 && rg.won === 1 && Math.abs(rg.sum - 1) < .02, 'a range bucket that lands pays $1 a contract, and only one bucket wins', JSON.stringify(rg));
-  const hh = await pg.evaluate("(()=>{newH2H(['GLDN','OIL']);const c=PRED.filter(x=>x.kind==='h2h'&&!x.done).pop();if(!c)return null;c.exp=T+120;const P=cP(c,3000);M[c.i].p*=1.05;const P2=cP(c,3000);c.exp=T;resolvePreds();return{P:+P.toFixed(2),P2:+P2.toFixed(2),yes:c.yes}})()");
-  check(hh && hh.P2 > hh.P && hh.yes === true, 'head to head: A pulling ahead lifts its price and A winning resolves it', JSON.stringify(hh));
-  const tc = await pg.evaluate("(()=>{const c=PRED.find(x=>x.kind==='tch'&&!x.done);if(!c)return null;M[c.i].p=c.up?c.L*1.001:c.L*.999;resolvePreds();return{done:c.done,yes:c.yes}})()");
-  check(tc && tc.done && tc.yes, 'a touch contract pays the moment the level is touched', JSON.stringify(tc));
+  /* v3 news: a live press conference, a takeover, a merger, an announced split, the screener */
+  const st = await pg.evaluate(`(async()=>{const i=byS('NVRX'),S=STOCKS[i];M[i].pend=storyPend(storyShape(S).map(b=>({t:1,x:b.x})));storyAnn(i);const ann=!!storyOf(i);await new Promise(r=>setTimeout(r,5500));
+    const s=RECENT_ST.find(x=>x.sym==='NVRX');return{ann,beats:s?s.beats.length:0,last:s?s.beats[3].tx:'',done:!M[i].pend}})()`);
+  check(st.ann && st.beats === 4 && st.done && st.last.length > 10, 'a press conference plays out in 4 written updates', JSON.stringify(st));
+  const tk = await pg.evaluate(`(()=>{const i=byS('PXFX');select(i);const bal0=getBal();ui.stake=1000;ui.T=300;ui.L=2;ui.tp=0;ui.sl=0;openTrade(1);const o=positions[positions.length-1],h=save.port.PXFX||(save.port.PXFX={q:0,cost:0});h.q+=10;h.cost+=10*M[i].p;
+    const want=Math.round(valueOf(o)*100)/100+Math.round(h.q*M[i].p*100)/100,b1=getBal();delist(i,'takeover',null,'Titan Capital');return{gone:STOCKS[i].gone,paid:+(getBal()-b1).toFixed(2),want:+want.toFixed(2),open:positions.some(x=>x.i===i),port:!!save.port.PXFX,watch:[...document.querySelectorAll('#wrows .wr')].some(b=>+b.dataset.i===i)}})()`);
+  check(tk.gone && Math.abs(tk.paid - tk.want) < .03 && !tk.open && !tk.port && !tk.watch, 'a takeover: open trades close and shares are paid at the final price, and it leaves the market', JSON.stringify(tk));
+  const mg = await pg.evaluate(`(()=>{const i=byS('MOON'),j=byS('NVRX'),h=save.port.MOON||(save.port.MOON={q:0,cost:0});h.q+=100;h.cost+=100;const v=save.port.MOON.q*M[i].p,q0=(save.port.NVRX||{q:0}).q;delist(i,'merger',j);return{gone:STOCKS[i].gone,val:+(((save.port.NVRX.q-q0)*M[j].p)/v).toFixed(4)}})()`);
+  check(mg.gone && Math.abs(mg.val - 1) < 1e-3, 'a merger turns your shares into the other company at market value', JSON.stringify(mg));
+  const sp = await pg.evaluate(`(async()=>{const i=byS('VLTC'),h=save.port.VLTC||(save.port.VLTC={q:0,cost:0});h.q+=1;h.cost+=3000;M[i].pend=null;M[i].p=STOCKS[i].p0*6.5;const q0=h.q,v0=h.q*M[i].p;await new Promise(r=>setTimeout(r,700));const ann=M[i].splitAt>0;M[i].splitAt=T+.25;await new Promise(r=>setTimeout(r,1200));return{ann,q:+(save.port.VLTC.q/q0).toFixed(3),v:+(save.port.VLTC.q*M[i].p/v0).toFixed(2)}})()`);
+  check(sp.ann && sp.q === 3 && Math.abs(sp.v - 1) < .05, 'a split is announced first, then triples the shares at the same value', JSON.stringify(sp));
+  const sc = await pg.evaluate(`(()=>{showSec('scr');const n=document.querySelectorAll('#scB tr').length,live=STOCKS.filter(S=>!S.gone).length;SCR.pre='div';buildScr();const d=[...document.querySelectorAll('#scB tr')].every(r=>STOCKS[+r.dataset.gi].div>0);SCR.pre='all';SCR.sort='p';SCR.dir=-1;buildScr();const ps=[...document.querySelectorAll('#scB tr')].map(r=>M[+r.dataset.gi].p);SCR.sort='today';saveScr();return{n,live,d,sorted:ps.every((p,k)=>!k||ps[k-1]>=p)}})()`);
+  check(sc.n === sc.live && sc.d && sc.sorted, 'the screener lists every live market, filters by preset and sorts by column', JSON.stringify(sc));
+  const gs = await pg.evaluate("snapshot();persist();Object.keys(save.gone).sort().join()"); await pg.reload(); await pg.waitForTimeout(1500); try { await pg.click('#helpGo', { timeout: 800 }) } catch (e) {}
+  const ga = await pg.evaluate("({g:STOCKS.filter(S=>S.gone).map(S=>S.sym).sort().join(),w:[...document.querySelectorAll('#wrows .wr')].every(b=>!STOCKS[+b.dataset.i].gone)})");
+  check(ga.g === gs && ga.w, 'companies that left stay gone after a reload', JSON.stringify({ gs, ga }));
   /* quality of life */
   await pg.evaluate("showSec('term');WF='All';UIP.sort='def';buildTerm();select(1)");
   await pg.click('[data-fav="SHRK"]'); await pg.evaluate("UIP.sort='move';buildWatch()");
@@ -239,7 +236,7 @@ async function ui() {
   const gp = await pg.evaluate(`(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const t0=T;lastF-=120000;await w(300);return{jump:T-t0}})()`);
   check(gp.jump < 3, 'coming back after a gap does not fast-forward the market', JSON.stringify(gp));
   /* announcements and results have their own lines: nothing is drawn over the page */
-  const ov = await pg.evaluate(`(()=>{headline(1,'Test breaking news',0.06,'jump');toast('Test result','x','+$1.00','win');const fixed=[...document.querySelectorAll('body *')].filter(e=>{const c=getComputedStyle(e);return (c.position==='fixed'||c.position==='absolute')&&e.offsetParent!==null&&/breaking|toast|bigwin|annc/.test(e.className+e.id)});
+  const ov = await pg.evaluate(`(()=>{headline(1,'Test breaking news',0.06,'res');toast('Test result','x','+$1.00','win');const fixed=[...document.querySelectorAll('body *')].filter(e=>{const c=getComputedStyle(e);return (c.position==='fixed'||c.position==='absolute')&&e.offsetParent!==null&&/breaking|toast|bigwin|annc/.test(e.className+e.id)});
     const br=$('breaking').getBoundingClientRect(),rail=document.querySelector('.rail').getBoundingClientRect(),t=$('toasts').firstElementChild.getBoundingClientRect(),bar=document.querySelector('.status').getBoundingClientRect();
     return{fixed:fixed.length,inRail:br.top>=rail.top&&br.bottom<=rail.bottom+1&&/Test breaking/.test($('breaking').textContent),inBar:t.top>=bar.top-1&&t.bottom<=bar.bottom+1}})()`);
   check(ov.fixed === 0 && ov.inRail && ov.inBar, 'breaking news sits in the news line, results in the status bar, nothing overlays the page', JSON.stringify(ov));

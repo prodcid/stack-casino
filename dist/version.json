@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.01.2",
-  "notes": "Stack Markets redesign: sleek new look with its own colours and Inter font, more room for the chart, a collapsible bottom panel; the market pauses while you're away and picks up exactly where it was; announcements get their own news line and results go to a status bar, nothing covers the page; Journal becomes Trades with live open positions, a running P&L and your last 500 trades",
-  "bytes": 5565406,
-  "at": "2026-10-01T10:00:26.442Z"
+  "version": "2026.10.02.1",
+  "notes": "Stack Markets: slow live news (press conferences in 4 updates), company takeovers, mergers, bankruptcies and announced splits, a new Screener; Options and Predictions removed (anything open is refunded)",
+  "bytes": 5554388,
+  "at": "2026-10-01T19:51:59.381Z"
 }
