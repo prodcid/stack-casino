@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.01.1",
-  "notes": "Stack Pool joins Stack: 8-ball, 9-ball, snooker and more in Stack's style; AI games are friendlies (no bets); invite your party mate from Pool's Online tab, they accept in the Party HUD and it opens for them; live cue and every shot plays identically on both screens",
-  "bytes": 5560107,
-  "at": "2026-10-01T09:18:14.120Z"
+  "version": "2026.10.01.2",
+  "notes": "Stack Markets redesign: sleek new look with its own colours and Inter font, more room for the chart, a collapsible bottom panel; the market pauses while you're away and picks up exactly where it was; announcements get their own news line and results go to a status bar, nothing covers the page; Journal becomes Trades with live open positions, a running P&L and your last 500 trades",
+  "bytes": 5565406,
+  "at": "2026-10-01T10:00:26.442Z"
 }

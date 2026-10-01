@@ -230,6 +230,24 @@ async function ui() {
   const lt = await pg.evaluate('T'); await pg.waitForTimeout(1000);
   const lv = await pg.evaluate(`({T:T,sym:STOCKS[sel].sym,ipo:!!STOCKS[sel].ipo,candles:M[sel].candles.length,errs:ERRS.slice()})`);
   check(lv.T > lt && lv.ipo && lv.candles >= 1 && lv.errs.length === 0, 'jumping to a brand-new listing keeps the market running (chart has its opening candle)', JSON.stringify(lv));
+  /* v3 (2026-10-01): away = paused. Hidden by Stack (another game), the market and every open bet stand still */
+  const pz = await pg.evaluate(`(async()=>{select(1);ui.stake=100;ui.T=60;openTrade(1);const o=positions[positions.length-1];const w=ms=>new Promise(r=>setTimeout(r,ms));
+    window.__gPaused=true;await w(400);const t0=T,k0=o.k,c0=mNow();await w(3200);const t1=T,k1=o.k,c1=mNow(),st=$('pauseSt').textContent,cls=document.body.classList.contains('paused');
+    window.__gPaused=false;await w(1600);return{still:t1===t0&&k1===k0,clock:c1-c0<50,st,cls,runs:T>t1&&o.k>k1,live:$('pauseSt').textContent,welcome:/Welcome back/.test($('toasts').textContent)}})()`);
+  check(pz.still && pz.clock && /Paused/.test(pz.st) && pz.cls && pz.runs && pz.live === 'Live' && pz.welcome, 'away = paused: the market, open bets and the chart clock stand still while hidden, then carry on', JSON.stringify(pz));
+  /* a long gap between frames (the tab wasn't drawn) is not replayed */
+  const gp = await pg.evaluate(`(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const t0=T;lastF-=120000;await w(300);return{jump:T-t0}})()`);
+  check(gp.jump < 3, 'coming back after a gap does not fast-forward the market', JSON.stringify(gp));
+  /* announcements and results have their own lines: nothing is drawn over the page */
+  const ov = await pg.evaluate(`(()=>{headline(1,'Test breaking news',0.06,'jump');toast('Test result','x','+$1.00','win');const fixed=[...document.querySelectorAll('body *')].filter(e=>{const c=getComputedStyle(e);return (c.position==='fixed'||c.position==='absolute')&&e.offsetParent!==null&&/breaking|toast|bigwin|annc/.test(e.className+e.id)});
+    const br=$('breaking').getBoundingClientRect(),rail=document.querySelector('.rail').getBoundingClientRect(),t=$('toasts').firstElementChild.getBoundingClientRect(),bar=document.querySelector('.status').getBoundingClientRect();
+    return{fixed:fixed.length,inRail:br.top>=rail.top&&br.bottom<=rail.bottom+1&&/Test breaking/.test($('breaking').textContent),inBar:t.top>=bar.top-1&&t.bottom<=bar.bottom+1}})()`);
+  check(ov.fixed === 0 && ov.inRail && ov.inBar, 'breaking news sits in the news line, results in the status bar, nothing overlays the page', JSON.stringify(ov));
+  /* Trades: open positions live, a running P&L, 500 kept */
+  const tv = await pg.evaluate(`(()=>{select(1);ui.stake=100;ui.T=60;openTrade(1);showSec('jour');drawOpenTr();const open=document.querySelectorAll('#oRows tr').length-1;const nav=[...document.querySelectorAll('#nav button')].map(b=>b.firstChild.textContent);
+    const keep=save.jr.slice();for(let k=0;k<520;k++)journal('STK','test',1,2,'Won',{kind:'trade',tr:[1,2,3],e:0});const n=save.jr.length,old=save.jr[100].tr.length,recent=save.jr[0].tr.length;save.jr=keep;drawJour();
+    return{open,nav:nav.slice(0,3).join(),n,old,recent,pnl:!!$('pnlC')}})()`);
+  check(tv.open >= 1 && tv.nav === 'Portfolio,Trades,Terminal' && tv.n === 500 && tv.old === 0 && tv.recent === 3 && tv.pnl, 'Trades: open positions live, running P&L, the last 500 closed kept (charts for the latest 60)', JSON.stringify(tv));
   check(errs.length === 0, 'no page errors', errs.slice(0, 3).join(' | '));
   await b.close();
 }
