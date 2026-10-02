@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.02.2",
-  "notes": "Stack Tables v2: big on-screen cards for every hand, a pointer on the Money Wheel, one roulette, new Texas Hold'em poker vs AI players, Casino War and Andar Bahar, and a new lobby",
+  "version": "2026.10.03.1",
+  "notes": "Stack Casino rebrand: the new black-and-white site (stack-site.html) with the S ribbon logo, new layout and the Motion Vault built in; pick the animation for every area in the Motion panel; games open a white 'Here is X' screen for now",
   "bytes": 5581327,
-  "at": "2026-10-01T20:37:14.579Z"
+  "at": "2026-10-02T23:29:56.952Z"
 }

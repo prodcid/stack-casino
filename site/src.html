@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>stack casino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* =====================================================================================================
+   STACK CASINO 2026 REBRAND - the site shell.
+   Strict black and white. Every colour is a token; dark mode flips them; the invert toggle forces either.
+   Motion comes from the Stack Motion Vault (its catalogue is built into this file by site/build.py).
+   Every area of the site is a "motion slot" with a vault animation chosen in the Motion panel.
+   ===================================================================================================== */
+:root{
+ --bg:#f3f3f1;--surface:#ffffff;--ink:#0b0b0b;--ink-2:#5c5c59;--ink-3:#a3a39f;--line:#e1e1de;
+ --disp:'Bricolage Grotesque','Plus Jakarta Sans',sans-serif;--body:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+ --t-instant:120ms;--t-quick:240ms;--t-std:420ms;--t-con:900ms;
+ --io:cubic-bezier(.65,0,.35,1);--out:cubic-bezier(.16,1,.3,1);--back:cubic-bezier(.34,1.56,.64,1);--in:cubic-bezier(.5,0,.75,0);
+ --r:16px;--max:1280px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070707;--surface:#111111;--ink:#f3f3f1;--ink-2:#9b9b97;--ink-3:#5c5c59;--line:#232323;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070707;--surface:#111111;--ink:#f3f3f1;--ink-2:#9b9b97;--ink-3:#5c5c59;--line:#232323;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.dw{font-family:var(--disp);font-weight:700;font-variation-settings:"opsz" 14;letter-spacing:-.025em}
+.dn{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.rib path{fill:none;stroke:currentColor;stroke-width:16;stroke-linecap:round;stroke-linejoin:round}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 32px}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:50;background:color-mix(in oklab,var(--bg) 78%,transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:28px;height:68px}
+.lock{display:flex;align-items:center;gap:10px;flex:none}
+.lock svg{width:30px;height:30px}.lock .wm{font-size:27px;line-height:1}.lock sup{font-family:var(--mono);font-weight:500;font-size:8px;letter-spacing:.32em;align-self:flex-start;margin:3px 0 0 -2px}
+.lock svg path{stroke-dasharray:1;stroke-dashoffset:0}.lock:hover svg path{animation:draw var(--t-con) var(--io)}
+@keyframes draw{from{stroke-dashoffset:1}}
+.nav{display:flex;gap:2px}
+.nav a{position:relative;padding:8px 12px;border-radius:999px;font-weight:600;font-size:13.5px;color:var(--ink-2);transition:color var(--t-quick)}
+.nav a:hover{color:var(--ink)}.nav a.on{color:var(--surface)}
+.nav .pill{position:absolute;top:0;left:0;height:100%;border-radius:999px;background:var(--ink);transition:transform var(--t-std) var(--back),width var(--t-std) var(--back);z-index:-1}
+.nav{position:relative;isolation:isolate}
+.sp{flex:1}
+.bal{display:flex;align-items:center;gap:10px;height:40px;padding:0 6px 0 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.bal .odo{font-size:17px}.bal button{height:30px;padding:0 14px;border-radius:999px;background:var(--ink);color:var(--surface);font-weight:700;font-size:12.5px}
+.ctl{width:40px;height:40px;border-radius:999px;border:1px solid var(--line);display:grid;place-items:center;background:var(--surface);transition:border-color var(--t-quick)}
+.ctl:hover{border-color:var(--ink)}.ctl svg{width:18px;height:18px}
+.ctl.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.motionbtn{height:40px;padding:0 16px 0 12px;border-radius:999px;border:1px solid var(--ink);display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.motionbtn svg{width:18px;height:18px}
+
+/* ---------- page frame ---------- */
+main{min-height:calc(100vh - 68px)}
+.page{display:none;padding:40px 0 96px}.page.on{display:block}
+.sh{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:end;margin:72px 0 22px}
+.sh:first-child{margin-top:8px}
+.sh h2{font-size:clamp(34px,4vw,52px);line-height:.95;margin:10px 0 0}
+.sh p{margin:0;color:var(--ink-2);max-width:48ch;justify-self:end}
+.frame{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.hgrid{display:grid;gap:1px;background:var(--line)}.hgrid>*{background:var(--surface);min-width:0}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- motion slots (a vault specimen inside any box) ---------- */
+.slot{position:relative;overflow:hidden;min-height:60px}
+.slot>.stage{position:absolute;left:0;top:0}
+.stage{position:relative;display:grid;place-items:center;overflow:hidden;color:var(--ink);width:calc(100% / var(--z,1));height:calc(100% / var(--z,1));transform:scale(var(--z,1));transform-origin:0 0}
+.stage:not(.vis) *,.stage:not(.vis) *::before,.stage:not(.vis) *::after{animation-play-state:paused!important}
+.stage canvas.fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.inv{--bg:#0b0b0b;--surface:#0b0b0b;--ink:#f3f3f1;--ink-2:#a3a39f;--ink-3:#5c5c59;--line:#2a2a2a;background:var(--surface);color:var(--ink)}
+:root[data-theme="dark"] .inv{--surface:#f3f3f1;--bg:#f3f3f1;--ink:#0b0b0b;--ink-2:#5c5c59;--ink-3:#a3a39f;--line:#d6d6d3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .inv{--surface:#f3f3f1;--bg:#f3f3f1;--ink:#0b0b0b;--ink-2:#5c5c59;--ink-3:#a3a39f;--line:#d6d6d3}}
+.tag{position:absolute;z-index:6;display:none;align-items:center;gap:6px;top:10px;right:10px;padding:4px 9px 4px 6px;border-radius:999px;background:var(--ink);color:var(--surface);font:500 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 0 3px var(--surface)}
+.tag svg{width:12px;height:12px}
+body.edit .tag{display:inline-flex}.bgslot>.tag{top:auto;bottom:12px;right:auto;left:12px}.tiles,.btnrow{position:relative}.btnrow>.tag{top:-14px;right:auto;left:0}
+body.edit [data-area]{outline:1.5px dashed var(--ink-3);outline-offset:-1.5px}
+[data-area].flash{animation:flash 1.2s var(--io)}@keyframes flash{30%{outline:3px solid var(--ink);outline-offset:-3px}}
+
+/* ---------- lobby hero ---------- */
+.hero{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);min-height:460px;border-radius:var(--r);overflow:hidden}
+.hero .bgslot{position:absolute;inset:0;opacity:.55}
+.hero .copy{position:relative;z-index:1;padding:44px 48px;display:flex;flex-direction:column;gap:22px;justify-content:space-between}
+.hero .headslot{height:190px;margin-left:-10px}
+.hero .copy p{margin:0;color:var(--ink-2);max-width:44ch;font-size:15px}
+.hero .feat{position:relative;z-index:1;border-left:1px solid var(--line)}
+.hero .feat .slot{position:absolute;inset:0}
+.ticks{display:grid;grid-template-columns:repeat(3,1fr)}
+.tick{display:grid;grid-template-rows:auto 1fr;padding:18px 20px 0;min-height:210px}
+.tick .slot{height:160px}
+.tick header{display:flex;justify-content:space-between}
+
+/* ---------- game tiles (hairline grid, outlined cards, big numeric glyphs) ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:0!important;background:var(--surface)!important}.tiles>.tcell{box-shadow:inset -1px -1px 0 var(--line)}
+.tcell{position:relative;aspect-ratio:1/1.08;cursor:pointer}
+.tcell .slot{position:absolute;inset:14px}
+.tcell .meta{position:absolute;left:18px;right:18px;bottom:14px;display:flex;justify-content:space-between;pointer-events:none;opacity:0;transition:opacity var(--t-quick)}
+.tcell:hover .meta{opacity:1}
+.chips{display:flex;gap:6px;margin:0 0 14px}
+.chips button{height:34px;padding:0 15px;border-radius:999px;border:1px solid var(--line);font-weight:600;font-size:12.5px;color:var(--ink-2);background:var(--surface)}
+.chips button.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+/* ---------- feeds and blocks ---------- */
+.duo{display:grid;grid-template-columns:repeat(2,1fr)}
+.cell{padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.cell .slot{height:220px}
+.promo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-radius:var(--r);overflow:hidden;min-height:340px}
+.promo .copy{padding:40px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.promo h3{font-size:46px;line-height:.95;margin:10px 0 0}
+.promo .slot{border-left:1px solid var(--line)}
+.secthero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);min-height:380px;border-radius:var(--r);overflow:hidden}
+.secthero .copy{padding:40px 44px;display:flex;flex-direction:column;justify-content:space-between}
+.secthero h1{font-size:clamp(56px,7vw,96px);line-height:.88;margin:12px 0 0}
+.secthero .slot{border-left:1px solid var(--line)}
+.wallet{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+.wallet .big{padding:28px 30px;display:flex;flex-direction:column;gap:12px}
+.wallet .big .slot{height:200px}
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr)}
+.wgrid .cell .slot{height:180px}
+.rows div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-weight:600}
+.rows div span{font-family:var(--disp);font-weight:700;font-variant-numeric:tabular-nums}
+.foot{border-top:1px solid var(--line);margin-top:80px;padding:44px 0 60px}
+.foot .wrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;align-items:end}
+.foot .slot{height:150px}
+
+/* ---------- the game screen: white, just says which game ---------- */
+.gamepage{position:fixed;inset:0;z-index:80;background:#ffffff;color:#0b0b0b;display:none;place-items:center}
+.gamepage.on{display:grid}
+.gamepage .load{position:absolute;inset:0;display:grid;place-items:center;background:#fff;transition:opacity var(--t-std) var(--io)}
+.gamepage .load .slot{width:min(640px,80vw);height:420px;--ink:#0b0b0b;--surface:#fff;--line:#e1e1de;--ink-2:#5c5c59;--ink-3:#a3a39f}
+.gamepage .msg{text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.gamepage .msg .glyph{font-size:120px;line-height:.9}
+.gamepage .msg h1{font-size:64px;line-height:.95;margin:0}
+.gamepage .back{position:absolute;top:22px;left:28px;display:flex;align-items:center;gap:8px;font-weight:700}
+.gamepage .lockg{position:absolute;top:20px;right:28px}
+
+/* ---------- buttons (base; the chosen vault style adds its motion) ---------- */
+.btn{height:46px;padding:0 22px;border-radius:999px;border:1.5px solid var(--ink);font-weight:700;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;isolation:isolate;color:var(--ink);background:var(--surface)}
+.btn.f{background:var(--ink);color:var(--surface)}
+.bst{display:inline-grid;position:relative}
+
+/* ---------- overlays: backdrop, drawer, sheet, toasts ---------- */
+.scrim{position:fixed;inset:0;z-index:90;background:color-mix(in oklab,var(--ink) 30%,transparent);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity var(--t-std) var(--io)}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:440px;z-index:95;background:var(--surface);border-left:1px solid var(--line);transform:translateX(102%);transition:transform var(--t-std) var(--out);display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.drawer header{padding:24px 26px 18px;border-bottom:1px solid var(--line)}
+.drawer header h3{font-size:30px;line-height:1;margin:8px 0 6px}
+.drawer header p{margin:0;color:var(--ink-2);font-size:13px}
+.drawer .body{flex:1;overflow:auto;padding:8px 0 30px}
+.drawer .grp{padding:16px 26px 6px}
+.arow{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center;padding:10px 26px;cursor:pointer;transition:background var(--t-quick)}
+.arow:hover{background:var(--bg)}
+.arow .mini{height:56px;border:1px solid var(--line);border-radius:10px;position:relative;overflow:hidden}
+.arow b{display:block;font-weight:700;font-size:13.5px}.arow small{display:block;color:var(--ink-2);font-size:12px}
+.arow .id{font:500 10.5px var(--mono);color:var(--ink-3);letter-spacing:.06em}
+.drawer footer{padding:16px 26px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center}
+.sw{display:flex;align-items:center;gap:10px;font-weight:600;font-size:13px}
+.sw i{width:38px;height:22px;border-radius:999px;background:var(--line);position:relative;transition:background var(--t-quick)}
+.sw i::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform var(--t-std) var(--back)}
+.sw.on i{background:var(--ink)}.sw.on i::after{transform:translateX(16px)}
+.sheet{position:fixed;left:50%;bottom:0;width:min(1180px,100vw);height:min(78vh,760px);z-index:96;background:var(--surface);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;transform:translate(-50%,104%);transition:transform var(--t-std) var(--out);display:flex;flex-direction:column}
+.sheet.on{transform:translate(-50%,0)}
+.sheet header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end;padding:22px 28px 14px;border-bottom:1px solid var(--line)}
+.sheet header h3{font-size:34px;line-height:1;margin:8px 0 0}
+.sheet .cats{display:flex;gap:6px;flex-wrap:wrap;padding:12px 28px;border-bottom:1px solid var(--line)}
+.sheet .cats button{height:30px;padding:0 13px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-2)}
+.sheet .cats button.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.sheet .list{flex:1;overflow:auto}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.pick{background:var(--surface);display:flex;flex-direction:column;cursor:pointer;position:relative}
+.pick .pv{aspect-ratio:4/3;position:relative;overflow:hidden}
+.pick .cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 8px;padding:9px 12px 11px;border-top:1px solid var(--line)}
+.pick .cap b{font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pick .cap span{font:500 10.5px var(--mono);color:var(--ink-3)}
+.pick.on{outline:2px solid var(--ink);outline-offset:-2px;z-index:1}
+.pick.on::after{content:'IN USE';position:absolute;top:8px;left:8px;font:500 9.5px var(--mono);letter-spacing:.1em;background:var(--ink);color:var(--surface);padding:3px 7px;border-radius:999px}
+.toasts{position:fixed;right:24px;top:84px;z-index:99;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.toast{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);font-weight:600;font-size:13px;padding:11px 16px 11px 12px;border-radius:12px;animation:tin var(--t-std) var(--back) both}
+.toast svg{width:18px;height:18px}.toast.out{animation:tout var(--t-quick) var(--in) forwards}
+@keyframes tin{from{transform:translateY(-14px) scale(.96);opacity:0}}@keyframes tout{to{transform:translateX(20px);opacity:0}}
+
+/* ---------- full-screen moments: boot, page transitions ---------- */
+.boot{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;transition:opacity var(--t-std) var(--io),visibility 0s linear var(--t-std)}
+.boot.off{opacity:0;visibility:hidden}
+.boot .slot{width:min(720px,90vw);height:480px}
+.boot .skip{position:absolute;bottom:28px;left:50%;transform:translateX(-50%)}
+.xbar{position:fixed;inset:0;z-index:150;pointer-events:none;overflow:hidden}
+.xbar i{position:absolute;left:-10%;width:120%;height:34.3%;border-radius:999px;background:var(--ink);transform:translateX(110%)}
+.xbar i:nth-child(1){top:-.5%}.xbar i:nth-child(2){top:33%}.xbar i:nth-child(3){top:66.5%}
+.xbar.go i{animation:xbin var(--t-std) var(--io) forwards}.xbar.go i:nth-child(2){animation-delay:60ms}.xbar.go i:nth-child(3){animation-delay:120ms}
+.xbar.out i{transform:none;animation:xbout var(--t-std) var(--io) forwards}.xbar.out i:nth-child(2){animation-delay:60ms}.xbar.out i:nth-child(3){animation-delay:120ms}
+@keyframes xbin{to{transform:none}}@keyframes xbout{to{transform:translateX(-110%)}}
+.xrib{position:fixed;inset:0;z-index:150;pointer-events:none;display:grid;place-items:center}
+.xrib svg{width:180vmax;height:180vmax}
+.xrib path{fill:none;stroke:var(--ink);stroke-width:60;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.xrib.go path{animation:ptrd .6s var(--io) forwards}.xrib.out path{stroke-dashoffset:0;animation:ptru .6s var(--io) forwards}
+@keyframes ptrd{to{stroke-dashoffset:0}}@keyframes ptru{to{stroke-dashoffset:-1}}
+.xfade{position:fixed;inset:0;z-index:150;pointer-events:none;background:var(--bg);opacity:0;transition:opacity var(--t-quick) var(--io)}.xfade.go{opacity:1}
+.page.enter>*{animation:penter var(--t-con) var(--out) both}.page.enter>*:nth-child(2){animation-delay:60ms}.page.enter>*:nth-child(3){animation-delay:120ms}.page.enter>*:nth-child(4){animation-delay:180ms}
+@keyframes penter{from{opacity:0;transform:translateY(18px)}}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity var(--t-con) var(--out),transform var(--t-con) var(--out)}.reveal.in{opacity:1;transform:none}
+.wmrise{display:inline-flex;overflow:hidden;line-height:1.1}.wmrise span{display:inline-block;animation:wmr var(--t-con) var(--out) both;animation-delay:calc(var(--i)*45ms)}
+@keyframes wmr{from{transform:translateY(110%)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}}
+/*@@MV_CSS@@*/
+</style>
+</head>
+<body>
+<div class="boot" id="boot"><div class="slot" data-area="boot"></div><button class="mono skip" id="skip">Skip</button></div>
+
+<header class="top">
+ <div class="wrap">
+  <a class="lock" href="#lobby" aria-label="stack casino home"><svg class="rib" viewBox="0 0 96 96"><path pathLength="1" d="M84 22 H30 A13 13 0 0 0 30 48 H66 A13 13 0 0 1 66 74 H12"/></svg><span class="wm dw">stack</span><sup>CASINO</sup></a>
+  <nav class="nav" id="nav"><span class="pill" id="navPill"></span></nav>
+  <div class="sp"></div>
+  <div class="bal"><span class="mono" style="font-size:10px">AUD</span><span class="odo dn" id="balOdo"></span><button id="dep">Deposit</button></div>
+  <button class="motionbtn" id="motionBtn" title="Choose the animation for every area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Motion</button>
+  <button class="ctl" id="invBtn" title="Invert (light / dark)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+ </div>
+</header>
+
+<main class="wrap" id="pages">
+ <!-- LOBBY -->
+ <section class="page" id="p-lobby">
+  <div class="hero inv" style="margin-top:8px">
+   <div class="slot bgslot" data-area="heroBg"></div>
+   <div class="copy">
+    <div><span class="mono">Stack casino · one balance, every game</span><div class="slot headslot" data-area="heroHead"></div></div>
+    <p>Originals, live tables, sport, markets and cards on one account. Fair odds on every game, every RTP shown.</p>
+    <div class="btnrow"><span data-btn="Play now" data-f="1" data-go="casino"></span><span data-btn="Claim bonus" data-act="bonus"></span></div>
+   </div>
+   <div class="feat"><div class="slot" data-area="heroFeat"></div></div>
+  </div>
+  <div class="frame hgrid ticks" style="margin-top:24px">
+   <div class="tick"><header><span class="mono">Live jackpot</span><span class="mono">01</span></header><div class="slot" data-area="tick1"></div></div>
+   <div class="tick"><header><span class="mono">Crash · this round</span><span class="mono">02</span></header><div class="slot" data-area="tick2"></div></div>
+   <div class="tick"><header><span class="mono">Next draw</span><span class="mono">03</span></header><div class="slot" data-area="tick3"></div></div>
+  </div>
+  <div class="sh reveal"><div><span class="mono">Lobby · originals</span><h2 class="dw">Pick a game.</h2></div><p>Every Stack original, outlined and numbered. Hover a tile to see the motion you picked for game tiles, click it to play.</p></div>
+  <div class="frame hgrid tiles" data-tiles="orig"></div>
+  <div class="sh reveal"><div><span class="mono">Results · the last round</span><h2 class="dw">Wins and losses.</h2></div><p>Win moments are loud and short. Losses are quiet and over quickly. Both are yours to choose.</p></div>
+  <div class="frame hgrid duo reveal">
+   <div class="cell"><span class="mono">You won</span><div class="slot" data-area="win"></div></div>
+   <div class="cell"><span class="mono">You lost</span><div class="slot" data-area="loss"></div></div>
+  </div>
+  <div class="sh reveal"><div><span class="mono">Stack cards · series 03</span><h2 class="dw">New pack day.</h2></div><p>Every pack, every pull and every rarity, opened with the card motion you choose.</p></div>
+  <div class="promo inv reveal">
+   <div class="copy"><div><span class="mono">Featured</span><h3 class="dw">Series 03<br>is live.</h3></div><p style="margin:0;color:var(--ink-2)">Six new characters, one holo chase card, and a pack that tears the way you tell it to.</p><div class="btnrow"><span data-btn="Open a pack" data-f="1" data-go="cards"></span></div></div>
+   <div class="slot" data-area="promo"></div>
+  </div>
+ </section>
+
+ <!-- CASINO: every original, with a skeleton while it loads -->
+ <section class="page" id="p-casino">
+  <div class="sh"><div><span class="mono">Casino · 18 originals</span><h2 class="dw">Every original.</h2></div><p>Provably fair originals built in house. Filter by type, hover for the motion, click to play.</p></div>
+  <div class="chips" id="casChips"></div>
+  <div class="frame" style="position:relative"><div class="slot" data-area="skeleton" id="casSkel" style="height:520px"></div><div class="hgrid tiles" data-tiles="all" id="casGrid" hidden></div></div>
+ </section>
+
+ <!-- SECTION PAGES (tables, sports, markets, cards, arcade) are built from one template -->
+ <section class="page" id="p-tables"></section>
+ <section class="page" id="p-sports"></section>
+ <section class="page" id="p-markets"></section>
+ <section class="page" id="p-cards"></section>
+ <section class="page" id="p-arcade"></section>
+
+ <!-- WALLET -->
+ <section class="page" id="p-wallet">
+  <div class="sh"><div><span class="mono">Wallet · AUD</span><h2 class="dw">Your money.</h2></div><p>Balance, VIP progress and account status. Numbers roll, never snap.</p></div>
+  <div class="frame hgrid wallet">
+   <div class="big"><span class="mono">Balance</span><div class="slot" data-area="walletNum"></div><div class="btnrow"><span data-btn="Deposit" data-f="1" data-act="dep"></span><span data-btn="Withdraw" data-act="wd"></span></div></div>
+   <div class="cell"><span class="mono">Recent activity</span><div class="rows" id="acts"></div></div>
+  </div>
+  <div class="frame hgrid wgrid" style="margin-top:24px">
+   <div class="cell"><span class="mono">VIP progress</span><div class="slot" data-area="walletProg"></div></div>
+   <div class="cell"><span class="mono">Account</span><div class="slot" data-area="walletState"></div></div>
+   <div class="cell"><span class="mono">Settings</span><div class="slot" data-area="walletToggle"></div></div>
+  </div>
+ </section>
+</main>
+
+<footer class="foot">
+ <div class="wrap"><div><div class="lock" style="margin-bottom:18px"><svg class="rib" viewBox="0 0 96 96"><path pathLength="1" d="M84 22 H30 A13 13 0 0 0 30 48 H66 A13 13 0 0 1 66 74 H12"/></svg><span class="wm dw">stack</span><sup>CASINO</sup></div>
+  <p class="mono" style="max-width:60ch;line-height:1.8">Play for fun · fake chips only · stack never sells chips or pays out real money · every game shows its return to player · 18+</p></div>
+  <div class="frame"><div class="slot" data-area="brand"></div></div></div>
+</footer>
+
+<!-- the game screen -->
+<div class="gamepage" id="game">
+ <button class="back" id="gBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>Lobby</button>
+ <div class="lock lockg"><svg class="rib" viewBox="0 0 96 96" style="width:26px;height:26px"><path d="M84 22 H30 A13 13 0 0 0 30 48 H66 A13 13 0 0 1 66 74 H12"/></svg><span class="wm dw" style="font-size:22px">stack</span></div>
+ <div class="msg"><span class="mono" id="gEyebrow">Stack original</span><b class="glyph dn" id="gGlyph"></b><h1 class="dw" id="gTitle"></h1><p style="margin:0;color:#5c5c59">The game itself goes here.</p></div>
+ <div class="load" id="gLoad"><div class="slot" data-area="gameLoad"></div></div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Motion">
+ <header><span class="mono">Brand motion · Stack Motion Vault</span><h3 class="dw">Motion</h3><p>Every area of the site runs one animation from the vault. Click an area to change it. Your picks are saved on this device.</p></header>
+ <div class="body" id="areaList"></div>
+ <footer><button class="sw" id="editSw"><i></i>Show areas on the page</button><span class="sp"></span><button class="btn" style="height:38px;font-size:12.5px" id="resetBtn">Reset all</button></footer>
+</aside>
+<section class="sheet" id="sheet" aria-label="Choose an animation">
+ <header><div><span class="mono" id="shEyebrow"></span><h3 class="dw" id="shTitle"></h3></div><button class="btn" style="height:38px" id="shClose">Done</button></header>
+ <div class="cats" id="shCats"></div>
+ <div class="list" id="shList"></div>
+</section>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/*@@MV_JS@@*/
+</script>
+<script>
+/*@@SITE_JS@@*/
+</script>
+</body>
+</html>
