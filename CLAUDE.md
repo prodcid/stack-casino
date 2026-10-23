@@ -656,6 +656,7 @@ Two patterns, don't mix them up:
 - **2026-10-23** — Stack 2: rebuilt the whole site black and white from scratch (stack2/ parts) instead of reskinning v1, because Alex asked for a new real-gambling-site product with sports, micro betting and new games; v1 saved as tag/branch legacy-v1. Kept the v1 account store and top-up rule so the mate's login and balance carry over and the launcher needs nothing. Retention nudges are realistic but honest: true numbers, offers that pay, no fake near-misses.
 - **2026-10-23** — build.py only rewrites stack-casino.html when its content changes (ignoring the version stamp), so ship.js's build step doesn't make CLAUDE.md look stale.
 - **2026-10-23** — Footer and lobby say 'fair odds', not 'provably fair': the games use Math.random with no seed verification, so the stronger claim would be false.
+- **2026-10-23** — Micro odds buttons act on pointerdown and the micro bar no longer rebuilds every second (a redraw between press and release swallowed real clicks); micro bets left open when a match ends are void and refunded; favourites get a heart on every tile, a toast and a live sidebar count.
 
 ---
 

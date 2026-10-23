@@ -109,6 +109,8 @@ main{grid-column:2;overflow:auto;min-height:0;position:relative}
 .tile .n{font-weight:800;font-size:14px}.tile .s{font:500 10px var(--mono);color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
 .tile .tg{position:absolute;top:12px;right:12px;font:500 9.5px var(--mono);letter-spacing:.08em;padding:2px 7px;border-radius:999px;background:var(--ink);color:var(--surface)}
 .tile.inv{background:var(--ink);color:var(--surface)}.tile.inv .tg{background:var(--surface);color:var(--ink)}
+.tile .fv{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;font-size:13px;opacity:0;transition:opacity var(--q),background var(--q);z-index:2;line-height:1}.tile .tg+.fv,.tile .fv{background:var(--surface);color:var(--ink)}.tile:hover .fv,.tile .fv.on{opacity:1}.tile .fv.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}.tile .tg{right:46px}
+.fvb.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .tile .pl{position:absolute;left:14px;right:14px;bottom:14px;transform:translateY(130%);transition:transform var(--std) var(--out)}.tile:hover .pl{transform:none}
 .tile:hover .bot{opacity:0}.tile .bot{transition:opacity var(--q)}
 .feedt{width:100%;border-collapse:collapse}.feedt th{font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -374,8 +376,10 @@ function wipe(fn){const b=document.createElement('div');b.className='bars3';b.in
 addEventListener('hashchange',route);
 
 /* ---------- lobby ---------- */
-const tileHTML=g=>{const G=GAMES[g];return `<div class="tile${G.inv?' inv':''}" data-g="${g}">${G.tag?`<span class="tg">${G.tag}</span>`:''}<div class="g">${G.glyph}</div><div class="bot"><div class="n">${G.name}</div><div class="s">${G.sub||CATS[G.cat]} · RTP ${G.rtp}</div></div><div class="pl">${BTN('Play','f sm w')}</div></div>`};
-function wireTiles(root){root.querySelectorAll('.tile[data-g]').forEach(t=>{t.onclick=()=>{sfx('click');location.hash='#/play/'+t.dataset.g};t.onmouseenter=()=>sfx('hover')})}
+const isFav=g=>loggedIn()&&X().favs.includes(g);
+function toggleFav(g){const x=X(),i=x.favs.indexOf(g);i<0?x.favs.push(g):x.favs.splice(i,1);save(true);sfx('click');toast(i<0?'Added to favourites':'Removed from favourites',GAMES[g].name,'lt','heart');drawNav();document.querySelectorAll(`[data-fav="${g}"]`).forEach(b=>b.classList.toggle('on',i<0))}
+const tileHTML=g=>{const G=GAMES[g];return `<div class="tile${G.inv?' inv':''}" data-g="${g}">${G.tag?`<span class="tg">${G.tag}</span>`:''}<button class="fv${isFav(g)?' on':''}" data-fav="${g}" title="Favourite">♥</button><div class="g">${G.glyph}</div><div class="bot"><div class="n">${G.name}</div><div class="s">${G.sub||CATS[G.cat]} · RTP ${G.rtp}</div></div><div class="pl">${BTN('Play','f sm w')}</div></div>`};
+function wireTiles(root){root.querySelectorAll('.tile [data-fav]').forEach(b=>b.onclick=e=>{e.stopPropagation();toggleFav(b.dataset.fav)});root.querySelectorAll('.tile[data-g]').forEach(t=>{t.onclick=()=>{sfx('click');location.hash='#/play/'+t.dataset.g};t.onmouseenter=()=>sfx('hover')})}
 function banners(){return `<div class="hero">
  <div class="ban inv" data-go="#/promos"><div><span class="mono">Daily bonus · day ${Math.min(7,X().daily.streak+1)} of 7</span><h3 class="dw">Your free spin<br>is waiting.</h3><p>Come back every day to build your streak. Day 7 pays the most.</p></div><div>${BTN('Claim now','sm')}</div><svg class="art rib" viewBox="0 0 96 96" style="opacity:.14;width:260px;height:260px"><path d="M84 22 H30 A13 13 0 0 0 30 48 H66 A13 13 0 0 1 66 74 H12" style="stroke-width:10"/></svg></div>
  <div class="ban out" data-go="#/play/holdem"><div><span class="mono">Poker · no limit</span><h3 class="dw">Hold'em<br>night.</h3><p>Four AI players. You sit down with 100 big blinds.</p></div><div>${BTN('Take a seat','sm')}</div></div>
@@ -393,9 +397,9 @@ ROUTES.c=(cat)=>{const v=$('view'),x=X();let ids=cat==='favs'?x.favs.filter(g=>G
 /* ---------- a game page: side panel + stage, with the shared header, rules and the game's own bets feed ---------- */
 ROUTES.play=(id)=>{const G=GAMES[id];if(!G){location.hash='#/lobby';return}const v=$('view'),fav=X().favs.includes(id);CURGAME=id;
  v.innerHTML=`<div class="ghead"><a class="icb" href="#/c/${G.cat}" title="Back">${svg('x')}</a><h1 class="dw">${G.name}</h1><span class="pill">${CATS[G.cat].toUpperCase()}</span><span class="pill">RTP ${G.rtp}</span><span class="sp"></span>
-  <button class="icb" id="gFav" title="Favourite" style="${fav?'background:var(--ink);color:var(--surface)':''}">${svg('heart')}</button><button class="btn sm" id="gRules"><i class="b"></i><i class="b"></i><i class="b"></i>How to play</button></div>
+  <button class="icb fvb${fav?' on':''}" id="gFav" data-fav="${id}" title="Favourite">${svg('heart')}</button><button class="btn sm" id="gRules"><i class="b"></i><i class="b"></i><i class="b"></i>How to play</button></div>
   <div id="gHost"></div><div class="sh"><div><span class="mono">${G.name} · live</span><h2 class="dw">Latest bets</h2></div></div>${feedBox(id)}`;
- $('gFav').onclick=()=>{const x=X(),i=x.favs.indexOf(id);i<0?x.favs.push(id):x.favs.splice(i,1);save();sfx('click');route()};
+ $('gFav').onclick=()=>toggleFav(id);
  $('gRules').onclick=()=>modal(`<span class="mono">${CATS[G.cat]} · RTP ${G.rtp}</span><h3 class="dw">${G.name}</h3><p class="mut" style="line-height:1.6">${G.rules}</p>`);
  wireFeed(v,id);G.mount($('gHost'))};
 
@@ -961,7 +965,7 @@ function point(m,quiet){const sv=m.server,p=TEAMS.tennis.find(t=>t[0]===(sv?m.a.
   const G=m.games;if((G[won]>=4&&G[won]-G[1-won]>=2)||tb){m.sets[won]++;m.setsHist.push(G.slice());m.games=[0,0];m.tb=0;if(!quiet)evt(m,`Set to ${won?m.a.n:m.h.n} · ${m.setsHist.map(g=>g.join('–')).join(', ')}`,won?'a':'h');if(m.sets[won]===2){m.hs=m.sets[0];m.as=m.sets[1];end(m,quiet)}}
   else if(G[0]===4&&G[1]===4){m.tb=1;if(!quiet)evt(m,'Tie-break',0)}else if(!quiet&&R()<.4)evt(m,`Game ${won?m.a.n:m.h.n} · ${G.join('–')}`,won?'a':'h')}
  m.hs=m.sets[0];m.as=m.sets[1]}
-function end(m,quiet){m.done=1;m.live=0;m.endW=Date.now();if(!quiet)evt(m,`Full time · ${m.hs}–${m.as}`,0);settleMatch(m);setTimeout(()=>newMatch(m.sp,60+rint(120)),2000)}
+function end(m,quiet){m.done=1;m.live=0;m.endW=Date.now();for(const x of MICRO)if(x.mid===m.id&&!x.done)microResolve(x,null,'Match over, stake returned');if(!quiet)evt(m,`Full time · ${m.hs}–${m.as}`,0);settleMatch(m);setTimeout(()=>newMatch(m.sp,60+rint(120)),2000)}
 /* ---------- prices ---------- */
 function probs(m){const o={};if(m.done)return o;
  if(m.sp==='football'){const left=Math.max(0,90-m.min)/90,mh=m.lh*left,ma=m.la*left;let ph=0,pd=0,po=0,pb=0;
@@ -1076,20 +1080,22 @@ function microSettle(kind,m,arg){if(kind==='goal'){settleNextGoal(m,arg);for(con
  if(kind==='pt')for(const x of MICRO)if(x.mid===m.id&&x.k==='pt'&&!x.done)microResolve(x,arg.won===x.sv?'s':'r',arg.won===x.sv?'Server won the point':'Receiver won the point');
  if(kind==='crashBust')for(const x of MICRO)if(x.k==='crash'&&!x.done&&!x.open)microResolve(x,arg>=2?'y':'n',`Bust at ${arg.toFixed(2)}×`)}
 const MB=[];/* placed micro bets: {x,sel,st,od} */
-function microResolve(x,win,why){x.done=1;x.open=0;x.doneW=Date.now();x.res=win;x.why=why;for(const b of MB.slice()){if(b.x!==x.id)continue;MB.splice(MB.indexOf(b),1);const ok=b.sel===win,pay=ok?b.st*b.od:0;if(pay)credit(pay,'micro');record('micro-'+x.k,b.st,pay,`${x.q} · ${why}`);outcome(ok);
+function microResolve(x,win,why){x.done=1;x.open=0;x.doneW=Date.now();x.res=win;x.why=why;for(const b of MB.slice()){if(b.x!==x.id)continue;MB.splice(MB.indexOf(b),1);if(win===null){credit(b.st,'micro');record('micro-'+x.k,b.st,b.st,`${x.q} · void`);toast('Micro bet void',`${x.q} · stake returned`,'lt','bolt');continue}
+ const ok=b.sel===win,pay=ok?b.st*b.od:0;if(pay)credit(pay,'micro');record('micro-'+x.k,b.st,pay,`${x.q} · ${why}`);outcome(ok);
  if(ok){sfx('win');toast(`Micro win · +${fmt(pay)}`,`${x.q} ${why}`,'','bolt')}else toast('Micro bet lost',`${x.q} ${why}`,'lt','bolt')}}
 let MST=X0()?5:5;function X0(){return 1}
 function microRow(x){const placed=MB.filter(b=>b.x===x.id);return `<div class="mk" style="min-width:0;grid-template-columns:repeat(${x.sel.length},auto) 1fr;border-right:0;border-bottom:1px solid var(--line);padding:10px 14px"><div class="q" style="grid-column:1/-1">${esc(x.q)}<span class="t">${x.done?esc(x.why):x.open?'OPEN':'IN PLAY'}</span></div>
  ${x.sel.map(([s,l,p])=>`<button class="ob${placed.some(b=>b.sel===s)?' on':''}" data-x="${x.id}" data-s="${s}" ${x.open?'':'disabled'}>${l}<b>${ODD(p)?ODD(p).toFixed(2):'—'}</b></button>`).join('')}<span class="mono" style="text-align:right">${placed.length?'You: '+placed.map(b=>fmt(b.st)).join(', '):''}</span></div>`}
-function wireMicro(root){root.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{const x=MICRO.find(z=>z.id==b.dataset.x);if(!x||!x.open)return;const sel=x.sel.find(s=>s[0]===b.dataset.s),od=ODD(sel[2]);if(!od)return;
+function wireMicro(root){root.querySelectorAll('[data-x]').forEach(b=>b.onpointerdown=e=>{e.preventDefault();const x=MICRO.find(z=>z.id==b.dataset.x);if(!x||!x.open)return;const sel=x.sel.find(s=>s[0]===b.dataset.s),od=ODD(sel[2]);if(!od)return;
  if(!spend(MST,'micro'))return;MB.push({x:x.id,sel:sel[0],st:MST,od});sfx('bet');toast('Micro bet placed',`${fmt(MST)} on ${sel[1]} @ ${od.toFixed(2)}`,'','bolt');drawMicro();if(CURMATCH)drawMatchLive()})}
 function drawMicro(){const t=$('mtrack');if(!t||!loggedIn())return;const L=MICRO.filter(x=>x.open||MB.some(b=>b.x===x.id)||(x.done&&Date.now()-x.doneW<4000)).slice(0,14);
  const key=L.map(x=>x.id+(x.open?'o':'c')+(x.done?'d':'')+MB.filter(b=>b.x===x.id).length).join(',');if(t._k===key&&!t._force){return}t._k=key;
  t.innerHTML=`<div class="mk" style="min-width:150px"><div class="q">Quick stake</div>${[1,5,25].map(v=>`<button class="ob${MST===v?' on':''}" data-qs="${v}">${v}</button>`).join('')}</div>`+L.map(x=>{const m=MATCHES.find(z=>z.id===x.mid),placed=MB.filter(b=>b.x===x.id);
-  return `<div class="mk"><div class="q"><span style="overflow:hidden;text-overflow:ellipsis;max-width:200px">${esc(x.q)}</span><span class="t">${x.done?'SETTLED':x.open?(x.k==='rou'?Math.max(0,Math.ceil((x.at-3000-Date.now())/1000))+'s':m&&m.sp==='football'?m.min+"'":'OPEN'):'LIVE'}</span></div>
+  return `<div class="mk"><div class="q"><span style="overflow:hidden;text-overflow:ellipsis;max-width:200px">${esc(x.q)}</span><span class="t" data-cd="${x.id}">${x.done?'SETTLED':x.open?(x.k==='rou'?Math.max(0,Math.ceil((x.at-3000-Date.now())/1000))+'s':m&&m.sp==='football'?m.min+"'":'OPEN'):'LIVE'}</span></div>
    ${x.sel.slice(0,3).map(([s,l,p])=>`<button class="ob${placed.some(b=>b.sel===s)?' on':''}${x.done&&x.res===s?' on':''}" data-x="${x.id}" data-s="${s}" ${x.open?'':'disabled'}>${l}<b>${ODD(p)?ODD(p).toFixed(2):'—'}</b></button>`).join('')}</div>`}).join('');
- t.querySelectorAll('[data-qs]').forEach(b=>b.onclick=()=>{MST=+b.dataset.qs;t._k='';drawMicro()});wireMicro(t)}
-setInterval(()=>{const t=$('mtrack');if(t)t._k=''},1000);
+ t.querySelectorAll('[data-qs]').forEach(b=>b.onpointerdown=()=>{MST=+b.dataset.qs;t._k='';drawMicro()});wireMicro(t)}
+/* countdowns tick in place, without rebuilding the buttons */
+setInterval(()=>{document.querySelectorAll('#mtrack [data-cd]').forEach(e=>{const x=MICRO.find(z=>z.id==e.dataset.cd);if(x&&x.k==='rou'&&x.open)e.textContent=Math.max(0,Math.ceil((x.at-3000-Date.now())/1000))+'s'})},1000);
 ROUTES.micro=()=>{const v=$('view');v.innerHTML=`<div class="sh"><div><span class="mono">Live · settles in seconds</span><h2 class="dw">Micro betting</h2></div><p class="mut" style="max-width:46ch;margin:0">Bet on the next slice of play: the next five minutes of football, the next basket, the next point, the next Crash round, the next live roulette spin. Every price returns 97%. Quick stake is set in the micro bar below.</p></div><div class="card" id="mcAll"></div>
  <div class="sh"><div><span class="mono">Live roulette · spins every 40 seconds</span><h2 class="dw" style="font-size:22px">Last spins</h2></div></div><div class="card" style="padding:14px 18px" id="mcRou"></div>${footer()}`;const up=()=>{if(!$('mcAll'))return clearInterval(tm);$('mcAll').innerHTML=MICRO.filter(x=>!x.done||Date.now()-x.doneW<4000).map(x=>`<div style="display:grid;grid-template-columns:200px 1fr"><div style="padding:14px 16px;border-bottom:1px solid var(--line)" class="mono">${esc(x.ev)}</div>${microRow(x)}</div>`).join('')||'<div class="empty">Opening markets…</div>';wireMicro($('mcAll'));
  $('mcRou').innerHTML=`<div class="hist">${LIVEROU.map(n=>`<i class="${REDS.has(n)?'w':''}">${n}</i>`).join('')||'<span class="mut">First spin soon</span>'}</div>`},tm=setInterval(up,1000);up()};

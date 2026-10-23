@@ -47,8 +47,10 @@ function wipe(fn){const b=document.createElement('div');b.className='bars3';b.in
 addEventListener('hashchange',route);
 
 /* ---------- lobby ---------- */
-const tileHTML=g=>{const G=GAMES[g];return `<div class="tile${G.inv?' inv':''}" data-g="${g}">${G.tag?`<span class="tg">${G.tag}</span>`:''}<div class="g">${G.glyph}</div><div class="bot"><div class="n">${G.name}</div><div class="s">${G.sub||CATS[G.cat]} · RTP ${G.rtp}</div></div><div class="pl">${BTN('Play','f sm w')}</div></div>`};
-function wireTiles(root){root.querySelectorAll('.tile[data-g]').forEach(t=>{t.onclick=()=>{sfx('click');location.hash='#/play/'+t.dataset.g};t.onmouseenter=()=>sfx('hover')})}
+const isFav=g=>loggedIn()&&X().favs.includes(g);
+function toggleFav(g){const x=X(),i=x.favs.indexOf(g);i<0?x.favs.push(g):x.favs.splice(i,1);save(true);sfx('click');toast(i<0?'Added to favourites':'Removed from favourites',GAMES[g].name,'lt','heart');drawNav();document.querySelectorAll(`[data-fav="${g}"]`).forEach(b=>b.classList.toggle('on',i<0))}
+const tileHTML=g=>{const G=GAMES[g];return `<div class="tile${G.inv?' inv':''}" data-g="${g}">${G.tag?`<span class="tg">${G.tag}</span>`:''}<button class="fv${isFav(g)?' on':''}" data-fav="${g}" title="Favourite">♥</button><div class="g">${G.glyph}</div><div class="bot"><div class="n">${G.name}</div><div class="s">${G.sub||CATS[G.cat]} · RTP ${G.rtp}</div></div><div class="pl">${BTN('Play','f sm w')}</div></div>`};
+function wireTiles(root){root.querySelectorAll('.tile [data-fav]').forEach(b=>b.onclick=e=>{e.stopPropagation();toggleFav(b.dataset.fav)});root.querySelectorAll('.tile[data-g]').forEach(t=>{t.onclick=()=>{sfx('click');location.hash='#/play/'+t.dataset.g};t.onmouseenter=()=>sfx('hover')})}
 function banners(){return `<div class="hero">
  <div class="ban inv" data-go="#/promos"><div><span class="mono">Daily bonus · day ${Math.min(7,X().daily.streak+1)} of 7</span><h3 class="dw">Your free spin<br>is waiting.</h3><p>Come back every day to build your streak. Day 7 pays the most.</p></div><div>${BTN('Claim now','sm')}</div><svg class="art rib" viewBox="0 0 96 96" style="opacity:.14;width:260px;height:260px"><path d="M84 22 H30 A13 13 0 0 0 30 48 H66 A13 13 0 0 1 66 74 H12" style="stroke-width:10"/></svg></div>
  <div class="ban out" data-go="#/play/holdem"><div><span class="mono">Poker · no limit</span><h3 class="dw">Hold'em<br>night.</h3><p>Four AI players. You sit down with 100 big blinds.</p></div><div>${BTN('Take a seat','sm')}</div></div>
@@ -66,9 +68,9 @@ ROUTES.c=(cat)=>{const v=$('view'),x=X();let ids=cat==='favs'?x.favs.filter(g=>G
 /* ---------- a game page: side panel + stage, with the shared header, rules and the game's own bets feed ---------- */
 ROUTES.play=(id)=>{const G=GAMES[id];if(!G){location.hash='#/lobby';return}const v=$('view'),fav=X().favs.includes(id);CURGAME=id;
  v.innerHTML=`<div class="ghead"><a class="icb" href="#/c/${G.cat}" title="Back">${svg('x')}</a><h1 class="dw">${G.name}</h1><span class="pill">${CATS[G.cat].toUpperCase()}</span><span class="pill">RTP ${G.rtp}</span><span class="sp"></span>
-  <button class="icb" id="gFav" title="Favourite" style="${fav?'background:var(--ink);color:var(--surface)':''}">${svg('heart')}</button><button class="btn sm" id="gRules"><i class="b"></i><i class="b"></i><i class="b"></i>How to play</button></div>
+  <button class="icb fvb${fav?' on':''}" id="gFav" data-fav="${id}" title="Favourite">${svg('heart')}</button><button class="btn sm" id="gRules"><i class="b"></i><i class="b"></i><i class="b"></i>How to play</button></div>
   <div id="gHost"></div><div class="sh"><div><span class="mono">${G.name} · live</span><h2 class="dw">Latest bets</h2></div></div>${feedBox(id)}`;
- $('gFav').onclick=()=>{const x=X(),i=x.favs.indexOf(id);i<0?x.favs.push(id):x.favs.splice(i,1);save();sfx('click');route()};
+ $('gFav').onclick=()=>toggleFav(id);
  $('gRules').onclick=()=>modal(`<span class="mono">${CATS[G.cat]} · RTP ${G.rtp}</span><h3 class="dw">${G.name}</h3><p class="mut" style="line-height:1.6">${G.rules}</p>`);
  wireFeed(v,id);G.mount($('gHost'))};
 

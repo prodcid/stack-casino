@@ -59,6 +59,15 @@ const res = [], check = (ok, n, d = '') => { res.push(!!ok); console.log(`  ${ok
   check(mres.left === 0 && mres.micro >= 1, 'the micro bet settles within a minute', mres);
   const sres = await pg.evaluate(`(async()=>{const b=SPB.find(z=>!z.multi);const m=MATCHES.find(z=>z.id===b.mid);m.min=93;m.clock=93*4;m.stop=1;for(let i=0;i<20&&!m.done;i++)await new Promise(r=>setTimeout(r,250));return{done:m.done,left:SPB.filter(z=>z.mid===m.id).length,rec:X().bets.some(x=>x.g==='sport')}})()`);
   check(sres.done && sres.left === 0 && sres.rec, 'the match ends and the bet settles into the history', sres);
+  /* a human-speed click on a micro odds button (press, hold, release) places the bet; a favourite saves and shows */
+  await pg.evaluate("location.hash='#/c/orig'"); await pg.waitForTimeout(800); await pg.hover('.tile[data-g="dice"]'); await pg.click('.tile[data-g="dice"] [data-fav]'); await pg.waitForTimeout(300);
+  const fv = await pg.evaluate("({saved:JSON.parse(localStorage.getItem('stack-casino')).players.find(p=>p.user==='mate').s2.favs.includes('dice'),count:document.querySelector('#nav a[href=\"#/c/favs\"] .ct').textContent})");
+  const n0 = await pg.evaluate('MB.length'); let el = null; for (let i = 0; i < 20 && !el; i++) { el = await pg.$('#mtrack .ob[data-x]:not([disabled])'); if (!el) await pg.waitForTimeout(500) }
+  const bb = await el.boundingBox(); await pg.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await pg.mouse.down(); await pg.waitForTimeout(400); await pg.mouse.up(); await pg.waitForTimeout(300);
+  const slow = await pg.evaluate('MB.length') - n0;
+  check(fv.saved && fv.count === '1' && slow === 1, 'a favourite saves and shows in the sidebar; a slow click on a micro bet places it', { ...fv, slow });
+  const voidm = await pg.evaluate("(()=>{const m=MATCHES.find(z=>z.live&&z.sp!=='football');const x=MICRO.find(z=>z.mid===m.id&&!z.done);if(!x)return{skip:1};spend(5,'micro');MB.push({x:x.id,sel:x.sel[0][0],st:5,od:2});const b=P().bal;end(m,true);return{left:MB.filter(q=>q.x===x.id).length,back:+(P().bal-b).toFixed(2)}})()");
+  check(voidm.skip || (voidm.left === 0 && voidm.back === 5), 'a micro bet still open when its match ends is void and refunded', voidm);
   /* reality check and limits */
   await pg.evaluate("location.hash='#/lobby'"); await pg.waitForTimeout(500);
   const rc = await pg.evaluate("(async()=>{closeAll();SES.lastRc=Date.now()-31*60000;await new Promise(r=>setTimeout(r,5600));const m=document.getElementById('modal');return{on:m.classList.contains('on'),txt:/You've been playing for/.test(m.textContent)&&/Wagered/.test(m.textContent)&&/Net/.test(m.textContent),keep:!!document.getElementById('rcGo')}})()");
