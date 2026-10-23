@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.23.3",
-  "notes": "Stack 2.1: much clearer (how-to guides, every match shows time left, every market explained, every game says how to play), soft colours, subtle win effects with coins and glow, cards deal one at a time without re-dealing hands, many more bets: double chance, draw no bet, totals, handicaps, correct score, spreads, sets, Crash ladder, serve holds, blackjack Perfect Pairs",
-  "bytes": 491723,
-  "at": "2026-10-23T10:38:19.357Z"
+  "version": "2026.10.24.1",
+  "notes": "Sports v3: live trackers, bet builder, boosts, new sports look",
+  "bytes": 524033,
+  "at": "2026-10-23T23:43:22.876Z"
 }

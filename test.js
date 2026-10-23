@@ -59,6 +59,11 @@ const res = [], check = (ok, n, d = '') => { res.push(!!ok); console.log(`  ${ok
   check(mres.left === 0 && mres.micro >= 1, 'the micro bet settles within a minute', mres);
   const sres = await pg.evaluate(`(async()=>{const b=SPB.find(z=>!z.multi);const m=MATCHES.find(z=>z.id===b.mid);m.min=93;m.clock=93*4;m.stop=1;for(let i=0;i<20&&!m.done;i++)await new Promise(r=>setTimeout(r,250));return{done:m.done,left:SPB.filter(z=>z.mid===m.id).length,rec:X().bets.some(x=>x.g==='sport')}})()`);
   check(sres.done && sres.left === 0 && sres.rec, 'the match ends and the bet settles into the history', sres);
+  const bbt = await pg.evaluate(`(async()=>{refreshOdds();const m=MATCHES.find(z=>z.live&&z.sp==='football'&&!z.done&&z.min<80&&!z.sus)||MATCHES.find(z=>z.sp==='football'&&!z.done&&!z.live);const one=Math.abs(jointP(m,[{k:'res',s:'h'}])-m.P.res.h)<1e-9,none=jointP(m,[{k:'res',s:'h'},{k:'res',s:'a'}])===0;
+    SLIP.length=0;toggleSel(m,'res','h');toggleSel(m,'ou15','o');SLIP.mst=10;const mo=multiOdd();const fair=mo.od>0&&mo.od*jointP(m,[{k:'res',s:'h'},{k:'ou15',s:'o'}])<=.965;const b0=P().bal;placeSlip();const bet=SPB.find(z=>z.multi);
+    m.min=93;m.clock=93*4;m.stop=1;m.live=1;for(let i=0;i<20&&!m.done;i++)await new Promise(r=>setTimeout(r,250));const won=m.hs>m.as&&m.hs+m.as>1,rec=X().bets.find(x=>x.g==='sport-multi');
+    return{one,none,fair,od:mo.od,placed:!!bet,left:SPB.filter(z=>z.multi).length,won,paid:+(P().bal-b0).toFixed(2),want:+((won?10*mo.od:0)-10).toFixed(2),rec:!!rec}})()`);
+  check(bbt.one && bbt.none && bbt.fair && bbt.placed && bbt.left === 0 && bbt.rec && Math.abs(bbt.paid - bbt.want) < .01, 'bet builder: priced jointly at 96% (one leg = the market, impossible = no price), placed, settled to the cent', bbt);
   /* a human-speed click on a micro odds button (press, hold, release) places the bet; a favourite saves and shows */
   await pg.evaluate("location.hash='#/c/orig'"); await pg.waitForTimeout(800); await pg.hover('.tile[data-g="dice"]'); await pg.click('.tile[data-g="dice"] [data-fav]'); await pg.waitForTimeout(300);
   const fv = await pg.evaluate("({saved:JSON.parse(localStorage.getItem('stack-casino')).players.find(p=>p.user==='mate').s2.favs.includes('dice'),count:document.querySelector('#nav a[href=\"#/c/favs\"] .ct').textContent})");
