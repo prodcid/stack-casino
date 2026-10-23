@@ -52,7 +52,16 @@ function topUp(){if(!loggedIn())return;if(P().bal>=100){toast('Top up unlocks un
 /* ---------- balance odometer ---------- */
 function odoHTML(s){return[...s].map(c=>/\d/.test(c)?`<span class="d"><span>${'0123456789'.split('').map(n=>`<i>${n}</i>`).join('')}</span></span>`:`<span>${c}</span>`).join('')}
 function odoSet(el,s){if(el.dataset.len!=String(s.length)){el.innerHTML=odoHTML(s);el.dataset.len=s.length}const ds=el.querySelectorAll('.d>span');let k=0;for(const c of s)if(/\d/.test(c)){ds[k].style.transform=`translateY(${-c*1.15}em)`;k++}}
-function drawBal(dir){const e=$('bal');if(!e)return;e.classList.add('odo');odoSet(e,fmt(bal()));e.setAttribute('aria-label',fmt(bal()));if(dir>0){e.classList.remove('up');void e.offsetWidth;e.classList.add('up')}if(typeof onBal==='function')onBal()}
+/* win effects: a number that floats up from the game, coins flying to the balance, the balance glowing. Bigger wins
+   send more coins; losses get a quiet red edge on the stage and nothing else. */
+function winFx(pay,mult){const st=document.querySelector('.gstage'),bl=$('bal');if(!st||!bl)return;const a=st.getBoundingClientRect(),b=bl.getBoundingClientRect();
+ st.classList.remove('wonfx');void st.offsetWidth;st.classList.add('wonfx');const p=document.createElement('div');p.className='pop';p.textContent='+'+fmt(pay);p.style.left=(a.left+a.width/2)+'px';p.style.top=(a.top+a.height*.42)+'px';document.body.appendChild(p);setTimeout(()=>p.remove(),1500);
+ const n=Math.min(16,3+Math.round(Math.log2(Math.max(1,mult))*3));for(let i=0;i<n;i++){const c=document.createElement('div');c.className='coin';const x0=a.left+a.width/2+(R()-.5)*120,y0=a.top+a.height*.45+(R()-.5)*60;c.style.left=x0+'px';c.style.top=y0+'px';document.body.appendChild(c);
+  const dx=b.left+b.width/2-x0,dy=b.top+b.height/2-y0;c.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${dx*.4+(R()-.5)*80}px,${dy*.4-60}px) scale(1.1)`,opacity:1,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.5)`,opacity:.9}],{duration:750+i*45,easing:'cubic-bezier(.5,0,.3,1)'}).onfinish=()=>{c.remove();if(i%3===0)sfx('tickup')}}
+ bl.classList.add('won');clearTimeout(bl._w);bl._w=setTimeout(()=>bl.classList.remove('won'),1200)}
+function loseFx(){const st=document.querySelector('.gstage');if(!st)return;st.classList.remove('lostfx');void st.offsetWidth;st.classList.add('lostfx')}
+function drawXp(){const b=$('avBtn');if(!b||!loggedIn()||typeof vipLevel!=='function')return;let x=b.querySelector('.xpbar');if(!x){x=document.createElement('span');x.className='xpbar';x.innerHTML='<i></i>';b.appendChild(x)}x.firstChild.style.width=vipLevel().pct+'%';b.title=`${vipLevel().n} · ${Math.round(vipLevel().pct)}% to ${vipLevel().next?vipLevel().next.n:'the top'}`}
+function drawBal(dir){if(typeof drawXp==='function')setTimeout(drawXp,0);const e=$('bal');if(!e)return;e.classList.add('odo');odoSet(e,fmt(bal()));e.setAttribute('aria-label',fmt(bal()));if(dir>0){e.classList.remove('up');void e.offsetWidth;e.classList.add('up')}if(typeof onBal==='function')onBal()}
 
 /* ---------- sound: recorded cards / chips / dice (Kenney CC0) + a new synthesized UI palette ---------- */
 const AU={c:null,buf:{},on:1,master:null};

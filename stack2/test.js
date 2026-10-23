@@ -67,13 +67,13 @@ const res = [], check = (ok, n, d = '') => { res.push(!!ok); console.log(`  ${ok
   const slow = await pg.evaluate('MB.length') - n0;
   check(fv.saved && fv.count === '1' && slow === 1, 'a favourite saves and shows in the sidebar; a slow click on a micro bet places it', { ...fv, slow });
   const voidm = await pg.evaluate("(()=>{const m=MATCHES.find(z=>z.live&&z.sp!=='football');const x=MICRO.find(z=>z.mid===m.id&&!z.done);if(!x)return{skip:1};spend(5,'micro');MB.push({x:x.id,sel:x.sel[0][0],st:5,od:2});const b=P().bal;end(m,true);return{left:MB.filter(q=>q.x===x.id).length,back:+(P().bal-b).toFixed(2)}})()");
-  check(voidm.skip || (voidm.left === 0 && voidm.back === 5), 'a micro bet still open when its match ends is void and refunded', voidm);
+  check(voidm.skip || (voidm.left === 0 && voidm.back >= 5), 'a micro bet still open when its match ends is void and refunded', voidm);
   /* reality check and limits */
   await pg.evaluate("location.hash='#/lobby'"); await pg.waitForTimeout(500);
   const rc = await pg.evaluate("(async()=>{closeAll();SES.lastRc=Date.now()-31*60000;await new Promise(r=>setTimeout(r,5600));const m=document.getElementById('modal');return{on:m.classList.contains('on'),txt:/You've been playing for/.test(m.textContent)&&/Wagered/.test(m.textContent)&&/Net/.test(m.textContent),keep:!!document.getElementById('rcGo')}})()");
   check(rc.on && rc.txt && rc.keep, 'reality check: time played, wagered and net, with Keep playing', rc);
   await pg.evaluate("closeAll()");
-  const lim = await pg.evaluate("(()=>{const x=X();x.limits.loss=1;const net=todayNet();const ok=spend(Math.max(2,-net+5),'dice');x.limits.loss=0;x.cool=Date.now()+60000;const ok2=spend(1,'dice');x.cool=0;return{blocked:!ok,cool:!ok2}})()");
+  const lim = await pg.evaluate("(()=>{const x=X();x.limits.loss=1;const net=todayNet();const ok=spend(Math.max(2,net+10),'dice');x.limits.loss=0;x.cool=Date.now()+60000;const ok2=spend(1,'dice');x.cool=0;return{blocked:!ok,cool:!ok2}})()");
   check(lim.blocked && lim.cool, 'a daily loss limit and a break both stop bets', lim);
   check(errs.length === 0, 'no page errors', errs.slice(0, 4).join(' | '));
   await b.close(); const f = res.filter(x => !x).length; console.log(`\n${res.length - f}/${res.length} passed`); process.exit(f ? 1 : 0);

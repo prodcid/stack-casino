@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.23.2",
-  "notes": "Fixes: micro bets now place on the first click and always settle (or refund if the match ends); favourites save, show a heart on every game and count in the sidebar",
-  "bytes": 473634,
-  "at": "2026-10-23T10:07:10.184Z"
+  "version": "2026.10.23.3",
+  "notes": "Stack 2.1: much clearer (how-to guides, every match shows time left, every market explained, every game says how to play), soft colours, subtle win effects with coins and glow, cards deal one at a time without re-dealing hands, many more bets: double chance, draw no bet, totals, handicaps, correct score, spreads, sets, Crash ladder, serve holds, blackjack Perfect Pairs",
+  "bytes": 491723,
+  "at": "2026-10-23T10:38:19.357Z"
 }

@@ -657,6 +657,7 @@ Two patterns, don't mix them up:
 - **2026-10-23** — build.py only rewrites stack-casino.html when its content changes (ignoring the version stamp), so ship.js's build step doesn't make CLAUDE.md look stale.
 - **2026-10-23** — Footer and lobby say 'fair odds', not 'provably fair': the games use Math.random with no seed verification, so the stronger claim would be false.
 - **2026-10-23** — Micro odds buttons act on pointerdown and the micro bar no longer rebuilds every second (a redraw between press and release swallowed real clicks); micro bets left open when a match ends are void and refunded; favourites get a heart on every tile, a toast and a live sidebar count.
+- **2026-10-23** — Stack 2.1: cards remember what each slot showed (SEEN + dealKey) so only new cards deal in and reveals flip, instead of every redraw re-dealing the hand; soft accent colours (win green, loss red, gold, live red, category tints) on top of black and white; subtle win effects scaled to the multiplier; plain explainers and match clocks with time left; more markets (double chance, draw no bet, totals 1.5/3.5, handicap, correct score, spread, sets) with push handling; Crash ladder and serve-hold micro markets; blackjack Perfect Pairs at 25/12/7 (97.8%, not 25/12/6 which is 93.9%).
 
 ---
 

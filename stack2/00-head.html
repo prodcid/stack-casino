@@ -13,10 +13,10 @@
    STACK 2 (2026-10-23) - the whole site, rebuilt black and white. Built from stack2/ parts by stack2/build.py.
    Tokens only; dark mode flips them. No accent colour: wins and losses show through weight, fills and motion.
    ===================================================================================================== */
-:root{--bg:#f3f3f1;--surface:#ffffff;--s2:#f8f8f6;--ink:#0b0b0b;--ink-2:#5c5c59;--ink-3:#a3a39f;--line:#e1e1de;--hov:#efefec;
+:root{--win:#12a150;--winbg:#e7f6ec;--loss:#d93f45;--lossbg:#fbeaea;--gold:#d99a13;--goldbg:#fbf1db;--live:#ef3b2d;--blue:#3466f6;--bluebg:#e9effe;--violet:#7c4dff;--violetbg:#efe9ff;--tealbg:#e3f5f2;--teal:#11998a;--bg:#f3f3f1;--surface:#ffffff;--s2:#f8f8f6;--ink:#0b0b0b;--ink-2:#5c5c59;--ink-3:#a3a39f;--line:#e1e1de;--hov:#efefec;
  --disp:'Bricolage Grotesque','Plus Jakarta Sans',sans-serif;--body:'Plus Jakarta Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
  --q:240ms;--std:420ms;--con:900ms;--io:cubic-bezier(.65,0,.35,1);--out:cubic-bezier(.16,1,.3,1);--back:cubic-bezier(.34,1.56,.64,1);--r:14px;color-scheme:light}
-:root[data-theme="dark"]{--bg:#070707;--surface:#111111;--s2:#0c0c0c;--ink:#f3f3f1;--ink-2:#9b9b97;--ink-3:#5c5c59;--line:#232323;--hov:#191919;color-scheme:dark}
+:root[data-theme="dark"]{--win:#34d074;--winbg:#0f2a1a;--loss:#ff6b6f;--lossbg:#2c1213;--gold:#f2b632;--goldbg:#2a2209;--live:#ff5a4c;--blue:#6b8dff;--bluebg:#131d38;--violet:#a585ff;--violetbg:#1d1530;--tealbg:#0c2420;--teal:#3dd2c0;--bg:#070707;--surface:#111111;--s2:#0c0c0c;--ink:#f3f3f1;--ink-2:#9b9b97;--ink-3:#5c5c59;--line:#232323;--hov:#191919;color-scheme:dark}
 *{box-sizing:border-box}[hidden]{display:none!important}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.5 var(--body);-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}a{color:inherit;text-decoration:none}
@@ -188,6 +188,37 @@ footer.site{border-top:1px solid var(--line);margin-top:56px;padding-top:28px;di
 footer.site h4{font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}footer.site a{display:block;padding:3px 0}footer.site a:hover{color:var(--ink)}
 .badges{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.badges span{border:1px solid var(--line);border-radius:8px;padding:5px 9px;font:500 10px var(--mono);letter-spacing:.06em}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}}
+/* ---------- v2.1: colour, feel and the deal ---------- */
+.feedt .w{color:var(--win)}.res{background:var(--win);color:#fff}.res.l{background:var(--surface);color:var(--loss);border-color:var(--loss)}
+.hist i.w{background:var(--win);border-color:var(--win)}
+.nav a .live{background:var(--live);color:var(--live)}
+.tile[data-cat="orig"]{background:linear-gradient(160deg,var(--violetbg),var(--surface) 60%)}.tile[data-cat="cards"]{background:linear-gradient(160deg,var(--bluebg),var(--surface) 60%)}
+.tile[data-cat="poker"]{background:linear-gradient(160deg,var(--winbg),var(--surface) 60%)}.tile[data-cat="table"]{background:linear-gradient(160deg,var(--goldbg),var(--surface) 60%)}
+.tile.inv{background:var(--ink)}.tile .tg{background:var(--live)}
+.ban.inv{background:radial-gradient(120% 140% at 100% 0%,#2a2350,transparent 60%),radial-gradient(90% 120% at 0% 100%,#0e3a2a,transparent 60%),var(--ink)}
+.ob{border-color:var(--line)}.ob.up{border-color:var(--win);color:var(--win)}.ob.dn{border-color:var(--loss);color:var(--loss)}.ob.on{background:var(--ink)}
+.gold{color:var(--gold)}.win{color:var(--win)}.loss{color:var(--loss)}
+.wal .amt.won{color:var(--win);text-shadow:0 0 18px color-mix(in oklab,var(--win) 45%,transparent);transition:color .2s}
+.xpbar{position:absolute;left:4px;right:4px;bottom:-5px;height:3px;border-radius:3px;background:var(--line);overflow:hidden}.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ffd36b);transition:width .9s var(--out)}
+#avBtn{position:relative;overflow:visible}
+.fxc{position:fixed;inset:0;pointer-events:none;z-index:120}
+.coin{position:fixed;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a8,var(--gold) 60%,#a86f00);box-shadow:0 2px 6px rgba(0,0,0,.25);pointer-events:none;z-index:121}
+.pop{position:fixed;z-index:122;pointer-events:none;font:800 30px var(--disp);color:var(--win);text-shadow:0 2px 12px color-mix(in oklab,var(--win) 35%,transparent);animation:popup 1.4s var(--out) forwards}
+@keyframes popup{0%{transform:translate(-50%,0) scale(.6);opacity:0}15%{transform:translate(-50%,-14px) scale(1.12);opacity:1}100%{transform:translate(-50%,-80px) scale(1);opacity:0}}
+.streak{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:var(--goldbg);color:var(--gold);font:700 12px var(--body)}
+.gstage.wonfx{animation:wonfx 1s var(--out)}@keyframes wonfx{0%{box-shadow:inset 0 0 0 0 var(--win)}30%{box-shadow:inset 0 0 0 4px color-mix(in oklab,var(--win) 60%,transparent)}100%{box-shadow:inset 0 0 0 0 transparent}}
+.gstage.lostfx{animation:lostfx .5s}@keyframes lostfx{30%{box-shadow:inset 0 0 0 3px color-mix(in oklab,var(--loss) 40%,transparent)}}
+/* cards: only a newly dealt card flies in; a revealed card flips; nothing else moves */
+.pc{animation:none}.pc.nw{animation:dealin .42s var(--out) both}.pc.fl{animation:flipin .42s var(--io) both}
+@keyframes dealin{from{transform:translate(160px,-120px) rotate(14deg) scale(.9);opacity:0}70%{opacity:1}}
+@keyframes flipin{0%{transform:rotateY(90deg)}100%{transform:none}}
+.pc.red{background:#c9252c;border-color:#8f1117;color:#fff}:root[data-theme="dark"] .pc.red{background:#d7333a}
+.pc.back{background:repeating-linear-gradient(45deg,#1b2b5c 0 6px,#26407f 6px 9px);border-color:#14214a}
+.help{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.help>div{padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.help b.n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--surface);font:700 13px var(--disp);margin-bottom:8px}
+.help h4{margin:0 0 4px;font-size:15px}.help p{margin:0;color:var(--ink-2);font-size:12.5px;line-height:1.5}
+.intro{color:var(--ink-2);max-width:62ch;margin:6px 0 0;font-size:13.5px}
+.mtag{display:inline-block;font:600 10px var(--mono);letter-spacing:.06em;padding:2px 7px;border-radius:999px;background:var(--bluebg);color:var(--blue);margin-left:6px;vertical-align:middle}
 </style>
 </head>
 <body>

@@ -4,7 +4,7 @@
    Lucky Wheel 97%. */
 function gLayout(host,side,stage){host.innerHTML=`<div class="gwrap"><div class="gside">${side}</div><div class="gstage" id="gst">${stage}<div class="res" id="gres"></div></div></div>`;wireBet(host,'bAmt')}
 function showRes(win,text){const r=$('gres');if(!r)return;r.textContent=text;r.className='res on'+(win?'':' l');clearTimeout(r._t);r._t=setTimeout(()=>r.className='res'+(win?'':' l'),2000)}
-function settle(id,stake,pay,detail){pay=Math.round(pay*100)/100;if(pay>0)credit(pay,id);record(id,stake,pay,detail);outcome(pay>stake);sfx(pay>stake?'win':pay>0?'tick':'lose')}
+function settle(id,stake,pay,detail){pay=Math.round(pay*100)/100;if(pay>0)credit(pay,id);record(id,stake,pay,detail);outcome(pay>stake);sfx(pay>stake?'win':pay>0?'tick':'lose');if(pay>stake)winFx(pay,stake?pay/stake:1);else if(pay<stake)loseFx()}
 const hist=(arr,fmtF)=>`<div class="hist">${arr.slice(0,12).map(v=>fmtF(v)).join('')}</div>`;
 
 /* ---------- CRASH: one live round at a time, for everyone. Bet before take-off, cash out before it busts. ---------- */

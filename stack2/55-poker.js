@@ -28,9 +28,9 @@ game('holdem',{name:"Texas Hold'em",cat:'poker',glyph:'AA',rtp:'Skill',tag:'POKE
  table(P,board,pot,show){const t=$('pkT');if(!t)return;const [sb,bb]=PKB[PK.lv];if(!PK.bots){const names=BOTS.slice().sort(()=>R()-.5);PK.bots=[1,2,3,4].map((s,i)=>({seat:s,name:names[i][0],tight:names[i][1],agg:names[i][2],stack:bb*(80+rint(80))}))}
   const ps=P||[{seat:0,name:'You',stack:X().pk.me,bot:0}].concat(PK.bots.map(b=>({...b,bot:1})));
   t.innerHTML=`<div style="position:absolute;inset:40px 30px;border-radius:260px;border:2px solid var(--ink);background:var(--surface)"></div><div style="position:absolute;inset:58px 48px;border-radius:240px;border:1px dashed var(--line)"></div>
-   <div style="position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center"><div style="display:flex;gap:8px;justify-content:center;min-height:80px">${(board||[]).map(c=>cardH(c,{sm:1})).join('')}</div><div class="mono" style="margin-top:10px">Pot</div><div class="dn" style="font-size:26px">${fmt(pot||0)}</div></div>
+   <div style="position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center"><div style="display:flex;gap:8px;justify-content:center;min-height:80px">${(board||[]).map((c,bi)=>cardH(c,{sm:1,k:dealKey('pkB'+bi)})).join('')}</div><div class="mono" style="margin-top:10px">Pot</div><div class="dn" style="font-size:26px">${fmt(pot||0)}</div></div>
    ${ps.map(p=>{const [x,y]=this.seats[p.seat],me=!p.bot;return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%);text-align:center;opacity:${p.fold?.35:1}">
-    <div style="display:flex;justify-content:center;gap:4px;margin-bottom:6px">${(p.cards||[]).map(c=>cardH(c,{sm:1,back:p.bot&&!show})).join('')}</div>
+    <div style="display:flex;justify-content:center;gap:4px;margin-bottom:6px">${(p.cards||[]).map((c,ci)=>cardH(c,{sm:1,back:p.bot&&!show,k:dealKey('pk'+p.seat+'-'+ci)})).join('')}</div>
     <div style="background:${me?'var(--ink)':'var(--surface)'};color:${me?'var(--surface)':'var(--ink)'};border:1.5px solid var(--ink);border-radius:12px;padding:6px 14px;min-width:120px;${p.act&&p.act.startsWith('Thinking')?'box-shadow:0 0 0 4px var(--line)':''}">
      <b style="font-size:13px">${PK.btn===p.seat?'Ⓓ ':''}${esc(p.name)}</b><div class="dn" style="font-size:15px">${fmt(p.stack)}</div></div>
     <div class="mono" style="margin-top:4px;min-height:14px;color:var(--ink)">${p.act||''}${p.bet?` · ${fmt(p.bet)}`:''}</div></div>`}).join('')}`},
@@ -39,7 +39,7 @@ game('holdem',{name:"Texas Hold'em",cat:'poker',glyph:'AA',rtp:'Skill',tag:'POKE
   this.busy=1;this.btns();for(const b of PK.bots)if(b.stack<bb){const n=pickA(BOTS.filter(z=>!PK.bots.some(q=>q.name===z[0])));this.log(`${n[0]} takes ${b.name}'s seat`);Object.assign(b,{name:n[0],tight:n[1],agg:n[2],stack:bb*(80+rint(80))})}
   const ORD=[1,2,0,3,4];PK.btn=ORD[(ORD.indexOf(PK.btn)+1)%5];const order=[];for(let k=1;k<=5;k++)order.push(ORD[(ORD.indexOf(PK.btn)+k)%5]);
   const PL=order.map(s=>s===0?{seat:0,name:'You',stack:x.pk.me,bot:0}:{...PK.bots.find(b=>b.seat===s),bot:1}).map(p=>({...p,cards:[],bet:0,tot:0,fold:0,allin:0,act:''}));const me=PL.find(p=>!p.bot),start=x.pk.me;
-  const d=deck();let pot=0,board=[];const put=(p,a)=>{a=Math.min(a,p.stack);p.stack-=a;p.bet+=a;p.tot+=a;if(p.stack<=0)p.allin=1;sfx('chip')};
+  const d=deck();let pot=0,board=[];DEALN++;const put=(p,a)=>{a=Math.min(a,p.stack);p.stack-=a;p.bet+=a;p.tot+=a;if(p.stack<=0)p.allin=1;sfx('chip')};
   const draw=(show)=>this.table(PL,board,pot+PL.reduce((a,p)=>a+p.bet,0),show);
   put(PL[0],sb);PL[0].act='SB';put(PL[1],bb);PL[1].act='BB';sfx('shuffle');draw();await wait(400);
   for(let r=0;r<2;r++)for(const p of PL){p.cards.push(d.pop());sfx('deal');draw();await wait(120)}
@@ -58,7 +58,7 @@ game('holdem',{name:"Texas Hold'em",cat:'poker',glyph:'AA',rtp:'Skill',tag:'POKE
   for(const p of PL){if(p.bot)PK.bots.find(b=>b.seat===p.seat).stack=Math.round(p.stack*100)/100;else x.pk.me=Math.round(p.stack*100)/100}
   const net=x.pk.me-start,got=won[0]||0;x.wag+=me.tot;x.n++;x.vip+=me.tot;x.rake+=me.tot*.002;SES.wag+=me.tot;SES.bets++;SES.won+=got;/* a hand's stake is what you put in, its payout what came back */
   record('holdem',me.tot,got,w.some(p=>!p.bot)?`Won the pot${L.length>1?' with '+hname(me.score||0):''}`:me.fold?'Folded':'Lost the pot');
-  outcome(net>0);if(net>0){sfx('win');showRes(true,`+${fmt(net)}`)}else if(net<0)showRes(false,`${fmt(net)}`);save();if($('pkMe'))$('pkMe').textContent=fmt(x.pk.me);
+  outcome(net>0);if(net>0){sfx('win');showRes(true,`+${fmt(net)}`);winFx(got,got/Math.max(1,me.tot))}else if(net<0)showRes(false,`${fmt(net)}`);save();if($('pkMe'))$('pkMe').textContent=fmt(x.pk.me);
   await wait(2200);this.busy=0;this.table();this.btns()},
  async round(P,street,board,pot0,bb,draw){let max=Math.max(...P.map(p=>p.bet)),minR=bb;const acted=new Set();let i=street?0:2%P.length;const need=p=>!p.fold&&!p.allin&&(p.bet<max||!acted.has(p));
   for(let g=0;g<60;g++){if(P.filter(p=>!p.fold).length<2||!P.some(need))return;const p=P[i%P.length];i++;if(!need(p))continue;const pot=pot0+P.reduce((a,q)=>a+q.bet,0),toCall=Math.min(max-p.bet,p.stack);let a;
