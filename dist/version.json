@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.03.1",
-  "notes": "Stack Casino rebrand: the new black-and-white site (stack-site.html) with the S ribbon logo, new layout and the Motion Vault built in; pick the animation for every area in the Motion panel; games open a white 'Here is X' screen for now",
-  "bytes": 5581327,
-  "at": "2026-10-02T23:29:56.952Z"
+  "version": "2026.10.23.1",
+  "notes": "Stack 2: the whole site rebuilt black and white like a real casino and sportsbook. Same account, same balance, same top up. New Originals, classic card games, 2D Hold'em, roulette, live sports with micro betting, daily spin, VIP, missions, reality checks and limits. The old Stack is saved as legacy-v1.",
+  "bytes": 472136,
+  "at": "2026-10-23T09:54:21.326Z"
 }

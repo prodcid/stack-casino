@@ -87,7 +87,7 @@ function check() {
   if (opens !== closes || bare !== 1) { console.log(`!  ${opens} <script> / ${closes} </script>, ${bare} bare — expected them balanced and exactly 1 bare`); }
 
   // 4b. the inlined card engine must match stack-cards.html
-  if (fs.existsSync(path.join(__dirname, 'sync-cards.js'))) {
+  if (fs.existsSync(path.join(__dirname, 'sync-cards.js')) && html.includes('<script id="stack-cards">')) {
     try { require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'sync-cards.js'), '--check'], { stdio: 'pipe' });
       console.log('ok Stack Cards in sync'); }
     catch (e) { console.log('x  Stack Cards is out of sync with stack-cards.html — run: node sync-cards.js'); bad++; }

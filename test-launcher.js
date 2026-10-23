@@ -67,13 +67,13 @@ const srv = http.createServer((req, res) => {
   await pg.goto(base.replace(/\/$/, '') + '/__launchertest.html');
   await pg.waitForFunction("typeof loggedIn==='function'", null, { timeout: 15000 }).catch(() => {});
   check('cold start boots the game', await pg.evaluate("typeof loggedIn==='function'"));
-  check('auth gate shown', await pg.evaluate("!!document.querySelector('#authGate.show')"));
+  check('login gate shown', await pg.evaluate("!!document.querySelector('#gate:not([hidden])')||!!document.querySelector('#authGate.show')"));
   const v1 = await pg.evaluate("(document.querySelector('meta[name=\\\"stack-version\\\"]')||{}).content");
   check('version stamped (' + v1 + ')', !!v1 && v1 !== '0.0.0-dev');
   check('build cached', await pg.evaluate("!!localStorage.getItem('stack-launcher-build')"));
 
   // --- sign up, then reload: account must survive a launcher restart ---
-  await pg.click('[data-am="signup"]');
+  await pg.click(await pg.$('[data-am="signup"]') ? '[data-am="signup"]' : '#auSw');
   await pg.fill('#auU', 'mate1'); await pg.fill('#auP', 'pw123'); await pg.fill('#auP2', 'pw123');
   await pg.click('#auGo');
   await pg.waitForFunction('loggedIn()', null, { timeout: 8000 });

@@ -159,8 +159,12 @@ function status() {
 
 /* ---------- ship ---------- */
 function ship(notes, local) {
-  // 0. pull the latest Stack Cards engine into the single-file build
-  if (fs.existsSync(path.join(ROOT, 'sync-cards.js'))) {
+  // 0. Stack 2 (2026-10-23): build stack-casino.html from the stack2/ parts. (Stack v1 lives on in the legacy-v1 tag.)
+  if (fs.existsSync(path.join(ROOT, 'stack2', 'build.py'))) {
+    let ok = false;
+    for (const py of ['python', 'py', 'python3']) { try { execFileSync(py, [path.join('stack2', 'build.py')], { cwd: ROOT, stdio: 'inherit' }); ok = true; break; } catch (e) { if (e.status) die('stack2/build.py failed - fix the parts first.'); } }
+    if (!ok) die('Python is needed to build Stack 2 (stack2/build.py).');
+  } else if (fs.existsSync(path.join(ROOT, 'sync-cards.js'))) {
     try { execFileSync(process.execPath, ['sync-cards.js'], { cwd: ROOT, stdio: 'inherit' }); }
     catch (e) { die('Stack Cards failed to sync - fix stack-cards.html first.'); }
   }
