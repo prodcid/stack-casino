@@ -7,7 +7,7 @@
 <title>stack — casino &amp; sports</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;900&family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* =====================================================================================================
    STACK 2 (2026-10-23) - the whole site, rebuilt black and white. Built from stack2/ parts by stack2/build.py.
@@ -287,6 +287,17 @@ body.spm .ob.sob,.ob.sob{height:44px;border-radius:10px;border:1.5px solid var(-
 .sll{margin:10px;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--s2)}
 .slf{padding:12px 14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;max-width:340px}.slf .kv{border:0}
 .slip .tabs button{font-size:12px}
+.sr{border-radius:20px;overflow:hidden;background:#01070f;box-shadow:0 20px 60px rgba(0,0,0,.45),0 0 0 2px #7a4d0c,0 0 0 5px #2a1a04;margin-bottom:22px}
+.srcab canvas{width:100%;aspect-ratio:16/9;display:block;cursor:pointer}
+.srcon{display:flex;align-items:center;gap:16px;padding:12px 20px;background:linear-gradient(#0d1b2e,#03080f);border-top:2px solid #d9a43a;color:#fff}
+.srm span{display:block;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#7fa6c8}.srm b{font:800 24px 'Barlow Condensed',sans-serif;color:#ffd76a;font-variant-numeric:tabular-nums}
+.srbet{display:flex;align-items:center;gap:8px}.srbet button{width:38px;height:38px;border-radius:50%;background:linear-gradient(#24405e,#0d1b2e);border:2px solid #d9a43a;color:#ffd76a;font:800 22px sans-serif}.srbet button:disabled{opacity:.35}
+.srspin{position:relative;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8dfff0,#12a597 50%,#04403f);border:3px solid #ffd76a;box-shadow:0 0 0 5px #3a2a08,0 8px 24px rgba(0,0,0,.6),0 0 34px rgba(40,220,200,.5);display:grid;place-items:center;transition:transform .15s}
+.srspin:hover{transform:scale(1.05)}.srspin:active{transform:scale(.95)}.srspin svg{width:44px;height:44px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}.srspin.busy svg{animation:srrot .6s linear infinite}@keyframes srrot{to{transform:rotate(360deg)}}
+.srspin span{position:absolute;bottom:-6px;right:-6px;background:#ff3c4c;color:#fff;border-radius:99px;font:800 12px 'Barlow Condensed';padding:1px 7px}.srspin span:empty{display:none}
+.srbtns{display:flex;flex-direction:column;gap:6px}.srsq{height:28px;padding:0 12px;border-radius:8px;background:linear-gradient(#1c3350,#0b1626);border:1.5px solid #3d5e82;color:#cfe6ff;font:800 13px 'Barlow Condensed';text-transform:uppercase;letter-spacing:.05em}.srsq.on{border-color:#ffd76a;color:#ffd76a;box-shadow:0 0 12px rgba(255,215,106,.35)}
+.srodds{font:500 10.5px var(--mono);color:#7fa6c8;max-width:170px;text-align:right;line-height:1.5}
+.srpt{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}.srpt>div{display:flex;gap:10px;align-items:center;font-size:13px;padding:8px;border:1px solid var(--line);border-radius:10px}.srpt.f{grid-template-columns:1fr}
 @media(max-width:1000px){.feat,.mgrid{grid-template-columns:1fr}}
 </style>
 </head>

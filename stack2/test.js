@@ -80,6 +80,10 @@ const res = [], check = (ok, n, d = '') => { res.push(!!ok); console.log(`  ${ok
   await pg.evaluate("closeAll()");
   const lim = await pg.evaluate("(()=>{const x=X();x.limits.loss=1;const net=todayNet();const ok=spend(Math.max(2,net+10),'dice');x.limits.loss=0;x.cool=Date.now()+60000;const ok2=spend(1,'dice');x.cool=0;return{blocked:!ok,cool:!ok2}})()");
   check(lim.blocked && lim.cool, 'a daily loss limit and a break both stop bets', lim);
+  await pg.evaluate("closeAll();location.hash='#/play/sunken'"); await pg.waitForTimeout(1200);
+  const sl = await pg.evaluate(`(async()=>{let t=0;const N=1200000;for(let i=0;i<N;i++)t+=srSpin().pay;const rtp=t/N;closeAll();X().cool=0;X().limits.loss=0;X().limits.sess=0;P().bal=5000;SRV.turbo=1;const b0=bal(),n0=X().bets.length;const iv=setInterval(()=>{SRV.skip=1;if(SRV.banner)SRV.banner.end=1;if(SRV.bw)SRV.bw.end=1},100);
+    await srPlay();clearInterval(iv);const rec=X().bets[0];return{rtp:+rtp.toFixed(4),rec:rec.g==='sunken',spent:b0-bal(),ok:Math.abs((bal()-b0)-(rec.p-rec.s))<.005,stake:rec.s,pay:rec.p}})()`);
+  check(sl.rtp > .94 && sl.rtp < 1 && sl.rec && sl.ok, 'Sunken Riches: returns ~97% over 1.2M spins, and a real spin settles to the cent', sl);
   check(errs.length === 0, 'no page errors', errs.slice(0, 4).join(' | '));
   await b.close(); const f = res.filter(x => !x).length; console.log(`\n${res.length - f}/${res.length} passed`); process.exit(f ? 1 : 0);
 })();

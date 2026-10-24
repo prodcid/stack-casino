@@ -659,6 +659,7 @@ Two patterns, don't mix them up:
 - **2026-10-23** — Micro odds buttons act on pointerdown and the micro bar no longer rebuilds every second (a redraw between press and release swallowed real clicks); micro bets left open when a match ends are void and refunded; favourites get a heart on every tile, a toast and a live sidebar count.
 - **2026-10-23** — Stack 2.1: cards remember what each slot showed (SEEN + dealKey) so only new cards deal in and reveals flip, instead of every redraw re-dealing the hand; soft accent colours (win green, loss red, gold, live red, category tints) on top of black and white; subtle win effects scaled to the multiplier; plain explainers and match clocks with time left; more markets (double chance, draw no bet, totals 1.5/3.5, handicap, correct score, spread, sets) with push handling; Crash ladder and serve-hold micro markets; blackjack Perfect Pairs at 25/12/7 (97.8%, not 25/12/6 which is 93.9%).
 - **2026-10-24** — Sports v3: own navy/lime look, live visual trackers (football pitch with momentum, basketball shot chart, tennis rallies), bet builder same-game multis priced jointly at 96%, price boosts at 99%, odds-move arrows, coloured market cards and stat bars
+- **2026-10-25** — Sunken Riches slot (5x4 1024 ways, bets to 300, Kraken/free spins/Hold & Win, 97% measured) + realistic broadcast football tracker with 22 players
 
 ---
 
