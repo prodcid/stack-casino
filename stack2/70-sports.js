@@ -9,6 +9,24 @@ const TEAMS={football:[['Northbank FC',.3],['Riverside Utd',.18],['Harbour City'
  basketball:[['Metro Kings',.3],['Coast Hawks',.15],['Summit Bears',.05],['Valley Wolves',0],['Harbor Tide',-.1],['Desert Suns',-.2]],
  tennis:[['A. Varga',.68],['L. Moreau',.66],['K. Sato',.64],['D. Okafor',.63],['R. Lindqvist',.62],['T. Brennan',.6],['P. Novak',.59],['J. Reyes',.58]]};
 const LEAGUE={football:'Stack Premier',basketball:'Stack Hoops',tennis:'Stack Open'};
+/* ---------- squads: every team has named players (seeded from the team name, so they never change) ---------- */
+const SURN=['Okoye','Brandt','Vance','Moreno','Kaplan','Haddad','Silva','Novak','Fischer','Mensah','Rossi','Duarte','Walsh','Petrov','Lindgren','Adeyemi','Costa','Mbeki','Tanaka','Kovac','Byrne','Larsen','Ramos','Diallo','Hughes','Ortega','Kimura','Nkemelu','Quinn','Berg','Abara','Romero','Dumas','Owusu','Falk','Price','Ivanov','Herrera','Sorensen','Achebe','Marsh','Vidal','Keane','Bauer','Toure','Sandoval','Hale','Ferreira','Nakamura','Osei','Clarke','Rinaldi','Mwangi','Doyle','Engel','Barros'],SQ={};
+const FBNUM=[1,2,5,4,3,8,6,10,7,9,11],BBNUM=[0,3,7,11,23,5,8,14];
+function squad(team,sp){const k=team+'|'+sp;if(SQ[k])return SQ[k];let h=2166136261;for(const c of team+sp)h=Math.imul(h^c.charCodeAt(0),16777619)>>>0;const rnd=()=>{h=Math.imul(h,1103515245)+12345>>>0;return h/4294967296};
+ const used=new Set(),n=sp==='basketball'?8:11;SQ[k]=Array.from({length:n},(_,i)=>{let s;do s=SURN[Math.floor(rnd()*SURN.length)];while(used.has(s));used.add(s);return{n:'ABCDEGHJKLMNOPRSTW'[Math.floor(rnd()*18)]+'. '+s,s,num:(sp==='basketball'?BBNUM:FBNUM)[i]}});return SQ[k]}
+const pickW=w=>{let t=0;for(const x of w)t+=x;let r=R()*t;for(let i=0;i<w.length;i++){r-=w[i];if(r<0)return i}return 0};
+function com(m,t,k,side){(m.com=m.com||[]).unshift({min:m.min,t,k,side,w:Date.now()});if(m.com.length>80)m.com.length=80}
+/* ---------- league tables: a whole season, kept on this device; finished matches update it ---------- */
+let LG=null;
+function lgLoad(){if(LG)return LG;try{LG=JSON.parse(localStorage.getItem('stack-league')||'null')}catch(e){LG=null}
+ if(!LG||LG.v!==1){LG={v:1,football:{},basketball:{}};for(const sp of['football','basketball']){for(const [n] of TEAMS[sp])LG[sp][n]={p:0,w:0,d:0,l:0,f:0,a:0,form:[]};
+  for(let rd=0;rd<(sp==='football'?14:12);rd++){const T=TEAMS[sp].slice().sort(()=>R()-.5);for(let i=0;i+1<T.length;i+=2){const [h,a]=[T[i],T[i+1]];let H,A;
+   if(sp==='football'){const lh=1.5*Math.exp((h[1]-a[1])*1.2),la=1.15*Math.exp((a[1]-h[1])*1.2),pk=l=>{let k=0,p=Math.exp(-l),c=p,u=R();while(u>c&&k<9){k++;p*=l/k;c+=p}return k};H=pk(lh);A=pk(la)}
+   else{H=Math.round(108+(h[1]-a[1])*30+(R()-.5)*26);A=Math.round(104+(a[1]-h[1])*30+(R()-.5)*26);if(H===A)H++}lgAdd(sp,h[0],a[0],H,A)}}}lgSave()}return LG}
+function lgAdd(sp,h,a,H,A){const T=LG[sp],r=(t,f,ag)=>{const x=T[t]||(T[t]={p:0,w:0,d:0,l:0,f:0,a:0,form:[]});x.p++;x.f+=f;x.a+=ag;const o=f>ag?'W':f<ag?'L':'D';x[o.toLowerCase()]++;x.form.push(o);if(x.form.length>5)x.form.shift()};r(h,H,A);r(a,A,H)}
+function lgSave(){try{localStorage.setItem('stack-league',JSON.stringify(LG))}catch(e){}}
+function lgRows(sp,live){lgLoad();const T=JSON.parse(JSON.stringify(LG[sp]));if(live)for(const m of MATCHES.filter(z=>z.sp===sp&&z.live&&!z.done)){const r=(t,f,ag)=>{const x=T[t];if(!x)return;x.p++;x.f+=f;x.a+=ag;x[(f>ag?'w':f<ag?'l':'d')]++;x.live=m.id};r(m.h.n,m.hs,m.as);r(m.a.n,m.as,m.hs)}
+ return Object.entries(T).map(([n,x])=>({n,...x,gd:x.f-x.a,pts:sp==='football'?x.w*3+x.d:x.w,pct:x.p?x.w/x.p:0})).sort((a,b)=>sp==='football'?b.pts-a.pts||b.gd-a.gd||b.f-a.f:b.pct-a.pct||b.gd-a.gd)}
 let MATCHES=[],mid=0;const SPB=[];/* open sports + micro bets */
 const pois=(k,m)=>{let p=Math.exp(-m);for(let i=1;i<=k;i++)p*=m/i;return p};
 const PhiN=x=>{const t=1/(1+.2316419*Math.abs(x)),d=.3989423*Math.exp(-x*x/2),p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p};
@@ -24,23 +42,35 @@ function seedMatches(){for(const [sp,n,live] of [['football',5,3],['basketball',
 function tickMatch(m,steps,quiet){for(let s=0;s<steps;s++){if(m.done)return;if(!m.live){if(Date.now()>=m.start){m.live=1;if(!quiet){evt(m,'Kick-off',0);if(m.sp==='tennis')m.ev[0].t='Players are on court'}}else return}
  if(m.sus>0)m.sus-=.25;
  if(m.sp==='football'){m.clock+=.25;const mn=Math.floor(m.clock/4);/* 4 real seconds a minute */
-  if(mn>m.min){m.min=mn;if(m.min===45&&!quiet)evt(m,'Half-time',0);
+  if(mn>m.min){const snap={...m.stats};m.min=mn;if(m.min===45&&!quiet){evt(m,'Half-time',0);com(m,`Half-time: ${m.h.n} ${m.hs}–${m.as} ${m.a.n}. Possession ${m.stats.hp}% to ${100-m.stats.hp}%.`,'whistle',0)}
    const gh=R()<m.lh/90,ga=R()<m.la/90;const press=clamp((m.h.r-m.a.r)*1.4+(R()-.5)*1.3+(gh?1.2:0)-(ga?1.2:0),-1,1);(m.mom=m.mom||[]).push(+press.toFixed(2));if(R()<.08+Math.max(0,press)*.08)m.stats.hst=(m.stats.hst||0)+1;if(R()<.07+Math.max(0,-press)*.08)m.stats.ast=(m.stats.ast||0)+1;if(gh)goal(m,'h',quiet);if(ga)goal(m,'a',quiet);if(R()<5/90)m.stats.hc++,quiet||note(m,'corner','h');if(R()<4.2/90)m.stats.ac++,quiet||note(m,'corner','a');
    if(R()<.12)m.stats.hsh++;if(R()<.1)m.stats.ash++;m.stats.hp=clamp(Math.round(50+(m.h.r-m.a.r)*30+(R()-.5)*8),30,70);if(m.min%9===0&&R()<.5){const sd=R()<.5?'h':'a';m.stats[sd+'f']=(m.stats[sd+'f']||0)+1;if(R()<.25&&!quiet){m.stats[sd+'y']=(m.stats[sd+'y']||0)+1;evt(m,`Yellow card, ${m[sd].n}`,sd)}}
-   if(m.min>=90+(m.stop||(m.stop=2+rint(4)))){end(m,quiet)}}}
- else if(m.sp==='basketball'){m.clock+=.25;if(Math.floor(m.clock*4)%2===0&&R()<.55*.5){const t=m.off,p=t?m.pa:m.ph,r=R();let pts=0;const three=R()<.27,ang=R()*Math.PI,rad=three?.86+R()*.1:.15+R()*.55;(m.shots=m.shots||[]).push({t,x:.5+Math.cos(ang)*rad*.47,y:Math.sin(ang)*rad*.9,made:r<p,three:r<p?0:three});if(m.shots.length>60)m.shots.shift();if(r<p){pts=three?3:2;m.shots[m.shots.length-1].three=three;if(t)m.as+=pts;else m.hs+=pts;m.last3=pts===3;if(!quiet)note(m,'score',t?'a':'h',pts);microSettle('bb',m,{t,pts})}m.off^=1}
+   fbMinute(m,quiet,snap);if(m.min>=90+(m.stop||(m.stop=2+rint(4)))){end(m,quiet)}}}
+ else if(m.sp==='basketball'){m.clock+=.25;if(Math.floor(m.clock*4)%2===0&&R()<.55*.5){const t=m.off,p=t?m.pa:m.ph,r=R();let pts=0;const three=R()<.27,ang=R()*Math.PI,rad=three?.86+R()*.1:.15+R()*.55;(m.shots=m.shots||[]).push({t,x:.5+Math.cos(ang)*rad*.47,y:Math.sin(ang)*rad*.9,made:r<p,three:r<p?0:three,p:pickW([1.2,1,1,.8,.9]),w:Date.now()});if(m.shots.length>60)m.shots.shift();if(r<p){pts=three?3:2;m.shots[m.shots.length-1].three=three;if(t)m.as+=pts;else m.hs+=pts;m.last3=pts===3;if(!quiet)note(m,'score',t?'a':'h',pts);microSettle('bb',m,{t,pts})}m.off^=1}
   m.min=Math.min(48,Math.floor(m.clock/7.5));if(Math.round(m.clock*4)%40===0)(m.run=m.run||[]).push(m.hs-m.as);if(m.clock>=360+(m.ot||0)){if(m.hs===m.as)m.ot=(m.ot||0)+40;else end(m,quiet)}}
  else{m.clock+=.25;if(Math.round(m.clock*4)%10===0)point(m,quiet)}}}
+function fbMinute(m,quiet,snap){const S=m.stats,mom=(m.mom||[0]).slice(-1)[0];for(const sd of['h','a']){const o=sd==='h'?'a':'h',sh=S[sd+'sh']-snap[sd+'sh'],st=(S[sd+'st']||0)-(snap[sd+'st']||0);
+  if(sh>0||st>0)S[sd+'xg']=(S[sd+'xg']||0)+.03+R()*(st>0?.25:.12);if(quiet)continue;const Q=squad(m[sd].n,'football'),O=squad(m[o].n,'football'),pl=Q[pickW([0,.2,.3,.3,.2,1,.8,1.5,2.5,3,2.5])].n,gk=O[0].n;
+  if(st>0)com(m,pickA([`Big save! ${gk} gets down to keep out ${pl}.`,`${pl} forces ${gk} into a smart stop at the near post.`,`Fingertips! ${gk} tips ${pl}'s effort over the bar.`]),'save',sd);
+  else if(sh>0)com(m,pickA([`${pl} lets fly from 25 yards… just wide.`,`Chance! ${pl} heads over from the corner.`,`${pl} curls one towards the top corner, a yard off target.`,`Blocked! ${pl}'s shot cannons off a defender.`]),'shot',sd)}
+ if(quiet)return;if(S.hc>snap.hc||S.ac>snap.ac){const sd=S.hc>snap.hc?'h':'a';com(m,`Corner to ${m[sd].n}. ${squad(m[sd].n,'football')[7].n} jogs over to take it.`,'corner',sd)}
+ if(Math.abs(mom)>.65&&R()<.3){const sd=mom>0?'h':'a',o=sd==='h'?'a':'h';com(m,pickA([`${m[sd].n} have ${m[o].n} pinned back. Wave after wave.`,`All ${m[sd].n} at the moment, ${m[o].n} can't get out of their half.`,`The crowd is up, ${m[sd].n} smell a goal here.`]),'press',sd)}
+ else if(R()<.09)com(m,pickA([`Patient spell of possession, ${m.stats.hp>50?m.h.n:m.a.n} probing.`,`Midfield battle. Neither side giving an inch.`,`Free kick in a harmless area. Tempo drops.`]),'calm',0);
+ if(m.min===75&&Math.abs(m.hs-m.as)<=1)com(m,`Fifteen to go and this is on a knife edge.`,'clock',0)}
 function evt(m,t,side){m.ev.unshift({t,side,min:m.sp==='football'?m.min:m.sp==='basketball'?m.min:null,w:Date.now()});m.ev.length=Math.min(m.ev.length,40)}
 function note(m,k,side,pts){if(k==='corner'){evt(m,`Corner, ${m[side].n}`,side);microSettle('corner',m,side)}if(k==='score'&&pts===3)evt(m,`Three-pointer, ${m[side].n}`,side)}
-function goal(m,side,quiet){m[side==='h'?'hs':'as']++;m.sus=3;microSettle('goal',m,side);if(quiet)return;evt(m,`GOAL! ${m[side].n} · ${m.hs}–${m.as}`,side);
+function goal(m,side,quiet){m[side==='h'?'hs':'as']++;m.sus=3;microSettle('goal',m,side);const SQd=squad(m[side].n,'football'),i=pickW([0,.35,.45,.45,.35,1.1,.9,1.4,3,4.2,3]),ai=R()<.72?pickW([0,.5,.3,.3,.5,1.4,1.2,2,2,1.2,2].map((w,k)=>k===i?0:w)):-1;
+ (m.sc=m.sc||[]).push({side,min:m.min,i,a:ai});m.lastGoal={side,i,a:ai,w:Date.now()};m.stats[side+'xg']=(m.stats[side+'xg']||0)+.25+R()*.45;if(quiet)return;
+ const nm=SQd[i].n,an=ai>=0?SQd[ai].n:null;evt(m,`GOAL! ${m[side].n} · ${nm} · ${m.hs}–${m.as}`,side);
+ com(m,pickA([`GOAL! ${nm} finishes it off${an?` after a lovely ball from ${an}`:''}! ${m.h.n} ${m.hs}–${m.as} ${m.a.n}.`,`${nm.toUpperCase()}! What a strike! ${an?an+' with the assist. ':''}It's ${m.hs}–${m.as}.`,`It's in! ${nm} ${an?`turns in ${an}'s cross`:'pounces in the box'} and ${m[side].n} lead the celebrations. ${m.hs}–${m.as}.`]),'goal',side);
+ if(typeof goalFlash==='function')goalFlash(m,side,nm);
  if(CURMATCH===m.id||SPB.some(b=>b.mid===m.id))sfx('goal');if(SPB.some(b=>b.mid===m.id))toast(`GOAL · ${m.h.n} ${m.hs}–${m.as} ${m.a.n}`,`${m.min}' · ${m[side].n}`,'','ball','#/match/'+m.id)}
 function point(m,quiet){const sv=m.server,p=TEAMS.tennis.find(t=>t[0]===(sv?m.a.n:m.h.n))[1]-.04*(sv?m.h.r-m.a.r:m.a.r-m.h.r)*0,won=R()<p?sv:1-sv;m.last={won,sv,w:Date.now(),rally:won===sv&&R()<.12?0:1+rint(7),df:won!==sv&&R()<.06};(m.ptl=m.ptl||[]).push(won);if(m.ptl.length>24)m.ptl.shift();m.pts[won]++;microSettle('pt',m,{won,sv});
  const P=m.pts,tb=m.tb,need=tb?5:4;if(P[won]>=need&&P[won]-P[1-won]>=2){m.games[won]++;m.pts=[0,0];if(!tb)m.server^=1;else m.server^=1;microSettle('game',m,{won,sv});
   const G=m.games;if((G[won]>=4&&G[won]-G[1-won]>=2)||tb){m.sets[won]++;m.setsHist.push(G.slice());m.games=[0,0];m.tb=0;if(!quiet)evt(m,`Set to ${won?m.a.n:m.h.n} · ${m.setsHist.map(g=>g.join('–')).join(', ')}`,won?'a':'h');if(m.sets[won]===2){m.hs=m.sets[0];m.as=m.sets[1];end(m,quiet)}}
   else if(G[0]===4&&G[1]===4){m.tb=1;if(!quiet)evt(m,'Tie-break',0)}else if(!quiet&&R()<.4)evt(m,`Game ${won?m.a.n:m.h.n} · ${G.join('–')}`,won?'a':'h')}
  m.hs=m.sets[0];m.as=m.sets[1]}
-function end(m,quiet){m.done=1;m.live=0;m.endW=Date.now();for(const x of MICRO)if(x.mid===m.id&&!x.done)microResolve(x,null,'Match over, stake returned');if(!quiet)evt(m,`Full time · ${m.hs}–${m.as}`,0);settleMatch(m);setTimeout(()=>newMatch(m.sp,60+rint(120)),2000)}
+function end(m,quiet){m.done=1;m.live=0;m.endW=Date.now();for(const x of MICRO)if(x.mid===m.id&&!x.done)microResolve(x,null,'Match over, stake returned');if(!quiet){evt(m,`Full time · ${m.hs}–${m.as}`,0);com(m,`Full time! ${m.h.n} ${m.hs}–${m.as} ${m.a.n}.`,'whistle',0)}if(m.sp!=='tennis'){lgLoad();lgAdd(m.sp,m.h.n,m.a.n,m.hs,m.as);lgSave()}settleMatch(m);if(typeof predSettle==='function')predSettle(m);setTimeout(()=>newMatch(m.sp,60+rint(120)),2000)}
 /* ---------- prices ---------- */
 function probs(m){const o={};if(m.done)return o;
  if(m.sp==='football'){const left=Math.max(0,90-m.min)/90,mh=m.lh*left,ma=m.la*left;let ph=0,pd=0,po=0,pb=0,p15=0,p35=0,hc=0;const cs={};

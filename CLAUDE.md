@@ -660,6 +660,7 @@ Two patterns, don't mix them up:
 - **2026-10-23** — Stack 2.1: cards remember what each slot showed (SEEN + dealKey) so only new cards deal in and reveals flip, instead of every redraw re-dealing the hand; soft accent colours (win green, loss red, gold, live red, category tints) on top of black and white; subtle win effects scaled to the multiplier; plain explainers and match clocks with time left; more markets (double chance, draw no bet, totals 1.5/3.5, handicap, correct score, spread, sets) with push handling; Crash ladder and serve-hold micro markets; blackjack Perfect Pairs at 25/12/7 (97.8%, not 25/12/6 which is 93.9%).
 - **2026-10-24** — Sports v3: own navy/lime look, live visual trackers (football pitch with momentum, basketball shot chart, tennis rallies), bet builder same-game multis priced jointly at 96%, price boosts at 99%, odds-move arrows, coloured market cards and stat bars
 - **2026-10-25** — Sunken Riches slot (5x4 1024 ways, bets to 300, Kraken/free spins/Hold & Win, 97% measured) + realistic broadcast football tracker with 22 players
+- **2026-11-07** — Sports v4 Matchday: broadcast basketball and tennis trackers, named squads and scorers, live commentary, goal flash and confetti, crowd audio, sweat panel, ticker, fan chat, polls, line-ups, live league tables, free Predictor game
 
 ---
 
