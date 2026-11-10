@@ -73,7 +73,7 @@ function tone(f,d,v=.08,type='sine',at=0,f2){if(!AU.c||!AU.on)return;const o=AU.
 function noise(d,v=.05,hp=2000,at=0){if(!AU.c||!AU.on)return;const n=AU.c.sampleRate*d,b=AU.c.createBuffer(1,n,AU.c.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(R()*2-1)*(1-i/n);const s=AU.c.createBufferSource(),f=AU.c.createBiquadFilter(),g=AU.c.createGain();f.type='highpass';f.frequency.value=hp;s.buffer=b;g.gain.value=v;s.connect(f);f.connect(g);g.connect(AU.master);s.start(AU.c.currentTime+at)}
 const SFX={
  click:()=>tone(2600,.035,.03,'square'),tick:()=>tone(1900,.025,.025,'triangle'),hover:()=>tone(3400,.02,.012,'sine'),
- card:()=>smp('card-place',.7),deal:()=>smp('card-slide',.75),flip:()=>smp('card-place',.6,1.1),shuffle:()=>smp('card-shuffle',.7),fan:()=>smp('card-fan',.6),
+ card:()=>smp('card-place',.7),deal:()=>smp('card-slide',.75),muck:()=>smp('card-shove',.6),newshoe:()=>smp('cards-pack-open',.7),flip:()=>smp('card-place',.6,1.1),shuffle:()=>smp('card-shuffle',.7),fan:()=>smp('card-fan',.6),
  chip:()=>smp('chip-lay',.8),chips:()=>smp('chips-stack',.75),collect:()=>smp('chips-collide',.7),handle:()=>smp('chips-handle',.5),
  dice:()=>smp('dice-throw',.8),shake:()=>smp('dice-shake',.7),
  bet:()=>{smp('chip-lay',.7);tone(880,.06,.03,'triangle')},

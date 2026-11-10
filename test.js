@@ -39,7 +39,7 @@ const res = [], check = (ok, n, d = '') => { res.push(!!ok); console.log(`  ${ok
   await pg.evaluate('closeAll()');const before = await pg.evaluate('P().bal');
   await pg.evaluate("location.hash='#/play/dice'"); await pg.waitForTimeout(800); await pg.click('#dGo'); await pg.waitForTimeout(900);
   await pg.evaluate("location.hash='#/play/blackjack'"); await pg.waitForTimeout(800); await pg.click('#bjGo'); await pg.waitForTimeout(1600);
-  for (let i = 0; i < 6; i++) { const a = await pg.$('#gActs [data-a="s"]'); if (a) { await a.click(); break } await pg.waitForTimeout(500) } await pg.waitForTimeout(2600);
+  for (let i = 0; i < 16; i++) { const a = await pg.$('#gActs [data-a="s"]'); if (a) { await a.click(); break } await pg.waitForTimeout(500) } await pg.waitForFunction("!document.querySelector('#bjGo')||!document.querySelector('#bjGo').disabled", null, {timeout: 15000}).catch(()=>{}); await pg.waitForTimeout(400);
   await pg.evaluate("location.hash='#/play/vpoker'"); await pg.waitForTimeout(800); await pg.click('#vpGo'); await pg.waitForTimeout(500); await pg.click('#vpGo'); await pg.waitForTimeout(600);
   await pg.evaluate("location.hash='#/play/roulette'"); await pg.waitForTimeout(800); await pg.click('[data-b="red"]'); await pg.click('#rGo'); await pg.waitForTimeout(6200);
   const rr = await pg.evaluate("(()=>{const b=X().bets;const r=b.find(x=>x.g==='roulette'),n=+r.d.split(' ')[0];return{n,s:r.s,p:r.p,ok:r.p===(REDS.has(n)?r.s*2:0)}})()");

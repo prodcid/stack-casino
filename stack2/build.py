@@ -2,8 +2,8 @@
 import io,os,re,json,collections
 here=os.path.dirname(os.path.abspath(__file__));root=os.path.dirname(here)
 t=io.open(os.path.join(root,'stack-tables.html'),encoding='utf8').read();i=t.index('const SND_B64=');j=t.index(';\n',i);allsnd=json.loads(t[i+14:j])
-keep=[k for k in allsnd if re.match(r'(card-place-[1-3]|card-slide-[1-4]|card-shuffle|card-fan-1|chip-lay-[1-3]|chips-stack-[1-3]|chips-collide-[1-2]|chips-handle-[1-3]|dice-throw-[1-2]|dice-shake-1)$',k)]
-snd='/* Kenney "Casino Audio" (kenney.nl), CC0 - recorded card, chip and dice sounds */\nconst SND_B64='+json.dumps({k:allsnd[k] for k in keep},separators=(',',':'))+';\n'
+keep=list(allsnd)  # the whole Kenney Casino Audio pack (CC0): 56 recorded card, chip and dice sounds
+snd='/* Kenney "Casino Audio" (kenney.nl), CC0 - the full pack of recorded card, chip and dice sounds */\nconst SND_B64='+json.dumps({k:allsnd[k] for k in keep},separators=(',',':'))+';\n'
 parts=sorted(p for p in os.listdir(here) if re.match(r'\d\d-.*\.(html|js)$',p))
 head=io.open(os.path.join(here,parts[0]),encoding='utf8').read()
 js=snd+''.join(io.open(os.path.join(here,p),encoding='utf8').read().rstrip('\n')+'\n' for p in parts[1:])
